@@ -14,16 +14,16 @@ const Login = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 to-gray-300">
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-black via-gray-900 to-blue-950">
             <div className="w-full max-w-md p-4">
                 <Card3D className="text-center">
                     <div className="flex justify-center mb-6">
-                        <div className="p-4 bg-blue-100 rounded-full">
+                        <div className="p-4 bg-blue-900/30 rounded-full">
                             <ShieldCheck size={48} className="text-primary" />
                         </div>
                     </div>
-                    <h1 className="text-3xl font-bold mb-2 text-primary">Admin Portal</h1>
-                    <p className="text-gray-600 mb-8">
+                    <h1 className="text-3xl font-bold mb-2 text-white">Admin Portal</h1>
+                    <p className="text-gray-400 mb-8">
                         Secure access for Microsoft Workplace Implementation Engineers.
                     </p>
                     <button

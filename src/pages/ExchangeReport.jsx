@@ -16,13 +16,21 @@ const ExchangeReport = () => {
     const navigate = useNavigate();
 
     const getAuthProvider = () => {
+        console.log("getAuthProvider called");
         return async (callback) => {
+            console.log("authProvider callback triggered");
             try {
                 const account = accounts[0];
+                if (!account) {
+                    console.warn("No active account found in MSAL");
+                    throw new Error("No active account found. Please log in again.");
+                }
+                console.log("Acquiring token silently for account:", account.username);
                 const response = await instance.acquireTokenSilent({
                     ...loginRequest,
                     account: account,
                 });
+                console.log("Token acquired successfully");
                 callback(null, response.accessToken);
             } catch (err) {
                 console.error("Auth provider error:", err);
@@ -32,6 +40,7 @@ const ExchangeReport = () => {
     };
 
     const handleGenerateReport = async () => {
+        console.log("handleGenerateReport called, loading state:", loading);
         if (loading) return; // Prevent multiple clicks
 
         console.log("Generate Report clicked");
@@ -131,28 +140,46 @@ const ExchangeReport = () => {
     };
 
     const downloadCSV = () => {
-        if (!reportData) return;
+        try {
+            if (!reportData || reportData.length === 0) {
+                console.warn("No report data to export");
+                return;
+            }
 
-        const headers = Object.keys(reportData[0]);
-        const csvContent = [
-            headers.join(','),
-            ...reportData.map(row => headers.map(header => `"${row[header]}"`).join(','))
-        ].join('\n');
+            console.log("Starting CSV export for", reportData.length, "rows");
+            const headers = Object.keys(reportData[0]);
+            const csvContent = [
+                headers.join(','),
+                ...reportData.map(row => headers.map(header => {
+                    const val = row[header] === undefined || row[header] === null ? "" : row[header];
+                    return `"${String(val).replace(/"/g, '""')}"`;
+                }).join(','))
+            ].join('\n');
 
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", `Exchange_Report_${new Date().toISOString().split('T')[0]}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", `Exchange_Report_${new Date().toISOString().split('T')[0]}.csv`);
+
+            document.body.appendChild(link);
+            link.click();
+
+            setTimeout(() => {
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }, 100);
+
+            console.log("CSV export triggered successfully");
+        } catch (err) {
+            console.error("Error exporting CSV:", err);
+            setError("Failed to export CSV. Check console for details.");
+        }
     };
 
     return (
         <div className="container py-10">
-            <button onClick={() => navigate('/dashboard')} className="flex items-center text-gray-600 mb-6 hover:text-primary transition-colors">
+            <button onClick={() => navigate('/dashboard')} className="flex items-center text-gray-400 mb-6 hover:text-primary transition-colors">
                 <ArrowLeft size={20} className="mr-2" /> Back to Dashboard
             </button>
 
@@ -161,12 +188,15 @@ const ExchangeReport = () => {
                 <Card3D>
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
-                            <h1 className="text-3xl font-bold text-primary">Exchange Portal Report</h1>
-                            <p className="text-gray-600">Comprehensive mailbox statistics and migration tracking.</p>
+                            <h1 className="text-3xl font-bold text-white">Exchange Portal Report</h1>
+                            <p className="text-gray-400">Comprehensive mailbox statistics and migration tracking.</p>
                         </div>
                         <div className="flex gap-4 w-full md:w-auto">
                             <button
-                                onClick={handleGenerateReport}
+                                onClick={() => {
+                                    console.log("Generate Report button clicked directly");
+                                    handleGenerateReport();
+                                }}
                                 disabled={loading}
                                 className="btn-primary flex-1 md:flex-none flex items-center justify-center"
                             >
@@ -190,7 +220,7 @@ const ExchangeReport = () => {
                                 <span>Processing Data...</span>
                                 <span>{Math.round(progress)}%</span>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2.5">
+                            <div className="w-full bg-gray-800 rounded-full h-2.5">
                                 <div className="bg-primary h-2.5 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
                             </div>
                         </div>
@@ -200,36 +230,36 @@ const ExchangeReport = () => {
                 {/* Summary Cards */}
                 {summary && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <Card3D className="bg-blue-50">
+                        <Card3D className="bg-blue-900/10 border border-blue-900/20">
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-blue-100 rounded-lg text-blue-600">
+                                <div className="p-3 bg-blue-900/30 rounded-lg text-blue-400">
                                     <Users size={24} />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-500 uppercase font-semibold">Total Mailboxes</p>
-                                    <p className="text-2xl font-bold">{summary.totalMailboxes}</p>
+                                    <p className="text-sm text-gray-400 uppercase font-semibold">Total Mailboxes</p>
+                                    <p className="text-2xl font-bold text-white">{summary.totalMailboxes}</p>
                                 </div>
                             </div>
                         </Card3D>
-                        <Card3D className="bg-green-50">
+                        <Card3D className="bg-green-900/10 border border-green-900/20">
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-green-100 rounded-lg text-green-600">
+                                <div className="p-3 bg-green-900/30 rounded-lg text-green-400">
                                     <CheckCircle size={24} />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-500 uppercase font-semibold">Completed Migrations</p>
-                                    <p className="text-2xl font-bold">{summary.completedMigrations}</p>
+                                    <p className="text-sm text-gray-400 uppercase font-semibold">Completed Migrations</p>
+                                    <p className="text-2xl font-bold text-white">{summary.completedMigrations}</p>
                                 </div>
                             </div>
                         </Card3D>
-                        <Card3D className="bg-purple-50">
+                        <Card3D className="bg-purple-900/10 border border-purple-900/20">
                             <div className="flex items-center gap-4">
-                                <div className="p-3 bg-purple-100 rounded-lg text-purple-600">
+                                <div className="p-3 bg-purple-900/30 rounded-lg text-purple-400">
                                     <Database size={24} />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-500 uppercase font-semibold">Total Storage Used</p>
-                                    <p className="text-2xl font-bold">{summary.totalStorage} GB</p>
+                                    <p className="text-sm text-gray-400 uppercase font-semibold">Total Storage Used</p>
+                                    <p className="text-2xl font-bold text-white">{summary.totalStorage} GB</p>
                                 </div>
                             </div>
                         </Card3D>
@@ -239,15 +269,15 @@ const ExchangeReport = () => {
                 {/* Data Table Card */}
                 <Card3D>
                     {error && (
-                        <div className="p-4 mb-4 text-red-700 bg-red-100 rounded-lg flex items-center">
+                        <div className="p-4 mb-4 text-red-400 bg-red-900/20 border border-red-900/30 rounded-lg flex items-center">
                             <Shield size={20} className="mr-2" /> {error}
                         </div>
                     )}
 
                     {reportData ? (
                         <div className="overflow-x-auto">
-                            <table className="min-w-full text-sm text-left text-gray-500">
-                                <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b">
+                            <table className="min-w-full text-sm text-left text-gray-300">
+                                <thead className="text-xs text-gray-400 uppercase bg-white/5 border-b border-white/10">
                                     <tr>
                                         <th className="px-6 py-3">User Principal Name</th>
                                         <th className="px-6 py-3">Migration Status</th>
@@ -259,13 +289,13 @@ const ExchangeReport = () => {
                                 </thead>
                                 <tbody>
                                     {reportData.map((row, index) => (
-                                        <tr key={index} className="bg-white border-b hover:bg-gray-50 transition-colors">
-                                            <td className="px-6 py-4 font-medium text-gray-900">{row['User Principal Name']}</td>
+                                        <tr key={index} className="bg-transparent border-b border-white/5 hover:bg-white/5 transition-colors">
+                                            <td className="px-6 py-4 font-medium text-white">{row['User Principal Name']}</td>
                                             <td className="px-6 py-4">
-                                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${row['Migration Status'] === 'Completed' ? 'bg-green-100 text-green-800' :
-                                                        row['Migration Status'] === 'In Progress' ? 'bg-blue-100 text-blue-800' :
-                                                            row['Migration Status'] === 'Failed' ? 'bg-red-100 text-red-800' :
-                                                                'bg-gray-100 text-gray-800'
+                                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${row['Migration Status'] === 'Completed' ? 'bg-green-900/30 text-green-400' :
+                                                    row['Migration Status'] === 'In Progress' ? 'bg-blue-900/30 text-blue-400' :
+                                                        row['Migration Status'] === 'Failed' ? 'bg-red-900/30 text-red-400' :
+                                                            'bg-gray-800 text-gray-400'
                                                     }`}>
                                                     {row['Migration Status']}
                                                 </span>
@@ -288,6 +318,7 @@ const ExchangeReport = () => {
                         </div>
                     )}
                 </Card3D>
+                <p className="text-[10px] text-gray-600 text-center opacity-50">v1.0.5 - System Ready</p>
             </div>
         </div>
     );

@@ -22,21 +22,21 @@ const Dashboard = () => {
             name: 'Intune Portal',
             icon: <Server size={32} />,
             desc: 'Device compliance, configuration, and enrollment.',
-            path: '/intune' // Placeholder
+            path: '/intune'
         },
         {
             id: 'security',
             name: 'Security Portal',
             icon: <Shield size={32} />,
             desc: 'Threat protection, alerts, and security score.',
-            path: '/security' // Placeholder
+            path: '/security'
         },
         {
             id: 'compliance',
             name: 'Compliance Portal',
             icon: <FileText size={32} />,
             desc: 'Data governance, eDiscovery, and audit logs.',
-            path: '/compliance' // Placeholder
+            path: '/compliance'
         },
     ];
 
@@ -45,19 +45,19 @@ const Dashboard = () => {
             <header className="mb-10 flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-bold text-primary">Welcome, {user?.name || 'Admin'}</h1>
-                    <p className="text-gray-600">Select a portal to generate reports.</p>
+                    <p className="text-gray-400">Select a portal to generate reports.</p>
                 </div>
             </header>
 
             <div className="grid-responsive">
                 {portals.map((portal) => (
                     <div key={portal.id} onClick={() => navigate(portal.path)} className="cursor-pointer">
-                        <Card3D className="h-full flex flex-col items-center text-center hover:bg-blue-50 transition-colors">
-                            <div className="mb-4 p-3 bg-blue-100 rounded-full text-primary">
+                        <Card3D className="h-full flex flex-col items-center text-center hover:bg-white/5 transition-colors">
+                            <div className="mb-4 p-3 bg-blue-900/30 rounded-full text-primary">
                                 {portal.icon}
                             </div>
-                            <h2 className="text-xl font-bold mb-2">{portal.name}</h2>
-                            <p className="text-gray-600">{portal.desc}</p>
+                            <h2 className="text-xl font-bold mb-2 text-white">{portal.name}</h2>
+                            <p className="text-gray-400">{portal.desc}</p>
                         </Card3D>
                     </div>
                 ))}

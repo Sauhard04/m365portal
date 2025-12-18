@@ -3,7 +3,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { AuthenticatedTemplate, UnauthenticatedTemplate, useIsAuthenticated } from "@azure/msal-react";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import ExchangeReport from "./pages/ExchangeReport"; // We will create this next
+import ExchangeReport from "./pages/ExchangeReport";
+import IntuneReport from "./pages/IntuneReport";
+import SecurityReport from "./pages/SecurityReport";
+import ComplianceReport from "./pages/ComplianceReport";
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useIsAuthenticated();
@@ -35,6 +38,21 @@ function App() {
         <Route path="/exchange" element={
           <ProtectedRoute>
             <ExchangeReport />
+          </ProtectedRoute>
+        } />
+        <Route path="/intune" element={
+          <ProtectedRoute>
+            <IntuneReport />
+          </ProtectedRoute>
+        } />
+        <Route path="/security" element={
+          <ProtectedRoute>
+            <SecurityReport />
+          </ProtectedRoute>
+        } />
+        <Route path="/compliance" element={
+          <ProtectedRoute>
+            <ComplianceReport />
           </ProtectedRoute>
         } />
       </Routes>

@@ -46,6 +46,10 @@ export const loginRequest = {
 let msalInstance;
 if (!window.msalInstance) {
     msalInstance = new PublicClientApplication(msalConfig);
+    // MSAL v3+ requires initialize() to be called
+    msalInstance.initialize().catch(err => {
+        console.error("MSAL initialization failed:", err);
+    });
     window.msalInstance = msalInstance;
 } else {
     msalInstance = window.msalInstance;
