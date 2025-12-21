@@ -120,7 +120,7 @@ const Dashboard = () => {
                             transition={{ delay: index * 0.1 }}
                             onClick={() => navigate(`/service/${service.id}`)}
                             className="glass service-card p-8 cursor-pointer group"
-                            style={{ boxShadow: `0 10px 30px -10px ${service.shadowColor}` }}
+                            style={{ boxShadow: `0 10px 30px - 10px ${service.shadowColor} ` }}
                         >
                             <service.icon className="absolute -right-4 -bottom-4 w-32 h-32 text-white/5 rotate-12 group-hover:rotate-0 transition-transform duration-500" />
 

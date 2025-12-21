@@ -26,6 +26,9 @@ const ServicePage = () => {
 
     const name = serviceNames[serviceId] || 'Service Module';
     const isExchange = serviceId === 'exchange';
+    const isLicensing = serviceId === 'licensing';
+
+    const [licensingSummary, setLicensingSummary] = useState([]);
 
     const filteredData = reportData.filter(item => {
         if (!filterText) return true;
@@ -50,6 +53,22 @@ const ServicePage = () => {
             if (isExchange) {
                 const data = await graphService.getExchangeMailboxReport();
                 setReportData(data);
+            } else if (isLicensing) {
+                const { skus, users } = await graphService.getLicensingData();
+                setLicensingSummary(skus);
+
+                // create a map of SKU Id to SKU Part Number for easy lookup
+                const skuMap = new Map();
+                skus.forEach(sku => skuMap.set(sku.skuId, sku.skuPartNumber));
+
+                // Process users for the table
+                const processedUsers = users.map(user => ({
+                    displayName: user.displayName,
+                    emailAddress: user.userPrincipalName,
+                    licenses: user.assignedLicenses.map(l => skuMap.get(l.skuId) || 'Unknown SKU').join(', ') || 'No License',
+                    licenseCount: user.assignedLicenses.length
+                }));
+                setReportData(processedUsers);
             } else {
                 // Placeholder for other modules
                 setReportData([1, 2, 3, 4, 5]);
@@ -68,15 +87,78 @@ const ServicePage = () => {
         fetchData();
     }, [serviceId, instance, accounts]);
 
-    const stats = isExchange ? [
-        { label: 'Total Mailboxes', value: reportData.length.toString(), trend: 'Real-time' },
-        { label: 'Archive Enabled', value: reportData.filter(r => r.archivePolicy).length.toString(), trend: 'Active' },
-        { label: 'Sync Status', value: 'Healthy', trend: '100%', color: 'text-green-400' }
-    ] : [
-        { label: 'Total Resources', value: '1,242', trend: '+12%' },
-        { label: 'Active Sessions', value: '842', trend: '+5%' },
-        { label: 'Security Alerts', value: '3', trend: '-2%', color: 'text-red-400' }
-    ];
+    let stats = [];
+    if (isExchange) {
+        stats = [
+            { label: 'Total Mailboxes', value: reportData.length.toString(), trend: 'Real-time' },
+            { label: 'Archive Enabled', value: reportData.filter(r => r.archivePolicy).length.toString(), trend: 'Active' },
+            { label: 'Sync Status', value: 'Healthy', trend: '100%', color: 'text-green-400' }
+        ];
+    } else if (isLicensing) {
+        // Calculate license stats
+        const totalSeats = licensingSummary.reduce((acc, sku) => acc + sku.prepaidUnits.enabled, 0);
+        const assignedSeats = licensingSummary.reduce((acc, sku) => acc + sku.consumedUnits, 0);
+        const availableSeats = totalSeats - assignedSeats;
+
+        stats = [
+            { label: 'Total Licenses', value: totalSeats.toLocaleString(), trend: 'Capacity' },
+            { label: 'Assigned', value: assignedSeats.toLocaleString(), trend: Math.round((assignedSeats / totalSeats) * 100) + '% Used' },
+            { label: 'Available', value: availableSeats.toLocaleString(), trend: 'Free', color: 'text-blue-400' }
+        ];
+    } else {
+        stats = [
+            { label: 'Total Resources', value: '1,242', trend: '+12%' },
+            { label: 'Active Sessions', value: '842', trend: '+5%' },
+            { label: 'Security Alerts', value: '3', trend: '-2%', color: 'text-red-400' }
+        ];
+    }
+
+    const handleDownloadCSV = () => {
+        if (filteredData.length === 0) return;
+
+        let headers = [];
+        let csvRows = [];
+
+        if (isLicensing) {
+            headers = ['Display Name', 'Email / UPN', 'Assigned Licenses', 'Count'];
+            csvRows.push(headers.join(','));
+
+            filteredData.forEach(row => {
+                const values = [
+                    `"${row.displayName || ''}"`,
+                    `"${row.emailAddress || ''}"`,
+                    `"${row.licenses || ''}"`,
+                    `"${row.licenseCount || 0}"`
+                ];
+                csvRows.push(values.join(','));
+            });
+        } else {
+            // Generic Fallback
+            headers = ['User / Resource', 'Status', 'Activity', 'Time'];
+            csvRows.push(headers.join(','));
+
+            filteredData.forEach(row => {
+                const values = [
+                    `"User Resource ${row}"`,
+                    '"Active"',
+                    '"Policy modification detected"',
+                    `"${row}h ago"`
+                ];
+                csvRows.push(values.join(','));
+            });
+        }
+
+        const csvContent = csvRows.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `${serviceId}_report.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     return (
         <div className="min-h-screen bg-[#050505] text-white">
@@ -119,6 +201,40 @@ const ServicePage = () => {
                     ))}
                 </motion.div>
 
+
+
+                {isLicensing && licensingSummary.length > 0 && (
+                    <div className="mb-12">
+                        <h3 className="text-xl font-bold mb-6">License Breakdown</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {licensingSummary.map((sku, i) => (
+                                <div key={i} className="glass p-6 border-l-4 border-l-blue-500">
+                                    <p className="text-gray-300 font-medium mb-1 truncate" title={sku.skuPartNumber}>{sku.skuPartNumber}</p>
+                                    <div className="flex justify-between items-end mt-4">
+                                        <div>
+                                            <p className="text-sm text-gray-500">Assigned</p>
+                                            <p className="text-2xl font-bold">{sku.consumedUnits}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-sm text-gray-500">Total</p>
+                                            <p className="text-2xl font-bold">{sku.prepaidUnits?.enabled || 0}</p>
+                                        </div>
+                                    </div>
+                                    <div className="w-full bg-gray-700/50 h-1.5 mt-4 rounded-full overflow-hidden">
+                                        <div
+                                            className="bg-blue-500 h-full rounded-full"
+                                            style={{ width: `${Math.min(((sku.consumedUnits / (sku.prepaidUnits?.enabled || 1)) * 100), 100)}%` }}
+                                        />
+                                    </div>
+                                    <p className="text-xs text-right mt-1 text-gray-500">
+                                        {Math.round((sku.consumedUnits / (sku.prepaidUnits?.enabled || 1)) * 100)}% Used
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 <div className="glass p-8 relative min-h-[400px] flex items-center justify-center">
                     {isExchange ? (
                         <div className="text-center space-y-4">
@@ -135,9 +251,10 @@ const ServicePage = () => {
                             </button>
                         </div>
                     ) : (
+
                         <div className="w-full">
                             <div className="flex items-center justify-between mb-8">
-                                <h3 className="text-xl font-bold">Latest Reports</h3>
+                                <h3 className="text-xl font-bold">{isLicensing ? 'User License Assignments' : 'Latest Reports'}</h3>
                                 <div className="flex items-center space-x-3">
                                     <div className="relative">
                                         <input
@@ -148,7 +265,11 @@ const ServicePage = () => {
                                             className="bg-white/5 border border-white/10 rounded-lg py-2 px-4 text-sm focus:outline-none focus:border-blue-500/50"
                                         />
                                     </div>
-                                    <button className="p-2 hover:bg-white/10 rounded-lg border border-white/10">
+                                    <button
+                                        onClick={handleDownloadCSV}
+                                        className="p-2 hover:bg-white/10 rounded-lg border border-white/10"
+                                        title="Download CSV"
+                                    >
                                         <Download className="w-4 h-4" />
                                     </button>
                                 </div>
@@ -164,34 +285,64 @@ const ServicePage = () => {
                                     <table className="w-full text-left">
                                         <thead>
                                             <tr className="border-b border-white/10 text-gray-400 text-sm uppercase tracking-wider">
-                                                <th className="pb-4 font-semibold">User / Resource</th>
-                                                <th className="pb-4 font-semibold">Status</th>
-                                                <th className="pb-4 font-semibold">Activity</th>
-                                                <th className="pb-4 font-semibold">Time</th>
+                                                {isLicensing ? (
+                                                    <>
+                                                        <th className="pb-4 font-semibold px-4">Display Name</th>
+                                                        <th className="pb-4 font-semibold px-4">Email / UPN</th>
+                                                        <th className="pb-4 font-semibold px-4">Assigned Licenses</th>
+                                                        <th className="pb-4 font-semibold px-4 text-center">Count</th>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <th className="pb-4 font-semibold">User / Resource</th>
+                                                        <th className="pb-4 font-semibold">Status</th>
+                                                        <th className="pb-4 font-semibold">Activity</th>
+                                                        <th className="pb-4 font-semibold">Time</th>
+                                                    </>
+                                                )}
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-white/5 text-sm">
                                             {filteredData.length > 0 ? filteredData.map((report, i) => (
                                                 <tr key={i} className="hover:bg-white/5 transition-colors">
-                                                    <td className="py-4">
-                                                        <div className="flex items-center space-x-3">
-                                                            <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-[10px]">
-                                                                UR
-                                                            </div>
-                                                            <span className="font-medium text-white/90">User Resource {report}</span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="py-4">
-                                                        <span className="px-2 py-1 bg-green-500/10 text-green-400 rounded-md text-[10px] uppercase font-bold border border-green-500/20">
-                                                            Active
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-4 text-gray-400">Policy modification detected</td>
-                                                    <td className="py-4 text-gray-500">{report}h ago</td>
+                                                    {isLicensing ? (
+                                                        <>
+                                                            <td className="py-4 px-4 font-medium text-white/90">{report.displayName}</td>
+                                                            <td className="py-4 px-4 text-gray-400">{report.emailAddress}</td>
+                                                            <td className="py-4 px-4 text-gray-300">
+                                                                {report.licenses !== 'No License' ? (
+                                                                    <span className="text-gray-300 text-sm">
+                                                                        {report.licenses}
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="text-gray-500 italic">Unlicensed</span>
+                                                                )}
+                                                            </td>
+                                                            <td className="py-4 px-4 text-center text-gray-400">{report.licenseCount}</td>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <td className="py-4">
+                                                                <div className="flex items-center space-x-3">
+                                                                    <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-[10px]">
+                                                                        UR
+                                                                    </div>
+                                                                    <span className="font-medium text-white/90">User Resource {report}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td className="py-4">
+                                                                <span className="px-2 py-1 bg-green-500/10 text-green-400 rounded-md text-[10px] uppercase font-bold border border-green-500/20">
+                                                                    Active
+                                                                </span>
+                                                            </td>
+                                                            <td className="py-4 text-gray-400">Policy modification detected</td>
+                                                            <td className="py-4 text-gray-500">{report}h ago</td>
+                                                        </>
+                                                    )}
                                                 </tr>
                                             )) : (
                                                 <tr>
-                                                    <td colSpan="4" className="py-20 text-center">
+                                                    <td colSpan={isLicensing ? "4" : "4"} className="py-20 text-center">
                                                         <div className="flex flex-col items-center space-y-4">
                                                             <AlertCircle className="w-12 h-12 text-gray-600" />
                                                             <div className="text-gray-500 italic">No real-time data found. Ensure Graph API permissions are granted.</div>
@@ -207,7 +358,7 @@ const ServicePage = () => {
                     )}
                 </div>
             </main>
-        </div>
+        </div >
     );
 };
 
