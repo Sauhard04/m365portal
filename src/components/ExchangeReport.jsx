@@ -213,212 +213,296 @@ const ExchangeReport = () => {
     }, [instance, accounts]);
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white font-['Inter']">
-            <header className="glass sticky top-0 z-40 rounded-none border-x-0 border-t-0 bg-black/40 backdrop-blur-xl px-8 py-6">
-                <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <div className="flex items-center space-x-6">
-                        <button
-                            onClick={() => navigate('/service/exchange')}
-                            className="p-2 hover:bg-white/10 rounded-full transition-colors"
+        <div className="min-h-screen bg-[#050505] text-white">
+            <header className="glass fixed top-0 left-0 right-0 z-50 h-20 rounded-none border-x-0 border-t-0 bg-black/50 backdrop-blur-2xl px-8 shadow-lg border-b border-white/10 flex items-center">
+                <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                        <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => navigate('/service/admin')}
+                            className="p-2 hover:bg-white/10 rounded-lg transition-all"
                         >
-                            <ArrowLeft className="w-6 h-6" />
-                        </button>
-                        <h1 className="text-2xl font-bold font-['Outfit']">Exchange Mailbox Report</h1>
+                            <ArrowLeft className="w-5 h-5" />
+                        </motion.button>
+                        <div>
+                            <h1 className="text-xl font-bold font-['Outfit'] bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent leading-tight">
+                                Exchange Mailbox Report
+                            </h1>
+                            <p className="text-xs text-gray-400 leading-tight">Real-time mailbox analytics</p>
+                        </div>
                     </div>
 
-                    <div className="flex items-center space-x-4">
-                        <button
+                    <div className="flex items-center space-x-3">
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={fetchData}
-                            className="flex items-center space-x-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-all text-sm font-medium"
+                            className="flex items-center space-x-2 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-all text-sm font-semibold"
                         >
                             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
                             <span>Refresh</span>
-                        </button>
+                        </motion.button>
                     </div>
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto p-8">
-                {isConcealed && (
-                    <div className="mb-8 p-6 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start space-x-4 animate-in fade-in slide-in-from-top-4 duration-500">
-                        <div className="p-3 bg-amber-500/20 rounded-xl text-amber-400">
-                            <Shield className="w-6 h-6" />
-                        </div>
-                        <div className="flex-1">
-                            <h4 className="text-amber-200 font-bold mb-1">M365 Privacy Settings Detected</h4>
-                            <p className="text-amber-200/70 text-sm leading-relaxed mb-4">
-                                Microsoft is concealing user identity in report telemetry. This prevents the portal from matching usage data (Mailbox Size, Archive Status) to specific users.
-                            </p>
-                            <div className="space-y-2 text-xs bg-black/40 p-4 rounded-xl border border-white/5">
-                                <p className="font-bold text-amber-100 uppercase tracking-widest">To Fix This:</p>
-                                <ol className="list-decimal list-inside space-y-1 text-amber-100/60">
-                                    <li>Open <b>M365 Admin Center</b> &gt; <b>Settings</b> &gt; <b>Org Settings</b>.</li>
-                                    <li>Select <b>Reports</b>.</li>
-                                    <li>Uncheck <b>"Display concealed user, group, and site names in all reports"</b>.</li>
-                                    <li>Click <b>Save</b> and refresh this page.</li>
-                                </ol>
+            <main className="max-w-7xl mx-auto p-8 pt-24">
+                <AnimatePresence>
+                    {isConcealed && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                            className="mb-8 glass p-6 bg-gradient-to-r from-amber-500/10 to-orange-500/5 border border-amber-500/30 rounded-2xl flex items-start space-x-4 shadow-lg"
+                        >
+                            <div className="p-3 bg-amber-500/20 rounded-xl text-amber-400 flex-shrink-0">
+                                <Shield className="w-6 h-6" />
                             </div>
+                            <div className="flex-1">
+                                <h4 className="text-amber-200 font-bold mb-2 text-lg">M365 Privacy Settings Detected</h4>
+                                <p className="text-amber-200/80 text-sm leading-relaxed mb-4">
+                                    Microsoft is concealing user identity in report telemetry. This prevents the portal from matching usage data (Mailbox Size, Archive Status) to specific users.
+                                </p>
+                                <div className="space-y-2 text-xs glass-panel p-4 rounded-xl">
+                                    <p className="font-bold text-amber-100 uppercase tracking-widest mb-2">To Fix This:</p>
+                                    <ol className="list-decimal list-inside space-y-2 text-amber-100/70">
+                                        <li>Open <b className="text-amber-100">M365 Admin Center</b> &gt; <b className="text-amber-100">Settings</b> &gt; <b className="text-amber-100">Org Settings</b>.</li>
+                                        <li>Select <b className="text-amber-100">Reports</b>.</li>
+                                        <li>Uncheck <b className="text-amber-100">"Display concealed user, group, and site names in all reports"</b>.</li>
+                                        <li>Click <b className="text-amber-100">Save</b> and refresh this page.</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                <AnimatePresence>
+                    {error && (
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            className="mb-8 glass p-5 bg-gradient-to-r from-red-500/10 to-pink-500/5 border border-red-500/30 rounded-xl flex items-center space-x-4 text-red-400 shadow-lg"
+                        >
+                            <AlertCircle className="w-6 h-6 flex-shrink-0" />
+                            <span className="font-medium">{error}</span>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="glass p-8 shadow-2xl"
+                >
+                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                        <div>
+                            <h3 className="text-2xl font-bold mb-1 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                                Mailbox Report
+                            </h3>
+                            <p className="text-sm text-gray-400">Real-time telemetry from Microsoft Graph</p>
                         </div>
-                    </div>
-                )}
-
-                {error && (
-                    <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center space-x-3 text-red-400">
-                        <AlertCircle className="w-6 h-6" />
-                        <span>{error}</span>
-                    </div>
-                )}
-
-                <div className="glass p-8">
-                    <div className="flex items-center justify-between mb-8">
-                        <h3 className="text-xl font-bold">
-                            Mailbox Report (Real-time)
-                        </h3>
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-3 flex-wrap">
                             <div className="relative">
+                                <Filter className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                                 <input
                                     type="text"
-                                    placeholder="Search here"
+                                    placeholder="Search mailboxes..."
                                     value={filterText}
                                     onChange={(e) => setFilterText(e.target.value)}
-                                    className="bg-white/5 border border-white/10 rounded-lg py-2 px-4 text-sm focus:outline-none focus:border-blue-500/50"
+                                    className="bg-white/5 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all w-full md:w-64"
                                 />
                             </div>
-                            <button
+                            <motion.button
+                                whileHover={selectedUsers.size > 0 && !isRunningMFA ? { scale: 1.05 } : {}}
+                                whileTap={selectedUsers.size > 0 && !isRunningMFA ? { scale: 0.95 } : {}}
                                 onClick={handleRunMFA}
                                 disabled={selectedUsers.size === 0 || isRunningMFA}
-                                className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-all text-sm font-medium ${selectedUsers.size > 0 && !isRunningMFA
-                                    ? 'bg-blue-600 border-blue-500 hover:bg-blue-500 text-white'
+                                className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl border transition-all text-sm font-semibold backdrop-blur-sm ${selectedUsers.size > 0 && !isRunningMFA
+                                    ? 'bg-gradient-to-r from-blue-600 to-blue-500 border-blue-400/50 hover:from-blue-500 hover:to-blue-400 text-white shadow-lg shadow-blue-500/20'
                                     : 'bg-white/5 border-white/10 text-gray-500 cursor-not-allowed'
-                                    }`}
+                                }`}
                             >
                                 <Shield className={`w-4 h-4 ${isRunningMFA ? 'animate-pulse' : ''}`} />
                                 <span>{isRunningMFA ? 'Running...' : 'Run MFA'}</span>
-                            </button>
+                            </motion.button>
 
-                            {selectedUsers.size > 0 && (
-                                <div className="flex items-center space-x-2 border-l border-white/10 pl-4 ml-2">
-                                    <div className="flex flex-col space-y-1">
-                                        <button
-                                            onClick={() => handleGenerateScript('enable_archive')}
-                                            className="px-3 py-1 bg-green-500/10 hover:bg-green-500/20 text-green-400 text-xs rounded border border-green-500/20 flex items-center space-x-1"
-                                        >
-                                            <Archive className="w-3 h-3" /> <span>Enable Archive</span>
-                                        </button>
-                                        <button
-                                            onClick={() => handleGenerateScript('disable_archive')}
-                                            className="px-3 py-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs rounded border border-red-500/20 flex items-center space-x-1"
-                                        >
-                                            <Archive className="w-3 h-3" /> <span>Disable Archive</span>
-                                        </button>
-                                    </div>
-                                    <div className="flex flex-col space-y-1">
-                                        <button
-                                            onClick={() => handleGenerateScript('enable_autoexpand')}
-                                            className="px-3 py-1 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-xs rounded border border-blue-500/20 flex items-center space-x-1"
-                                        >
-                                            <Database className="w-3 h-3" /> <span>Enable Auto-Exp</span>
-                                        </button>
-                                        <button
-                                            onClick={() => handleGenerateScript('disable_autoexpand')}
-                                            className="px-3 py-1 bg-gray-500/10 hover:bg-gray-500/20 text-gray-400 text-xs rounded border border-gray-500/20 flex items-center space-x-1"
-                                        >
-                                            <Database className="w-3 h-3" /> <span>Disable Auto-Exp</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
+                            <AnimatePresence>
+                                {selectedUsers.size > 0 && (
+                                    <motion.div
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: -10 }}
+                                        className="flex items-center space-x-2 border-l border-white/10 pl-4 ml-2"
+                                    >
+                                        <div className="flex flex-col space-y-1.5">
+                                            <motion.button
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                                onClick={() => handleGenerateScript('enable_archive')}
+                                                className="px-3 py-1.5 bg-green-500/10 hover:bg-green-500/20 text-green-400 text-xs rounded-lg border border-green-500/30 flex items-center space-x-1.5 font-semibold transition-all shadow-sm"
+                                            >
+                                                <Archive className="w-3.5 h-3.5" /> <span>Enable Archive</span>
+                                            </motion.button>
+                                            <motion.button
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                                onClick={() => handleGenerateScript('disable_archive')}
+                                                className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs rounded-lg border border-red-500/30 flex items-center space-x-1.5 font-semibold transition-all shadow-sm"
+                                            >
+                                                <Archive className="w-3.5 h-3.5" /> <span>Disable Archive</span>
+                                            </motion.button>
+                                        </div>
+                                        <div className="flex flex-col space-y-1.5">
+                                            <motion.button
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                                onClick={() => handleGenerateScript('enable_autoexpand')}
+                                                className="px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-xs rounded-lg border border-blue-500/30 flex items-center space-x-1.5 font-semibold transition-all shadow-sm"
+                                            >
+                                                <Database className="w-3.5 h-3.5" /> <span>Enable Auto-Exp</span>
+                                            </motion.button>
+                                            <motion.button
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.95 }}
+                                                onClick={() => handleGenerateScript('disable_autoexpand')}
+                                                className="px-3 py-1.5 bg-gray-500/10 hover:bg-gray-500/20 text-gray-400 text-xs rounded-lg border border-gray-500/30 flex items-center space-x-1.5 font-semibold transition-all shadow-sm"
+                                            >
+                                                <Database className="w-3.5 h-3.5" /> <span>Disable Auto-Exp</span>
+                                            </motion.button>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
 
-                            <button
+                            <motion.button
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
                                 onClick={handleDownloadCSV}
-                                className="p-2 hover:bg-white/10 rounded-lg border border-white/10"
+c                                className="p-2.5 hover:bg-white/10 rounded-xl border border-white/10 transition-all backdrop-blur-sm"
+                                title="Download CSV"
                             >
-                                <Download className="w-4 h-4" />
-                            </button>
+                                <Download className="w-5 h-5" />
+                            </motion.button>
                         </div>
                     </div>
 
-                    <div className="overflow-x-auto min-h-[300px]">
+                    <div className="overflow-x-auto min-h-[300px] rounded-xl">
                         {loading ? (
-                            <div className="flex flex-col items-center justify-center py-20 space-y-4">
-                                <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
-                                <p className="text-gray-400 animate-pulse">Fetching Real-time Telemetry...</p>
-                            </div>
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="flex flex-col items-center justify-center py-24 space-y-6"
+                            >
+                                <motion.div
+                                    animate={{ rotate: 360 }}
+                                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                >
+                                    <Loader2 className="w-16 h-16 text-blue-500" />
+                                </motion.div>
+                                <div className="text-center">
+                                    <p className="text-gray-300 font-semibold mb-1">Fetching Real-time Telemetry</p>
+                                    <p className="text-gray-500 text-sm">Connecting to Microsoft Graph API...</p>
+                                </div>
+                            </motion.div>
                         ) : (
-                            <table className="w-full text-left">
-                                <thead>
-                                    <tr className="border-b border-white/10 text-gray-400 text-sm uppercase tracking-wider">
-                                        <th className="pb-4 font-semibold px-4 w-12">
-                                            <input
-                                                type="checkbox"
-                                                checked={filteredData.length > 0 && selectedUsers.size === filteredData.length}
-                                                onChange={toggleAllSelection}
-                                                className="rounded border-gray-600 bg-transparent text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-900"
-                                            />
-                                        </th>
-                                        <th className="pb-4 font-semibold px-4">Display Name</th>
-                                        <th className="pb-4 font-semibold px-4">Email Address</th>
-                                        <th className="pb-4 font-semibold px-4">Mailbox Size</th>
-                                        <th className="pb-4 font-semibold px-4">Data Migrated</th>
-                                        <th className="pb-4 font-semibold px-4">Migration Status</th>
-                                        <th className="pb-4 font-semibold px-4 text-center">Archive Policy</th>
-                                        <th className="pb-4 font-semibold px-4">Retention Policy</th>
-                                        <th className="pb-4 font-semibold px-4 text-center">Auto Expanding</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-white/5 text-sm">
-                                    {filteredData.length > 0 ? filteredData.map((report, i) => (
-                                        <tr key={i} className="hover:bg-white/5 transition-colors">
-                                            <td className="py-4 px-4 font-medium text-white/90">
+                            <div className="glass-panel rounded-xl overflow-hidden border border-white/10">
+                                <div className="overflow-x-auto max-h-[calc(100vh-400px)]">
+                                    <table className="w-full text-left">
+                                        <thead className="sticky top-0 z-30 bg-white/5 backdrop-blur-xl border-b border-white/10">
+                                            <tr>
+                                            <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider w-12">
                                                 <input
                                                     type="checkbox"
-                                                    checked={selectedUsers.has(report.emailAddress)}
-                                                    onChange={() => toggleUserSelection(report.emailAddress)}
-                                                    className="rounded border-gray-600 bg-transparent text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-900"
+                                                    checked={filteredData.length > 0 && selectedUsers.size === filteredData.length}
+                                                    onChange={toggleAllSelection}
+                                                    className="w-4 h-4 rounded border-gray-600 bg-transparent text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
                                                 />
-                                            </td>
-                                            <td className="py-4 px-4 font-medium text-white/90">{report.displayName}</td>
-                                            <td className="py-4 px-4 text-gray-400">{report.emailAddress}</td>
-                                            <td className="py-4 px-4 text-gray-300">{report.mailboxSize}</td>
-                                            <td className="py-4 px-4 text-gray-300">{report.dataMigrated}</td>
-                                            <td className="py-4 px-4">
-                                                <span className={`px-2 py-1 rounded-md text-[10px] font-bold border ${report.migrationStatus === 'Migrated'
-                                                    ? 'text-purple-400 bg-purple-400/10 border-purple-400/20'
-                                                    : 'text-blue-400 bg-blue-400/10 border-blue-400/20'
+                                            </th>
+                                            <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Display Name</th>
+                                            <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Email Address</th>
+                                            <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Mailbox Size</th>
+                                            <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Data Migrated</th>
+                                            <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Migration Status</th>
+                                            <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider text-center">Archive Policy</th>
+                                            <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Retention Policy</th>
+                                            <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider text-center">Auto Expanding</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/5">
+                                        {filteredData.length > 0 ? filteredData.map((report, i) => (
+                                            <motion.tr
+                                                key={i}
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: i * 0.02 }}
+                                                className="hover:bg-white/5 transition-all group"
+                                            >
+                                                <td className="py-5 px-6">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedUsers.has(report.emailAddress)}
+                                                        onChange={() => toggleUserSelection(report.emailAddress)}
+                                                        className="w-4 h-4 rounded border-gray-600 bg-transparent text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
+                                                    />
+                                                </td>
+                                                <td className="py-5 px-6 font-semibold text-white group-hover:text-blue-400 transition-colors">{report.displayName}</td>
+                                                <td className="py-5 px-6 text-gray-400 font-mono text-sm">{report.emailAddress}</td>
+                                                <td className="py-5 px-6 text-gray-300 font-mono text-sm">{report.mailboxSize}</td>
+                                                <td className="py-5 px-6 text-gray-300 font-mono text-sm">{report.dataMigrated}</td>
+                                                <td className="py-5 px-6">
+                                                    <span className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold border ${
+                                                        report.migrationStatus === 'Migrated'
+                                                            ? 'text-purple-400 bg-purple-400/10 border-purple-400/30 shadow-sm'
+                                                            : 'text-blue-400 bg-blue-400/10 border-blue-400/30 shadow-sm'
                                                     }`}>
-                                                    {report.migrationStatus}
-                                                </span>
-                                            </td>
-                                            <td className="py-4 px-4 text-center">
-                                                {report.archivePolicy ?
-                                                    <span className="inline-flex items-center space-x-1 text-green-400 bg-green-400/10 px-2 py-1 rounded-md text-[10px] font-bold border border-green-400/20">
-                                                        <CheckCircle2 className="w-3 h-3" /> <span>ENABLED</span>
-                                                    </span> :
-                                                    <span className="inline-flex items-center space-x-1 text-gray-500 bg-gray-500/10 px-2 py-1 rounded-md text-[10px] font-bold border border-gray-500/20">
-                                                        <XCircle className="w-3 h-3" /> <span>DISABLED</span>
+                                                        {report.migrationStatus}
                                                     </span>
-                                                }
-                                            </td>
-                                            <td className="py-4 px-4 text-gray-300 italic">{report.retentionPolicy}</td>
-                                            <td className="py-4 px-4 text-center">
-                                                <span className="text-gray-500 bg-gray-500/10 px-2 py-1 rounded-md text-[10px] font-bold border border-gray-500/20">N/A*</span>
-                                            </td>
-                                        </tr>
-                                    )) : (
-                                        <tr>
-                                            <td colSpan="9" className="py-20 text-center">
-                                                <div className="flex flex-col items-center space-y-4">
-                                                    <AlertCircle className="w-12 h-12 text-gray-600" />
-                                                    <div className="text-gray-500 italic">No matching data found.</div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                                </td>
+                                                <td className="py-5 px-6 text-center">
+                                                    {report.archivePolicy ? (
+                                                        <span className="inline-flex items-center space-x-1.5 text-green-400 bg-green-400/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-green-400/30 shadow-sm">
+                                                            <CheckCircle2 className="w-3.5 h-3.5" /> <span>ENABLED</span>
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center space-x-1.5 text-gray-500 bg-gray-500/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-gray-500/30 shadow-sm">
+                                                            <XCircle className="w-3.5 h-3.5" /> <span>DISABLED</span>
+                                                        </span>
+                                                    )}
+                                                </td>
+                                                <td className="py-5 px-6 text-gray-400 italic text-sm">{report.retentionPolicy || '-'}</td>
+                                                <td className="py-5 px-6 text-center">
+                                                    <span className="text-gray-500 bg-gray-500/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-gray-500/30 shadow-sm">N/A*</span>
+                                                </td>
+                                            </motion.tr>
+                                        )) : (
+                                            <tr>
+                                                <td colSpan="9" className="py-20 text-center">
+                                                    <motion.div
+                                                        initial={{ opacity: 0, scale: 0.9 }}
+                                                        animate={{ opacity: 1, scale: 1 }}
+                                                        className="flex flex-col items-center space-y-4"
+                                                    >
+                                                        <AlertCircle className="w-16 h-16 text-gray-600" />
+                                                        <div>
+                                                            <p className="text-gray-400 font-semibold mb-1">No matching data found</p>
+                                                            <p className="text-gray-500 text-sm">Try adjusting your search filters</p>
+                                                        </div>
+                                                    </motion.div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         )}
                     </div>
-                </div>
+                </motion.div>
             </main>
         </div>
     );

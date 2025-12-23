@@ -12,12 +12,13 @@ const ServicePage = () => {
     const { instance, accounts } = useMsal();
 
     const [reportData, setReportData] = useState([]);
+    const [exchangeData, setExchangeData] = useState([]);
     const [filterText, setFilterText] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const serviceNames = {
-        exchange: 'Exchange Online',
+        admin: 'Admin',
         entra: 'Microsoft Entra ID',
         intune: 'Microsoft Intune',
         purview: 'Microsoft Purview',
@@ -25,7 +26,7 @@ const ServicePage = () => {
     };
 
     const name = serviceNames[serviceId] || 'Service Module';
-    const isExchange = serviceId === 'exchange';
+    const isAdmin = serviceId === 'admin';
     const isLicensing = serviceId === 'licensing';
 
     const [licensingSummary, setLicensingSummary] = useState([]);
@@ -37,6 +38,14 @@ const ServicePage = () => {
         const email = item.emailAddress?.toLowerCase() || '';
         const raw = String(item).toLowerCase();
         return name.includes(searchStr) || email.includes(searchStr) || raw.includes(searchStr);
+    });
+
+    const filteredExchangeData = exchangeData.filter(item => {
+        if (!filterText) return true;
+        const searchStr = filterText.toLowerCase();
+        const name = item.displayName?.toLowerCase() || '';
+        const email = item.emailAddress?.toLowerCase() || '';
+        return name.includes(searchStr) || email.includes(searchStr);
     });
 
     const fetchData = async () => {
@@ -52,9 +61,29 @@ const ServicePage = () => {
 
             const graphService = new GraphService(response.accessToken);
 
-            if (isExchange) {
-                const { reports } = await graphService.getExchangeMailboxReport();
-                setReportData(reports);
+            if (isAdmin) {
+                // Fetch both Exchange and Licensing data
+                const [exchangeResult, licensingResult] = await Promise.all([
+                    graphService.getExchangeMailboxReport().catch(() => ({ reports: [] })),
+                    graphService.getLicensingData().catch(() => ({ skus: [], users: [] }))
+                ]);
+                
+                setExchangeData(exchangeResult.reports || []);
+                
+                const { skus, users } = licensingResult;
+                setLicensingSummary(skus || []);
+                
+                // Process licensing users for the table
+                const skuMap = new Map();
+                (skus || []).forEach(sku => skuMap.set(sku.skuId, sku.skuPartNumber));
+                
+                const processedUsers = (users || []).map(user => ({
+                    displayName: user.displayName,
+                    emailAddress: user.userPrincipalName,
+                    licenses: user.assignedLicenses.map(l => skuMap.get(l.skuId) || 'Unknown SKU').join(', ') || 'No License',
+                    licenseCount: user.assignedLicenses.length
+                }));
+                setReportData(processedUsers);
             } else if (isLicensing) {
                 const { skus, users } = await graphService.getLicensingData();
                 setLicensingSummary(skus);
@@ -92,11 +121,14 @@ const ServicePage = () => {
     }, [serviceId, instance, accounts]);
 
     let stats = [];
-    if (isExchange) {
+    if (isAdmin) {
+        // Combined stats for Admin page
+        const totalSeats = licensingSummary.reduce((acc, sku) => acc + (sku.prepaidUnits?.enabled || 0), 0);
+        const assignedSeats = licensingSummary.reduce((acc, sku) => acc + (sku.consumedUnits || 0), 0);
         stats = [
-            { label: 'Total Mailboxes', value: reportData.length.toString(), trend: 'Real-time' },
-            { label: 'Archive Enabled', value: reportData.filter(r => r.archivePolicy).length.toString(), trend: 'Active' },
-            { label: 'Sync Status', value: 'Healthy', trend: '100%', color: 'text-green-400' }
+            { label: 'Total Mailboxes', value: exchangeData.length.toString(), trend: 'Real-time' },
+            { label: 'Total Licenses', value: totalSeats.toLocaleString(), trend: 'Capacity' },
+            { label: 'Licenses Used', value: assignedSeats.toLocaleString(), trend: totalSeats > 0 ? Math.round((assignedSeats / totalSeats) * 100) + '%' : '0%', color: 'text-blue-400' }
         ];
     } else if (isLicensing) {
         // Calculate license stats
@@ -166,21 +198,26 @@ const ServicePage = () => {
 
     return (
         <div className="min-h-screen bg-[#050505] text-white">
-            <header className="glass sticky top-0 z-40 rounded-none border-x-0 border-t-0 bg-black/40 backdrop-blur-xl px-8 py-6">
-                <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <div className="flex items-center space-x-6">
+            <header className="glass fixed top-0 left-0 right-0 z-50 h-20 rounded-none border-x-0 border-t-0 bg-black/50 backdrop-blur-2xl px-8 shadow-lg border-b border-white/10 flex items-center">
+                <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
                         <button
                             onClick={() => navigate('/dashboard')}
-                            className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
                         >
-                            <ArrowLeft className="w-6 h-6" />
+                            <ArrowLeft className="w-5 h-5" />
                         </button>
-                        <h1 className="text-2xl font-bold font-['Outfit']">{name}</h1>
+                        <div>
+                            <h1 className="text-xl font-bold font-['Outfit'] bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent leading-tight">
+                                {name}
+                            </h1>
+                            <p className="text-xs text-gray-400 leading-tight">Manage and monitor resources</p>
+                        </div>
                     </div>
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto p-8">
+            <main className="max-w-7xl mx-auto p-8 pt-24">
                 {error && (
                     <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center space-x-3 text-red-400">
                         <AlertCircle className="w-6 h-6" />
@@ -207,7 +244,7 @@ const ServicePage = () => {
 
 
 
-                {isLicensing && licensingSummary.length > 0 && (
+                {(isLicensing || isAdmin) && licensingSummary.length > 0 && (
                     <div className="mb-12">
                         <h3 className="text-xl font-bold mb-6">License Breakdown</h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -239,26 +276,93 @@ const ServicePage = () => {
                     </div>
                 )}
 
-                <div className="glass p-8 relative min-h-[400px] flex items-center justify-center">
-                    {isExchange ? (
-                        <div className="text-center space-y-4">
-                            <h3 className="text-2xl font-bold">Exchange Mailbox Report</h3>
-                            <p className="text-gray-400 max-w-md mx-auto">
-                                View detailed statistics about user mailboxes, archive status, retention policies, and more.
-                            </p>
+                {/* Exchange Section for Admin */}
+                {isAdmin && (
+                    <div className="mb-12">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-xl font-bold">Exchange Mailboxes</h3>
                             <button
-                                onClick={() => navigate('/service/exchange/report')}
-                                className="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold transition-all flex items-center space-x-2 mx-auto"
+                                onClick={() => navigate('/service/admin/report')}
+                                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-semibold transition-all text-sm"
                             >
-                                <span>View Mailbox Report</span>
-
+                                View Full Report
                             </button>
                         </div>
-                    ) : (
+                        {loading ? (
+                            <div className="glass p-8 flex items-center justify-center">
+                                <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+                            </div>
+                        ) : exchangeData.length > 0 ? (
+                            <div className="glass p-6">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                    <div>
+                                        <p className="text-sm text-gray-400 mb-1">Total Mailboxes</p>
+                                        <p className="text-2xl font-bold">{exchangeData.length}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-400 mb-1">Archive Enabled</p>
+                                        <p className="text-2xl font-bold">{exchangeData.filter(r => r.archivePolicy).length}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-400 mb-1">Auto-Expanding</p>
+                                        <p className="text-2xl font-bold">{exchangeData.filter(r => r.autoExpanding).length}</p>
+                                    </div>
+                                </div>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left text-sm">
+                                        <thead className="border-b border-white/10">
+                                            <tr className="text-gray-400 uppercase tracking-wider text-xs">
+                                                <th className="pb-3 px-4 font-semibold">Display Name</th>
+                                                <th className="pb-3 px-4 font-semibold">Email</th>
+                                                <th className="pb-3 px-4 font-semibold text-center">Archive</th>
+                                                <th className="pb-3 px-4 font-semibold">Size</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-white/5">
+                                            {filteredExchangeData.slice(0, 5).map((mailbox, i) => (
+                                                <tr key={i} className="hover:bg-white/5 transition-colors">
+                                                    <td className="py-3 px-4 font-medium">{mailbox.displayName}</td>
+                                                    <td className="py-3 px-4 text-gray-400 text-xs">{mailbox.emailAddress}</td>
+                                                    <td className="py-3 px-4 text-center">
+                                                        {mailbox.archivePolicy ? (
+                                                            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-bold bg-green-400/10 text-green-400 border border-green-400/30">
+                                                                Enabled
+                                                            </span>
+                                                        ) : (
+                                                            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-bold bg-gray-500/10 text-gray-500 border border-gray-500/30">
+                                                                Disabled
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                    <td className="py-3 px-4 text-gray-300 text-xs">{mailbox.mailboxSize || 'N/A'}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                    {exchangeData.length > 5 && (
+                                        <div className="mt-4 text-center">
+                                            <button
+                                                onClick={() => navigate('/service/admin/report')}
+                                                className="text-sm text-blue-400 hover:text-blue-300"
+                                            >
+                                                View all {exchangeData.length} mailboxes →
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="glass p-8 text-center text-gray-400">
+                                <p>No exchange data available</p>
+                            </div>
+                        )}
+                    </div>
+                )}
 
-                        <div className="w-full">
+                <div className="glass p-8 relative min-h-[400px] flex items-center justify-center">
+                    <div className="w-full">
                             <div className="flex items-center justify-between mb-8">
-                                <h3 className="text-xl font-bold">{isLicensing ? 'User License Assignments' : 'Latest Reports'}</h3>
+                                <h3 className="text-xl font-bold">{isAdmin ? 'User License Assignments' : isLicensing ? 'User License Assignments' : 'Latest Reports'}</h3>
                                 <div className="flex items-center space-x-3">
                                     <div className="relative">
                                         <input
@@ -279,17 +383,18 @@ const ServicePage = () => {
                                 </div>
                             </div>
 
-                            <div className="overflow-x-auto min-h-[300px]">
+                            <div className="overflow-x-auto min-h-[300px] max-h-[calc(100vh-500px)]">
                                 {loading ? (
                                     <div className="flex flex-col items-center justify-center py-20 space-y-4">
                                         <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
                                         <p className="text-gray-400 animate-pulse">Fetching Real-time Telemetry...</p>
                                     </div>
                                 ) : (
-                                    <table className="w-full text-left">
-                                        <thead>
-                                            <tr className="border-b border-white/10 text-gray-400 text-sm uppercase tracking-wider">
-                                                {isLicensing ? (
+                                    <div className="glass-panel rounded-xl overflow-hidden border border-white/10">
+                                        <table className="w-full text-left">
+                                            <thead className="sticky top-0 z-20 bg-white/5 backdrop-blur-xl border-b border-white/10">
+                                                <tr className="text-gray-400 text-sm uppercase tracking-wider">
+                                                {(isLicensing || isAdmin) ? (
                                                     <>
                                                         <th className="pb-4 font-semibold px-4">Display Name</th>
                                                         <th className="pb-4 font-semibold px-4">Email / UPN</th>
@@ -309,7 +414,7 @@ const ServicePage = () => {
                                         <tbody className="divide-y divide-white/5 text-sm">
                                             {filteredData.length > 0 ? filteredData.map((report, i) => (
                                                 <tr key={i} className="hover:bg-white/5 transition-colors">
-                                                    {isLicensing ? (
+                                                    {(isLicensing || isAdmin) ? (
                                                         <>
                                                             <td className="py-4 px-4 font-medium text-white/90">{report.displayName}</td>
                                                             <td className="py-4 px-4 text-gray-400">{report.emailAddress}</td>
@@ -354,8 +459,9 @@ const ServicePage = () => {
                                                     </td>
                                                 </tr>
                                             )}
-                                        </tbody>
-                                    </table>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 )}
                             </div>
                         </div>
