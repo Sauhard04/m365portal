@@ -5,6 +5,7 @@ import { loginRequest } from '../authConfig';
 import { motion } from 'framer-motion';
 import { Shield, Zap, ArrowRight, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
+import Header from './Header';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -28,7 +29,8 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 md:p-12 overflow-hidden relative">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 md:p-12 overflow-hidden relative pt-28">
+      <Header isAuthenticated={false} />
       {/* Enhanced Background Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
         <motion.div

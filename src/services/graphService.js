@@ -291,4 +291,61 @@ export class GraphService {
             throw error;
         }
     }
+
+    async getApplications() {
+        try {
+            const response = await this.client.api("/applications")
+                .select("id,appId,displayName,createdDateTime,signInAudience")
+                .top(100)
+                .get();
+            return response.value || [];
+        } catch (error) {
+            console.error("Graph API Error (Applications):", error);
+            return [];
+        }
+    }
+
+    // Entra: Directory Audits
+    async getDirectoryAudits() {
+        try {
+            return await this.client.api("/auditLogs/directoryAudits")
+                .top(5)
+                .orderby("activityDateTime desc")
+                .get();
+        } catch (error) {
+            console.warn("Audit Logs access denied", error);
+            return null;
+        }
+    }
+
+    // Entra: Conditional Access Policies
+    async getConditionalAccessPolicies() {
+        try {
+            const res = await this.client.api("/identity/conditionalAccess/policies")
+                .select("id,displayName,state,createdDateTime")
+                .top(100)
+                .get();
+            return res.value || [];
+        } catch (error) {
+            console.warn("CA Policies access denied", error);
+            return [];
+        }
+    }
+
+    // Entra: Global Admins Count
+    async getGlobalAdmins() {
+        try {
+            // Need to ensure Directory Roles are activated/fetched first
+            // But simple way is to query member objects
+            // Role Template ID for Global Admin: "62e90394-69f5-4237-9190-012177145e10"
+            const res = await this.client.api("/directoryRoles")
+                .filter("roleTemplateId eq '62e90394-69f5-4237-9190-012177145e10'")
+                .expand("members")
+                .get();
+            return res.value?.[0]?.members || [];
+        } catch (error) {
+            console.warn("Directory Roles access denied", error);
+            return [];
+        }
+    }
 }
