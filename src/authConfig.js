@@ -16,7 +16,10 @@ export const loginRequest = {
         "User.Read",
         "Directory.Read.All",
         "Reports.Read.All",
-        "MailboxSettings.Read"
+        "MailboxSettings.Read",
+        "ServiceHealth.Read.All",
+        "AuditLog.Read.All",
+        "DeviceManagementManagedDevices.Read.All"
     ]
 };
 

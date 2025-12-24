@@ -31,9 +31,7 @@ const Header = ({
                         <div className="w-2.5 h-2.5 bg-[#00a4ef] rounded-[1px]"></div>
                         <div className="w-2.5 h-2.5 bg-[#ffb900] rounded-[1px]"></div>
                     </div>
-                    <span className="font-bold text-xl font-['Outfit'] tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
-                        M365 Portal
-                    </span>
+
                 </div>
             </div>
 

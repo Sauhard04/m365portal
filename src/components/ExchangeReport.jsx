@@ -118,13 +118,15 @@ const ExchangeReport = () => {
     const handleDownloadCSV = () => {
         if (filteredData.length === 0) return;
 
-        const headers = ['Display Name', 'Email Address', 'Archive Policy', 'Retention Policy', 'Auto Expanding', 'Mailbox Size', 'Data Migrated', 'Migration Status'];
+        const headers = ['Display Name', 'Email Address', 'Emails Sent (7d)', 'Emails Received (7d)', 'Archive Policy', 'Retention Policy', 'Auto Expanding', 'Mailbox Size', 'Data Migrated', 'Migration Status'];
         const csvRows = [headers.join(',')];
 
         filteredData.forEach(row => {
             const values = [
                 `"${row.displayName || ''}"`,
                 `"${row.emailAddress || ''}"`,
+                row.sentCount || 0,
+                row.receivedCount || 0,
                 row.archivePolicy ? 'Enabled' : 'Disabled',
                 `"${row.retentionPolicy || ''}"`,
                 row.autoExpanding ? 'Yes' : 'No',
@@ -234,8 +236,26 @@ const ExchangeReport = () => {
             });
 
             const graphService = new GraphService(response.accessToken);
-            const { reports, isConcealed: concealedFlag } = await graphService.getExchangeMailboxReport();
-            setReportData(reports);
+
+            // Fetch Mailbox Usage and Email Activity in parallel
+            const [mailboxData, activityData] = await Promise.all([
+                graphService.getExchangeMailboxReport(),
+                graphService.getEmailActivityUserDetail('D7')
+            ]);
+
+            const { reports: mailboxReports, isConcealed: concealedFlag } = mailboxData;
+
+            // Merge Activity Data into Mailbox Reports
+            const mergedReports = mailboxReports.map(mb => {
+                const activity = activityData.find(a => a.userPrincipalName?.toLowerCase() === mb.userPrincipalName?.toLowerCase());
+                return {
+                    ...mb,
+                    sentCount: activity ? activity.sendCount : 0,
+                    receivedCount: activity ? activity.receiveCount : 0
+                };
+            });
+
+            setReportData(mergedReports);
             setIsConcealed(concealedFlag);
         } catch (err) {
             console.error("Data Fetch Error:", err);
@@ -522,6 +542,8 @@ const ExchangeReport = () => {
                                                 </th>
                                                 <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Display Name</th>
                                                 <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Email Address</th>
+                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Sent (7d)</th>
+                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Received (7d)</th>
                                                 <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Mailbox Size</th>
                                                 <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Data Migrated</th>
                                                 <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Migration Status</th>
@@ -549,6 +571,8 @@ const ExchangeReport = () => {
                                                     </td>
                                                     <td className="py-5 px-6 font-semibold text-white group-hover:text-blue-400 transition-colors">{report.displayName}</td>
                                                     <td className="py-5 px-6 text-gray-400 font-mono text-sm">{report.emailAddress}</td>
+                                                    <td className="py-5 px-6 text-gray-300 font-mono text-sm">{report.sentCount}</td>
+                                                    <td className="py-5 px-6 text-gray-300 font-mono text-sm">{report.receivedCount}</td>
                                                     <td className="py-5 px-6 text-gray-300 font-mono text-sm">{report.mailboxSize}</td>
                                                     <td className="py-5 px-6 text-gray-300 font-mono text-sm">{report.dataMigrated}</td>
                                                     <td className="py-5 px-6">

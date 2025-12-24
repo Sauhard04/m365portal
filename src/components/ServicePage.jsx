@@ -4,7 +4,7 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { motion } from 'framer-motion';
-import { Settings, RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2, Shield, Activity, AlertTriangle } from 'lucide-react';
+import { Settings, RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2, Shield, Activity, AlertTriangle, Users, Mail, Globe, CreditCard, LayoutGrid, Trash2 } from 'lucide-react';
 
 const ServicePage = ({ serviceId: propServiceId }) => {
     const params = useParams();
@@ -31,6 +31,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
     const [auditLogs, setAuditLogs] = useState([]);
     const [caPolicies, setCaPolicies] = useState([]);
     const [globalAdmins, setGlobalAdmins] = useState([]);
+    const [deletedUsersCount, setDeletedUsersCount] = useState(0);
 
     const serviceNames = {
         admin: 'Admin',
@@ -106,6 +107,27 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 // Fetch Groups Count
                 graphService.getGroups().then(groups => {
                     setGroupsCount(groups.length);
+                });
+
+                // Fetch Deleted Users
+                graphService.getDeletedUsers().then(users => {
+                    setDeletedUsersCount(users ? users.length : 0);
+                });
+
+                // Fetch Security & Health Data
+                const [score, health, signIns] = await Promise.all([
+                    graphService.getSecureScore(),
+                    graphService.getServiceHealth(),
+                    graphService.getFailedSignIns()
+                ]);
+
+                if (score) setSecureScore(score);
+                if (health) setServiceHealth(health);
+                if (signIns) setFailedSignIns(signIns);
+
+                // Fetch Device Compliance
+                graphService.getDeviceComplianceStats().then(stats => {
+                    setDeviceSummary(stats);
                 });
 
                 // Process licensing users for the table
@@ -212,23 +234,26 @@ const ServicePage = ({ serviceId: propServiceId }) => {
         const totalSeats = licensingSummary.reduce((acc, sku) => acc + (sku.prepaidUnits?.enabled || 0), 0);
         const assignedSeats = licensingSummary.reduce((acc, sku) => acc + (sku.consumedUnits || 0), 0);
         stats = [
-            { label: 'Total Mailboxes', value: exchangeData.length.toString(), trend: 'Real-time' },
-            { label: 'Emails Sent (7d)', value: emailActivity.sent.toLocaleString(), trend: emailActivity.date ? `As of ${emailActivity.date}` : 'Activity*', color: 'text-purple-400' },
-            { label: 'Emails Received (7d)', value: emailActivity.received.toLocaleString(), trend: emailActivity.date ? `As of ${emailActivity.date}` : 'Activity*', color: 'text-blue-400' },
-            { label: 'Licenses Used', value: assignedSeats.toLocaleString(), trend: totalSeats > 0 ? Math.round((assignedSeats / totalSeats) * 100) + '%' : '0%', color: 'text-orange-400', path: '/service/admin/licenses' },
-            { label: 'Groups', value: groupsCount.toString(), trend: 'Manage', path: '/service/admin/groups', color: 'text-indigo-400' },
-            { label: 'Domains', value: domainsCount.toString(), trend: 'Manage', path: '/service/admin/domains', color: 'text-green-400' },
+            { label: 'Total Mailboxes', value: exchangeData.length.toString(), trend: 'Real-time', icon: Mail, color: 'text-blue-400', path: '/service/admin/report' },
+            { label: 'Emails Sent (7d)', value: emailActivity.sent.toLocaleString(), trend: emailActivity.date ? `As of ${emailActivity.date}` : 'Activity*', icon: Activity, color: 'text-purple-400' },
+            { label: 'Emails Received (7d)', value: emailActivity.received.toLocaleString(), trend: emailActivity.date ? `As of ${emailActivity.date}` : 'Activity*', icon: Activity, color: 'text-blue-400' },
+            { label: 'Licenses Used', value: assignedSeats.toLocaleString(), trend: totalSeats > 0 ? Math.round((assignedSeats / totalSeats) * 100) + '%' : '0%', color: 'text-orange-400', path: '/service/admin/licenses', icon: CreditCard },
+            { label: 'Groups', value: groupsCount.toString(), trend: 'Manage', path: '/service/admin/groups', color: 'text-indigo-400', icon: Users },
+            { label: 'Domains', value: domainsCount.toString(), trend: 'Manage', path: '/service/admin/domains', color: 'text-green-400', icon: Globe },
             /* Admin Extras */
-            { label: 'Inactive Users', value: inactiveUsers.toString(), trend: '> 30 Days', color: 'text-red-400' },
-            { label: 'Device Compliance', value: deviceSummary.total > 0 ? Math.round((deviceSummary.compliant / deviceSummary.total) * 100) + '%' : 'No Data', trend: `${deviceSummary.compliant}/${deviceSummary.total}`, color: 'text-teal-400' }
+            { label: 'Deleted Users', value: deletedUsersCount.toString(), trend: 'Restore', color: 'text-red-400', icon: Trash2, path: '/service/admin/deleted-users' },
+            { label: 'Secure Score', value: secureScore ? `${Math.round((secureScore.currentScore / secureScore.maxScore) * 100)}%` : 'N/A', trend: secureScore ? `${secureScore.currentScore} Pts` : 'Check', color: 'text-blue-500', icon: Shield, path: '/service/admin/secure-score' },
+            { label: 'Failed Logins (24h)', value: failedSignIns ? failedSignIns.length.toString() : 'N/A', trend: failedSignIns ? 'Review' : 'Access Denied', color: 'text-yellow-400', icon: AlertTriangle, path: '/service/admin/sign-ins' },
+            { label: 'Service Health', value: serviceHealth ? (serviceHealth.filter(s => s.status !== 'ServiceOperational').length > 0 ? `${serviceHealth.filter(s => s.status !== 'ServiceOperational').length} Issues` : 'Healthy') : 'N/A', trend: serviceHealth ? 'Status' : 'Access Denied', color: 'text-green-400', icon: Activity, path: '/service/admin/service-health' },
+            { label: 'Device Compliance', value: deviceSummary.total > 0 ? Math.round((deviceSummary.compliant / deviceSummary.total) * 100) + '%' : 'No Data', trend: `${deviceSummary.compliant}/${deviceSummary.total}`, color: 'text-teal-400', icon: Shield }
         ];
     } else if (isEntra) {
         stats = [
-            { label: 'Total Users', value: exchangeData.length.toString(), trend: 'Manage', path: '/service/entra/users', color: 'text-blue-400' },
-            { label: 'Groups', value: groupsCount.toString(), trend: 'Manage', path: '/service/entra/groups', color: 'text-indigo-400' },
-            { label: 'Applications', value: appsCount.toString(), trend: 'Manage', path: '/service/entra/apps', color: 'text-cyan-400' },
-            { label: 'Global Admins', value: globalAdmins.length.toString(), trend: 'Security', color: 'text-red-400' },
-            { label: 'CA Policies', value: caPolicies.length.toString(), trend: `${caPolicies.filter(p => p.state === 'enabled').length} Active`, color: 'text-orange-400' }
+            { label: 'Total Users', value: exchangeData.length.toString(), trend: 'Manage', path: '/service/entra/users', color: 'text-blue-400', icon: Users },
+            { label: 'Groups', value: groupsCount.toString(), trend: 'Manage', path: '/service/entra/groups', color: 'text-indigo-400', icon: Users },
+            { label: 'Applications', value: appsCount.toString(), trend: 'Manage', path: '/service/entra/apps', color: 'text-cyan-400', icon: LayoutGrid },
+            { label: 'Global Admins', value: globalAdmins.length.toString(), trend: 'Security', color: 'text-red-400', icon: Shield },
+            { label: 'CA Policies', value: caPolicies.length.toString(), trend: `${caPolicies.filter(p => p.state === 'enabled').length} Active`, color: 'text-orange-400', icon: Shield }
         ];
     } else if (isLicensing) {
         // Calculate license stats
@@ -237,9 +262,9 @@ const ServicePage = ({ serviceId: propServiceId }) => {
         const availableSeats = totalSeats - assignedSeats;
 
         stats = [
-            { label: 'Total Licenses', value: totalSeats.toLocaleString(), trend: 'Capacity' },
-            { label: 'Assigned', value: assignedSeats.toLocaleString(), trend: Math.round((assignedSeats / totalSeats) * 100) + '% Used' },
-            { label: 'Available', value: availableSeats.toLocaleString(), trend: 'Free', color: 'text-blue-400' }
+            { label: 'Total Licenses', value: totalSeats.toLocaleString(), trend: 'Capacity', icon: CreditCard, color: 'text-gray-400' },
+            { label: 'Assigned', value: assignedSeats.toLocaleString(), trend: Math.round((assignedSeats / totalSeats) * 100) + '% Used', icon: CreditCard, color: 'text-blue-400' },
+            { label: 'Available', value: availableSeats.toLocaleString(), trend: 'Free', color: 'text-green-400', icon: CreditCard }
         ];
     } else {
         stats = [];
@@ -389,7 +414,10 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                             onClick={stat.path ? () => navigate(stat.path) : undefined}
                             className={`glass p-6 ${stat.path ? 'cursor-pointer hover:bg-white/5 transition-all hover:scale-[1.02]' : ''}`}
                         >
-                            <p className="text-gray-400 text-sm mb-1">{stat.label}</p>
+                            <div className="flex justify-between items-start mb-2">
+                                <p className="text-gray-400 text-sm">{stat.label}</p>
+                                {stat.icon && <stat.icon className={`w-5 h-5 ${stat.color || 'text-gray-400'}`} />}
+                            </div>
                             <p className="text-3xl font-bold">{stat.value}</p>
                             <div className={`mt-4 flex items-center text-xs ${stat.color || 'text-green-400'}`}>
                                 <span className="font-bold">{stat.trend}</span>
@@ -437,94 +465,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                     </div>
                 )}
 
-                {/* Advanced Admin Features */}
-                {isAdmin && (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-                        {/* Secure Score */}
-                        <div className="glass p-6">
-                            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                <Shield className="w-5 h-5 text-blue-400" />
-                                Secure Score
-                            </h3>
-                            {secureScore ? (
-                                <div className="flex items-center gap-6">
-                                    <div className="relative w-24 h-24 flex items-center justify-center">
-                                        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                                            <path
-                                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                                fill="none"
-                                                stroke="#333"
-                                                strokeWidth="4"
-                                            />
-                                            <path
-                                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                                                fill="none"
-                                                stroke="#3b82f6"
-                                                strokeWidth="4"
-                                                strokeDasharray={`${(secureScore.currentScore / secureScore.maxScore) * 100}, 100`}
-                                            />
-                                        </svg>
-                                        <span className="absolute text-xl font-bold">{Math.round((secureScore.currentScore / secureScore.maxScore) * 100)}%</span>
-                                    </div>
-                                    <div>
-                                        <div className="text-3xl font-bold">{secureScore.currentScore} <span className="text-sm text-gray-500">/ {secureScore.maxScore}</span></div>
-                                        <div className="text-gray-400 text-sm mt-1">Microsoft Benchmarked Security</div>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="text-gray-500 text-sm flex flex-col gap-2">
-                                    <p>Secure Score unavailable.</p>
-                                    <span className="text-xs text-gray-600">Requires SecurityEvents.Read.All permission.</span>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Recent Failed Sign-ins */}
-                        <div className="glass p-6">
-                            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                <AlertTriangle className="w-5 h-5 text-yellow-400" />
-                                Recent Failed Logins
-                            </h3>
-                            <div className="space-y-3 max-h-[140px] overflow-y-auto custom-scrollbar">
-                                {failedSignIns.length > 0 ? failedSignIns.map((log, i) => (
-                                    <div key={i} className="flex items-center justify-between text-sm p-2 bg-white/5 rounded-lg border border-white/5 hover:bg-white/10 transition-colors">
-                                        <div>
-                                            <div className="text-white font-medium">{log.userPrincipalName}</div>
-                                            <div className="text-xs text-gray-400">{log.location?.city}, {log.location?.countryOrRegion}</div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="text-red-400 text-xs">{log.status?.failureReason || 'Failed'}</div>
-                                            <div className="text-gray-500 text-[10px]">{new Date(log.createdDateTime).toLocaleTimeString()}</div>
-                                        </div>
-                                    </div>
-                                )) : (
-                                    <div className="text-gray-500 text-sm">No recent failed sign-ins found or access denied.</div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Service Health */}
-                        <div className="glass p-6 col-span-1 lg:col-span-2">
-                            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                <Activity className="w-5 h-5 text-green-400" />
-                                Service Health Status
-                            </h3>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                {serviceHealth.length > 0 ? serviceHealth.slice(0, 8).map((s, i) => (
-                                    <div key={i} className="p-3 bg-white/5 rounded-lg border border-white/5 flex flex-col">
-                                        <span className="text-sm font-medium mb-1 truncate" title={s.service}>{s.service}</span>
-                                        <div className="flex items-center gap-2">
-                                            <div className={`w-2 h-2 rounded-full ${s.status === 'ServiceOperational' ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
-                                            <span className={`text-xs ${s.status === 'ServiceOperational' ? 'text-green-400' : 'text-yellow-400'}`}>
-                                                {s.status === 'ServiceOperational' ? 'Operational' : s.status}
-                                            </span>
-                                        </div>
-                                    </div>
-                                )) : <div className="text-gray-500">Service health data unavailable (Requires ServiceHealth.Read.All).</div>}
-                            </div>
-                        </div>
-                    </div>
-                )}
+                {/* Advanced Admin Features - REMOVED (Moved to Tiles) */}
 
                 {/* Entra Specific Dashboards */}
                 {isEntra && (

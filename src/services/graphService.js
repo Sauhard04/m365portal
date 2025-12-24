@@ -350,4 +350,87 @@ export class GraphService {
     }
 
 
+    // Security: Secure Score
+    async getSecureScore() {
+        try {
+            const res = await this.client.api("/security/secureScores")
+                .top(1)
+                .select("currentScore,maxScore,createdDateTime")
+                .orderby("createdDateTime desc")
+                .get();
+            return res.value?.[0] || null;
+        } catch (error) {
+            console.warn("Secure Score access denied", error);
+            return null;
+        }
+    }
+
+    // Admin: Service Health
+    async getServiceHealth() {
+        try {
+            const res = await this.client.api("/admin/serviceAnnouncement/healthOverviews")
+                .select("service,status")
+                .get();
+            return res.value || [];
+        } catch (error) {
+            console.warn("Service Health access denied", error);
+            return null;
+        }
+    }
+
+    // Service Issues (Incidents)
+    async getServiceIssues() {
+        try {
+            const res = await this.client.api("/admin/serviceAnnouncement/issues")
+                .filter("isResolved eq false")
+                .orderby("lastModifiedDateTime desc")
+                .top(20)
+                .get();
+            return res.value || [];
+        } catch (error) {
+            console.warn("Service Issues access denied", error);
+            return [];
+        }
+    }
+
+    // Security: Failed Sign-ins
+    async getFailedSignIns() {
+        try {
+            const res = await this.client.api("/auditLogs/signIns")
+                .filter("status/errorCode ne 0")
+                .top(5)
+                .orderby("createdDateTime desc")
+                .get();
+            return res.value || [];
+        } catch (error) {
+            console.warn("Sign-ins access denied", error);
+            return null;
+        }
+    }
+    async getDeletedUsers() {
+        try {
+            const response = await this.client.api("/directory/deletedItems/microsoft.graph.user")
+                .select("id,displayName,userPrincipalName,mail,deletedDateTime")
+                .top(100)
+                .get();
+            return response.value || [];
+        } catch (error) {
+            console.error("Graph API Error (Deleted Users):", error);
+            return [];
+        }
+    }
+
+    // Device Compliance Stats
+    async getDeviceComplianceStats() {
+        try {
+            const [total, compliant] = await Promise.all([
+                this.client.api('/deviceManagement/managedDevices').header('ConsistencyLevel', 'eventual').count(true).get().then(res => res['@odata.count'] || 0).catch(() => 0),
+                this.client.api('/deviceManagement/managedDevices').header('ConsistencyLevel', 'eventual').count(true).filter("complianceState eq 'compliant'").get().then(res => res['@odata.count'] || 0).catch(() => 0)
+            ]);
+            return { total, compliant };
+        } catch (error) {
+            console.warn("Device Info access denied", error);
+            return { total: 0, compliant: 0 };
+        }
+    }
 }
