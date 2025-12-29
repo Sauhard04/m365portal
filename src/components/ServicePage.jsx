@@ -4,7 +4,7 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { motion } from 'framer-motion';
-import { Settings, RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2, Shield, Activity, AlertTriangle, Users, Mail, Globe, CreditCard, LayoutGrid, Trash2 } from 'lucide-react';
+import { Settings, RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2, Shield, Activity, AlertTriangle, Users, Mail, Globe, CreditCard, LayoutGrid, Trash2, ArrowRight } from 'lucide-react';
 
 const ServicePage = ({ serviceId: propServiceId }) => {
     const params = useParams();
@@ -21,690 +21,273 @@ const ServicePage = ({ serviceId: propServiceId }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // New Features State
+    // Entra Specific State
     const [secureScore, setSecureScore] = useState(null);
     const [serviceHealth, setServiceHealth] = useState([]);
     const [failedSignIns, setFailedSignIns] = useState([]);
     const [deviceSummary, setDeviceSummary] = useState({ total: 0, compliant: 0 });
-    const [inactiveUsers, setInactiveUsers] = useState(0);
     const [appsCount, setAppsCount] = useState(0);
     const [auditLogs, setAuditLogs] = useState([]);
     const [caPolicies, setCaPolicies] = useState([]);
     const [globalAdmins, setGlobalAdmins] = useState([]);
     const [deletedUsersCount, setDeletedUsersCount] = useState(0);
+    const [licensingSummary, setLicensingSummary] = useState([]);
 
     const serviceNames = {
-        admin: 'Admin',
+        admin: 'Admin Center',
         entra: 'Microsoft Entra ID',
         intune: 'Microsoft Intune',
         purview: 'Microsoft Purview',
         licensing: 'Licensing & Billing'
     };
 
-    const name = serviceNames[serviceId] || 'Service Module';
     const isAdmin = serviceId === 'admin';
     const isEntra = serviceId === 'entra';
     const isLicensing = serviceId === 'licensing';
-
-    const [licensingSummary, setLicensingSummary] = useState([]);
-
-    const filteredData = reportData.filter(item => {
-        if (!filterText) return true;
-        const searchStr = filterText.toLowerCase();
-        const name = item.displayName?.toLowerCase() || '';
-        const email = item.emailAddress?.toLowerCase() || '';
-        const raw = String(item).toLowerCase();
-        return name.includes(searchStr) || email.includes(searchStr) || raw.includes(searchStr);
-    });
-
-    const filteredExchangeData = exchangeData.filter(item => {
-        if (!filterText) return true;
-        const searchStr = filterText.toLowerCase();
-        const name = item.displayName?.toLowerCase() || '';
-        const email = item.emailAddress?.toLowerCase() || '';
-        return name.includes(searchStr) || email.includes(searchStr);
-    });
 
     const fetchData = async () => {
         setLoading(true);
         setError(null);
         try {
             if (accounts.length === 0) return;
-
-            const response = await instance.acquireTokenSilent({
-                ...loginRequest,
-                account: accounts[0]
-            });
-
+            const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
             const graphService = new GraphService(response.accessToken);
 
             if (isAdmin) {
-                // Fetch both Exchange and Licensing data
                 const [exchangeResult, licensingResult] = await Promise.all([
                     graphService.getExchangeMailboxReport().catch(() => ({ reports: [] })),
                     graphService.getLicensingData().catch(() => ({ skus: [], users: [] }))
                 ]);
-
                 setExchangeData(exchangeResult.reports || []);
+                setLicensingSummary(licensingResult.skus || []);
 
-                const { skus, users } = licensingResult;
-                setLicensingSummary(skus || []);
-
-                // Fetch Email Activity - Use User Detail for accurate sums
                 graphService.getEmailActivityUserDetail('D7').then(activity => {
                     const sent = activity.reduce((acc, curr) => acc + (parseInt(curr.sendCount) || 0), 0);
                     const received = activity.reduce((acc, curr) => acc + (parseInt(curr.receiveCount) || 0), 0);
-                    const latestDate = activity.length > 0 ? activity[0].reportRefreshDate : null;
-                    setEmailActivity({ sent, received, date: latestDate });
-                    console.log("Email Activity Data:", activity); // Debug log
+                    setEmailActivity({ sent, received, date: activity[0]?.reportRefreshDate });
                 });
 
-                // Fetch Domains Count
-                graphService.getDomains().then(domains => {
-                    setDomainsCount(domains.length);
-                });
+                graphService.getDomains().then(d => setDomainsCount(d.length));
+                graphService.getGroups().then(g => setGroupsCount(g.length));
+                graphService.getDeletedUsers().then(u => setDeletedUsersCount(u?.length || 0));
+                graphService.getDeviceComplianceStats().then(s => setDeviceSummary(s));
 
-                // Fetch Groups Count
-                graphService.getGroups().then(groups => {
-                    setGroupsCount(groups.length);
-                });
-
-                // Fetch Deleted Users
-                graphService.getDeletedUsers().then(users => {
-                    setDeletedUsersCount(users ? users.length : 0);
-                });
-
-                // Fetch Security & Health Data
                 const [score, health, signIns] = await Promise.all([
                     graphService.getSecureScore(),
                     graphService.getServiceHealth(),
                     graphService.getFailedSignIns()
                 ]);
-
                 if (score) setSecureScore(score);
                 if (health) setServiceHealth(health);
                 if (signIns) setFailedSignIns(signIns);
 
-                // Fetch Device Compliance
-                graphService.getDeviceComplianceStats().then(stats => {
-                    setDeviceSummary(stats);
-                });
-
-                // Process licensing users for the table
-
-                // Process licensing users for the table
-                const skuMap = new Map();
-                (skus || []).forEach(sku => skuMap.set(sku.skuId, sku.skuPartNumber));
-
-                const processedUsers = (users || []).map(user => ({
-                    displayName: user.displayName,
-                    emailAddress: user.userPrincipalName,
-                    licenses: user.assignedLicenses.map(l => skuMap.get(l.skuId) || 'Unknown SKU').join(', ') || 'No License',
-                    licenseCount: user.assignedLicenses.length
-                }));
-                setReportData(processedUsers);
             } else if (isEntra) {
-                const apps = await graphService.getApplications();
-                setAppsCount(apps ? apps.length : 0);
-
-                const groups = await graphService.getGroups();
-                setGroupsCount(groups ? groups.length : 0);
-
-                // Fetch Users for Count
-                const usersData = await graphService.getExchangeMailboxReport();
+                const [apps, groups, usersData, domains, audits, policies, admins] = await Promise.all([
+                    graphService.getApplications(),
+                    graphService.getGroups(),
+                    graphService.getExchangeMailboxReport(),
+                    graphService.getDomains(),
+                    graphService.getDirectoryAudits(),
+                    graphService.getConditionalAccessPolicies(),
+                    graphService.getGlobalAdmins()
+                ]);
+                setAppsCount(apps?.length || 0);
+                setGroupsCount(groups?.length || 0);
                 setExchangeData(usersData.reports || []);
-
-                // Use domains count too
-                const domains = await graphService.getDomains();
-                setDomainsCount(domains ? domains.length : 0);
-
-                // Fetch Advanced Entra Features
-                const [audits, policies, admins] = await Promise.all([
-                    graphService.getDirectoryAudits(),
-                    graphService.getConditionalAccessPolicies(),
-                    graphService.getGlobalAdmins()
-                ]);
-
+                setDomainsCount(domains?.length || 0);
                 if (audits?.value) setAuditLogs(audits.value);
                 if (policies) setCaPolicies(policies);
                 if (admins) setGlobalAdmins(admins);
-
-            } else if (isEntra) {
-                const apps = await graphService.getApplications();
-                setAppsCount(apps ? apps.length : 0);
-                const groups = await graphService.getGroups();
-                setGroupsCount(groups ? groups.length : 0);
-
-                // Fetch Users for Count and Table
-                const usersData = await graphService.getExchangeMailboxReport();
-                const uList = usersData.reports || [];
-                setExchangeData(uList);
-                setReportData(uList); // Populate main table with rich user data
-
-                const domains = await graphService.getDomains();
-                setDomainsCount(domains ? domains.length : 0);
-
-                const [audits, policies, admins] = await Promise.all([
-                    graphService.getDirectoryAudits(),
-                    graphService.getConditionalAccessPolicies(),
-                    graphService.getGlobalAdmins()
-                ]);
-                if (audits?.value) setAuditLogs(audits.value);
-                if (policies) setCaPolicies(policies);
-                if (admins) setGlobalAdmins(admins);
-
-            } else if (isLicensing) {
-                const { skus, users } = await graphService.getLicensingData();
-                setLicensingSummary(skus);
-
-                // create a map of SKU Id to SKU Part Number for easy lookup
-                const skuMap = new Map();
-                skus.forEach(sku => skuMap.set(sku.skuId, sku.skuPartNumber));
-
-                // Process users for the table
-                const processedUsers = users.map(user => ({
-                    displayName: user.displayName,
-                    emailAddress: user.userPrincipalName,
-                    licenses: user.assignedLicenses.map(l => skuMap.get(l.skuId) || 'Unknown SKU').join(', ') || 'No License',
-                    licenseCount: user.assignedLicenses.length
-                }));
-                setReportData(processedUsers);
-            } else {
-                setReportData([]);
             }
         } catch (err) {
-            console.error("Data Fetch Error:", err);
-            setError("Failed to fetch real-time data from Microsoft Graph. Please check permissions.");
-            // Fallback to empty if real fetch fails
-            setReportData([]);
+            console.error("Fetch error:", err);
+            setError("Connectivity issue with Microsoft Graph.");
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        if (accounts.length > 0) {
-            fetchData();
-        }
-    }, [serviceId, instance, accounts]);
+    useEffect(() => { fetchData(); }, [serviceId]);
 
-    let stats = [];
-    if (isAdmin) {
-        // Combined stats for Admin page
-        const totalSeats = licensingSummary.reduce((acc, sku) => acc + (sku.prepaidUnits?.enabled || 0), 0);
-        const assignedSeats = licensingSummary.reduce((acc, sku) => acc + (sku.consumedUnits || 0), 0);
-        stats = [
-            { label: 'Total Mailboxes', value: exchangeData.length.toString(), trend: 'Real-time', icon: Mail, color: 'text-blue-400', path: '/service/admin/report' },
-            { label: 'Emails Sent (7d)', value: emailActivity.sent.toLocaleString(), trend: emailActivity.date ? `As of ${emailActivity.date}` : 'Activity*', icon: Activity, color: 'text-purple-400' },
-            { label: 'Emails Received (7d)', value: emailActivity.received.toLocaleString(), trend: emailActivity.date ? `As of ${emailActivity.date}` : 'Activity*', icon: Activity, color: 'text-blue-400' },
-            { label: 'Licenses Used', value: assignedSeats.toLocaleString(), trend: totalSeats > 0 ? Math.round((assignedSeats / totalSeats) * 100) + '%' : '0%', color: 'text-orange-400', path: '/service/admin/licenses', icon: CreditCard },
-            { label: 'Groups', value: groupsCount.toString(), trend: 'Manage', path: '/service/admin/groups', color: 'text-indigo-400', icon: Users },
-            { label: 'Domains', value: domainsCount.toString(), trend: 'Manage', path: '/service/admin/domains', color: 'text-green-400', icon: Globe },
-            /* Admin Extras */
-            { label: 'Deleted Users', value: deletedUsersCount.toString(), trend: 'Restore', color: 'text-red-400', icon: Trash2, path: '/service/admin/deleted-users' },
-            { label: 'Secure Score', value: secureScore ? `${Math.round((secureScore.currentScore / secureScore.maxScore) * 100)}%` : 'N/A', trend: secureScore ? `${secureScore.currentScore} Pts` : 'Check', color: 'text-blue-500', icon: Shield, path: '/service/admin/secure-score' },
-            { label: 'Failed Logins (24h)', value: failedSignIns ? failedSignIns.length.toString() : 'N/A', trend: failedSignIns ? 'Review' : 'Access Denied', color: 'text-yellow-400', icon: AlertTriangle, path: '/service/admin/sign-ins' },
-            { label: 'Service Health', value: serviceHealth ? (serviceHealth.filter(s => s.status !== 'ServiceOperational').length > 0 ? `${serviceHealth.filter(s => s.status !== 'ServiceOperational').length} Issues` : 'Healthy') : 'N/A', trend: serviceHealth ? 'Status' : 'Access Denied', color: 'text-green-400', icon: Activity, path: '/service/admin/service-health' },
-            { label: 'Device Compliance', value: deviceSummary.total > 0 ? Math.round((deviceSummary.compliant / deviceSummary.total) * 100) + '%' : 'No Data', trend: `${deviceSummary.compliant}/${deviceSummary.total}`, color: 'text-teal-400', icon: Shield }
-        ];
-    } else if (isEntra) {
-        stats = [
-            { label: 'Total Users', value: exchangeData.length.toString(), trend: 'Manage', path: '/service/entra/users', color: 'text-blue-400', icon: Users },
-            { label: 'Groups', value: groupsCount.toString(), trend: 'Manage', path: '/service/entra/groups', color: 'text-indigo-400', icon: Users },
-            { label: 'Applications', value: appsCount.toString(), trend: 'Manage', path: '/service/entra/apps', color: 'text-cyan-400', icon: LayoutGrid },
-            { label: 'Global Admins', value: globalAdmins.length.toString(), trend: 'Security', color: 'text-red-400', icon: Shield },
-            { label: 'CA Policies', value: caPolicies.length.toString(), trend: `${caPolicies.filter(p => p.state === 'enabled').length} Active`, color: 'text-orange-400', icon: Shield }
-        ];
-    } else if (isLicensing) {
-        // Calculate license stats
-        const totalSeats = licensingSummary.reduce((acc, sku) => acc + (sku.prepaidUnits?.enabled || 0), 0);
-        const assignedSeats = licensingSummary.reduce((acc, sku) => acc + (sku.consumedUnits || 0), 0);
-        const availableSeats = totalSeats - assignedSeats;
-
-        stats = [
-            { label: 'Total Licenses', value: totalSeats.toLocaleString(), trend: 'Capacity', icon: CreditCard, color: 'text-gray-400' },
-            { label: 'Assigned', value: assignedSeats.toLocaleString(), trend: Math.round((assignedSeats / totalSeats) * 100) + '% Used', icon: CreditCard, color: 'text-blue-400' },
-            { label: 'Available', value: availableSeats.toLocaleString(), trend: 'Free', color: 'text-green-400', icon: CreditCard }
-        ];
-    } else {
-        stats = [];
-    }
-
-    const handleDownloadCSV = () => {
-        if (filteredData.length === 0) return;
-
-        let headers = [];
-        let csvRows = [];
-
-        if (isLicensing) {
-            headers = ['Display Name', 'Email / UPN', 'Assigned Licenses', 'Count'];
-            csvRows.push(headers.join(','));
-
-            filteredData.forEach(row => {
-                const values = [
-                    `"${row.displayName || ''}"`,
-                    `"${row.emailAddress || ''}"`,
-                    `"${row.licenses || ''}"`,
-                    `"${row.licenseCount || 0}"`
-                ];
-                csvRows.push(values.join(','));
-            });
-        } else {
-            // Generic Fallback
-            headers = ['User / Resource', 'Status', 'Activity', 'Time'];
-            csvRows.push(headers.join(','));
-
-            filteredData.forEach(row => {
-                const values = [
-                    `"User Resource ${row}"`,
-                    '"Active"',
-                    '"Policy modification detected"',
-                    `"${row}h ago"`
-                ];
-                csvRows.push(values.join(','));
-            });
-        }
-
-        const csvContent = csvRows.join('\n');
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.setAttribute('href', url);
-        link.setAttribute('download', `${serviceId}_report.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
-    const handleDownloadExchangeReport = () => {
-        if (exchangeData.length === 0) return;
-
-        const headers = [
-            'Display Name',
-            'User Principal Name',
-            'Job Title',
-            'Department',
-            'Office Location',
-            'City',
-            'Country',
-            'Account Enabled',
-            'Created Date',
-            'Last Activity Date',
-            'Item Count',
-            'Deleted Item Count',
-            'Mailbox Size Used',
-            'Quota Used %',
-            'Issue Warning Quota',
-            'Prohibit Send Quota',
-            'Prohibit Send/Receive Quota',
-            'Archive Status',
-            'Retention Policy',
-            'Auto Expanding',
-            'Migration Status'
-        ];
-
-        const csvRows = [headers.join(',')];
-
-        exchangeData.forEach(row => {
-            const values = [
-                `"${row.displayName || ''}"`,
-                `"${row.userPrincipalName || ''}"`,
-                `"${row.jobTitle || ''}"`,
-                `"${row.department || ''}"`,
-                `"${row.officeLocation || ''}"`,
-                `"${row.city || ''}"`,
-                `"${row.country || ''}"`,
-                `"${row.accountEnabled || ''}"`,
-                `"${row.createdDateTime || ''}"`,
-                `"${row.lastActivityDate || ''}"`,
-                `"${row.itemCount || 0}"`,
-                `"${row.deletedItemCount || 0}"`,
-                `"${row.mailboxSize || ''}"`,
-                `"${row.quotaUsedPct || ''}"`,
-                `"${row.issueWarningQuota || ''}"`,
-                `"${row.prohibitSendQuota || ''}"`,
-                `"${row.prohibitSendReceiveQuota || ''}"`,
-                row.archivePolicy ? 'Enabled' : 'Disabled',
-                `"${row.retentionPolicy || ''}"`,
-                `"${row.autoExpanding || ''}"`,
-                `"${row.migrationStatus || ''}"`
-            ];
-            csvRows.push(values.join(','));
-        });
-
-        const csvContent = csvRows.join('\n');
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.setAttribute('href', url);
-        link.setAttribute('download', 'full_exchange_report.csv');
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
+    const stats = isAdmin ? [
+        { label: 'Total Mailboxes', value: exchangeData.length, icon: Mail, color: 'var(--accent-blue)', path: '/service/admin/report', trend: 'Live' },
+        { label: 'Emails Sent (7d)', value: emailActivity.sent.toLocaleString(), icon: Activity, color: 'var(--accent-purple)', path: '/service/admin/emails', trend: emailActivity.date ? `As of ${emailActivity.date}` : '7 Days' },
+        { label: 'Emails Received (7d)', value: emailActivity.received.toLocaleString(), icon: Activity, color: 'var(--accent-blue)', path: '/service/admin/emails', trend: emailActivity.date ? `As of ${emailActivity.date}` : '7 Days' },
+        { label: 'Licenses Used', value: licensingSummary.reduce((acc, curr) => acc + (curr.consumedUnits || 0), 0), icon: CreditCard, color: 'var(--accent-cyan)', path: '/service/admin/licenses', trend: 'Active' },
+        { label: 'Groups', value: groupsCount, icon: Users, color: 'var(--accent-indigo)', path: '/service/admin/groups', trend: 'Manage' },
+        { label: 'Domains', value: domainsCount, icon: Globe, color: 'var(--accent-success)', path: '/service/admin/domains', trend: 'Manage' },
+        { label: 'Deleted Users', value: deletedUsersCount, icon: Trash2, color: 'var(--accent-error)', path: '/service/admin/deleted-users', trend: 'Restore' },
+        { label: 'Secure Score', value: secureScore ? `${Math.round((secureScore.currentScore / secureScore.maxScore) * 100)}%` : '--', icon: Shield, color: 'var(--accent-blue)', path: '/service/admin/secure-score', trend: `${secureScore?.currentScore || 0} Pts` },
+        { label: 'Failed Logins (24h)', value: failedSignIns.length, icon: AlertTriangle, color: 'var(--accent-error)', path: '/service/admin/sign-ins', trend: 'Review' },
+        { label: 'Service Health', value: `${serviceHealth.filter(s => s.status !== 'ServiceOperational').length} Issues`, icon: Activity, color: 'var(--accent-warning)', path: '/service/admin/service-health', trend: 'Status' },
+        { label: 'Device Compliance', value: deviceSummary.total > 0 ? `${Math.round((deviceSummary.compliant / deviceSummary.total) * 100)}%` : '0%', icon: Shield, color: 'var(--accent-blue)', path: '/service/entra/devices', trend: `${deviceSummary.compliant}/${deviceSummary.total}` }
+    ] : isEntra ? [
+        { label: 'Users', value: exchangeData.length, icon: Users, color: 'var(--accent-blue)', path: '/service/entra/users' },
+        { label: 'Groups', value: groupsCount, icon: Users, color: 'var(--accent-purple)', path: '/service/entra/groups' },
+        { label: 'Applications', value: appsCount, icon: LayoutGrid, color: 'var(--accent-cyan)', path: '/service/entra/apps' },
+        { label: 'Global Admins', value: globalAdmins.length, icon: Shield, color: 'var(--accent-error)' }
+    ] : [];
 
     return (
-        <div className="w-full">
-            {/* Header removed as it is now in ServiceLayout */}
-
-            <div className="w-full">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold font-['Outfit'] bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent leading-tight mb-2">
-                        {name}
-                    </h1>
-                    <p className="text-sm text-gray-400">Manage and monitor resources</p>
+        <div className="animate-in">
+            <header className="flex-between spacing-v-8">
+                <div>
+                    <h1 className="title-gradient" style={{ fontSize: '32px' }}>{serviceNames[serviceId]} Overview</h1>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Real-time operational telemetry and management</p>
                 </div>
-                {error && (
-                    <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center space-x-3 text-red-400">
-                        <AlertCircle className="w-6 h-6" />
+                <div className="flex-gap-4">
+                    <button className="btn btn-secondary" onClick={fetchData}>
+                        <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+                        Refresh
+                    </button>
+                    <button className="btn btn-primary">
+                        <Download size={16} />
+                        Export Data
+                    </button>
+                </div>
+            </header>
+
+            {error && (
+                <div className="glass-card" style={{ background: 'hsla(0, 84%, 60%, 0.05)', borderColor: 'hsla(0, 84%, 60%, 0.2)', marginBottom: '32px', padding: '20px' }}>
+                    <div className="flex-center flex-gap-4" style={{ color: 'var(--accent-error)' }}>
+                        <AlertCircle size={24} />
                         <span>{error}</span>
                     </div>
-                )}
-
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
-                >
-                    {stats.map((stat, i) => (
-                        <div
-                            key={i}
-                            onClick={stat.path ? () => navigate(stat.path) : undefined}
-                            className={`glass p-6 ${stat.path ? 'cursor-pointer hover:bg-white/5 transition-all hover:scale-[1.02]' : ''}`}
-                        >
-                            <div className="flex justify-between items-start mb-2">
-                                <p className="text-gray-400 text-sm">{stat.label}</p>
-                                {stat.icon && <stat.icon className={`w-5 h-5 ${stat.color || 'text-gray-400'}`} />}
-                            </div>
-                            <p className="text-3xl font-bold">{stat.value}</p>
-                            <div className={`mt-4 flex items-center text-xs ${stat.color || 'text-green-400'}`}>
-                                <span className="font-bold">{stat.trend}</span>
-                                <span className="ml-2 text-gray-500 text-[10px] uppercase tracking-wider">Source: Microsoft Graph</span>
-                            </div>
-                        </div>
-                    ))}
-                </motion.div>
-
-                <div className="text-xs text-gray-500 mb-8 -mt-8 text-right px-2 italic">
-                    * Metrics reflect available reports (typically 24-48h delayed)
                 </div>
+            )}
 
-
-
-                {(isLicensing) && licensingSummary.length > 0 && (
-                    <div className="mb-12">
-                        <h3 className="text-xl font-bold mb-6">License Breakdown</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {licensingSummary.map((sku, i) => (
-                                <div key={i} className="glass p-6 border-l-4 border-l-blue-500">
-                                    <p className="text-gray-300 font-medium mb-1 truncate" title={sku.skuPartNumber}>{sku.skuPartNumber}</p>
-                                    <div className="flex justify-between items-end mt-4">
-                                        <div>
-                                            <p className="text-sm text-gray-500">Assigned</p>
-                                            <p className="text-2xl font-bold">{sku.consumedUnits}</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-sm text-gray-500">Total</p>
-                                            <p className="text-2xl font-bold">{sku.prepaidUnits?.enabled || 0}</p>
-                                        </div>
-                                    </div>
-                                    <div className="w-full bg-gray-700/50 h-1.5 mt-4 rounded-full overflow-hidden">
-                                        <div
-                                            className="bg-blue-500 h-full rounded-full"
-                                            style={{ width: `${Math.min(((sku.consumedUnits / (sku.prepaidUnits?.enabled || 1)) * 100), 100)}%` }}
-                                        />
-                                    </div>
-                                    <p className="text-xs text-right mt-1 text-gray-500">
-                                        {Math.round((sku.consumedUnits / (sku.prepaidUnits?.enabled || 1)) * 100)}% Used
-                                    </p>
-                                </div>
-                            ))}
+            <div className="stat-grid">
+                {stats.map((stat, i) => (
+                    <motion.div
+                        key={i}
+                        whileHover={{ y: -5 }}
+                        className="glass-card stat-card"
+                        onClick={() => stat.path && navigate(stat.path)}
+                        style={{ cursor: stat.path ? 'pointer' : 'default' }}
+                    >
+                        <div className="flex-between spacing-v-4">
+                            <span className="stat-label">{stat.label}</span>
+                            <stat.icon size={20} style={{ color: stat.color }} />
                         </div>
-                    </div>
-                )}
-
-                {/* Advanced Admin Features - REMOVED (Moved to Tiles) */}
-
-                {/* Entra Specific Dashboards */}
-                {isEntra && (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
-                        {/* Directory Audits */}
-                        <div className="glass p-6">
-                            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                <Activity className="w-5 h-5 text-indigo-400" />
-                                Recent Directory Audits
-                            </h3>
-                            <div className="space-y-3 max-h-[200px] overflow-y-auto custom-scrollbar">
-                                {auditLogs.length > 0 ? auditLogs.map((log, i) => (
-                                    <div key={i} className="text-sm p-3 bg-white/5 rounded-lg border border-white/5 flex justify-between items-start">
-                                        <div>
-                                            <div className="font-medium text-white">{log.activityDisplayName}</div>
-                                            <div className="text-xs text-gray-400 mt-1">
-                                                by {log.initiatedBy?.user?.userPrincipalName || 'System'}
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="text-xs text-gray-500">{new Date(log.activityDateTime).toLocaleTimeString()}</div>
-                                            <div className={`text-[10px] uppercase font-bold mt-1 ${log.result === 'success' ? 'text-green-500' : 'text-red-500' // 'success' is typical value, check Graph docs. Actually usually 'success' or 'failure'.
-                                                }`}>{log.result}</div>
-                                        </div>
-                                    </div>
-                                )) : <div className="text-gray-500 text-sm">No audit logs available (Requires AuditLog.Read.All).</div>}
-                            </div>
-                        </div>
-
-                        {/* Conditional Access */}
-                        <div className="glass p-6">
-                            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                                <Shield className="w-5 h-5 text-orange-400" />
-                                Conditional Access Policies
-                            </h3>
-                            <div className="space-y-2 max-h-[200px] overflow-y-auto custom-scrollbar">
-                                {caPolicies.length > 0 ? caPolicies.map((policy, i) => (
-                                    <div key={i} className="flex items-center justify-between p-2 hover:bg-white/5 rounded-md transition-colors">
-                                        <div className="flex items-center gap-2">
-                                            <div className={`w-2 h-2 rounded-full ${policy.state === 'enabled' ? 'bg-green-500' :
-                                                policy.state === 'disabled' ? 'bg-red-500' : 'bg-yellow-500'
-                                                }`} />
-                                            <span className="text-sm text-gray-300">{policy.displayName}</span>
-                                        </div>
-                                        <span className="text-xs text-gray-500 capitalize">{policy.state}</span>
-                                    </div>
-                                )) : <div className="text-gray-500 text-sm">No policies found or access denied.</div>}
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Exchange Section for Admin */}
-                {isAdmin && (
-                    <div className="mb-12">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-xl font-bold">Exchange Mailboxes</h3>
-                            <button
-                                onClick={handleDownloadExchangeReport}
-                                className="btn-primary !py-2 !px-5 !rounded-lg !text-sm flex items-center gap-2"
-                            >
-                                <Download className="w-4 h-4" />
-                                <span>Download Full Report</span>
-                            </button>
-                        </div>
-                        {loading ? (
-                            <div className="glass p-8 flex items-center justify-center">
-                                <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-                            </div>
-                        ) : exchangeData.length > 0 ? (
-                            <div className="glass p-6">
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                                    <div>
-                                        <p className="text-sm text-gray-400 mb-1">Total Mailboxes</p>
-                                        <p className="text-2xl font-bold">{exchangeData.length}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm text-gray-400 mb-1">Archive Enabled</p>
-                                        <p className="text-2xl font-bold">{exchangeData.filter(r => r.archivePolicy).length}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm text-gray-400 mb-1">Auto-Expanding</p>
-                                        <p className="text-2xl font-bold">{exchangeData.filter(r => r.autoExpanding).length}</p>
-                                    </div>
-                                </div>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left text-sm">
-                                        <thead className="border-b border-white/10">
-                                            <tr className="text-gray-400 uppercase tracking-wider text-xs">
-                                                <th className="pb-3 px-4 font-semibold">Display Name</th>
-                                                <th className="pb-3 px-4 font-semibold">Email</th>
-                                                <th className="pb-3 px-4 font-semibold text-center">Archive</th>
-                                                <th className="pb-3 px-4 font-semibold">Size</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-white/5">
-                                            {filteredExchangeData.slice(0, 5).map((mailbox, i) => (
-                                                <tr key={i} className="hover:bg-white/5 transition-colors">
-                                                    <td className="py-3 px-4 font-medium">{mailbox.displayName}</td>
-                                                    <td className="py-3 px-4 text-gray-400 text-xs">{mailbox.emailAddress}</td>
-                                                    <td className="py-3 px-4 text-center">
-                                                        {mailbox.archivePolicy ? (
-                                                            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-bold bg-green-400/10 text-green-400 border border-green-400/30">
-                                                                Enabled
-                                                            </span>
-                                                        ) : (
-                                                            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-bold bg-gray-500/10 text-gray-500 border border-gray-500/30">
-                                                                Disabled
-                                                            </span>
-                                                        )}
-                                                    </td>
-                                                    <td className="py-3 px-4 text-gray-300 text-xs">{mailbox.mailboxSize || 'N/A'}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                    {exchangeData.length > 5 && (
-                                        <div className="mt-4 text-center">
-                                            <button
-                                                onClick={() => navigate('/service/admin/report')}
-                                                className="text-sm text-blue-400 hover:text-blue-300"
-                                            >
-                                                View all {exchangeData.length} mailboxes →
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="glass p-8 text-center text-gray-400">
-                                <p>No exchange data available</p>
+                        <div className="stat-value">{stat.value}</div>
+                        {stat.trend && (
+                            <div className="flex-between mt-4" style={{ marginTop: '16px' }}>
+                                <span className="badge badge-info">{stat.trend}</span>
+                                <ArrowRight size={14} style={{ color: 'var(--text-dim)' }} />
                             </div>
                         )}
-                    </div>
-                )}
+                    </motion.div>
+                ))}
+            </div>
 
-                {!isAdmin && (
-                    <div className="glass p-8 relative min-h-[400px] flex items-center justify-center">
-                        <div className="w-full">
-                            <div className="flex items-center justify-between mb-8">
-                                <h3 className="text-xl font-bold">{isAdmin ? 'User License Assignments' : isLicensing ? 'User License Assignments' : 'Latest Reports'}</h3>
-                                <div className="flex items-center space-x-3">
-
-                                    <button
-                                        onClick={handleDownloadCSV}
-                                        className="p-2 hover:bg-white/10 rounded-lg border border-white/10"
-                                        title="Download CSV"
-                                    >
-                                        <Download className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="overflow-x-auto min-h-[300px] max-h-[calc(100vh-500px)]">
-                                {loading ? (
-                                    <div className="flex flex-col items-center justify-center py-20 space-y-4">
-                                        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
-                                        <p className="text-gray-400 animate-pulse">Fetching Real-time Telemetry...</p>
-                                    </div>
-                                ) : (
-                                    <div className="glass-panel rounded-xl overflow-hidden border border-white/10">
-                                        <table className="w-full text-left">
-                                            <thead className="sticky top-0 z-20 bg-white/5 backdrop-blur-xl border-b border-white/10">
-                                                <tr className="text-gray-400 text-sm uppercase tracking-wider">
-                                                    {(isLicensing || isAdmin) ? (
-                                                        <>
-                                                            <th className="pb-4 font-semibold px-4">Display Name</th>
-                                                            <th className="pb-4 font-semibold px-4">Email / UPN</th>
-                                                            <th className="pb-4 font-semibold px-4">Assigned Licenses</th>
-                                                            <th className="pb-4 font-semibold px-4 text-center">Count</th>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <th className="pb-4 font-semibold">User / Resource</th>
-                                                            <th className="pb-4 font-semibold">Status</th>
-                                                            <th className="pb-4 font-semibold">Activity</th>
-                                                            <th className="pb-4 font-semibold">Time</th>
-                                                        </>
-                                                    )}
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-white/5 text-sm">
-                                                {filteredData.length > 0 ? filteredData.map((report, i) => (
-                                                    <tr key={i} className="hover:bg-white/5 transition-colors">
-                                                        {(isLicensing || isAdmin) ? (
-                                                            <>
-                                                                <td className="py-4 px-4 font-medium text-white/90">{report.displayName}</td>
-                                                                <td className="py-4 px-4 text-gray-400">{report.emailAddress}</td>
-                                                                <td className="py-4 px-4 text-gray-300">
-                                                                    {report.licenses !== 'No License' ? (
-                                                                        <span className="text-gray-300 text-sm">
-                                                                            {report.licenses}
-                                                                        </span>
-                                                                    ) : (
-                                                                        <span className="text-gray-500 italic">Unlicensed</span>
-                                                                    )}
-                                                                </td>
-                                                                <td className="py-4 px-4 text-center text-gray-400">{report.licenseCount}</td>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <td className="py-4">
-                                                                    <div className="flex items-center space-x-3">
-                                                                        <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-[10px]">
-                                                                            UR
-                                                                        </div>
-                                                                        <span className="font-medium text-white/90">User Resource {typeof report === 'object' ? 'Unknown' : report}</span>
-                                                                    </div>
-                                                                </td>
-                                                                <td className="py-4">
-                                                                    <span className="px-2 py-1 bg-green-500/10 text-green-400 rounded-md text-[10px] uppercase font-bold border border-green-500/20">
-                                                                        Active
-                                                                    </span>
-                                                                </td>
-                                                                <td className="py-4 text-gray-400">Policy modification detected</td>
-                                                                <td className="py-4 text-gray-500">{typeof report === 'object' ? '0' : report}h ago</td>
-                                                            </>
-                                                        )}
-                                                    </tr>
-                                                )) : (
-                                                    <tr>
-                                                        <td colSpan={isLicensing ? "4" : "4"} className="py-20 text-center">
-                                                            <div className="flex flex-col items-center space-y-4">
-                                                                <AlertCircle className="w-12 h-12 text-gray-600" />
-                                                                <div className="text-gray-500 italic">No real-time data found. Ensure Graph API permissions are granted.</div>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )}
-                            </div>
+            {isEntra && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
+                    <div className="glass-card">
+                        <h3 className="spacing-v-8 flex-center justify-start flex-gap-4">
+                            <Activity size={20} color="var(--accent-purple)" />
+                            Directory Audits
+                        </h3>
+                        <div className="table-container">
+                            <table className="modern-table">
+                                <thead>
+                                    <tr>
+                                        <th>Activity</th>
+                                        <th>Initiated By</th>
+                                        <th>Result</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {auditLogs.slice(0, 5).map((log, i) => (
+                                        <tr key={i}>
+                                            <td style={{ fontWeight: 600 }}>{log.activityDisplayName}</td>
+                                            <td style={{ fontSize: '12px' }}>{log.initiatedBy?.user?.userPrincipalName || 'System'}</td>
+                                            <td>
+                                                <span className={`badge ${log.result === 'success' ? 'badge-success' : 'badge-error'}`}>
+                                                    {log.result}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                )}
-            </div>
-        </div >
+
+                    <div className="glass-card">
+                        <h3 className="spacing-v-8 flex-center justify-start flex-gap-4">
+                            <Shield size={20} color="var(--accent-blue)" />
+                            CA Policies
+                        </h3>
+                        <div className="table-container">
+                            <table className="modern-table">
+                                <thead>
+                                    <tr>
+                                        <th>Policy Name</th>
+                                        <th>State</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {caPolicies.slice(0, 5).map((policy, i) => (
+                                        <tr key={i}>
+                                            <td>{policy.displayName}</td>
+                                            <td>
+                                                <span className={`badge ${policy.state === 'enabled' ? 'badge-success' : 'badge-error'}`}>
+                                                    {policy.state}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {isAdmin && exchangeData.length > 0 && (
+                <div className="glass-card" style={{ marginTop: '32px' }}>
+                    <div className="flex-between spacing-v-8">
+                        <h3 className="flex-center flex-gap-4">
+                            <Mail size={20} color="var(--accent-blue)" />
+                            Recent Mailboxes
+                        </h3>
+                        <button className="btn-secondary" onClick={() => navigate('/service/admin/report')}>View All Reports</button>
+                    </div>
+                    <div className="table-container">
+                        <table className="modern-table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Archive</th>
+                                    <th>Size</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {exchangeData.slice(0, 8).map((mb, i) => (
+                                    <tr key={i}>
+                                        <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{mb.displayName}</td>
+                                        <td style={{ fontSize: '12px' }}>{mb.emailAddress}</td>
+                                        <td>
+                                            <span className={`badge ${mb.archivePolicy ? 'badge-success' : 'badge-info'}`}>
+                                                {mb.archivePolicy ? 'Active' : 'Not Set'}
+                                            </span>
+                                        </td>
+                                        <td>{mb.mailboxSize || '0 KB'}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
+
+            {loading && (
+                <div className="flex-center" style={{ padding: '60px' }}>
+                    <Loader2 className="animate-spin" size={40} color="var(--accent-blue)" />
+                </div>
+            )}
+        </div>
     );
 };
 

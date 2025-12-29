@@ -4,9 +4,8 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { RolesService } from '../services/entra';
-import { ArrowLeft, ShieldCheck, ChevronDown, ChevronRight, User, Loader2 } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, ChevronDown, ChevronRight, User, Loader2, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import styles from './DetailPage.module.css';
 
 const EntraAdmins = () => {
     const navigate = useNavigate();
@@ -19,10 +18,7 @@ const EntraAdmins = () => {
         const fetchRoles = async () => {
             if (accounts.length > 0) {
                 try {
-                    const response = await instance.acquireTokenSilent({
-                        ...loginRequest,
-                        account: accounts[0]
-                    });
+                    const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
                     const client = new GraphService(response.accessToken).client;
                     const data = await RolesService.getRoles(client);
                     const activeRoles = data.filter(r => r.members && r.members.length > 0);
@@ -37,131 +33,101 @@ const EntraAdmins = () => {
         fetchRoles();
     }, [accounts, instance]);
 
-    const toggleExpand = (roleId) => {
-        setExpandedRole(expandedRole === roleId ? null : roleId);
-    };
-
     if (loading) {
         return (
-            <div className={styles.loadingContainer}>
-                <Loader2 className="animate-spin" style={{ width: '2.5rem', height: '2.5rem', color: '#ef4444' }} />
+            <div className="flex-center" style={{ height: '60vh' }}>
+                <Loader2 className="animate-spin" size={40} color="var(--accent-error)" />
             </div>
         );
     }
 
     return (
-        <div className={styles.pageContainer}>
-            <div className={styles.contentWrapper}>
-                <button onClick={() => navigate('/service/entra')} className={styles.backButton}>
-                    <ArrowLeft style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
-                    Back to Dashboard
-                </button>
+        <div className="animate-in">
+            <button onClick={() => navigate('/service/entra')} className="btn-back">
+                <ArrowLeft size={14} style={{ marginRight: '8px' }} />
+                Back to Dashboard
+            </button>
 
-                <div className={styles.pageHeader}>
-                    <h1 className={styles.pageTitle}>
-                        <ShieldCheck style={{ width: '2rem', height: '2rem', color: '#ef4444' }} />
-                        Admin Roles
-                    </h1>
-                    <p className={styles.pageSubtitle}>
-                        Manage privileged role assignments and administrative permissions
-                    </p>
+            <header className="flex-between spacing-v-8">
+                <div>
+                    <h1 className="title-gradient" style={{ fontSize: '32px' }}>Privileged Roles</h1>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Administrative authority and security group attribution</p>
                 </div>
+            </header>
 
-                <div className={styles.card}>
-                    <div className={styles.cardHeader}>
-                        <h2 className={styles.cardTitle}>Privileged Roles</h2>
-                        <span className={`${styles.badge} ${styles.badgeError}`}>
-                            {roles.length} ACTIVE ROLES
-                        </span>
-                    </div>
-
-                    {roles.length > 0 ? (
-                        <div className={styles.tableContainer}>
-                            <table className={styles.table}>
-                                <thead className={styles.tableHead}>
-                                    <tr>
-                                        <th style={{ width: '3rem' }}></th>
-                                        <th>Role Name</th>
-                                        <th>Description</th>
-                                        <th style={{ textAlign: 'center' }}>Assigned Users</th>
+            <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
+                <div className="p-8 flex-between" style={{ padding: '24px' }}>
+                    <h3 className="flex-center flex-gap-4">
+                        <ShieldAlert size={20} color="var(--accent-error)" />
+                        Active Assignments
+                    </h3>
+                    <span className="badge badge-error">{roles.length} ROLES DETECTED</span>
+                </div>
+                <div className="table-container">
+                    <table className="modern-table">
+                        <thead>
+                            <tr>
+                                <th style={{ width: '40px' }}></th>
+                                <th>Role Identity</th>
+                                <th>Function Description</th>
+                                <th style={{ textAlign: 'center' }}>Subject Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {roles.length > 0 ? roles.map((role) => (
+                                <React.Fragment key={role.id}>
+                                    <tr
+                                        onClick={() => setExpandedRole(expandedRole === role.id ? null : role.id)}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        <td>{expandedRole === role.id ? <ChevronDown size={14} /> : <ChevronRight size={14} />}</td>
+                                        <td>
+                                            <div className="flex-center justify-start flex-gap-4">
+                                                <div style={{ padding: '8px', background: 'hsla(0, 84%, 60%, 0.1)', color: 'var(--accent-error)', borderRadius: '8px' }}>
+                                                    <ShieldCheck size={16} />
+                                                </div>
+                                                <span style={{ fontWeight: 600 }}>{role.displayName}</span>
+                                            </div>
+                                        </td>
+                                        <td style={{ fontSize: '12px', opacity: 0.7, maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            {role.description}
+                                        </td>
+                                        <td style={{ textAlign: 'center' }}>
+                                            <span className="badge badge-error">{role.members?.length || 0}</span>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {roles.map((role) => (
-                                        <React.Fragment key={role.id}>
-                                            <tr
-                                                className={styles.tableRow}
-                                                onClick={() => toggleExpand(role.id)}
-                                                style={{ cursor: 'pointer', background: expandedRole === role.id ? 'rgba(255, 255, 255, 0.05)' : undefined }}
-                                            >
-                                                <td style={{ textAlign: 'center' }}>
-                                                    {expandedRole === role.id ? (
-                                                        <ChevronDown style={{ width: '1rem', height: '1rem', color: '#9ca3af' }} />
-                                                    ) : (
-                                                        <ChevronRight style={{ width: '1rem', height: '1rem', color: '#9ca3af' }} />
-                                                    )}
-                                                </td>
-                                                <td>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                        <ShieldCheck style={{ width: '1rem', height: '1rem', color: '#ef4444' }} />
-                                                        <span style={{ fontWeight: 500, color: 'white' }}>{role.displayName}</span>
-                                                    </div>
-                                                </td>
-                                                <td style={{ color: '#9ca3af', fontSize: '0.875rem', maxWidth: '30rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                    {role.description}
-                                                </td>
-                                                <td style={{ textAlign: 'center' }}>
-                                                    <span className={`${styles.badge} ${styles.badgeError}`}>
-                                                        {role.members ? role.members.length : 0}
-                                                    </span>
+                                    <AnimatePresence>
+                                        {expandedRole === role.id && (
+                                            <tr>
+                                                <td colSpan="4" style={{ background: 'hsla(0,0%,100%,0.01)', padding: '24px' }}>
+                                                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+                                                        {role.members?.map(member => (
+                                                            <div key={member.id} className="glass-card" style={{ padding: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                                    <User size={14} color="var(--text-dim)" />
+                                                                </div>
+                                                                <div style={{ overflow: 'hidden' }}>
+                                                                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'white' }}>{member.displayName}</div>
+                                                                    <div style={{ fontSize: '11px', color: 'var(--text-dim)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{member.userPrincipalName}</div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </motion.div>
                                                 </td>
                                             </tr>
-                                            <AnimatePresence>
-                                                {expandedRole === role.id && role.members && (
-                                                    <motion.tr
-                                                        initial={{ opacity: 0 }}
-                                                        animate={{ opacity: 1 }}
-                                                        exit={{ opacity: 0 }}
-                                                        style={{ background: 'rgba(0, 0, 0, 0.3)' }}
-                                                    >
-                                                        <td colSpan="4" style={{ padding: 0 }}>
-                                                            <div style={{ padding: '2rem', paddingLeft: '4rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
-                                                                {role.members.map(member => (
-                                                                    <div key={member.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem', borderRadius: '0.5rem', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                                                                        <div style={{ width: '2rem', height: '2rem', borderRadius: '9999px', background: 'rgba(107, 114, 128, 0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                                            <User style={{ width: '1rem', height: '1rem', color: '#9ca3af' }} />
-                                                                        </div>
-                                                                        <div style={{ flex: 1, overflow: 'hidden' }}>
-                                                                            <div style={{ fontSize: '0.875rem', fontWeight: 500, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                                                {member.displayName}
-                                                                            </div>
-                                                                            <div style={{ fontSize: '0.75rem', color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                                                {member.userPrincipalName || 'N/A'}
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </td>
-                                                    </motion.tr>
-                                                )}
-                                            </AnimatePresence>
-                                        </React.Fragment>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    ) : (
-                        <div className={styles.emptyState}>
-                            <div className={styles.emptyIcon} style={{ background: 'rgba(239, 68, 68, 0.08)', borderColor: 'rgba(239, 68, 68, 0.2)' }}>
-                                <ShieldCheck style={{ width: '2.5rem', height: '2.5rem', color: '#ef4444' }} />
-                            </div>
-                            <h3 className={styles.emptyTitle}>No Admin Roles Found</h3>
-                            <p className={styles.emptyDescription}>
-                                No privileged roles with active assignments found.
-                            </p>
-                        </div>
-                    )}
+                                        )}
+                                    </AnimatePresence>
+                                </React.Fragment>
+                            )) : (
+                                <tr>
+                                    <td colSpan="4" style={{ textAlign: 'center', padding: '100px', color: 'var(--text-dim)' }}>
+                                        <ShieldCheck size={48} style={{ opacity: 0.1, marginBottom: '16px' }} />
+                                        <p>No active administrative roles found.</p>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

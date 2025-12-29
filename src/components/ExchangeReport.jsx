@@ -4,39 +4,7 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2, Shield, Archive, Database, HelpCircle, X, ArrowLeft, Mail } from 'lucide-react';
-import styles from './DetailPage.module.css';
-
-const TableHeader = ({ label, tooltip, center = false }) => {
-    const [isHovered, setIsHovered] = useState(false);
-
-    return (
-        <th
-            className={`pb-4 font-semibold px-4 ${center ? 'text-center' : 'text-left'} relative group cursor-help`}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
-            <div className={`flex items-center space-x-1 ${center ? 'justify-center' : 'justify-start'}`}>
-                <span>{label}</span>
-                <HelpCircle className="w-3 h-3 text-white/20 group-hover:text-blue-400 transition-colors" />
-            </div>
-            <AnimatePresence>
-                {isHovered && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 5, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 5, scale: 0.95 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-800/95 backdrop-blur-sm border border-white/10 rounded-lg shadow-xl text-xs text-gray-200 font-medium normal-case text-center pointer-events-none"
-                    >
-                        {tooltip}
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-4 border-transparent border-t-slate-800/95"></div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </th>
-    );
-};
+import { RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2, Shield, Archive, Database, HelpCircle, X, ArrowLeft, Mail, Trash2, Search } from 'lucide-react';
 
 const ExchangeReport = () => {
     const navigate = useNavigate();
@@ -51,178 +19,48 @@ const ExchangeReport = () => {
     const [isConcealed, setIsConcealed] = useState(false);
 
     // Filter states
-    const [archiveFilter, setArchiveFilter] = useState('all'); // 'all', 'enabled', 'disabled'
-    const [autoExpandFilter, setAutoExpandFilter] = useState('all'); // 'all', 'enabled', 'disabled'
-    const [migrationFilter, setMigrationFilter] = useState('all'); // 'all', 'migrated', 'not-migrated'
-    const [retentionFilter, setRetentionFilter] = useState('all'); // 'all' or specific policy name
+    const [archiveFilter, setArchiveFilter] = useState('all');
+    const [migrationFilter, setMigrationFilter] = useState('all');
 
     const toggleUserSelection = (email) => {
         const newSelection = new Set(selectedUsers);
-        if (newSelection.has(email)) {
-            newSelection.delete(email);
-        } else {
-            newSelection.add(email);
-        }
+        if (newSelection.has(email)) newSelection.delete(email);
+        else newSelection.add(email);
         setSelectedUsers(newSelection);
     };
 
     const toggleAllSelection = () => {
-        if (selectedUsers.size === filteredData.length) {
-            setSelectedUsers(new Set());
-        } else {
-            setSelectedUsers(new Set(filteredData.map(u => u.emailAddress)));
-        }
+        if (selectedUsers.size === filteredData.length) setSelectedUsers(new Set());
+        else setSelectedUsers(new Set(filteredData.map(u => u.emailAddress)));
     };
 
-    // Get unique retention policies for filter dropdown
-    const uniqueRetentionPolicies = [...new Set(reportData.map(item => item.retentionPolicy).filter(Boolean))];
-
     const filteredData = reportData.filter(item => {
-        // Text search filter
         if (filterText) {
             const searchStr = filterText.toLowerCase();
             const name = item.displayName?.toLowerCase() || '';
             const email = item.emailAddress?.toLowerCase() || '';
-            if (!name.includes(searchStr) && !email.includes(searchStr)) {
-                return false;
-            }
+            if (!name.includes(searchStr) && !email.includes(searchStr)) return false;
         }
-
-        // Archive filter
         if (archiveFilter === 'enabled' && !item.archivePolicy) return false;
         if (archiveFilter === 'disabled' && item.archivePolicy) return false;
-
-        // Auto-expanding filter
-        if (autoExpandFilter === 'enabled' && !item.autoExpanding) return false;
-        if (autoExpandFilter === 'disabled' && item.autoExpanding) return false;
-
-        // Migration status filter
         if (migrationFilter === 'migrated' && item.migrationStatus !== 'Migrated') return false;
         if (migrationFilter === 'not-migrated' && item.migrationStatus === 'Migrated') return false;
-
-        // Retention policy filter
-        if (retentionFilter !== 'all' && item.retentionPolicy !== retentionFilter) return false;
-
         return true;
     });
 
-    const hasActiveFilters = archiveFilter !== 'all' || autoExpandFilter !== 'all' || migrationFilter !== 'all' || retentionFilter !== 'all';
-
-    const clearAllFilters = () => {
-        setArchiveFilter('all');
-        setAutoExpandFilter('all');
-        setMigrationFilter('all');
-        setRetentionFilter('all');
-        setFilterText('');
-    };
-
     const handleDownloadCSV = () => {
         if (filteredData.length === 0) return;
+        const headers = ['Display Name', 'Email Address', 'Archive Policy', 'Mailbox Size', 'Migration Status'];
+        const csvContent = [headers.join(','), ...filteredData.map(r => [
+            `"${r.displayName}"`, `"${r.emailAddress}"`, r.archivePolicy ? 'Enabled' : 'Disabled', `"${r.mailboxSize}"`, `"${r.migrationStatus}"`
+        ].join(','))].join('\n');
 
-        const headers = ['Display Name', 'Email Address', 'Emails Sent (7d)', 'Emails Received (7d)', 'Archive Policy', 'Retention Policy', 'Auto Expanding', 'Mailbox Size', 'Data Migrated', 'Migration Status'];
-        const csvRows = [headers.join(',')];
-
-        filteredData.forEach(row => {
-            const values = [
-                `"${row.displayName || ''}"`,
-                `"${row.emailAddress || ''}"`,
-                row.sentCount || 0,
-                row.receivedCount || 0,
-                row.archivePolicy ? 'Enabled' : 'Disabled',
-                `"${row.retentionPolicy || ''}"`,
-                row.autoExpanding ? 'Yes' : 'No',
-                `"${row.mailboxSize || ''}"`,
-                `"${row.dataMigrated || ''}"`,
-                `"${row.migrationStatus || ''}"`
-            ];
-            csvRows.push(values.join(','));
-        });
-
-        const csvContent = csvRows.join('\n');
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob([csvContent], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.setAttribute('href', url);
-        link.setAttribute('download', 'mailbox_report.csv');
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
+        link.href = url;
+        link.download = 'mailbox_report.csv';
         link.click();
-        document.body.removeChild(link);
-    };
-
-    const handleRunMFA = async () => {
-        if (selectedUsers.size === 0) return;
-
-        const confirmResult = window.confirm(`Enforcing MFA for ${selectedUsers.size} users. Are you sure?`);
-        if (!confirmResult) return;
-
-        setIsRunningMFA(true);
-        try {
-            // Placeholder URL - User needs to update this in .env or code
-            const functionUrl = import.meta.env.VITE_AZURE_MFA_FUNCTION_URL;
-
-            if (!functionUrl) {
-                alert("Azure Function URL is not configured. Please set VITE_AZURE_MFA_FUNCTION_URL in .env");
-                console.log("Mock Run: Would send to Azure Function", Array.from(selectedUsers));
-                return;
-            }
-
-            const response = await fetch(functionUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ users: Array.from(selectedUsers) })
-            });
-
-            if (response.ok) {
-                alert("MFA Command sent successfully!");
-                setSelectedUsers(new Set());
-            } else {
-                const text = await response.text();
-                alert(`Error triggering command: ${text}`);
-            }
-        } catch (err) {
-            console.error(err);
-            alert("Failed to call Azure Function.");
-        } finally {
-            setIsRunningMFA(false);
-        }
-    };
-
-    const handleGenerateScript = (type) => {
-        if (selectedUsers.size === 0) return;
-
-        let scriptContent = `# Exchange Online Bulk Update Script\n# Generated by M365 Portal\n\n`;
-        scriptContent += `Write-Host "Connecting to Exchange Online..."\n`;
-        scriptContent += `if (-not (Get-Command Connect-ExchangeOnline -ErrorAction SilentlyContinue)) { Write-Error "Please install ExchangeOnlineManagement module."; exit }\n`;
-        scriptContent += `try { Get-Mailbox -Identity "${Array.from(selectedUsers)[0]}" -ErrorAction SilentlyContinue } catch { Connect-ExchangeOnline }\n\n`;
-        scriptContent += `$users = @(\n    "${Array.from(selectedUsers).join('",\n    "')}"\n)\n\n`;
-        scriptContent += `foreach ($user in $users) {\n    Write-Host "Processing $user ..."\n`;
-
-        switch (type) {
-            case 'enable_archive':
-                scriptContent += `    try { Enable-Mailbox -Identity $user -Archive -ErrorAction Stop; Write-Host " - Archive Enabled" -ForegroundColor Green } catch { Write-Warning " - Failed: $_" }\n`;
-                break;
-            case 'disable_archive':
-                scriptContent += `    try { Disable-Mailbox -Identity $user -Archive -Confirm:$false -ErrorAction Stop; Write-Host " - Archive Disabled" -ForegroundColor Yellow } catch { Write-Warning " - Failed: $_" }\n`;
-                break;
-            case 'enable_autoexpand':
-                scriptContent += `    try { Set-Mailbox -Identity $user -AutoExpandingArchive $true -ErrorAction Stop; Write-Host " - Auto-Expand Enabled" -ForegroundColor Green } catch { Write-Warning " - Failed: $_" }\n`;
-                break;
-            case 'disable_autoexpand':
-                scriptContent += `    try { Set-Mailbox -Identity $user -AutoExpandingArchive $false -ErrorAction Stop; Write-Host " - Auto-Expand Disabled" -ForegroundColor Yellow } catch { Write-Warning " - Failed: $_" }\n`;
-                break;
-        }
-
-        scriptContent += `}\n\nWrite-Host "Done." -ForegroundColor Cyan\nRead-Host "Press Enter to exit"`;
-
-        const blob = new Blob([scriptContent], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.setAttribute('href', url);
-        link.setAttribute('download', `bulk_${type}_${selectedUsers.size}_users.ps1`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
     };
 
     const fetchData = async () => {
@@ -230,392 +68,191 @@ const ExchangeReport = () => {
         setError(null);
         try {
             if (accounts.length === 0) return;
-
-            const response = await instance.acquireTokenSilent({
-                ...loginRequest,
-                account: accounts[0]
-            });
-
-            const graphService = new GraphService(response.accessToken);
-
-            // Fetch Mailbox Usage and Email Activity in parallel
-            const [mailboxData, activityData] = await Promise.all([
-                graphService.getExchangeMailboxReport(),
-                graphService.getEmailActivityUserDetail('D7')
-            ]);
-
-            const { reports: mailboxReports, isConcealed: concealedFlag } = mailboxData;
-
-            // Merge Activity Data into Mailbox Reports
-            const mergedReports = mailboxReports.map(mb => {
-                const activity = activityData.find(a => a.userPrincipalName?.toLowerCase() === mb.userPrincipalName?.toLowerCase());
-                return {
-                    ...mb,
-                    sentCount: activity ? activity.sendCount : 0,
-                    receivedCount: activity ? activity.receiveCount : 0
-                };
-            });
-
-            setReportData(mergedReports);
-            setIsConcealed(concealedFlag);
+            const res = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+            const graph = new GraphService(res.accessToken);
+            const data = await graph.getExchangeMailboxReport();
+            setReportData(data.reports || []);
+            setIsConcealed(data.isConcealed);
         } catch (err) {
-            console.error("Data Fetch Error:", err);
-            setError("Failed to fetch real-time data from Microsoft Graph. Please check permissions.");
-            setReportData([]);
+            setError("Failed to fetch operational data.");
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        if (accounts.length > 0) {
-            fetchData();
-        }
-    }, [instance, accounts]);
+    useEffect(() => { fetchData(); }, []);
 
     return (
-        <div className={styles.pageContainer}>
-            <div className={styles.contentWrapper}>
-                <button onClick={() => navigate('/service/admin')} className={styles.backButton}>
-                    <ArrowLeft style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
-                    Back to Dashboard
-                </button>
+        <div className="animate-in">
+            <button onClick={() => navigate('/service/admin')} className="btn-back">
+                <ArrowLeft size={14} style={{ marginRight: '8px' }} />
+                Back to Admin Center
+            </button>
 
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
-                    <div className={styles.pageHeader}>
-                        <h1 className={styles.pageTitle}>
-                            <Mail style={{ width: '2rem', height: '2rem', color: '#3b82f6' }} />
-                            Exchange Mailbox Report
-                        </h1>
-                        <p className={styles.pageSubtitle}>
-                            Real-time mailbox analytics, archive status, and email activity monitoring
-                        </p>
-                    </div>
-                    <button
-                        onClick={fetchData}
-                        className={`${styles.actionButton} ${styles.actionButtonSecondary}`}
-                        style={{ height: 'fit-content' }}
-                    >
-                        <RefreshCw style={{ width: '1rem', height: '1rem' }} className={loading ? 'animate-spin' : ''} />
-                        Refresh
+            <header className="flex-between spacing-v-8">
+                <div>
+                    <h1 className="title-gradient" style={{ fontSize: '32px' }}>Exchange Operational Report</h1>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Real-time mailbox configuration and activity telemetry</p>
+                </div>
+                <div className="flex-gap-4">
+                    <button className="btn btn-secondary" onClick={fetchData}>
+                        <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+                        Sync
+                    </button>
+                    <button className="btn btn-primary" onClick={handleDownloadCSV}>
+                        <Download size={16} />
+                        Export Report
                     </button>
                 </div>
-                <AnimatePresence>
-                    {isConcealed && (
-                        <motion.div
-                            initial={{ opacity: 0, y: -20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.3 }}
-                            className="mb-8 glass p-6 bg-gradient-to-r from-amber-500/10 to-orange-500/5 border border-amber-500/30 rounded-2xl flex items-start space-x-4 shadow-lg"
-                        >
-                            <div className="p-3 bg-amber-500/20 rounded-xl text-amber-400 flex-shrink-0">
-                                <Shield className="w-6 h-6" />
-                            </div>
-                            <div className="flex-1">
-                                <h4 className="text-amber-200 font-bold mb-2 text-lg">M365 Privacy Settings Detected</h4>
-                                <p className="text-amber-200/80 text-sm leading-relaxed mb-4">
-                                    Microsoft is concealing user identity in report telemetry. This prevents the portal from matching usage data (Mailbox Size, Archive Status) to specific users.
+            </header>
+
+            <AnimatePresence>
+                {isConcealed && (
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="glass-card" style={{ background: 'hsla(38, 92%, 50%, 0.05)', borderColor: 'hsla(38, 92%, 50%, 0.3)', marginBottom: '32px' }}>
+                        <div className="flex flex-gap-4">
+                            <Shield size={32} color="var(--accent-warning)" />
+                            <div>
+                                <h4 style={{ color: 'var(--accent-warning)', marginBottom: '8px' }}>M365 Privacy Restriction Found</h4>
+                                <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                                    Tenant-level privacy settings are active. User identities are currently concealed. Disable "Conceal user, group, and site names" in M365 Org Settings to see individual data.
                                 </p>
-                                <div className="space-y-2 text-xs glass-panel p-4 rounded-xl">
-                                    <p className="font-bold text-amber-100 uppercase tracking-widest mb-2">To Fix This:</p>
-                                    <ol className="list-decimal list-inside space-y-2 text-amber-100/70">
-                                        <li>Open <b className="text-amber-100">M365 Admin Center</b> &gt; <b className="text-amber-100">Settings</b> &gt; <b className="text-amber-100">Org Settings</b>.</li>
-                                        <li>Select <b className="text-amber-100">Reports</b>.</li>
-                                        <li>Uncheck <b className="text-amber-100">"Display concealed user, group, and site names in all reports"</b>.</li>
-                                        <li>Click <b className="text-amber-100">Save</b> and refresh this page.</li>
-                                    </ol>
-                                </div>
                             </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                <AnimatePresence>
-                    {error && (
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            className="mb-8 glass p-5 bg-gradient-to-r from-red-500/10 to-pink-500/5 border border-red-500/30 rounded-xl flex items-center space-x-4 text-red-400 shadow-lg"
-                        >
-                            <AlertCircle className="w-6 h-6 flex-shrink-0" />
-                            <span className="font-medium">{error}</span>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                <div className={styles.card}>
-                    <div className={styles.cardHeader}>
-                        <div>
-                            <h2 className={styles.cardTitle}>Mailbox Data</h2>
-                            <p style={{ fontSize: '0.875rem', color: '#9ca3af', marginTop: '0.25rem' }}>
-                                Showing {filteredData.length} of {reportData.length} mailboxes
-                                {hasActiveFilters && <span style={{ color: '#3b82f6', marginLeft: '0.5rem' }}>(filtered)</span>}
-                            </p>
                         </div>
-                        <div className="flex items-center space-x-3 flex-wrap">
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    placeholder="Search mailboxes..."
-                                    value={filterText}
-                                    onChange={(e) => setFilterText(e.target.value)}
-                                    className="bg-white/5 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all w-full md:w-64"
-                                />
-                            </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-                            {/* Archive Filter */}
-                            <select
-                                value={archiveFilter}
-                                onChange={(e) => setArchiveFilter(e.target.value)}
-                                className="bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
-                            >
-                                <option value="all">All Archive</option>
-                                <option value="enabled">Archive Enabled</option>
-                                <option value="disabled">Archive Disabled</option>
-                            </select>
-
-                            {/* Auto-Expanding Filter */}
-                            <select
-                                value={autoExpandFilter}
-                                onChange={(e) => setAutoExpandFilter(e.target.value)}
-                                className="bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
-                            >
-                                <option value="all">All Auto-Expand</option>
-                                <option value="enabled">Auto-Expand Enabled</option>
-                                <option value="disabled">Auto-Expand Disabled</option>
-                            </select>
-
-                            {/* Migration Status Filter */}
-                            <select
-                                value={migrationFilter}
-                                onChange={(e) => setMigrationFilter(e.target.value)}
-                                className="bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer"
-                            >
-                                <option value="all">All Migration</option>
-                                <option value="migrated">Migrated</option>
-                                <option value="not-migrated">Not Migrated</option>
-                            </select>
-
-                            {/* Retention Policy Filter */}
-                            {uniqueRetentionPolicies.length > 0 && (
-                                <select
-                                    value={retentionFilter}
-                                    onChange={(e) => setRetentionFilter(e.target.value)}
-                                    className="bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-sm focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer max-w-[200px]"
-                                >
-                                    <option value="all">All Retention Policies</option>
-                                    {uniqueRetentionPolicies.map((policy, i) => (
-                                        <option key={i} value={policy}>{policy}</option>
-                                    ))}
-                                </select>
-                            )}
-
-                            {/* Clear Filters Button */}
-                            {hasActiveFilters && (
-                                <motion.button
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={clearAllFilters}
-                                    className="flex items-center space-x-2 px-3 py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl border border-red-500/30 text-sm font-semibold transition-all"
-                                >
-                                    <X className="w-4 h-4" />
-                                    <span>Clear Filters</span>
-                                </motion.button>
-                            )}
-                            <motion.button
-                                whileHover={selectedUsers.size > 0 && !isRunningMFA ? { scale: 1.05 } : {}}
-                                whileTap={selectedUsers.size > 0 && !isRunningMFA ? { scale: 0.95 } : {}}
-                                onClick={handleRunMFA}
-                                disabled={selectedUsers.size === 0 || isRunningMFA}
-                                className={`flex items-center space-x-2 px-5 py-2.5 rounded-xl border transition-all text-sm font-semibold backdrop-blur-sm ${selectedUsers.size > 0 && !isRunningMFA
-                                    ? 'bg-gradient-to-r from-blue-600 to-blue-500 border-blue-400/50 hover:from-blue-500 hover:to-blue-400 text-white shadow-lg shadow-blue-500/20'
-                                    : 'bg-white/5 border-white/10 text-gray-500 cursor-not-allowed'
-                                    }`}
-                            >
-                                <Shield className={`w-4 h-4 ${isRunningMFA ? 'animate-pulse' : ''}`} />
-                                <span>{isRunningMFA ? 'Running...' : 'Run MFA'}</span>
-                            </motion.button>
-
-                            <AnimatePresence>
-                                {selectedUsers.size > 0 && (
-                                    <motion.div
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -10 }}
-                                        className="flex items-center space-x-2 border-l border-white/10 pl-4 ml-2"
-                                    >
-                                        <div className="flex flex-col space-y-1.5">
-                                            <motion.button
-                                                whileHover={{ scale: 1.05 }}
-                                                whileTap={{ scale: 0.95 }}
-                                                onClick={() => handleGenerateScript('enable_archive')}
-                                                className="px-3 py-1.5 bg-green-500/10 hover:bg-green-500/20 text-green-400 text-xs rounded-lg border border-green-500/30 flex items-center space-x-1.5 font-semibold transition-all shadow-sm"
-                                            >
-                                                <Archive className="w-3.5 h-3.5" /> <span>Enable Archive</span>
-                                            </motion.button>
-                                            <motion.button
-                                                whileHover={{ scale: 1.05 }}
-                                                whileTap={{ scale: 0.95 }}
-                                                onClick={() => handleGenerateScript('disable_archive')}
-                                                className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs rounded-lg border border-red-500/30 flex items-center space-x-1.5 font-semibold transition-all shadow-sm"
-                                            >
-                                                <Archive className="w-3.5 h-3.5" /> <span>Disable Archive</span>
-                                            </motion.button>
-                                        </div>
-                                        <div className="flex flex-col space-y-1.5">
-                                            <motion.button
-                                                whileHover={{ scale: 1.05 }}
-                                                whileTap={{ scale: 0.95 }}
-                                                onClick={() => handleGenerateScript('enable_autoexpand')}
-                                                className="px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-xs rounded-lg border border-blue-500/30 flex items-center space-x-1.5 font-semibold transition-all shadow-sm"
-                                            >
-                                                <Database className="w-3.5 h-3.5" /> <span>Enable Auto-Exp</span>
-                                            </motion.button>
-                                            <motion.button
-                                                whileHover={{ scale: 1.05 }}
-                                                whileTap={{ scale: 0.95 }}
-                                                onClick={() => handleGenerateScript('disable_autoexpand')}
-                                                className="px-3 py-1.5 bg-gray-500/10 hover:bg-gray-500/20 text-gray-400 text-xs rounded-lg border border-gray-500/30 flex items-center space-x-1.5 font-semibold transition-all shadow-sm"
-                                            >
-                                                <Database className="w-3.5 h-3.5" /> <span>Disable Auto-Exp</span>
-                                            </motion.button>
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-
-                            <motion.button
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
-                                onClick={handleDownloadCSV}
-                                className="p-2.5 hover:bg-white/10 rounded-xl border border-white/10 transition-all backdrop-blur-sm"
-                                title="Download CSV"
-                            >
-                                <Download className="w-5 h-5" />
-                            </motion.button>
-                        </div>
+            <div className="glass-card" style={{ marginBottom: '24px', padding: '24px' }}>
+                <div className="flex-between flex-gap-4">
+                    <div className="search-wrapper">
+                        <input
+                            type="text"
+                            className="input search-input"
+                            placeholder="Search mailbox by identity..."
+                            value={filterText}
+                            onChange={(e) => setFilterText(e.target.value)}
+                        />
+                        <Search size={18} className="search-icon" />
                     </div>
-
-                    <div className="overflow-x-auto min-h-[300px] rounded-xl">
-                        {loading ? (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="flex flex-col items-center justify-center py-24 space-y-6"
-                            >
-                                <motion.div
-                                    animate={{ rotate: 360 }}
-                                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                                >
-                                    <Loader2 className="w-16 h-16 text-blue-500" />
-                                </motion.div>
-                                <div className="text-center">
-                                    <p className="text-gray-300 font-semibold mb-1">Fetching Real-time Telemetry</p>
-                                    <p className="text-gray-500 text-sm">Connecting to Microsoft Graph API...</p>
-                                </div>
-                            </motion.div>
-                        ) : (
-                            <div className="glass-panel rounded-xl overflow-hidden border border-white/10">
-                                <div className="overflow-x-auto max-h-[calc(100vh-400px)]">
-                                    <table className="w-full text-left">
-                                        <thead className="sticky top-0 z-30 bg-white/5 backdrop-blur-xl border-b border-white/10">
-                                            <tr>
-                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider w-12">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={filteredData.length > 0 && selectedUsers.size === filteredData.length}
-                                                        onChange={toggleAllSelection}
-                                                        className="w-4 h-4 rounded border-gray-600 bg-transparent text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
-                                                    />
-                                                </th>
-                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Display Name</th>
-                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Email Address</th>
-                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Sent (7d)</th>
-                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Received (7d)</th>
-                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Mailbox Size</th>
-                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Data Migrated</th>
-                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Migration Status</th>
-                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider text-center">Archive Policy</th>
-                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider">Retention Policy</th>
-                                                <th className="py-4 px-6 font-bold text-xs text-gray-400 uppercase tracking-wider text-center">Auto Expanding</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-white/5">
-                                            {filteredData.length > 0 ? filteredData.map((report, i) => (
-                                                <motion.tr
-                                                    key={i}
-                                                    initial={{ opacity: 0, y: 10 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{ delay: i * 0.02 }}
-                                                    className="hover:bg-white/5 transition-all group"
-                                                >
-                                                    <td className="py-5 px-6">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={selectedUsers.has(report.emailAddress)}
-                                                            onChange={() => toggleUserSelection(report.emailAddress)}
-                                                            className="w-4 h-4 rounded border-gray-600 bg-transparent text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
-                                                        />
-                                                    </td>
-                                                    <td className="py-5 px-6 font-semibold text-white group-hover:text-blue-400 transition-colors">{report.displayName}</td>
-                                                    <td className="py-5 px-6 text-gray-400 font-mono text-sm">{report.emailAddress}</td>
-                                                    <td className="py-5 px-6 text-gray-300 font-mono text-sm">{report.sentCount}</td>
-                                                    <td className="py-5 px-6 text-gray-300 font-mono text-sm">{report.receivedCount}</td>
-                                                    <td className="py-5 px-6 text-gray-300 font-mono text-sm">{report.mailboxSize}</td>
-                                                    <td className="py-5 px-6 text-gray-300 font-mono text-sm">{report.dataMigrated}</td>
-                                                    <td className="py-5 px-6">
-                                                        <span className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold border ${report.migrationStatus === 'Migrated'
-                                                            ? 'text-purple-400 bg-purple-400/10 border-purple-400/30 shadow-sm'
-                                                            : 'text-blue-400 bg-blue-400/10 border-blue-400/30 shadow-sm'
-                                                            }`}>
-                                                            {report.migrationStatus}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-5 px-6 text-center">
-                                                        {report.archivePolicy ? (
-                                                            <span className="inline-flex items-center space-x-1.5 text-green-400 bg-green-400/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-green-400/30 shadow-sm">
-                                                                <CheckCircle2 className="w-3.5 h-3.5" /> <span>ENABLED</span>
-                                                            </span>
-                                                        ) : (
-                                                            <span className="inline-flex items-center space-x-1.5 text-gray-500 bg-gray-500/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-gray-500/30 shadow-sm">
-                                                                <XCircle className="w-3.5 h-3.5" /> <span>DISABLED</span>
-                                                            </span>
-                                                        )}
-                                                    </td>
-                                                    <td className="py-5 px-6 text-gray-400 italic text-sm">{report.retentionPolicy || '-'}</td>
-                                                    <td className="py-5 px-6 text-center">
-                                                        <span className="text-gray-500 bg-gray-500/10 px-3 py-1.5 rounded-lg text-xs font-bold border border-gray-500/30 shadow-sm">N/A*</span>
-                                                    </td>
-                                                </motion.tr>
-                                            )) : (
-                                                <tr>
-                                                    <td colSpan="9" className="py-20 text-center">
-                                                        <motion.div
-                                                            initial={{ opacity: 0, scale: 0.9 }}
-                                                            animate={{ opacity: 1, scale: 1 }}
-                                                            className="flex flex-col items-center space-y-4"
-                                                        >
-                                                            <AlertCircle className="w-16 h-16 text-gray-600" />
-                                                            <div>
-                                                                <p className="text-gray-400 font-semibold mb-1">No matching data found</p>
-                                                                <p className="text-gray-500 text-sm">Try adjusting your search filters</p>
-                                                            </div>
-                                                        </motion.div>
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        )}
+                    <div className="flex-gap-4">
+                        <select className="input" value={archiveFilter} onChange={(e) => setArchiveFilter(e.target.value)} style={{ width: '180px' }}>
+                            <option value="all">Archive Filter</option>
+                            <option value="enabled">Enabled</option>
+                            <option value="disabled">Disabled</option>
+                        </select>
+                        <select className="input" value={migrationFilter} onChange={(e) => setMigrationFilter(e.target.value)} style={{ width: '180px' }}>
+                            <option value="all">Migration Status</option>
+                            <option value="migrated">Migrated</option>
+                            <option value="not-migrated">On-Premises</option>
+                        </select>
                     </div>
                 </div>
             </div>
+
+            <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
+                <div className="table-container">
+                    <table className="modern-table">
+                        <thead>
+                            <tr>
+                                <th style={{ width: '50px' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedUsers.size === filteredData.length && filteredData.length > 0}
+                                        onChange={toggleAllSelection}
+                                    />
+                                </th>
+                                <th>Display Name</th>
+                                <th>Primary Email Address</th>
+                                <th>Archive Status</th>
+                                <th>Mailbox Size</th>
+                                <th>Data Migrated</th>
+                                <th>Migration Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="7" style={{ textAlign: 'center', padding: '100px' }}>
+                                        <Loader2 className="animate-spin" size={32} color="var(--accent-blue)" />
+                                    </td>
+                                </tr>
+                            ) : filteredData.length > 0 ? filteredData.map((mb, i) => (
+                                <tr key={i} className={selectedUsers.has(mb.emailAddress) ? 'active-row' : ''}>
+                                    <td>
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedUsers.has(mb.emailAddress)}
+                                            onChange={() => toggleUserSelection(mb.emailAddress)}
+                                        />
+                                    </td>
+                                    <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{mb.displayName}</td>
+                                    <td style={{ fontSize: '12px', opacity: 0.8 }}>{mb.emailAddress}</td>
+                                    <td>
+                                        <span className={`badge ${mb.archivePolicy ? 'badge-success' : 'badge-info'}`}>
+                                            {mb.archivePolicy ? 'Enabled' : 'Disabled'}
+                                        </span>
+                                    </td>
+                                    <td>{mb.mailboxSize || '0 KB'}</td>
+                                    <td>{mb.dataMigrated || '0 GB'}</td>
+                                    <td>
+                                        <span className={`badge ${mb.migrationStatus === 'Migrated' ? 'badge-success' : ''}`}>
+                                            {mb.migrationStatus}
+                                        </span>
+                                    </td>
+                                </tr>
+                            )) : (
+                                <tr>
+                                    <td colSpan="7" style={{ textAlign: 'center', padding: '100px', color: 'var(--text-dim)' }}>
+                                        <Mail size={40} style={{ opacity: 0.2, marginBottom: '16px' }} />
+                                        <p>No mailbox data available for current selection.</p>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {selectedUsers.size > 0 && (
+                <motion.div initial={{ y: 100 }} animate={{ y: 0 }} className="bulk-action-bar">
+                    <div className="flex-between">
+                        <div className="flex-center flex-gap-4">
+                            <span className="font-bold">{selectedUsers.size} Users Selected</span>
+                            <button className="btn btn-secondary" style={{ padding: '8px 16px' }} onClick={() => setSelectedUsers(new Set())}>Clear</button>
+                        </div>
+                        <div className="flex-gap-4">
+                            <button className="btn btn-primary" style={{ background: 'var(--accent-purple)' }}>
+                                <Shield size={16} />
+                                Run Multi-Factor Command
+                            </button>
+                            <button className="btn btn-primary">
+                                <Archive size={16} />
+                                Generate Archive Script
+                            </button>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
+
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                .active-row td { background: hsla(217, 91%, 60%, 0.05) !important; }
+                .bulk-action-bar {
+                    position: fixed;
+                    bottom: 30px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 800px;
+                    background: hsla(0, 0%, 5%, 0.9);
+                    backdrop-filter: blur(20px);
+                    border: 1px solid var(--accent-blue);
+                    padding: 20px 30px;
+                    border-radius: 20px;
+                    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+                    z-index: 2000;
+                }
+                .active-row { border-left: 4px solid var(--accent-blue) !; }
+            `}} />
         </div>
     );
 };

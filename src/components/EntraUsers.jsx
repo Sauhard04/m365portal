@@ -5,7 +5,6 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { UsersService } from '../services/entra';
 import { ArrowLeft, Search, Download, CheckCircle2, XCircle, Loader2, Users } from 'lucide-react';
-import styles from './DetailPage.module.css';
 
 const EntraUsers = () => {
     const navigate = useNavigate();
@@ -21,10 +20,7 @@ const EntraUsers = () => {
         const fetchUsers = async () => {
             if (accounts.length > 0) {
                 try {
-                    const response = await instance.acquireTokenSilent({
-                        ...loginRequest,
-                        account: accounts[0]
-                    });
+                    const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
                     const client = new GraphService(response.accessToken).client;
                     const data = await UsersService.getAllUsers(client, 100);
                     setUsers(data);
@@ -41,30 +37,18 @@ const EntraUsers = () => {
     const filteredUsers = users.filter(user => {
         const matchesText = (user.displayName || '').toLowerCase().includes(filterText.toLowerCase()) ||
             (user.userPrincipalName || '').toLowerCase().includes(filterText.toLowerCase());
-
-        const matchesType = filterType === 'all' ||
-            (filterType === 'guest' ? user.userType === 'Guest' : user.userType !== 'Guest');
-
-        const matchesStatus = filterStatus === 'all' ||
-            (filterStatus === 'enabled' ? user.accountEnabled : !user.accountEnabled);
-
+        const matchesType = filterType === 'all' || (filterType === 'guest' ? user.userType === 'Guest' : user.userType !== 'Guest');
+        const matchesStatus = filterStatus === 'all' || (filterStatus === 'enabled' ? user.accountEnabled : !user.accountEnabled);
         const isLicensed = user.assignedLicenses && user.assignedLicenses.length > 0;
-        const matchesLicense = filterLicense === 'all' ||
-            (filterLicense === 'licensed' ? isLicensed : !isLicensed);
-
+        const matchesLicense = filterLicense === 'all' || (filterLicense === 'licensed' ? isLicensed : !isLicensed);
         return matchesText && matchesType && matchesStatus && matchesLicense;
     });
 
     const handleDownloadCSV = () => {
         const headers = ['Display Name', 'User Principal Name', 'User Type', 'Account Enabled', 'Licensed'];
         const rows = filteredUsers.map(u => [
-            `"${u.displayName}"`,
-            `"${u.userPrincipalName}"`,
-            `"${u.userType || 'Member'}"`,
-            u.accountEnabled,
-            (u.assignedLicenses && u.assignedLicenses.length > 0) ? 'Yes' : 'No'
+            `"${u.displayName}"`, `"${u.userPrincipalName}"`, `"${u.userType || 'Member'}"`, u.accountEnabled, (u.assignedLicenses && u.assignedLicenses.length > 0) ? 'Yes' : 'No'
         ]);
-
         const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
         const blob = new Blob([csvContent], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
@@ -76,133 +60,122 @@ const EntraUsers = () => {
 
     if (loading) {
         return (
-            <div className={styles.loadingContainer}>
-                <Loader2 className="animate-spin" style={{ width: '2.5rem', height: '2.5rem', color: '#3b82f6' }} />
+            <div className="flex-center" style={{ height: '60vh' }}>
+                <Loader2 className="animate-spin" size={40} color="var(--accent-blue)" />
             </div>
         );
     }
 
     return (
-        <div className={styles.pageContainer}>
-            <div className={styles.contentWrapper}>
-                <button onClick={() => navigate('/service/entra')} className={styles.backButton}>
-                    <ArrowLeft style={{ width: '1rem', height: '1rem', marginRight: '0.5rem' }} />
-                    Back to Dashboard
-                </button>
+        <div className="animate-in">
+            <button onClick={() => navigate('/service/entra')} className="btn-back">
+                <ArrowLeft size={14} style={{ marginRight: '8px' }} />
+                Back to Dashboard
+            </button>
 
-                <div className={styles.pageHeader}>
-                    <h1 className={styles.pageTitle}>
-                        <Users style={{ width: '2rem', height: '2rem', color: '#3b82f6' }} />
-                        All Users
-                    </h1>
-                    <p className={styles.pageSubtitle}>
-                        Manage user identities, access permissions, and account settings
-                    </p>
+            <header className="flex-between spacing-v-8">
+                <div>
+                    <h1 className="title-gradient" style={{ fontSize: '32px' }}>Microsoft Entra Users</h1>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Identity management and access control directory</p>
                 </div>
+                <button className="btn btn-primary" onClick={handleDownloadCSV}>
+                    <Download size={16} />
+                    Export Users
+                </button>
+            </header>
 
-                <div className={styles.filterBar}>
-                    <select value={filterType} onChange={(e) => setFilterType(e.target.value)} className={styles.filterInput} style={{ flex: 'initial', minWidth: '150px' }}>
+            <div className="glass-card" style={{ marginBottom: '32px', padding: '24px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+                    <div className="search-wrapper">
+                        <input
+                            type="text"
+                            className="input search-input"
+                            placeholder="Search by name or email..."
+                            value={filterText}
+                            onChange={(e) => setFilterText(e.target.value)}
+                        />
+                        <Search size={18} className="search-icon" />
+                    </div>
+                    <select className="input" value={filterType} onChange={(e) => setFilterType(e.target.value)}>
                         <option value="all">All Types</option>
                         <option value="member">Members</option>
                         <option value="guest">Guests</option>
                     </select>
-                    <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className={styles.filterInput} style={{ flex: 'initial', minWidth: '150px' }}>
+                    <select className="input" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
                         <option value="all">All Status</option>
-                        <option value="enabled">Enabled</option>
-                        <option value="disabled">Disabled</option>
+                        <option value="enabled">Enabled Only</option>
+                        <option value="disabled">Disabled Only</option>
                     </select>
-                    <select value={filterLicense} onChange={(e) => setFilterLicense(e.target.value)} className={styles.filterInput} style={{ flex: 'initial', minWidth: '180px' }}>
-                        <option value="all">All License States</option>
+                    <select className="input" value={filterLicense} onChange={(e) => setFilterLicense(e.target.value)}>
+                        <option value="all">All Licenses</option>
                         <option value="licensed">Licensed</option>
                         <option value="unlicensed">Unlicensed</option>
                     </select>
-
-                    <div style={{ position: 'relative', flex: 1, minWidth: '250px' }}>
-                        <Search style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', width: '1rem', height: '1rem', color: '#6b7280' }} />
-                        <input
-                            type="text"
-                            placeholder="Search users..."
-                            value={filterText}
-                            onChange={(e) => setFilterText(e.target.value)}
-                            className={styles.filterInput}
-                            style={{ paddingLeft: '2.75rem' }}
-                        />
-                    </div>
-                    <button onClick={handleDownloadCSV} className={`${styles.actionButton} ${styles.actionButtonSecondary}`}>
-                        <Download style={{ width: '1rem', height: '1rem' }} />
-                        Export
-                    </button>
                 </div>
+            </div>
 
-                <div className={styles.card}>
-                    <div className={styles.cardHeader}>
-                        <h2 className={styles.cardTitle}>Users Directory</h2>
-                        <span className={`${styles.badge} ${styles.badgeInfo}`}>
-                            {filteredUsers.length} USERS
-                        </span>
-                    </div>
-
-                    {filteredUsers.length > 0 ? (
-                        <div className={styles.tableContainer}>
-                            <table className={styles.table}>
-                                <thead className={styles.tableHead}>
-                                    <tr>
-                                        <th>Display Name</th>
-                                        <th>User Principal Name</th>
-                                        <th>Type</th>
-                                        <th>Status</th>
-                                        <th>License</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {filteredUsers.map((user, i) => (
-                                        <tr key={i} className={styles.tableRow}>
-                                            <td>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                                    <div style={{ width: '2rem', height: '2rem', borderRadius: '9999px', background: 'rgba(59, 130, 246, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, color: '#3b82f6' }}>
-                                                        {user.displayName ? user.displayName.substring(0, 2).toUpperCase() : 'U'}
-                                                    </div>
-                                                    <span style={{ fontWeight: 500, color: 'white' }}>{user.displayName}</span>
-                                                </div>
-                                            </td>
-                                            <td style={{ color: '#9ca3af', fontSize: '0.875rem' }}>{user.userPrincipalName}</td>
-                                            <td style={{ color: '#d1d5db', fontSize: '0.875rem' }}>{user.userType || 'Member'}</td>
-                                            <td>
-                                                {user.accountEnabled ? (
-                                                    <span className={`${styles.badge} ${styles.badgeSuccess}`}>
-                                                        <CheckCircle2 style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.375rem' }} />
-                                                        Enabled
-                                                    </span>
-                                                ) : (
-                                                    <span className={`${styles.badge} ${styles.badgeError}`}>
-                                                        <XCircle style={{ width: '0.875rem', height: '0.875rem', marginRight: '0.375rem' }} />
-                                                        Disabled
-                                                    </span>
-                                                )}
-                                            </td>
-                                            <td>
-                                                {user.assignedLicenses && user.assignedLicenses.length > 0 ? (
-                                                    <span className={`${styles.badge} ${styles.badgeInfo}`}>Licensed</span>
-                                                ) : (
-                                                    <span className={`${styles.badge} ${styles.badgeNeutral}`}>Unlicensed</span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    ) : (
-                        <div className={styles.emptyState}>
-                            <div className={styles.emptyIcon}>
-                                <Users style={{ width: '2.5rem', height: '2.5rem', color: '#6b7280' }} />
-                            </div>
-                            <h3 className={styles.emptyTitle}>No Users Found</h3>
-                            <p className={styles.emptyDescription}>
-                                No users match your current filters. Try adjusting your search criteria.
-                            </p>
-                        </div>
-                    )}
+            <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
+                <div className="table-container">
+                    <table className="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Display Name</th>
+                                <th>UPN / Email</th>
+                                <th>User Type</th>
+                                <th>Status</th>
+                                <th>License</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredUsers.length > 0 ? filteredUsers.map((user, i) => (
+                                <tr key={i}>
+                                    <td>
+                                        <div className="flex-center justify-start flex-gap-4">
+                                            <div style={{
+                                                width: '32px',
+                                                height: '32px',
+                                                borderRadius: '50%',
+                                                background: 'hsla(var(--hue), 90%, 60%, 0.1)',
+                                                color: 'var(--accent-blue)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontSize: '11px',
+                                                fontWeight: 800,
+                                                border: '1px solid hsla(var(--hue), 90%, 60%, 0.2)'
+                                            }}>
+                                                {user.displayName?.substring(0, 2).toUpperCase()}
+                                            </div>
+                                            <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{user.displayName}</span>
+                                        </div>
+                                    </td>
+                                    <td style={{ fontSize: '12px' }}>{user.userPrincipalName}</td>
+                                    <td>
+                                        <span className={`badge ${user.userType === 'Guest' ? 'badge-info' : ''}`} style={{ opacity: user.userType === 'Guest' ? 1 : 0.6 }}>
+                                            {user.userType || 'Member'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span className={`badge ${user.accountEnabled ? 'badge-success' : 'badge-error'}`}>
+                                            {user.accountEnabled ? 'Enabled' : 'Disabled'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span className={`badge ${user.assignedLicenses?.length > 0 ? 'badge-info' : ''}`} style={{ opacity: user.assignedLicenses?.length > 0 ? 1 : 0.4 }}>
+                                            {user.assignedLicenses?.length > 0 ? 'Licensed' : 'No License'}
+                                        </span>
+                                    </td>
+                                </tr>
+                            )) : (
+                                <tr>
+                                    <td colSpan="5" style={{ textAlign: 'center', padding: '100px', color: 'var(--text-dim)' }}>
+                                        <Users size={48} style={{ marginBottom: '16px', opacity: 0.2 }} />
+                                        <p>No users found matching your filters.</p>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

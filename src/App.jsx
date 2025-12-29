@@ -17,6 +17,7 @@ import EntraApps from './components/EntraApps';
 import SecureScorePage from './components/SecureScorePage';
 import ServiceHealthPage from './components/ServiceHealthPage';
 import SignInsPage from './components/SignInsPage';
+import EmailActivityPage from './components/EmailActivityPage';
 import ServiceLayout from './components/Layout'; // Imported from Layout.jsx which we updated
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -35,11 +36,11 @@ function App() {
               <Route path="admin/domains" element={<DomainsPage />} />
               <Route path="admin/licenses" element={<LicensesPage />} />
               <Route path="admin/groups" element={<GroupsPage />} />
-              <Route path="admin/groups" element={<GroupsPage />} />
               <Route path="admin/deleted-users" element={<DeletedUsersPage />} />
               <Route path="admin/secure-score" element={<SecureScorePage />} />
               <Route path="admin/service-health" element={<ServiceHealthPage />} />
               <Route path="admin/sign-ins" element={<SignInsPage />} />
+              <Route path="admin/emails" element={<EmailActivityPage />} />
 
               {/* Entra ID Routes */}
               <Route path="entra" element={<EntraDashboard />} />

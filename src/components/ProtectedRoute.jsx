@@ -10,10 +10,10 @@ const ProtectedRoute = () => {
     // Check if authentication interaction is in progress
     if (inProgress !== InteractionStatus.None && accounts.length === 0) {
         return (
-            <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-                <div className="flex flex-col items-center space-y-4">
-                    <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
-                    <p className="text-gray-400 font-medium">Restoring session...</p>
+            <div className="flex-center" style={{ height: '100vh', background: 'var(--bg-darker)' }}>
+                <div className="glass-card flex-center" style={{ flexDirection: 'column', gap: '20px', padding: '40px' }}>
+                    <Loader2 className="animate-spin" size={40} color="var(--accent-blue)" />
+                    <p style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>Restoring secure session...</p>
                 </div>
             </div>
         );

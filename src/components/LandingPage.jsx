@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Zap, ArrowRight, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
-import { AnimatePresence } from 'framer-motion';
-import Header from './Header';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -29,157 +27,187 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 md:p-12 overflow-hidden relative pt-28">
-      <Header isAuthenticated={false} />
-      {/* Enhanced Background Decorative Elements */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+    <div className="landing-page">
+      {/* Background Glows */}
+      <div className="background-decor">
         <motion.div
-          animate={{
-            x: [0, 50, 0],
-            y: [0, 30, 0],
-            scale: [1, 1.1, 1],
-          }}
+          animate={{ x: [0, 50, 0], y: [0, 30, 0], scale: [1, 1.1, 1] }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-600/15 blur-[120px] rounded-full"
+          className="glow glow-blue"
         />
         <motion.div
-          animate={{
-            x: [0, -30, 0],
-            y: [0, -50, 0],
-            scale: [1, 1.2, 1],
-          }}
+          animate={{ x: [0, -30, 0], y: [0, -50, 0], scale: [1, 1.2, 1] }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-purple-600/15 blur-[120px] rounded-full"
-        />
-        <motion.div
-          animate={{
-            x: [0, 20, 0],
-            y: [0, -20, 0],
-            scale: [1, 1.15, 1],
-          }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-          className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-cyan-500/10 blur-[100px] rounded-full -translate-x-1/2 -translate-y-1/2"
+          className="glow glow-purple"
         />
       </div>
 
-      <div className="z-10 w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        {/* Left Side: Branding & Info */}
+      <div className="landing-content">
+        {/* Left Section */}
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="flex flex-col space-y-8"
+          transition={{ duration: 0.8 }}
+          className="branding-section"
         >
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="flex items-center space-x-3 mb-6"
-          >
-            <div className="grid grid-cols-2 gap-1 p-2 bg-white/5 rounded-xl backdrop-blur-sm border border-white/10">
-              <div className="w-4 h-4 bg-[#f25022] rounded-sm"></div>
-              <div className="w-4 h-4 bg-[#7fba00] rounded-sm"></div>
-              <div className="w-4 h-4 bg-[#00a4ef] rounded-sm"></div>
-              <div className="w-4 h-4 bg-[#ffb900] rounded-sm"></div>
+          <div className="flex-center flex-gap-4 spacing-v-8">
+            <div className="logo-grid">
+              <div style={{ backgroundColor: '#f25022' }}></div>
+              <div style={{ backgroundColor: '#7fba00' }}></div>
+              <div style={{ backgroundColor: '#00a4ef' }}></div>
+              <div style={{ backgroundColor: '#ffb900' }}></div>
             </div>
-            <span className="text-2xl font-bold tracking-tight text-white font-['Outfit'] bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-              M365 Portal
-            </span>
-          </motion.div>
+            <span className="font-bold" style={{ fontSize: '24px' }}>M365 Operations</span>
+          </div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight text-white mb-6"
-          >
-            Unified <span className="primary-gradient">Operations</span><br />for the Modern Cloud
-          </motion.h1>
+          <h1 className="hero-title">
+            Unified <span className="primary-gradient-text">Intelligence</span><br />
+            for Microsoft 365
+          </h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="text-xl text-gray-300 max-w-lg leading-relaxed"
-          >
-            Gain deeper visibility and safer execution for your Microsoft 365 environment.
-            Connect your Microsoft account to securely manage your tenant.
-          </motion.p>
+          <p className="hero-subtitle">
+            Deeper visibility, safer execution, and modern analytics for your enterprise tenant.
+            Sign in with your work account to get started.
+          </p>
         </motion.div>
 
-        {/* Right Side: Signin Card */}
+        {/* Right Section: Sign In Card */}
         <motion.div
-          layout
-          initial={{ opacity: 0, y: 50, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="glass p-10 md:p-12 shadow-2xl relative overflow-hidden border border-white/10"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
         >
-          <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-500/20 blur-[80px] rounded-full"></div>
-          <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-purple-500/20 blur-[80px] rounded-full"></div>
+          <div className="glass-card sign-in-card">
+            <h2 className="spacing-v-4 title-gradient">Enterprise Sign In</h2>
+            <p className="spacing-v-8" style={{ color: 'var(--text-secondary)' }}>
+              Authorize with your Microsoft Identity
+            </p>
 
-          <motion.div layout className="mb-10 relative z-10">
-            <h2 className="text-3xl font-bold text-white mb-3 bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
-              Enterprise Sign In
-            </h2>
-            <p className="text-gray-400 text-base">Sign in with your Microsoft 365 Work Account</p>
-          </motion.div>
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="error-alert spacing-v-8"
+                >
+                  <AlertCircle size={18} />
+                  <span>{error}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-          <AnimatePresence>
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center space-x-3 text-red-400 text-sm backdrop-blur-sm"
-              >
-                <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                <span>{error}</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <div className="space-y-6 relative z-10">
-            <motion.button
-              whileHover={{ scale: 1.02, y: -2 }}
-              whileTap={{ scale: 0.98 }}
+            <button
+              className="btn btn-primary w-full"
               onClick={handleLogin}
               disabled={loading}
-              className="btn-primary w-full py-6 text-lg flex items-center justify-center space-x-4 mt-4 shadow-xl"
+              style={{ padding: '20px', fontSize: '16px' }}
             >
               {loading ? (
-                <>
-                  <Loader2 className="w-6 h-6 animate-spin" />
-                  <span>Authenticating...</span>
-                </>
+                <Loader2 className="animate-spin" />
               ) : (
                 <>
-                  <div className="grid grid-cols-2 gap-0.5 p-1 bg-white/10 rounded">
-                    <div className="w-2 h-2 bg-[#f25022] rounded-sm"></div>
-                    <div className="w-2 h-2 bg-[#7fba00] rounded-sm"></div>
-                    <div className="w-2 h-2 bg-[#00a4ef] rounded-sm"></div>
-                    <div className="w-2 h-2 bg-[#ffb900] rounded-sm"></div>
-                  </div>
-                  <span className="font-semibold">Sign in with Microsoft</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <Shield size={20} />
+                  <span>Sign in with Microsoft</span>
+                  <ArrowRight size={20} />
                 </>
               )}
-            </motion.button>
-            <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
-              <Shield className="w-3 h-3" />
-              <span>Secure enterprise connection via Microsoft Identity platform</span>
+            </button>
+
+            <div className="flex-center flex-gap-2 mt-8" style={{ fontSize: '11px', color: 'var(--text-dim)', marginTop: '24px' }}>
+              <Zap size={12} />
+              <span>OAuth 2.0 Secure Connection via Microsoft Entra</span>
             </div>
           </div>
         </motion.div>
       </div>
 
-      {/* Footer */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1, duration: 1 }}
-        className="mt-12 text-gray-600 text-sm flex space-x-6"
-      ></motion.div>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        .landing-page {
+          min-height: 100vh;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 60px;
+          position: relative;
+          overflow: hidden;
+          background: var(--bg-darker);
+        }
+        .background-decor {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+        .glow {
+          position: absolute;
+          width: 600px;
+          height: 600px;
+          border-radius: 50%;
+          filter: blur(140px);
+          opacity: 0.1;
+        }
+        .glow-blue { top: -10%; right: -10%; background: var(--accent-blue); }
+        .glow-purple { bottom: -10%; left: -10%; background: var(--accent-purple); }
+
+        .landing-content {
+          z-index: 10;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 100px;
+          max-width: 1400px;
+          align-items: center;
+        }
+
+        .hero-title {
+          font-size: 84px;
+          line-height: 1.1;
+          margin-bottom: 32px;
+        }
+        .hero-subtitle {
+          font-size: 20px;
+          color: var(--text-secondary);
+          max-width: 500px;
+          line-height: 1.6;
+        }
+
+        .sign-in-card {
+          padding: 60px;
+          max-width: 500px;
+          box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+        }
+
+        .logo-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 4px;
+          padding: 8px;
+          background: hsla(0,0%,100%,0.05);
+          border-radius: 12px;
+          border: 1px solid var(--glass-border);
+        }
+        .logo-grid div { width: 14px; height: 14px; border-radius: 2px; }
+
+        .error-alert {
+          background: hsla(0, 84%, 60%, 0.1);
+          border: 1px solid hsla(0, 84%, 60%, 0.2);
+          color: var(--accent-error);
+          padding: 16px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          font-size: 14px;
+        }
+
+        @media (max-width: 1024px) {
+          .landing-content { grid-template-columns: 1fr; gap: 60px; text-align: center; }
+          .hero-subtitle { margin: 0 auto; }
+          .hero-title { font-size: 56px; }
+          .branding-section { order: 2; }
+          .landing-page { padding: 40px 20px; }
+        }
+      `}} />
     </div>
   );
 };
