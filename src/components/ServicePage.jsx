@@ -4,7 +4,7 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { motion } from 'framer-motion';
-import { Settings, RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2, Shield, Activity, AlertTriangle, Users, Mail, Globe, CreditCard, LayoutGrid, Trash2, ArrowRight } from 'lucide-react';
+import { Settings, RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2, Shield, Activity, AlertTriangle, Users, Mail, Globe, CreditCard, LayoutGrid, Trash2, ArrowRight, Lock } from 'lucide-react';
 
 const ServicePage = ({ serviceId: propServiceId }) => {
     const params = useParams();
@@ -44,6 +44,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
     const isAdmin = serviceId === 'admin';
     const isEntra = serviceId === 'entra';
     const isLicensing = serviceId === 'licensing';
+    const isPurview = serviceId === 'purview';
 
     const fetchData = async () => {
         setLoading(true);
@@ -109,21 +110,23 @@ const ServicePage = ({ serviceId: propServiceId }) => {
 
     const stats = isAdmin ? [
         { label: 'Total Mailboxes', value: exchangeData.length, icon: Mail, color: 'var(--accent-blue)', path: '/service/admin/report', trend: 'Live' },
-        { label: 'Emails Sent (7d)', value: emailActivity.sent.toLocaleString(), icon: Activity, color: 'var(--accent-purple)', path: '/service/admin/emails', trend: emailActivity.date ? `As of ${emailActivity.date}` : '7 Days' },
-        { label: 'Emails Received (7d)', value: emailActivity.received.toLocaleString(), icon: Activity, color: 'var(--accent-blue)', path: '/service/admin/emails', trend: emailActivity.date ? `As of ${emailActivity.date}` : '7 Days' },
         { label: 'Licenses Used', value: licensingSummary.reduce((acc, curr) => acc + (curr.consumedUnits || 0), 0), icon: CreditCard, color: 'var(--accent-cyan)', path: '/service/admin/licenses', trend: 'Active' },
         { label: 'Groups', value: groupsCount, icon: Users, color: 'var(--accent-indigo)', path: '/service/admin/groups', trend: 'Manage' },
         { label: 'Domains', value: domainsCount, icon: Globe, color: 'var(--accent-success)', path: '/service/admin/domains', trend: 'Manage' },
         { label: 'Deleted Users', value: deletedUsersCount, icon: Trash2, color: 'var(--accent-error)', path: '/service/admin/deleted-users', trend: 'Restore' },
         { label: 'Secure Score', value: secureScore ? `${Math.round((secureScore.currentScore / secureScore.maxScore) * 100)}%` : '--', icon: Shield, color: 'var(--accent-blue)', path: '/service/admin/secure-score', trend: `${secureScore?.currentScore || 0} Pts` },
         { label: 'Failed Logins (24h)', value: failedSignIns.length, icon: AlertTriangle, color: 'var(--accent-error)', path: '/service/admin/sign-ins', trend: 'Review' },
-        { label: 'Service Health', value: `${serviceHealth.filter(s => s.status !== 'ServiceOperational').length} Issues`, icon: Activity, color: 'var(--accent-warning)', path: '/service/admin/service-health', trend: 'Status' },
-        { label: 'Device Compliance', value: deviceSummary.total > 0 ? `${Math.round((deviceSummary.compliant / deviceSummary.total) * 100)}%` : '0%', icon: Shield, color: 'var(--accent-blue)', path: '/service/entra/devices', trend: `${deviceSummary.compliant}/${deviceSummary.total}` }
+        { label: 'Service Health', value: `${serviceHealth.filter(s => s.status !== 'ServiceOperational').length} Issues`, icon: Activity, color: 'var(--accent-warning)', path: '/service/admin/service-health', trend: 'Status' }
     ] : isEntra ? [
         { label: 'Users', value: exchangeData.length, icon: Users, color: 'var(--accent-blue)', path: '/service/entra/users' },
         { label: 'Groups', value: groupsCount, icon: Users, color: 'var(--accent-purple)', path: '/service/entra/groups' },
         { label: 'Applications', value: appsCount, icon: LayoutGrid, color: 'var(--accent-cyan)', path: '/service/entra/apps' },
         { label: 'Global Admins', value: globalAdmins.length, icon: Shield, color: 'var(--accent-error)' }
+    ] : isPurview ? [
+        { label: 'Sensitivity Labels', value: '--', icon: Lock, color: 'var(--accent-purple)' },
+        { label: 'Data Policy Matches', value: '--', icon: AlertTriangle, color: 'var(--accent-warning)' },
+        { label: 'Retention Policies', value: '--', icon: Activity, color: 'var(--accent-blue)' },
+        { label: 'DLP Alerts', value: '--', icon: Shield, color: 'var(--accent-error)' }
     ] : [];
 
     return (
@@ -177,6 +180,46 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                     </motion.div>
                 ))}
             </div>
+
+            {isPurview && (
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="glass-card"
+                    style={{
+                        marginTop: '32px',
+                        padding: '60px',
+                        textAlign: 'center',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '20px',
+                        background: 'hsla(0, 0%, 100%, 0.02)'
+                    }}
+                >
+                    <div style={{
+                        width: '80px',
+                        height: '80px',
+                        borderRadius: '50%',
+                        background: 'hsla(0, 0%, 100%, 0.05)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'var(--text-dim)'
+                    }}>
+                        <AlertCircle size={40} />
+                    </div>
+                    <div>
+                        <h2 className="title-gradient" style={{ fontSize: '24px', marginBottom: '8px' }}>Telemetry Unavailable</h2>
+                        <p style={{ color: 'var(--text-dim)', maxWidth: '400px', margin: '0 auto' }}>
+                            Couldn't retrieve Microsoft Purview data.
+                        </p>
+                    </div>
+                    <button className="btn btn-secondary" onClick={() => navigate('/service/admin')}>
+                        Return to Admin Center
+                    </button>
+                </motion.div>
+            )}
 
             {isEntra && (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>

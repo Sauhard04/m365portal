@@ -12,6 +12,7 @@
   "dependencies": {
     "@azure/msal-browser": "^4.27.0",
     "@azure/msal-react": "^3.0.23",
+    "@google/generative-ai": "^0.24.1",
     "@microsoft/microsoft-graph-client": "^3.0.7",
     "framer-motion": "^12.23.26",
     "lucide-react": "^0.562.0",
