@@ -235,16 +235,16 @@ const OverviewDashboard = () => {
                                 <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Real-time Status</p>
                             </div>
                         </div>
-                        <ResponsiveContainer width="100%" height={160}>
+                        <ResponsiveContainer width="100%" height={240}>
                             <PieChart>
                                 <defs>
                                     <linearGradient id="gradSuccess" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.9} />
-                                        <stop offset="95%" stopColor="#059669" stopOpacity={0.9} />
+                                        <stop offset="0%" stopColor="#00f2fe" stopOpacity={1} />
+                                        <stop offset="100%" stopColor="#4facfe" stopOpacity={1} />
                                     </linearGradient>
                                     <linearGradient id="gradError" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.9} />
-                                        <stop offset="95%" stopColor="#dc2626" stopOpacity={0.9} />
+                                        <stop offset="0%" stopColor="#ff0844" stopOpacity={1} />
+                                        <stop offset="100%" stopColor="#ffb199" stopOpacity={1} />
                                     </linearGradient>
                                 </defs>
                                 <Pie
@@ -253,19 +253,28 @@ const OverviewDashboard = () => {
                                     cy="50%"
                                     labelLine={false}
                                     label={renderCustomLabel}
-                                    outerRadius={100}
+                                    outerRadius={85}
                                     innerRadius={60}
-                                    paddingAngle={4}
+                                    paddingAngle={5}
                                     dataKey="value"
                                     animationBegin={0}
-                                    animationDuration={1000}
+                                    animationDuration={1200}
+                                    stroke="none"
                                 >
                                     {data.charts.serviceHealth.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.name === 'Operational' ? 'url(#gradSuccess)' : 'url(#gradError)'} />
+                                        <Cell
+                                            key={`cell-${index}`}
+                                            fill={entry.name === 'Operational' ? 'url(#gradSuccess)' : 'url(#gradError)'}
+                                            style={{ filter: 'drop-shadow(0px 0px 8px rgba(0,0,0,0.3))' }}
+                                        />
                                     ))}
                                 </Pie>
                                 <Tooltip content={<CustomTooltip />} />
-                                <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px', fontSize: '13px' }} />
+                                <Legend
+                                    iconType="circle"
+                                    verticalAlign="bottom"
+                                    wrapperStyle={{ paddingTop: '24px', fontSize: '13px', fontWeight: 600 }}
+                                />
                             </PieChart>
                         </ResponsiveContainer>
                     </motion.div>
@@ -289,16 +298,16 @@ const OverviewDashboard = () => {
                                 <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Active vs Inactive</p>
                             </div>
                         </div>
-                        <ResponsiveContainer width="100%" height={160}>
+                        <ResponsiveContainer width="100%" height={240}>
                             <PieChart>
                                 <defs>
                                     <linearGradient id="gradActive" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#10b981" stopOpacity={1} />
-                                        <stop offset="95%" stopColor="#059669" stopOpacity={1} />
+                                        <stop offset="0%" stopColor="#10b981" stopOpacity={1} />
+                                        <stop offset="100%" stopColor="#34d399" stopOpacity={1} />
                                     </linearGradient>
                                     <linearGradient id="gradInactive" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={1} />
-                                        <stop offset="95%" stopColor="#d97706" stopOpacity={1} />
+                                        <stop offset="0%" stopColor="#f59e0b" stopOpacity={1} />
+                                        <stop offset="100%" stopColor="#fbbf24" stopOpacity={1} />
                                     </linearGradient>
                                 </defs>
                                 <Pie
@@ -307,19 +316,28 @@ const OverviewDashboard = () => {
                                     cy="50%"
                                     labelLine={false}
                                     label={renderCustomLabel}
-                                    outerRadius={100}
+                                    outerRadius={85}
                                     innerRadius={60}
-                                    paddingAngle={4}
+                                    paddingAngle={5}
                                     dataKey="value"
                                     animationBegin={100}
-                                    animationDuration={1000}
+                                    animationDuration={1200}
+                                    stroke="none"
                                 >
                                     {data.charts.userDistribution.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.name === 'Active' ? 'url(#gradActive)' : 'url(#gradInactive)'} />
+                                        <Cell
+                                            key={`cell-${index}`}
+                                            fill={entry.name === 'Active' ? 'url(#gradActive)' : 'url(#gradInactive)'}
+                                            style={{ filter: 'drop-shadow(0px 0px 8px rgba(0,0,0,0.3))' }}
+                                        />
                                     ))}
                                 </Pie>
                                 <Tooltip content={<CustomTooltip />} />
-                                <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px', fontSize: '13px' }} />
+                                <Legend
+                                    iconType="circle"
+                                    verticalAlign="bottom"
+                                    wrapperStyle={{ paddingTop: '24px', fontSize: '13px', fontWeight: 600 }}
+                                />
                             </PieChart>
                         </ResponsiveContainer>
                     </motion.div>
@@ -343,32 +361,32 @@ const OverviewDashboard = () => {
                                 <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Security Posture</p>
                             </div>
                         </div>
-                        <ResponsiveContainer width="100%" height={160}>
-                            <BarChart data={data.charts.deviceCompliance} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
+                        <ResponsiveContainer width="100%" height={240}>
+                            <BarChart data={data.charts.deviceCompliance} margin={{ top: 30, right: 30, left: 0, bottom: 20 }}>
                                 <defs>
                                     <linearGradient id="compGradSuccess" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#10b981" stopOpacity={1} />
-                                        <stop offset="95%" stopColor="#059669" stopOpacity={0.8} />
+                                        <stop offset="0%" stopColor="#00c853" stopOpacity={1} />
+                                        <stop offset="100%" stopColor="#b2ff59" stopOpacity={1} />
                                     </linearGradient>
                                     <linearGradient id="compGradError" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#ef4444" stopOpacity={1} />
-                                        <stop offset="95%" stopColor="#dc2626" stopOpacity={0.8} />
+                                        <stop offset="0%" stopColor="#d50000" stopOpacity={1} />
+                                        <stop offset="100%" stopColor="#ff5252" stopOpacity={1} />
                                     </linearGradient>
                                     <linearGradient id="compGradWarning" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={1} />
-                                        <stop offset="95%" stopColor="#d97706" stopOpacity={0.8} />
+                                        <stop offset="0%" stopColor="#ffab00" stopOpacity={1} />
+                                        <stop offset="100%" stopColor="#ffd740" stopOpacity={1} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                <XAxis dataKey="name" stroke="var(--text-dim)" style={{ fontSize: '12px' }} />
-                                <YAxis stroke="var(--text-dim)" style={{ fontSize: '12px' }} />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Bar dataKey="value" radius={[12, 12, 0, 0]} animationDuration={1000}>
-                                    <LabelList dataKey="value" position="top" style={{ fill: 'var(--text-primary)', fontSize: '13px', fontWeight: 600 }} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+                                <XAxis dataKey="name" stroke="var(--text-dim)" axisLine={false} tickLine={false} style={{ fontSize: '12px', fontWeight: 500 }} dy={10} />
+                                <YAxis stroke="var(--text-dim)" axisLine={false} tickLine={false} style={{ fontSize: '12px' }} />
+                                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
+                                <Bar dataKey="value" barSize={40} radius={[10, 10, 0, 0]} animationDuration={1200}>
+                                    <LabelList dataKey="value" position="top" style={{ fill: 'var(--text-primary)', fontSize: '14px', fontWeight: 700 }} dy={-10} />
                                     {data.charts.deviceCompliance.map((entry, index) => {
                                         const fillGrad = entry.name === 'Compliant' ? 'url(#compGradSuccess)' :
                                             entry.name === 'Non-Compliant' ? 'url(#compGradError)' : 'url(#compGradWarning)';
-                                        return <Cell key={`cell-${index}`} fill={fillGrad} />;
+                                        return <Cell key={`cell-${index}`} fill={fillGrad} style={{ filter: 'drop-shadow(0px 4px 8px rgba(0,0,0,0.3))' }} />;
                                     })}
                                 </Bar>
                             </BarChart>
@@ -455,28 +473,28 @@ const OverviewDashboard = () => {
                                 <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Last 7 Days</p>
                             </div>
                         </div>
-                        <ResponsiveContainer width="100%" height={160}>
-                            <BarChart data={data.charts.emailTrend} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
+                        <ResponsiveContainer width="100%" height={240}>
+                            <BarChart data={data.charts.emailTrend} margin={{ top: 30, right: 30, left: 0, bottom: 20 }}>
                                 <defs>
                                     <linearGradient id="emailGradSent" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#a855f7" stopOpacity={1} />
-                                        <stop offset="95%" stopColor="#9333ea" stopOpacity={0.8} />
+                                        <stop offset="0%" stopColor="#8e2de2" stopOpacity={1} />
+                                        <stop offset="100%" stopColor="#4a00e0" stopOpacity={1} />
                                     </linearGradient>
                                     <linearGradient id="emailGradReceived" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={1} />
-                                        <stop offset="95%" stopColor="#2563eb" stopOpacity={0.8} />
+                                        <stop offset="0%" stopColor="#00d2ff" stopOpacity={1} />
+                                        <stop offset="100%" stopColor="#3a7bd5" stopOpacity={1} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                <XAxis dataKey="name" stroke="var(--text-dim)" style={{ fontSize: '12px' }} />
-                                <YAxis stroke="var(--text-dim)" style={{ fontSize: '12px' }} />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Legend wrapperStyle={{ fontSize: '13px' }} />
-                                <Bar dataKey="sent" fill="url(#emailGradSent)" radius={[12, 12, 0, 0]} animationDuration={1000}>
-                                    <LabelList dataKey="sent" position="top" style={{ fill: 'var(--text-primary)', fontSize: '12px', fontWeight: 600 }} formatter={(value) => value.toLocaleString()} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+                                <XAxis dataKey="name" stroke="var(--text-dim)" axisLine={false} tickLine={false} style={{ fontSize: '12px', fontWeight: 500 }} dy={10} />
+                                <YAxis stroke="var(--text-dim)" axisLine={false} tickLine={false} style={{ fontSize: '12px' }} />
+                                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
+                                <Legend wrapperStyle={{ paddingTop: '20px', fontSize: '13px', fontWeight: 600 }} />
+                                <Bar dataKey="sent" fill="url(#emailGradSent)" barSize={30} radius={[8, 8, 0, 0]} animationDuration={1200}>
+                                    <LabelList dataKey="sent" position="top" style={{ fill: 'var(--text-primary)', fontSize: '11px', fontWeight: 700 }} dy={-10} formatter={(value) => value.toLocaleString()} />
                                 </Bar>
-                                <Bar dataKey="received" fill="url(#emailGradReceived)" radius={[12, 12, 0, 0]} animationDuration={1200}>
-                                    <LabelList dataKey="received" position="top" style={{ fill: 'var(--text-primary)', fontSize: '12px', fontWeight: 600 }} formatter={(value) => value.toLocaleString()} />
+                                <Bar dataKey="received" fill="url(#emailGradReceived)" barSize={30} radius={[8, 8, 0, 0]} animationDuration={1400}>
+                                    <LabelList dataKey="received" position="top" style={{ fill: 'var(--text-primary)', fontSize: '11px', fontWeight: 700 }} dy={-10} formatter={(value) => value.toLocaleString()} />
                                 </Bar>
                             </BarChart>
                         </ResponsiveContainer>
@@ -501,20 +519,20 @@ const OverviewDashboard = () => {
                                 <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Operating Systems</p>
                             </div>
                         </div>
-                        <ResponsiveContainer width="100%" height={160}>
-                            <BarChart data={data.charts.deviceByPlatform} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
+                        <ResponsiveContainer width="100%" height={240}>
+                            <BarChart data={data.charts.deviceByPlatform} margin={{ top: 30, right: 30, left: 0, bottom: 20 }}>
                                 <defs>
                                     <linearGradient id="platformGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#10b981" stopOpacity={1} />
-                                        <stop offset="95%" stopColor="#059669" stopOpacity={0.8} />
+                                        <stop offset="0%" stopColor="#00f2fe" stopOpacity={1} />
+                                        <stop offset="100%" stopColor="#4facfe" stopOpacity={1} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                <XAxis dataKey="name" stroke="var(--text-dim)" style={{ fontSize: '12px' }} />
-                                <YAxis stroke="var(--text-dim)" style={{ fontSize: '12px' }} />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Bar dataKey="value" fill="url(#platformGrad)" radius={[12, 12, 0, 0]} animationDuration={1000}>
-                                    <LabelList dataKey="value" position="top" style={{ fill: 'var(--text-primary)', fontSize: '13px', fontWeight: 600 }} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+                                <XAxis dataKey="name" stroke="var(--text-dim)" axisLine={false} tickLine={false} style={{ fontSize: '12px', fontWeight: 500 }} dy={10} />
+                                <YAxis stroke="var(--text-dim)" axisLine={false} tickLine={false} style={{ fontSize: '12px' }} />
+                                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
+                                <Bar dataKey="value" fill="url(#platformGrad)" barSize={40} radius={[10, 10, 0, 0]} animationDuration={1200}>
+                                    <LabelList dataKey="value" position="top" style={{ fill: 'var(--text-primary)', fontSize: '14px', fontWeight: 700 }} dy={-10} />
                                 </Bar>
                             </BarChart>
                         </ResponsiveContainer>
@@ -555,20 +573,29 @@ const OverviewDashboard = () => {
                                     <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>5-Dimensional View</p>
                                 </div>
                             </div>
-                            <ResponsiveContainer width="100%" height={200}>
-                                <RadarChart data={data.charts.securityRadar}>
+                            <ResponsiveContainer width="100%" height={260}>
+                                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data.charts.securityRadar}>
                                     <defs>
                                         <linearGradient id="radarGrad" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
-                                            <stop offset="95%" stopColor="#a855f7" stopOpacity={0.3} />
+                                            <stop offset="0%" stopColor="#00d2ff" stopOpacity={0.85} />
+                                            <stop offset="100%" stopColor="#3a7bd5" stopOpacity={0.4} />
                                         </linearGradient>
                                     </defs>
-                                    <PolarGrid stroke="rgba(255,255,255,0.1)" />
-                                    <PolarAngleAxis dataKey="subject" stroke="var(--text-secondary)" style={{ fontSize: '12px' }} />
-                                    <PolarRadiusAxis angle={90} domain={[0, 100]} stroke="var(--text-dim)" style={{ fontSize: '11px' }} />
-                                    <Radar name="Security Score" dataKey="value" stroke="#3b82f6" fill="url(#radarGrad)" fillOpacity={0.6} strokeWidth={2} dot={{ fill: '#3b82f6', r: 5 }} animationDuration={1500} />
+                                    <PolarGrid stroke="rgba(255,255,255,0.15)" />
+                                    <PolarAngleAxis dataKey="subject" stroke="var(--text-secondary)" tick={{ fill: 'var(--text-secondary)', fontSize: 11, fontWeight: 500 }} />
+                                    <PolarRadiusAxis angle={90} domain={[0, 100]} stroke="var(--text-dim)" tick={{ fill: 'var(--text-dim)', fontSize: 10 }} />
+                                    <Radar
+                                        name="Security Score"
+                                        dataKey="value"
+                                        stroke="#00d2ff"
+                                        fill="url(#radarGrad)"
+                                        fillOpacity={0.7}
+                                        strokeWidth={3}
+                                        dot={{ fill: '#00d2ff', r: 4, strokeWidth: 2, stroke: '#fff' }}
+                                        animationDuration={1500}
+                                    />
                                     <Tooltip content={<CustomTooltip />} />
-                                    <Legend wrapperStyle={{ fontSize: '13px', paddingTop: '20px' }} />
+                                    <Legend verticalAlign="bottom" wrapperStyle={{ fontSize: '13px', fontWeight: 600, paddingTop: '30px' }} />
                                 </RadarChart>
                             </ResponsiveContainer>
                         </motion.div>
