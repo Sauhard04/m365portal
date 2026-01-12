@@ -325,6 +325,12 @@ select.input {
   padding-right: 44px;
 }
 
+select option {
+  background-color: var(--bg-darker);
+  color: var(--text-primary);
+  padding: 12px;
+}
+
 .search-wrapper {
   position: relative;
   flex: 1;
