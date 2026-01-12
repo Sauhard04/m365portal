@@ -1,4 +1,4 @@
-import { Home, Users, Shield, Smartphone, Globe, CreditCard, Mail, Activity, AlertTriangle, Trash2, Settings, Package, Lock, FileText, TrendingUp, LayoutGrid, Rocket, UserCog, Clock, AlertCircle } from 'lucide-react';
+import { Home, Users, Shield, Smartphone, Globe, CreditCard, Mail, Activity, AlertTriangle, Trash2, Settings, Package, Lock, FileText, TrendingUp, LayoutGrid, Rocket, UserCog, Clock, AlertCircle, BookOpen } from 'lucide-react';
 
 // Comprehensive search index for all pages and features
 export const searchableItems = [
