@@ -5,7 +5,7 @@ import {
     User, Mail, Shield, ShieldCheck, Key,
     Globe, Phone, Building, Briefcase,
     CheckCircle2, AlertCircle, ArrowLeft,
-    LogOut, ExternalLink, Settings
+    LogOut, ExternalLink
 } from 'lucide-react';
 import { useMsal } from '@azure/msal-react';
 
@@ -70,7 +70,9 @@ const UserDetailsPage = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
+                        justifyContent: 'center',
+                        boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+                        border: '2px solid rgba(255, 255, 255, 0.1)'
                     }}>
                         {user.name.substring(0, 2).toUpperCase()}
                     </div>
@@ -130,7 +132,7 @@ const UserDetailsPage = () => {
                                 }}>
                                     <detail.icon size={18} />
                                 </div>
-                                <div style={{ overflow: 'hidden', width: '100%' }}>
+                                <div style={{ overflow: 'hidden', width: '100%', flex: 1, minWidth: 0 }}>
                                     <div style={{ fontSize: '10px', color: 'var(--text-dim)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{detail.label}</div>
                                     <div style={{
                                         fontSize: '13px',

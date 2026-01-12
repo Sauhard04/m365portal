@@ -18,7 +18,7 @@ const LandingPage = () => {
     try {
       const loginResponse = await instance.loginPopup(loginRequest);
       localStorage.setItem('m365_user', loginResponse.account.name || loginResponse.account.username.split('@')[0]);
-      navigate('/service/admin');
+      navigate('/service/overview');
     } catch (err) {
       console.error(err);
       setError('Login failed. Please ensure your Azure App Registration is configured correctly.');

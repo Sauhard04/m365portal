@@ -1,5 +1,5 @@
 {
-  "timestamp": 1768202607405,
+  "timestamp": 1768212508103,
   "data": {
     "admincenter": {
       "mailboxes": {
@@ -1017,7 +1017,7 @@
           {
             "basis": "AllTenants",
             "averageScore": 53.38,
-            "appsScore": 40.22,
+            "appsScore": 40.23,
             "appsScoreMax": 103.75,
             "dataScore": 0.66,
             "dataScoreMax": 4.32,
@@ -1040,7 +1040,7 @@
             "deviceScore": 8.93,
             "deviceScoreMax": 16.59,
             "identityScore": 35.66,
-            "identityScoreMax": 60.46,
+            "identityScoreMax": 60.47,
             "infrastructureScore": 0,
             "infrastructureScoreMax": 0
           }
@@ -1241,7 +1241,7 @@
             "controlName": "McasFirewallLogUpload",
             "description": "Log collectors provide visibility into cloud app usage so you can identify if there are any apps that run without official approval, or if there is anomalous behavior. Log collectors automatically upload reports and parse the firewall/ proxy traffic logs to see if there is a match with your services in the Cloud App Catalog.",
             "score": 0,
-            "lastSynced": "2026-01-11T00:47:47Z",
+            "lastSynced": "2026-01-12T08:11:41Z",
             "implementationStatus": "Feature in place: false.",
             "on": "false",
             "scoreInPercentage": 0
@@ -1929,6 +1929,53 @@
       ],
       "failedSignIns": [
         {
+          "id": "d6bc5e9b-9b14-4d92-bfbc-c7629cc12700",
+          "createdDateTime": "2026-01-12T08:48:04Z",
+          "userDisplayName": "Demo User",
+          "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+          "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+          "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
+          "appDisplayName": "Azure Portal",
+          "ipAddress": "122.184.91.214",
+          "clientAppUsed": "Browser",
+          "correlationId": "0806789c-8119-4d5b-a38e-91a19f3429c4",
+          "conditionalAccessStatus": "notApplied",
+          "isInteractive": true,
+          "riskDetail": "none",
+          "riskLevelAggregated": "none",
+          "riskLevelDuringSignIn": "none",
+          "riskState": "none",
+          "riskEventTypes": [],
+          "riskEventTypes_v2": [],
+          "resourceDisplayName": "Azure Resource Manager",
+          "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
+          "status": {
+            "errorCode": 50207,
+            "failureReason": "This web native bridge interrupt will be shown to the user during login when the application is requesting login through the native broker and needs eSTS to ensure the broker is properly configured.",
+            "additionalDetails": "MFA requirement satisfied by claim in the token"
+          },
+          "deviceDetail": {
+            "deviceId": "",
+            "displayName": "",
+            "operatingSystem": "Windows10",
+            "browser": "Chrome 143.0.0",
+            "isCompliant": false,
+            "isManaged": false,
+            "trustType": ""
+          },
+          "location": {
+            "city": "New Delhi",
+            "state": "Delhi",
+            "countryOrRegion": "IN",
+            "geoCoordinates": {
+              "altitude": null,
+              "latitude": 28.6353,
+              "longitude": 77.225
+            }
+          },
+          "appliedConditionalAccessPolicies": []
+        },
+        {
           "id": "dcd85348-e0c6-4921-bb0a-3567715e1b00",
           "createdDateTime": "2026-01-12T06:27:40Z",
           "userDisplayName": "Vishal",
@@ -2193,53 +2240,6 @@
               "result": "reportOnlySuccess"
             }
           ]
-        },
-        {
-          "id": "7ff5049f-01eb-4de8-b908-9fbc1dcb2900",
-          "createdDateTime": "2026-01-10T14:11:46Z",
-          "userDisplayName": "Parth Narang",
-          "userPrincipalName": "pn@intunetraininglabs.onmicrosoft.com",
-          "userId": "ee17efc3-3e5f-40e2-b0d9-26dd89484e45",
-          "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
-          "appDisplayName": "Azure Portal",
-          "ipAddress": "146.196.32.183",
-          "clientAppUsed": "Browser",
-          "correlationId": "65999c4a-7f40-4882-8eb4-e4c89a9dc32e",
-          "conditionalAccessStatus": "notApplied",
-          "isInteractive": true,
-          "riskDetail": "none",
-          "riskLevelAggregated": "none",
-          "riskLevelDuringSignIn": "none",
-          "riskState": "none",
-          "riskEventTypes": [],
-          "riskEventTypes_v2": [],
-          "resourceDisplayName": "Azure Resource Manager",
-          "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
-          "status": {
-            "errorCode": 50207,
-            "failureReason": "This web native bridge interrupt will be shown to the user during login when the application is requesting login through the native broker and needs eSTS to ensure the broker is properly configured.",
-            "additionalDetails": "MFA requirement satisfied by claim in the token"
-          },
-          "deviceDetail": {
-            "deviceId": "",
-            "displayName": "",
-            "operatingSystem": "Windows10",
-            "browser": "Chrome 143.0.0",
-            "isCompliant": false,
-            "isManaged": false,
-            "trustType": ""
-          },
-          "location": {
-            "city": "Indraprastha",
-            "state": "Delhi",
-            "countryOrRegion": "IN",
-            "geoCoordinates": {
-              "altitude": null,
-              "latitude": 28.655,
-              "longitude": 77.231
-            }
-          },
-          "appliedConditionalAccessPolicies": []
         }
       ]
     }
