@@ -182,7 +182,7 @@ const ResultItem = ({ item, isSelected, onClick, query }) => {
         const regex = new RegExp(`(${query})`, 'gi');
         const parts = text.split(regex);
         return parts.map((part, i) =>
-            regex.test(part) ? <mark key={i} className={styles.highlight}>{part}</mark> : part
+            regex.test(part) ? <mark key={`${i}-${part}`} className={styles.highlight}>{part}</mark> : part
         );
     };
 

@@ -1,9 +1,9 @@
 {
-  "timestamp": 1767953341858,
+  "timestamp": 1768193091661,
   "data": {
     "entra_id": {
       "identities": {
-        "total": 11,
+        "total": 12,
         "trend": "Directory"
       },
       "groups": {
@@ -15,7 +15,7 @@
         "trend": "Enterprise"
       },
       "admins": {
-        "global_count": 5,
+        "global_count": 6,
         "trend": "Privileged"
       },
       "subscriptions": {
@@ -28,7 +28,7 @@
       },
       "compliance": {
         "score_percentage": "64%",
-        "score_points": 181.45,
+        "score_points": 181.5,
         "max_points": 283,
         "status": "Identity Guard"
       }
@@ -36,7 +36,7 @@
     "raw": {
       "stats": {
         "users": {
-          "total": 11,
+          "total": 12,
           "growth": "Directory"
         },
         "groups": {
@@ -52,7 +52,7 @@
           "growth": "Verified"
         },
         "admins": {
-          "total": 5,
+          "total": 6,
           "growth": "Privileged"
         },
         "apps": {
@@ -61,7 +61,7 @@
         }
       },
       "secureScore": {
-        "current": 181.45,
+        "current": 181.5,
         "max": 283
       }
     }

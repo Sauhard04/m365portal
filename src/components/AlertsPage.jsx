@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Bell, AlertTriangle, Info, AlertCircle, Filter,
-    MoreHorizontal, CheckCircle2, Search, Calendar,
-    ShieldAlert, Zap, ArrowLeft
+    CheckCircle2, Search, Calendar,
+    ShieldAlert, Zap, ArrowLeft, ChevronDown, ChevronRight
 } from 'lucide-react';
 import { useMsal } from '@azure/msal-react';
 import { Client } from '@microsoft/microsoft-graph-client';
@@ -22,6 +22,7 @@ const AlertsPage = () => {
         unresolved: 0,
         resolved: 0
     });
+    const [expandedAlert, setExpandedAlert] = useState(null);
 
     useEffect(() => {
         fetchAlerts();
@@ -170,12 +171,12 @@ const AlertsPage = () => {
                     <table className="modern-table">
                         <thead>
                             <tr>
+                                <th style={{ width: '40px' }}></th>
                                 <th>Severity</th>
                                 <th>Alert Details</th>
                                 <th>Service</th>
                                 <th>Timestamp</th>
                                 <th>Status</th>
-                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -193,44 +194,75 @@ const AlertsPage = () => {
                                 </tr>
                             ) : (
                                 filteredAlerts.map((alert) => (
-                                    <tr key={alert.id}>
-                                        <td>
-                                            <span style={{
-                                                ...getSeverityStyle(alert.severity),
-                                                padding: '4px 10px',
-                                                borderRadius: '6px',
-                                                fontSize: '10px',
-                                                fontWeight: 700,
-                                                textTransform: 'uppercase'
-                                            }}>
-                                                {alert.severity}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div>
-                                                <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '12px' }}>{alert.title}</div>
-                                                <div style={{ fontSize: '10px', color: 'var(--text-dim)', marginTop: '2px' }}>{alert.message}</div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="flex-center justify-start flex-gap-2">
-                                                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent-blue)' }}></div>
-                                                <span style={{ fontSize: '11px' }}>{alert.service}</span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="flex-center justify-start flex-gap-2" style={{ color: 'var(--text-dim)', fontSize: '11px' }}>
-                                                <Calendar size={12} />
-                                                {alert.timestamp}
-                                            </div>
-                                        </td>
-                                        <td>{getStatusBadge(alert.status)}</td>
-                                        <td>
-                                            <button className="btn-secondary" style={{ padding: '4px' }}>
-                                                <MoreHorizontal size={14} />
-                                            </button>
-                                        </td>
-                                    </tr>
+                                    <React.Fragment key={alert.id}>
+                                        <tr
+                                            onClick={() => setExpandedAlert(expandedAlert === alert.id ? null : alert.id)}
+                                            style={{ cursor: 'pointer' }}
+                                        >
+                                            <td>
+                                                {expandedAlert === alert.id ?
+                                                    <ChevronDown size={14} style={{ color: 'var(--text-dim)' }} /> :
+                                                    <ChevronRight size={14} style={{ color: 'var(--text-dim)' }} />
+                                                }
+                                            </td>
+                                            <td>
+                                                <span style={{
+                                                    ...getSeverityStyle(alert.severity),
+                                                    padding: '4px 10px',
+                                                    borderRadius: '6px',
+                                                    fontSize: '10px',
+                                                    fontWeight: 700,
+                                                    textTransform: 'uppercase'
+                                                }}>
+                                                    {alert.severity}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <div style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '12px' }}>{alert.title}</div>
+                                                    <div style={{ fontSize: '10px', color: 'var(--text-dim)', marginTop: '2px' }}>{alert.message}</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div className="flex-center justify-start flex-gap-2">
+                                                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent-blue)' }}></div>
+                                                    <span style={{ fontSize: '11px' }}>{alert.service}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div className="flex-center justify-start flex-gap-2" style={{ color: 'var(--text-dim)', fontSize: '11px' }}>
+                                                    <Calendar size={12} />
+                                                    {alert.timestamp}
+                                                </div>
+                                            </td>
+                                            <td>{getStatusBadge(alert.status)}</td>
+                                        </tr>
+                                        {expandedAlert === alert.id && (
+                                            <tr>
+                                                <td colSpan="6" style={{ background: 'hsla(0, 0%, 100%, 0.02)', padding: '20px', borderTop: '1px solid var(--glass-border)' }}>
+                                                    <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '12px', fontSize: '12px' }}>
+                                                        <div style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Alert ID:</div>
+                                                        <div style={{ color: 'var(--text-primary)', fontFamily: 'monospace', fontSize: '11px' }}>{alert.id}</div>
+
+                                                        <div style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Category:</div>
+                                                        <div style={{ color: 'var(--text-primary)' }}>{alert.category || 'N/A'}</div>
+
+                                                        <div style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Service:</div>
+                                                        <div style={{ color: 'var(--text-primary)' }}>{alert.service}</div>
+
+                                                        <div style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Full Message:</div>
+                                                        <div style={{ color: 'var(--text-primary)', lineHeight: '1.6' }}>{alert.message}</div>
+
+                                                        <div style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Timestamp:</div>
+                                                        <div style={{ color: 'var(--text-primary)' }}>{alert.timestamp}</div>
+
+                                                        <div style={{ color: 'var(--text-dim)', fontWeight: 600 }}>Status:</div>
+                                                        <div>{getStatusBadge(alert.status)}</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </React.Fragment>
                                 ))
                             )}
                         </tbody>

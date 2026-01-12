@@ -50,17 +50,57 @@ const ExchangeReport = () => {
 
     const handleDownloadCSV = () => {
         if (filteredData.length === 0) return;
-        const headers = ['Display Name', 'Email Address', 'Archive Policy', 'Mailbox Size', 'Migration Status'];
-        const csvContent = [headers.join(','), ...filteredData.map(r => [
-            `"${r.displayName}"`, `"${r.emailAddress}"`, r.archivePolicy ? 'Enabled' : 'Disabled', `"${r.mailboxSize}"`, `"${r.migrationStatus}"`
-        ].join(','))].join('\n');
 
-        const blob = new Blob([csvContent], { type: 'text/csv' });
+        // Comprehensive headers with all API fields
+        const headers = [
+            'Display Name',
+            'User Principal Name',
+            'Email Address',
+            'Job Title',
+            'Department',
+            'Office Location',
+            'City',
+            'Country',
+            'Account Enabled',
+            'Created Date',
+            'Last Activity Date',
+            'Item Count',
+            'Archive Policy',
+            'Mailbox Size',
+            'Data Migrated',
+            'Migration Status'
+        ];
+
+        // Map all data fields
+        const csvContent = [
+            headers.join(','),
+            ...filteredData.map(r => [
+                `"${r.displayName || ''}"`,
+                `"${r.userPrincipalName || ''}"`,
+                `"${r.emailAddress || ''}"`,
+                `"${r.jobTitle || ''}"`,
+                `"${r.department || ''}"`,
+                `"${r.officeLocation || ''}"`,
+                `"${r.city || ''}"`,
+                `"${r.country || ''}"`,
+                `"${r.accountEnabled || 'N/A'}"`,
+                `"${r.createdDateTime || 'N/A'}"`,
+                `"${r.lastActivityDate || 'N/A'}"`,
+                `"${r.itemCount || 0}"`,
+                `"${r.archivePolicy ? 'Enabled' : 'Disabled'}"`,
+                `"${r.mailboxSize || '0 KB'}"`,
+                `"${r.dataMigrated || '0 GB'}"`,
+                `"${r.migrationStatus || 'N/A'}"`
+            ].join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = 'mailbox_report.csv';
+        link.download = `exchange_mailbox_report_${new Date().toISOString().split('T')[0]}.csv`;
         link.click();
+        URL.revokeObjectURL(url);
     };
 
     const fetchData = async () => {
@@ -164,8 +204,8 @@ const ExchangeReport = () => {
                                 <th>Primary Email Address</th>
                                 <th>Archive Status</th>
                                 <th>Mailbox Size</th>
-                                <th>Data Migrated</th>
-                                <th>Migration Status</th>
+                                <th>Account Created</th>
+                                <th>Account Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -192,10 +232,12 @@ const ExchangeReport = () => {
                                         </span>
                                     </td>
                                     <td>{mb.mailboxSize || '0 KB'}</td>
-                                    <td>{mb.dataMigrated || '0 GB'}</td>
+                                    <td style={{ fontSize: '12px', opacity: 0.8 }}>
+                                        {mb.createdDateTime ? new Date(mb.createdDateTime).toLocaleDateString() : 'N/A'}
+                                    </td>
                                     <td>
-                                        <span className={`badge ${mb.migrationStatus === 'Migrated' ? 'badge-success' : ''}`}>
-                                            {mb.migrationStatus}
+                                        <span className={`badge ${mb.accountEnabled === 'Yes' ? 'badge-success' : 'badge-error'}`}>
+                                            {mb.accountEnabled === 'Yes' ? 'Enabled' : 'Disabled'}
                                         </span>
                                     </td>
                                 </tr>

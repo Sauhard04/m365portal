@@ -65,9 +65,16 @@ export class GraphService {
                     if (firstUPN && /^[A-F0-9]+$/.test(firstUPN)) isConcealed = true;
                 }
 
-                const isArchiveEnabled = (reportInfo && reportInfo.hasArchive !== undefined) ?
-                    reportInfo.hasArchive :
-                    (user.archiveStatus && user.archiveStatus.toLowerCase() === 'active');
+                // Check archive status from usage report first (most reliable)
+                // hasArchive is a boolean in the usage report
+                let isArchiveEnabled = false;
+                if (reportInfo && reportInfo.hasArchive !== undefined && reportInfo.hasArchive !== null) {
+                    isArchiveEnabled = reportInfo.hasArchive === true || reportInfo.hasArchive === 'True';
+                } else if (user.archiveStatus) {
+                    // Fallback to user's archiveStatus property
+                    isArchiveEnabled = user.archiveStatus.toLowerCase() === 'active';
+                }
+                // If neither source has data, default to false (disabled)
 
                 const formatGB = (bytes) => (bytes ? (bytes / 1073741824).toFixed(2) : "0.00");
                 const quotaBytes = reportInfo?.prohibitSendReceiveQuotaInBytes || reportInfo?.archiveQuotaInBytes;

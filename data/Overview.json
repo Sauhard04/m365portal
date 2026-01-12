@@ -1,25 +1,25 @@
 {
-  "timestamp": 1767953451671,
+  "timestamp": 1768193103464,
   "data": {
     "overview": {
       "statistics": {
-        "total_users": 11,
+        "total_users": 12,
         "total_devices": 4,
-        "total_licenses": 12,
-        "secure_score": 181.45
+        "total_licenses": 13,
+        "secure_score": 181.5
       },
       "health_and_security": {
         "service_issues": 6,
-        "failed_signins": 19,
+        "failed_signins": 0,
         "compliance_rate": 75
       }
     },
     "raw": {
       "quickStats": {
-        "totalUsers": 11,
+        "totalUsers": 12,
         "totalDevices": 4,
-        "totalLicenses": 12,
-        "secureScore": 181.45,
+        "totalLicenses": 13,
+        "secureScore": 181.5,
         "maxSecureScore": 283
       },
       "charts": {
@@ -38,7 +38,7 @@
         "userDistribution": [
           {
             "name": "Active",
-            "value": 11,
+            "value": 12,
             "color": "var(--accent-success)"
           }
         ],
@@ -77,8 +77,8 @@
           },
           {
             "name": "DEVELOPERPACK E5",
-            "assigned": 9,
-            "available": 16
+            "assigned": 10,
+            "available": 15
           },
           {
             "name": "RMSBASIC",
@@ -94,8 +94,8 @@
         "signIns": [
           {
             "name": "Last 24h",
-            "failed": 19,
-            "successful": 50
+            "failed": 0,
+            "successful": 0
           }
         ],
         "emailTrend": [
@@ -128,7 +128,7 @@
           },
           {
             "subject": "Sign-in Success",
-            "value": 72,
+            "value": 96,
             "fullMark": 100
           }
         ],
@@ -145,7 +145,7 @@
           },
           {
             "name": "DEVELOPERPACK E5",
-            "size": 9,
+            "size": 10,
             "fill": "#06b6d4"
           },
           {
@@ -167,39 +167,39 @@
           },
           {
             "week": "3 weeks ago",
-            "active": 10,
+            "active": 11,
             "inactive": 54
           },
           {
             "week": "2 weeks ago",
-            "active": 10,
+            "active": 11,
             "inactive": 52
           },
           {
             "week": "Last week",
-            "active": 10,
+            "active": 11,
             "inactive": 51
           },
           {
             "week": "This week",
-            "active": 11,
+            "active": 12,
             "inactive": 50
           }
         ],
         "enrollmentFunnel": [
           {
             "stage": "Total Users",
-            "count": 11,
+            "count": 12,
             "fill": "#3b82f6"
           },
           {
             "stage": "License Assigned",
-            "count": 11,
+            "count": 12,
             "fill": "#a855f7"
           },
           {
             "stage": "Device Enrolled",
-            "count": 7,
+            "count": 8,
             "fill": "#06b6d4"
           },
           {
@@ -212,25 +212,25 @@
           {
             "month": "3 Mon Ago",
             "assigned": 10,
-            "available": 33615,
+            "available": 33614,
             "utilization": 68
           },
           {
             "month": "2 Mon Ago",
-            "assigned": 10,
-            "available": 31814,
+            "assigned": 11,
+            "available": 31813,
             "utilization": 74
           },
           {
             "month": "Last Month",
-            "assigned": 11,
-            "available": 30614,
+            "assigned": 12,
+            "available": 30613,
             "utilization": 79
           },
           {
             "month": "This Month",
-            "assigned": 12,
-            "available": 30014,
+            "assigned": 13,
+            "available": 30013,
             "utilization": 0
           }
         ]

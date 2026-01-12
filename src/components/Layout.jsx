@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useMsal } from '@azure/msal-react';
 import {
     ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, BarChart3, Command
 } from 'lucide-react';
@@ -9,8 +10,10 @@ import SearchModal from './SearchModal';
 const ServiceLayout = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { instance, accounts } = useMsal();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [unresolvedAlertsCount, setUnresolvedAlertsCount] = useState(0);
     const username = localStorage.getItem('m365_user') || 'Admin';
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -27,6 +30,40 @@ const ServiceLayout = () => {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
+
+    // Fetch unresolved alerts count
+    useEffect(() => {
+        const fetchAlertCount = async () => {
+            try {
+                if (!accounts || accounts.length === 0) return;
+
+                const AlertsService = (await import('../services/alerts/alerts.service')).default;
+                const { Client } = await import('@microsoft/microsoft-graph-client');
+
+                const accessToken = await instance.acquireTokenSilent({
+                    scopes: ['https://graph.microsoft.com/.default'],
+                    account: accounts[0]
+                });
+
+                const client = Client.init({
+                    authProvider: (done) => {
+                        done(null, accessToken.accessToken);
+                    }
+                });
+
+                const alerts = await AlertsService.getAllAlerts(client);
+                const unresolved = alerts.filter(a => a.status === 'unresolved').length;
+                setUnresolvedAlertsCount(unresolved);
+            } catch (error) {
+                console.debug('Could not fetch alert count:', error);
+            }
+        };
+
+        fetchAlertCount();
+        // Refresh every 5 minutes
+        const interval = setInterval(fetchAlertCount, 5 * 60 * 1000);
+        return () => clearInterval(interval);
+    }, [instance, accounts]);
 
     const handleLogout = () => {
         localStorage.removeItem('m365_user');
@@ -136,9 +173,27 @@ const ServiceLayout = () => {
                     <div className="flex-center flex-gap-4">
                         <button
                             onClick={() => navigate('/service/admin/alerts')}
-                            style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+                            style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', position: 'relative' }}
                         >
                             <Bell size={18} />
+                            {unresolvedAlertsCount > 0 && (
+                                <span style={{
+                                    position: 'absolute',
+                                    top: '-4px',
+                                    right: '-6px',
+                                    background: 'var(--accent-error)',
+                                    color: 'white',
+                                    borderRadius: '10px',
+                                    padding: '2px 5px',
+                                    fontSize: '9px',
+                                    fontWeight: 700,
+                                    minWidth: '16px',
+                                    textAlign: 'center',
+                                    border: '1.5px solid var(--bg-primary)'
+                                }}>
+                                    {unresolvedAlertsCount > 99 ? '99+' : unresolvedAlertsCount}
+                                </span>
+                            )}
                         </button>
                         <div style={{ width: '1px', height: '16px', background: 'var(--glass-border)' }}></div>
                         <button

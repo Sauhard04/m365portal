@@ -7,9 +7,9 @@ class AlertsService {
      */
     async getAllAlerts(client) {
         try {
-            const [securityAlerts, riskySignIns, auditLogs, deviceCompliance] = await Promise.all([
+            // Note: riskySignIns requires Identity Protection license - removed to prevent 403 errors
+            const [securityAlerts, auditLogs, deviceCompliance] = await Promise.all([
                 this.getSecurityAlerts(client).catch(() => []),
-                this.getRiskySignIns(client).catch(() => []),
                 this.getAuditLogs(client).catch(() => []),
                 this.getDeviceComplianceFailures(client).catch(() => [])
             ]);
@@ -17,7 +17,6 @@ class AlertsService {
             // Combine all alerts
             const allAlerts = [
                 ...securityAlerts,
-                ...riskySignIns,
                 ...auditLogs,
                 ...deviceCompliance
             ];
@@ -41,8 +40,8 @@ class AlertsService {
                 .filter("createdDateTime ge " + new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
                 .get();
 
-            return (response.value || []).map(alert => ({
-                id: alert.id?.substring(0, 8) || `SEC-${Math.random().toString(36).substring(7)}`,
+            return (response.value || []).map((alert, index) => ({
+                id: alert.id || `SEC-${Date.now()}-${index}`,
                 title: alert.title || 'Security Alert',
                 severity: this.mapSeverity(alert.severity),
                 category: 'Security',
@@ -68,8 +67,8 @@ class AlertsService {
                 .filter("riskState eq 'atRisk' or riskState eq 'confirmedCompromised'")
                 .get();
 
-            return (response.value || []).map(user => ({
-                id: user.id?.substring(0, 8) || `RISK-${Math.random().toString(36).substring(7)}`,
+            return (response.value || []).map((user, index) => ({
+                id: user.id || `RISK-${Date.now()}-${index}`,
                 title: 'Risky User Detected',
                 severity: user.riskLevel === 'high' ? 'high' : 'medium',
                 category: 'Security',
@@ -79,7 +78,10 @@ class AlertsService {
                 message: `User "${user.userDisplayName || user.userPrincipalName}" flagged as ${user.riskState}`
             }));
         } catch (error) {
-            console.error('Error fetching risky sign-ins:', error);
+            // Silently handle permission errors (403) - Identity Protection requires special licenses/permissions
+            if (error.statusCode !== 403 && error.status !== 403) {
+                console.error('Error fetching risky sign-ins:', error);
+            }
             return [];
         }
     }
@@ -97,16 +99,24 @@ class AlertsService {
 
             return (response.value || [])
                 .filter(log => this.isCriticalAuditEvent(log))
-                .map(log => ({
-                    id: log.id?.substring(0, 8) || `AUD-${Math.random().toString(36).substring(7)}`,
-                    title: log.activityDisplayName || 'Policy Changed',
-                    severity: this.getAuditSeverity(log),
-                    category: 'Governance',
-                    service: 'Entra ID',
-                    timestamp: this.formatTimestamp(log.activityDateTime),
-                    status: 'unresolved',
-                    message: `${log.activityDisplayName} by ${log.initiatedBy?.user?.userPrincipalName || 'System'}`
-                }));
+                .map((log, index) => {
+                    const initiatedBy = log.initiatedBy?.user?.userPrincipalName ||
+                        log.initiatedBy?.app?.displayName ||
+                        'System';
+                    const targetResources = log.targetResources?.map(t => t.displayName || t.userPrincipalName).filter(Boolean).join(', ') || 'N/A';
+                    const result = log.result || 'N/A';
+
+                    return {
+                        id: log.id || `AUD-${Date.now()}-${index}`,
+                        title: log.activityDisplayName || 'Policy Changed',
+                        severity: this.getAuditSeverity(log),
+                        category: 'Governance',
+                        service: 'Entra ID',
+                        timestamp: this.formatTimestamp(log.activityDateTime),
+                        status: 'unresolved',
+                        message: `${log.activityDisplayName} by ${initiatedBy}${targetResources !== 'N/A' ? ` | Target: ${targetResources}` : ''}${result !== 'N/A' ? ` | Result: ${result}` : ''}`
+                    };
+                });
         } catch (error) {
             console.error('Error fetching audit logs:', error);
             return [];
@@ -118,24 +128,29 @@ class AlertsService {
      */
     async getDeviceComplianceFailures(client) {
         try {
+            // Use the correct managed devices endpoint with compliance status filter
             const response = await client
-                .api('/deviceManagement/deviceComplianceDeviceStatus')
-                .filter("status eq 'nonCompliant'")
+                .api('/deviceManagement/managedDevices')
+                .filter("complianceState eq 'noncompliant'")
+                .select('id,deviceName,complianceState,lastSyncDateTime,userPrincipalName')
                 .top(20)
                 .get();
 
-            return (response.value || []).map(device => ({
-                id: device.id?.substring(0, 8) || `DEV-${Math.random().toString(36).substring(7)}`,
+            return (response.value || []).map((device, index) => ({
+                id: device.id || `DEV-${Date.now()}-${index}`,
                 title: 'Device Compliance Failure',
                 severity: 'medium',
                 category: 'Device',
                 service: 'Intune',
-                timestamp: this.formatTimestamp(device.lastReportedDateTime),
+                timestamp: this.formatTimestamp(device.lastSyncDateTime),
                 status: 'unresolved',
-                message: `Device not compliant with policy requirements`
+                message: `Device "${device.deviceName || 'Unknown'}" is not compliant with policy requirements`
             }));
         } catch (error) {
-            console.error('Error fetching device compliance:', error);
+            // Silently handle resource not found errors (400) - endpoint may not be available
+            if (error.statusCode !== 400 && error.statusCode !== 404) {
+                console.error('Error fetching device compliance:', error);
+            }
             return [];
         }
     }
