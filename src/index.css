@@ -194,12 +194,27 @@ h6 {
 }
 
 /* Data Table Architecture */
+/* Data Table Architecture */
 .table-container {
   width: 100%;
+  max-width: 100%;
   overflow-x: auto;
   border-radius: 20px;
   background: hsla(0, 0%, 0%, 0.2);
   border: 1px solid var(--glass-border);
+  /* Custom scrollbar for table container "slider" effect */
+  scrollbar-width: thin;
+  scrollbar-color: var(--glass-border) transparent;
+}
+
+.table-container::-webkit-scrollbar {
+  height: 8px;
+  /* Slightly taller for functionality */
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: var(--text-dim);
+  border-radius: 4px;
 }
 
 .modern-table {
@@ -210,7 +225,8 @@ h6 {
 }
 
 .modern-table th {
-  padding: 16px 24px;
+  padding: 12px 8px;
+  /* Reduced from 16px */
   font-weight: 600;
   text-transform: uppercase;
   font-size: 11px;
@@ -224,7 +240,8 @@ h6 {
 }
 
 .modern-table td {
-  padding: 10px 16px;
+  padding: 8px 8px;
+  /* Reduced from 16px */
   border-bottom: 1px solid hsla(0, 0%, 100%, 0.03);
   font-size: 11px;
   color: var(--text-secondary);
@@ -323,6 +340,12 @@ select.input {
   background-repeat: no-repeat;
   background-position: right 16px center;
   padding-right: 44px;
+}
+
+select.input option {
+  background-color: var(--bg-darker);
+  color: var(--text-primary);
+  padding: 8px;
 }
 
 .search-wrapper {

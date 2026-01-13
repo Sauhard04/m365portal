@@ -104,12 +104,12 @@ const ServiceHealthPage = () => {
                     <table className="modern-table">
                         <thead>
                             <tr>
-                                <th>Classification</th>
-                                <th>Service Module</th>
-                                <th>Incident Title</th>
-                                <th>Audit ID</th>
-                                <th>Last Updated</th>
-                                <th></th>
+                                <th style={{ width: '120px' }}>Classification</th>
+                                <th style={{ width: '180px' }}>Service Module</th>
+                                <th style={{ width: '180px' }}>Incident Title</th>
+                                <th style={{ width: '100px' }}>Audit ID</th>
+                                <th style={{ width: '120px' }}>Last Updated</th>
+                                <th style={{ width: '20px' }}></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -125,9 +125,13 @@ const ServiceHealthPage = () => {
                                             </span>
                                         </td>
                                         <td style={{ fontWeight: 600 }}>{issue.service}</td>
-                                        <td style={{ maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis' }}>{issue.title}</td>
+                                        <td title={issue.title}>
+                                            <div style={{ maxWidth: '250px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                {issue.title}
+                                            </div>
+                                        </td>
                                         <td style={{ fontSize: '11px', fontFamily: 'monospace', opacity: 0.6 }}>{issue.id}</td>
-                                        <td style={{ fontSize: '12px' }}>{new Date(issue.lastModifiedDateTime).toLocaleDateString()}</td>
+                                        <td style={{ fontSize: '12px', whiteSpace: 'nowrap' }}>{new Date(issue.lastModifiedDateTime).toLocaleDateString()}</td>
                                         <td>{expandedIssue === issue.id ? <ChevronDown size={16} /> : <ChevronRight size={16} />}</td>
                                     </tr>
                                     {expandedIssue === issue.id && (

@@ -36,6 +36,7 @@ import UserDetailsPage from './components/UserDetailsPage';
 import ServiceLayout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import DocumentationPage from './components/DocumentationPage';
+import PDFViewerPage from './components/PDFViewerPage';
 
 function App() {
   return (
@@ -89,6 +90,7 @@ function App() {
 
 
               <Route path="documentation" element={<DocumentationPage />} />
+              <Route path="documentation/view/:id" element={<PDFViewerPage />} />
               <Route path=":serviceId" element={<ServicePage />} /> {/* generic service handler */}
               <Route index element={<Navigate to="overview" replace />} /> {/* /service -> /service/overview */}
             </Route>

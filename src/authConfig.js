@@ -22,7 +22,10 @@ export const loginRequest = {
         "DeviceManagementManagedDevices.Read.All",
         "DeviceManagementServiceConfig.Read.All",
         "DeviceManagementApps.Read.All",
-        "DeviceManagementConfiguration.Read.All"
+        "DeviceManagementConfiguration.Read.All",
+        "IdentityRiskyUser.Read.All",
+        "IdentityRiskEvent.Read.All",
+        "SecurityAlert.Read.All"
     ]
 };
 

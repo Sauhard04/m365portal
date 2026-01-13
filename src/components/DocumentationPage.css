@@ -29,13 +29,14 @@
 .doc-card {
     transition: all 0.4s var(--transition-smooth);
     border-left: 4px solid transparent;
-    cursor: default;
+    cursor: pointer;
 }
 
 .doc-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
     background: var(--glass-bg-hover);
+    border-left-color: var(--accent-blue);
 }
 
 .doc-icon-box {
@@ -124,4 +125,50 @@
     margin-right: 8px;
     background: hsla(217, 91%, 60%, 0.1);
     color: var(--accent-blue);
+}
+
+.upload-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 12px;
+}
+
+.upload-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(56, 189, 248, 0.3);
+}
+
+.upload-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.upload-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
