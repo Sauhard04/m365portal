@@ -1,23 +1,23 @@
 {
-  "timestamp": 1768201245709,
+  "timestamp": 1768283968051,
   "data": {
     "overview": {
       "statistics": {
         "total_users": 12,
-        "total_devices": 4,
+        "total_devices": 3,
         "total_licenses": 13,
         "secure_score": 181.5
       },
       "health_and_security": {
         "service_issues": 6,
         "failed_signins": 3,
-        "compliance_rate": 75
+        "compliance_rate": 67
       }
     },
     "raw": {
       "quickStats": {
         "totalUsers": 12,
-        "totalDevices": 4,
+        "totalDevices": 3,
         "totalLicenses": 13,
         "secureScore": 181.5,
         "maxSecureScore": 283
@@ -45,7 +45,7 @@
         "deviceCompliance": [
           {
             "name": "Compliant",
-            "value": 3,
+            "value": 2,
             "color": "var(--accent-success)"
           },
           {
@@ -56,12 +56,12 @@
         ],
         "deviceByPlatform": [
           {
-            "name": "macOS",
-            "value": 1
+            "name": "Windows",
+            "value": 2
           },
           {
-            "name": "Windows",
-            "value": 3
+            "name": "macOS",
+            "value": 1
           }
         ],
         "licenseUsage": [
@@ -95,7 +95,7 @@
           {
             "name": "Last 24h",
             "failed": 3,
-            "successful": 42
+            "successful": 58
           }
         ],
         "emailTrend": [
@@ -113,7 +113,7 @@
           },
           {
             "subject": "Compliance",
-            "value": 75,
+            "value": 67,
             "fullMark": 100
           },
           {
@@ -128,7 +128,7 @@
           },
           {
             "subject": "Sign-in Success",
-            "value": 93,
+            "value": 95,
             "fullMark": 100
           }
         ],
