@@ -40,6 +40,8 @@ import PDFViewerPage from './components/PDFViewerPage';
 
 import { ThemeProvider } from './contexts/ThemeContext';
 
+import BirdsEyeView from './components/BirdsEyeView';
+
 function App() {
   return (
     <ThemeProvider>
@@ -53,6 +55,7 @@ function App() {
               <Route path="/service" element={<ServiceLayout />}>
                 {/* Overview Dashboard */}
                 <Route path="overview" element={<OverviewDashboard />} />
+                <Route path="birdseye" element={<BirdsEyeView />} />
 
                 {/* Admin Center Routes */}
                 <Route path="admin" element={<ServicePage serviceId="admin" />} /> {/* /service/admin */}

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../contexts/ThemeContext';
 import { useMsal } from '@azure/msal-react';
 import {
-    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, BarChart3, Command, BookOpen, Sun, Moon
+    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, BarChart3, Command, BookOpen, Sun, Moon, Eye
 } from 'lucide-react';
 import SearchModal from './SearchModal';
 import Logo from './Logo';
@@ -93,6 +93,13 @@ const ServiceLayout = () => {
                         active={isActive('/service/overview')}
                         isOpen={isSidebarOpen}
                         onClick={() => navigate('/service/overview')}
+                    />
+                    <NavItem
+                        icon={Eye}
+                        label="Bird's Eye View"
+                        active={isActive('/service/birdseye')}
+                        isOpen={isSidebarOpen}
+                        onClick={() => navigate('/service/birdseye')}
                     />
                     <NavItem
                         icon={LayoutDashboard}

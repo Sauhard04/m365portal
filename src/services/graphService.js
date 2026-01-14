@@ -153,6 +153,11 @@ export class GraphService {
         return res.value?.[0]?.members || [];
     }
 
+    // Updated to return full list of roles to filter client-side if needed, or we can fetch specific roles
+    async getDirectoryRoles() {
+        return this.client.api("/directoryRoles").expand("members").get().then(r => r.value || []).catch(() => []);
+    }
+
     async getSecureScore() {
         const res = await this.client.api("/security/secureScores").top(1).select("currentScore,maxScore,createdDateTime").orderby("createdDateTime desc").get().catch(() => ({ value: [] }));
         return res.value?.[0] || null;
@@ -174,9 +179,27 @@ export class GraphService {
         return this.client.api("/directory/deletedItems/microsoft.graph.user").select("id,displayName,userPrincipalName,mail,deletedDateTime").top(100).get().then(r => r.value || []).catch(() => []);
     }
 
+    async getTotalDevicesCount() {
+        try {
+            // Fetch total count of directory devices (Entra ID)
+            const count = await this.client.api('/devices/$count')
+                .header('ConsistencyLevel', 'eventual')
+                .get();
+            return count || 0;
+        } catch (e) {
+            console.warn("Failed to fetch Entra devices count, falling back to basic list length check (max 999).", e);
+            try {
+                const res = await this.client.api('/devices').select('id').top(999).get();
+                return res.value?.length || 0;
+            } catch (err) {
+                return 0;
+            }
+        }
+    }
+
     async getDeviceComplianceStats() {
         if (!GraphService.isIntuneOperational) {
-            return { total: 0, compliant: 0 };
+            return { total: 0, compliant: 0, osSummary: null };
         }
 
         try {
@@ -194,10 +217,11 @@ export class GraphService {
 
             return {
                 total: overview.deviceCount || 0,
-                compliant: overview.compliantDeviceCount || 0
+                compliant: overview.compliantDeviceCount || 0,
+                osSummary: overview.deviceOperatingSystemSummary || null
             };
         } catch (e) {
-            return { total: 0, compliant: 0 };
+            return { total: 0, compliant: 0, osSummary: null };
         }
     }
 }

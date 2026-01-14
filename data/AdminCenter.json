@@ -1,5 +1,5 @@
 {
-  "timestamp": 1768297739487,
+  "timestamp": 1768363896831,
   "data": {
     "admincenter": {
       "mailboxes": {
@@ -986,10 +986,10 @@
       "groupsCount": 58,
       "deletedUsersCount": 1,
       "secureScore": {
-        "id": "3163c13f-b80f-426c-94b0-fa4c0bf66ad7_2026-01-13",
+        "id": "3163c13f-b80f-426c-94b0-fa4c0bf66ad7_2026-01-14",
         "azureTenantId": "3163c13f-b80f-426c-94b0-fa4c0bf66ad7",
         "activeUserCount": 10,
-        "createdDateTime": "2026-01-13T00:00:00Z",
+        "createdDateTime": "2026-01-14T00:00:00Z",
         "currentScore": 181.5,
         "enabledServices": [
           "HasAADP1",
@@ -1017,14 +1017,14 @@
           {
             "basis": "AllTenants",
             "averageScore": 53.38,
-            "appsScore": 40.23,
-            "appsScoreMax": 103.77,
+            "appsScore": 40.22,
+            "appsScoreMax": 103.75,
             "dataScore": 0.66,
-            "dataScoreMax": 4.33,
-            "deviceScore": 11.27,
-            "deviceScoreMax": 20.86,
-            "identityScore": 37.21,
-            "identityScoreMax": 60.19,
+            "dataScoreMax": 4.32,
+            "deviceScore": 11.28,
+            "deviceScoreMax": 20.88,
+            "identityScore": 37.19,
+            "identityScoreMax": 60.17,
             "infrastructureScore": 0,
             "infrastructureScoreMax": 0
           },
@@ -1033,14 +1033,14 @@
             "averageScore": 46.68,
             "SeatSizeRangeLowerValue": "1",
             "SeatSizeRangeUpperValue": "100",
-            "appsScore": 46.74,
-            "appsScoreMax": 128,
+            "appsScore": 46.72,
+            "appsScoreMax": 127.97,
             "dataScore": 0.67,
             "dataScoreMax": 5.4,
-            "deviceScore": 8.93,
-            "deviceScoreMax": 16.59,
-            "identityScore": 35.66,
-            "identityScoreMax": 60.46,
+            "deviceScore": 8.95,
+            "deviceScoreMax": 16.61,
+            "identityScore": 35.65,
+            "identityScoreMax": 60.44,
             "infrastructureScore": 0,
             "infrastructureScoreMax": 0
           }
@@ -1221,7 +1221,7 @@
             "controlName": "spo_idle_session_timeout",
             "description": "\r\n\t\t\tIdle session sign-out lets you specify a time at which users are warned and are later signed out of Microsoft 365 after a period of browser inactivity in SharePoint and OneDrive.\r\n            <br/>\r\n\t\t\tThis policy is one of several you can use with SharePoint and OneDrive to balance security and user productivity and help keep your data safe, regardless  of where users access the data from, what device they're working on, and how secure their network connection is.\r\n\t\t",
             "score": 0,
-            "lastSynced": "2026-01-13T04:14:24Z",
+            "lastSynced": "2026-01-13T16:45:12Z",
             "implementationStatus": "The setting is not compliant.",
             "on": "false",
             "scoreInPercentage": 0
@@ -1231,7 +1231,7 @@
             "controlName": "spo_legacy_auth",
             "description": "\r\n\t\t\tModern authentication in Microsoft 365 enables authentication features like multifactor authentication (MFA) using smart cards, certificate-based authentication (CBA), and third-party SAML identity providers.\r\n\t\t\t<br/>\r\n\t\t\tStrong authentication controls, such as the use of multifactor authentication, may be circumvented if basic authentication is used by SharePoint applications. Requiring modern authentication for SharePoint applications ensures strong authentication mechanisms are used when establishing sessions between these applications, SharePoint, and connecting users.\r\n\t\t\t<br/>\r\n\t\t\t<i>This information was taken from Center for Internet Security (CIS).</i>\r\n\t\t",
             "score": 0,
-            "lastSynced": "2026-01-13T04:14:24Z",
+            "lastSynced": "2026-01-13T16:45:12Z",
             "implementationStatus": "The setting is not compliant.",
             "on": "false",
             "scoreInPercentage": 0
@@ -1241,7 +1241,7 @@
             "controlName": "McasFirewallLogUpload",
             "description": "Log collectors provide visibility into cloud app usage so you can identify if there are any apps that run without official approval, or if there is anomalous behavior. Log collectors automatically upload reports and parse the firewall/ proxy traffic logs to see if there is a match with your services in the Cloud App Catalog.",
             "score": 0,
-            "lastSynced": "2026-01-12T08:11:41Z",
+            "lastSynced": "2026-01-13T21:09:21Z",
             "implementationStatus": "Feature in place: false.",
             "on": "false",
             "scoreInPercentage": 0
@@ -1251,7 +1251,7 @@
             "controlName": "AATP_DefenderForIdentityIsNotInstalled",
             "description": "Installing Microsoft Defender for Identity sensors provides you with the ability to detect advanced threats in your entire identity infrastructure. Actionable security alerts are generated through the analysis of network traffic and security events.",
             "score": 0,
-            "lastSynced": "2026-01-11T23:58:12Z",
+            "lastSynced": "2026-01-13T14:26:31Z",
             "implementationStatus": "",
             "on": "false",
             "scoreInPercentage": 0
@@ -1802,7 +1802,7 @@
             "controlName": "AATP_AccountWithLeakedCredentials",
             "description": "\r\n\t\tThis report lists users whose valid credentials have been leaked. \r\n\t\tWhen cybercriminals compromise valid passwords of legitimate users, the criminals often share those credentials. \r\n\t\tThis is usually done by posting them publicly on the dark web or paste sites or by trading or selling the credentials on the black market.<br><br>\r\n\t\tThe Microsoft leaked credentials service acquires username/password pairs by monitoring public and dark websites and by working with:<br><br>\r\n\t\t• Researchers<br>\r\n\t\t• Law enforcement<br>\r\n\t\t• Security teams at Microsoft<br>\r\n\t\t• Other trusted sources<br>\r\n\t",
             "score": 5,
-            "lastSynced": "2026-01-12T22:57:01Z",
+            "lastSynced": "2026-01-13T23:29:33Z",
             "implementationStatus": "",
             "on": "true",
             "scoreInPercentage": 100
@@ -1929,16 +1929,16 @@
       ],
       "failedSignIns": [
         {
-          "id": "d6bc5e9b-9b14-4d92-bfbc-c7629cc12700",
-          "createdDateTime": "2026-01-12T08:48:04Z",
+          "id": "5350cd6e-6622-4abb-890e-4ff1b8509b00",
+          "createdDateTime": "2026-01-13T13:10:30Z",
           "userDisplayName": "Demo User",
           "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
           "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
-          "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
-          "appDisplayName": "Azure Portal",
-          "ipAddress": "122.184.91.214",
+          "appId": "0fb1ce07-0af3-4192-a8bf-d8b3cce097fc",
+          "appDisplayName": "M365Portal-Purview-Service",
+          "ipAddress": "106.219.226.225",
           "clientAppUsed": "Browser",
-          "correlationId": "0806789c-8119-4d5b-a38e-91a19f3429c4",
+          "correlationId": "019bb77a-b078-7c57-8864-b99340bea125",
           "conditionalAccessStatus": "notApplied",
           "isInteractive": true,
           "riskDetail": "none",
@@ -1947,45 +1947,71 @@
           "riskState": "none",
           "riskEventTypes": [],
           "riskEventTypes_v2": [],
-          "resourceDisplayName": "Azure Resource Manager",
-          "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
+          "resourceDisplayName": "Microsoft Graph",
+          "resourceId": "00000003-0000-0000-c000-000000000000",
           "status": {
-            "errorCode": 50207,
-            "failureReason": "This web native bridge interrupt will be shown to the user during login when the application is requesting login through the native broker and needs eSTS to ensure the broker is properly configured.",
-            "additionalDetails": "MFA requirement satisfied by claim in the token"
+            "errorCode": 50133,
+            "failureReason": "The session is not valid due to password expiration or recent password change.",
+            "additionalDetails": "Expected - auth codes, refresh tokens, and sessions expire over time or are revoked by the user or an admin. The app will request a new login from the user."
           },
           "deviceDetail": {
             "deviceId": "",
             "displayName": "",
-            "operatingSystem": "Windows10",
-            "browser": "Chrome 143.0.0",
+            "operatingSystem": "Android",
+            "browser": "Chrome Mobile 143.0.0",
             "isCompliant": false,
             "isManaged": false,
-            "trustType": ""
+            "trustType": null
           },
           "location": {
-            "city": "New Delhi",
+            "city": "Janpath",
             "state": "Delhi",
             "countryOrRegion": "IN",
             "geoCoordinates": {
               "altitude": null,
-              "latitude": 28.6353,
-              "longitude": 77.225
+              "latitude": 28.6278,
+              "longitude": 77.219
             }
           },
-          "appliedConditionalAccessPolicies": []
+          "appliedConditionalAccessPolicies": [
+            {
+              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+              "displayName": "Mac Require",
+              "enforcedGrantControls": [
+                "RequireCompliantDevice"
+              ],
+              "enforcedSessionControls": [],
+              "result": "notApplied"
+            },
+            {
+              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+              "displayName": "Require phishing-resistant multifactor authentication for admins",
+              "enforcedGrantControls": [],
+              "enforcedSessionControls": [],
+              "result": "reportOnlyInterrupted"
+            },
+            {
+              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+              "displayName": "Use application enforced restrictions for O365 apps",
+              "enforcedGrantControls": [],
+              "enforcedSessionControls": [
+                "AppEnforcedRestrictions"
+              ],
+              "result": "reportOnlySuccess"
+            }
+          ]
         },
         {
-          "id": "dcd85348-e0c6-4921-bb0a-3567715e1b00",
-          "createdDateTime": "2026-01-12T06:27:40Z",
-          "userDisplayName": "Vishal",
-          "userPrincipalName": "vishal@intunetraininglabs.onmicrosoft.com",
-          "userId": "99ff6360-9526-4142-81bc-f8abe5d3bf78",
-          "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
-          "appDisplayName": "Azure Portal",
+          "id": "d230d5f5-0a67-4504-9c3f-beb4a9601900",
+          "createdDateTime": "2026-01-13T12:23:31Z",
+          "userDisplayName": "Demo User",
+          "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+          "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+          "appId": "fab89c3f-93ac-4d4d-9ee5-844290170dd6",
+          "appDisplayName": "AdminSphere",
           "ipAddress": "122.184.91.214",
           "clientAppUsed": "Browser",
-          "correlationId": "439b1cb2-267c-434c-aadc-fad41e138a29",
+          "correlationId": "04e9956e-d8ea-4a19-8958-3522ae5fab69",
           "conditionalAccessStatus": "notApplied",
           "isInteractive": true,
           "riskDetail": "none",
@@ -1994,12 +2020,12 @@
           "riskState": "none",
           "riskEventTypes": [],
           "riskEventTypes_v2": [],
-          "resourceDisplayName": "Azure Resource Manager",
-          "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
+          "resourceDisplayName": "Microsoft Graph",
+          "resourceId": "00000003-0000-0000-c000-000000000000",
           "status": {
-            "errorCode": 50072,
-            "failureReason": "Due to a configuration change made by your administrator, or because you moved to a new location, you must enroll in multi-factor authentication to access '{identifier}'.",
-            "additionalDetails": "The user was presented options to provide contact options so that they can do MFA."
+            "errorCode": 65001,
+            "failureReason": "The user or administrator has not consented to use the application with ID '{identifier}'{namePhrase}. Send an interactive authorization request for this user and resource.",
+            "additionalDetails": null
           },
           "deviceDetail": {
             "deviceId": "",
@@ -2008,7 +2034,7 @@
             "browser": "Edge 143.0.0",
             "isCompliant": false,
             "isManaged": false,
-            "trustType": ""
+            "trustType": null
           },
           "location": {
             "city": "New Delhi",
@@ -2049,6 +2075,53 @@
           ]
         },
         {
+          "id": "d6bc5e9b-9b14-4d92-bfbc-c7629cc12700",
+          "createdDateTime": "2026-01-12T08:48:04Z",
+          "userDisplayName": "Demo User",
+          "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+          "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+          "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
+          "appDisplayName": "Azure Portal",
+          "ipAddress": "122.184.91.214",
+          "clientAppUsed": "Browser",
+          "correlationId": "0806789c-8119-4d5b-a38e-91a19f3429c4",
+          "conditionalAccessStatus": "notApplied",
+          "isInteractive": true,
+          "riskDetail": "none",
+          "riskLevelAggregated": "none",
+          "riskLevelDuringSignIn": "none",
+          "riskState": "none",
+          "riskEventTypes": [],
+          "riskEventTypes_v2": [],
+          "resourceDisplayName": "Azure Resource Manager",
+          "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
+          "status": {
+            "errorCode": 50207,
+            "failureReason": "This web native bridge interrupt will be shown to the user during login when the application is requesting login through the native broker and needs eSTS to ensure the broker is properly configured.",
+            "additionalDetails": null
+          },
+          "deviceDetail": {
+            "deviceId": "",
+            "displayName": "",
+            "operatingSystem": "Windows10",
+            "browser": "Chrome 143.0.0",
+            "isCompliant": false,
+            "isManaged": false,
+            "trustType": null
+          },
+          "location": {
+            "city": "New Delhi",
+            "state": "Delhi",
+            "countryOrRegion": "IN",
+            "geoCoordinates": {
+              "altitude": null,
+              "latitude": 28.6353,
+              "longitude": 77.225
+            }
+          },
+          "appliedConditionalAccessPolicies": []
+        },
+        {
           "id": "bdc760bf-1c53-477c-97a1-56a04d003000",
           "createdDateTime": "2026-01-12T06:27:33Z",
           "userDisplayName": "Vishal",
@@ -2081,7 +2154,7 @@
             "browser": "Edge 143.0.0",
             "isCompliant": false,
             "isManaged": false,
-            "trustType": ""
+            "trustType": null
           },
           "location": {
             "city": "New Delhi",
@@ -2154,7 +2227,7 @@
             "browser": "Edge 143.0.0",
             "isCompliant": false,
             "isManaged": false,
-            "trustType": ""
+            "trustType": null
           },
           "location": {
             "city": "New Delhi",
@@ -2167,79 +2240,6 @@
             }
           },
           "appliedConditionalAccessPolicies": []
-        },
-        {
-          "id": "7a1f7068-5123-4dca-9578-4c9b97f30800",
-          "createdDateTime": "2026-01-12T05:12:12Z",
-          "userDisplayName": "Demo User",
-          "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
-          "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
-          "appId": "0fb1ce07-0af3-4192-a8bf-d8b3cce097fc",
-          "appDisplayName": "M365Portal-Purview-Service",
-          "ipAddress": "122.184.91.214",
-          "clientAppUsed": "Browser",
-          "correlationId": "019bb09e-5b58-76f6-b662-21d8ae71b491",
-          "conditionalAccessStatus": "notApplied",
-          "isInteractive": true,
-          "riskDetail": "none",
-          "riskLevelAggregated": "none",
-          "riskLevelDuringSignIn": "none",
-          "riskState": "none",
-          "riskEventTypes": [],
-          "riskEventTypes_v2": [],
-          "resourceDisplayName": "Microsoft Graph",
-          "resourceId": "00000003-0000-0000-c000-000000000000",
-          "status": {
-            "errorCode": 65001,
-            "failureReason": "The user or administrator has not consented to use the application with ID '{identifier}'{namePhrase}. Send an interactive authorization request for this user and resource.",
-            "additionalDetails": null
-          },
-          "deviceDetail": {
-            "deviceId": "",
-            "displayName": "",
-            "operatingSystem": "Windows10",
-            "browser": "Edge 143.0.0",
-            "isCompliant": false,
-            "isManaged": false,
-            "trustType": ""
-          },
-          "location": {
-            "city": "New Delhi",
-            "state": "Delhi",
-            "countryOrRegion": "IN",
-            "geoCoordinates": {
-              "altitude": null,
-              "latitude": 28.6353,
-              "longitude": 77.225
-            }
-          },
-          "appliedConditionalAccessPolicies": [
-            {
-              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-              "displayName": "Mac Require",
-              "enforcedGrantControls": [
-                "RequireCompliantDevice"
-              ],
-              "enforcedSessionControls": [],
-              "result": "notApplied"
-            },
-            {
-              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-              "displayName": "Require phishing-resistant multifactor authentication for admins",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [],
-              "result": "reportOnlyInterrupted"
-            },
-            {
-              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-              "displayName": "Use application enforced restrictions for O365 apps",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [
-                "AppEnforcedRestrictions"
-              ],
-              "result": "reportOnlySuccess"
-            }
-          ]
         }
       ]
     }
