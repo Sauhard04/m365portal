@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useMsal } from "@azure/msal-react";
 import { GraphService } from "../services/graphService";
 import { useNavigate } from 'react-router-dom';
+import { DataPersistenceService } from '../services/dataPersistence';
 import {
     Users, ShieldCheck, Mail, Globe,
     LayoutGrid, KeyRound, UserCog, Shield,
@@ -34,6 +35,14 @@ const BirdsEyeView = () => {
 
     useEffect(() => {
         const fetchData = async () => {
+            // Check cache first
+            const cached = await DataPersistenceService.load('BirdsEyeView');
+            if (cached && !DataPersistenceService.isExpired('BirdsEyeView', 15)) { // 15 min cache
+                setStats(cached);
+                setLoading(false);
+                return;
+            }
+
             try {
                 const request = {
                     scopes: ["User.Read.All", "Directory.Read.All", "DeviceManagementManagedDevices.Read.All", "Reports.Read.All", "Policy.Read.All", "ServiceHealth.Read.All"],
@@ -126,7 +135,7 @@ const BirdsEyeView = () => {
                 const activeIssues = serviceIssues.length;
                 const enabledCaPolicies = (caPolicies || []).filter(p => p.state === 'enabled').length;
 
-                setStats({
+                const newStats = {
                     entra: userStats,
                     licenses: licenseStats,
                     devices: { ...devices, entraTotal: entraDevicesCount }, // { total, compliant, osSummary }
@@ -139,7 +148,10 @@ const BirdsEyeView = () => {
                     exchange: { mailboxes: userStats.licensed }, // Proxy
                     teams: { total: teamsCount, private: privateTeams, public: publicTeams },
                     sharepoint: { sites: 0 } // Placeholder
-                });
+                };
+
+                setStats(newStats);
+                await DataPersistenceService.save('BirdsEyeView', newStats);
 
             } catch (error) {
                 console.error("Failed to fetch Bird's Eye data", error);

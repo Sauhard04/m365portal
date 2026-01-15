@@ -1,0 +1,87 @@
+{
+  "timestamp": 1768479161117,
+  "data": {
+    "entra": {
+      "users": 12,
+      "signin": 12,
+      "licensed": 11,
+      "guest": 2,
+      "groups": 58,
+      "securityGroups": 40,
+      "distGroups": 6,
+      "unifiedGroups": 12,
+      "admins": [
+        {
+          "name": "Global",
+          "count": 6
+        },
+        {
+          "name": "Exchange",
+          "count": 2
+        }
+      ],
+      "apps": 31,
+      "domains": 5,
+      "deletedUsers": 1
+    },
+    "licenses": {
+      "purchased": 30026,
+      "assigned": 13,
+      "total": 5,
+      "topSkus": [
+        {
+          "name": "DEVELOPERPACK_E5",
+          "count": 10
+        },
+        {
+          "name": "FLOW_FREE",
+          "count": 2
+        },
+        {
+          "name": "CCIBOTS_PRIVPREV_VIRAL",
+          "count": 1
+        }
+      ]
+    },
+    "devices": {
+      "total": 0,
+      "compliant": 0,
+      "osSummary": {
+        "androidCount": 0,
+        "iosCount": 0,
+        "macOSCount": 1,
+        "windowsMobileCount": 0,
+        "windowsCount": 2,
+        "unknownCount": 0,
+        "androidDedicatedCount": 0,
+        "androidDeviceAdminCount": 0,
+        "androidFullyManagedCount": 0,
+        "androidWorkProfileCount": 0,
+        "androidCorporateWorkProfileCount": 0,
+        "configMgrDeviceCount": 0,
+        "aospUserlessCount": 0,
+        "aospUserAssociatedCount": 0,
+        "linuxCount": 0,
+        "chromeOSCount": 0
+      },
+      "entraTotal": "18"
+    },
+    "security": {
+      "score": 181.5,
+      "max": 283,
+      "caPolicies": 1,
+      "healthIssues": 5
+    },
+    "exchange": {
+      "mailboxes": 11
+    },
+    "teams": {
+      "total": 5,
+      "private": 1,
+      "public": 4
+    },
+    "sharepoint": {
+      "sites": 0
+    }
+  }
+}
