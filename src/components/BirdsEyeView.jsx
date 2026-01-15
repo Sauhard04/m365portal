@@ -8,7 +8,7 @@ import {
     LayoutGrid, KeyRound, UserCog, Shield,
     UserX, CreditCard, AppWindow, Activity,
     Laptop, CheckCircle, AlertTriangle, FileWarning,
-    Smartphone, Monitor, Command
+    Smartphone, Monitor, Command, RefreshCw
 } from 'lucide-react';
 
 const BirdsEyeView = () => {
@@ -33,8 +33,8 @@ const BirdsEyeView = () => {
         sharepoint: { sites: 0 }
     });
 
-    useEffect(() => {
-        const fetchData = async () => {
+    const fetchData = async (isManual = false) => {
+        if (!isManual) {
             // Check cache first
             const cached = await DataPersistenceService.load('BirdsEyeView');
             if (cached && !DataPersistenceService.isExpired('BirdsEyeView', 15)) { // 15 min cache
@@ -42,124 +42,128 @@ const BirdsEyeView = () => {
                 setLoading(false);
                 return;
             }
+        }
 
-            try {
-                const request = {
-                    scopes: ["User.Read.All", "Directory.Read.All", "DeviceManagementManagedDevices.Read.All", "Reports.Read.All", "Policy.Read.All", "ServiceHealth.Read.All"],
-                    account: accounts[0],
-                };
-                const response = await instance.acquireTokenSilent(request);
-                const graphService = new GraphService(response.accessToken);
+        if (isManual) setLoading(true);
 
-                // Parallel Fetching of Expanded Data
-                const [
-                    users,
-                    groups,
-                    devices,
-                    secureScore,
-                    skus,
-                    directoryRoles, // Now fetches all roles
-                    apps,
-                    domains,
-                    deletedUsers,
-                    caPolicies,
-                    serviceIssues,
-                    entraDevicesCount
-                ] = await Promise.all([
-                    graphService.client.api('/users').select('id,accountEnabled,userType,assignedLicenses').top(999).get().catch(e => ({ value: [] })),
-                    graphService.client.api('/groups').select('id,groupTypes,mailEnabled,securityEnabled,resourceProvisioningOptions,visibility').top(999).get().catch(e => ({ value: [] })),
-                    graphService.getDeviceComplianceStats(),
-                    graphService.getSecureScore(),
-                    graphService.client.api('/subscribedSkus').get().catch(e => ({ value: [] })),
-                    graphService.getDirectoryRoles(),
-                    graphService.getApplications(),
-                    graphService.getDomains(),
-                    graphService.getDeletedUsers(),
-                    graphService.getConditionalAccessPolicies(),
-                    graphService.getServiceIssues(),
-                    graphService.getTotalDevicesCount()
-                ]);
+        try {
+            const request = {
+                scopes: ["User.Read.All", "Directory.Read.All", "DeviceManagementManagedDevices.Read.All", "Reports.Read.All", "Policy.Read.All", "ServiceHealth.Read.All"],
+                account: accounts[0],
+            };
+            const response = await instance.acquireTokenSilent(request);
+            const graphService = new GraphService(response.accessToken);
+
+            // Parallel Fetching of Expanded Data
+            const [
+                users,
+                groups,
+                devices,
+                secureScore,
+                skus,
+                directoryRoles, // Now fetches all roles
+                apps,
+                domains,
+                deletedUsers,
+                caPolicies,
+                serviceIssues,
+                entraDevicesCount
+            ] = await Promise.all([
+                graphService.client.api('/users').select('id,accountEnabled,userType,assignedLicenses').top(999).get().catch(e => ({ value: [] })),
+                graphService.client.api('/groups').select('id,groupTypes,mailEnabled,securityEnabled,resourceProvisioningOptions,visibility').top(999).get().catch(e => ({ value: [] })),
+                graphService.getDeviceComplianceStats(),
+                graphService.getSecureScore(),
+                graphService.client.api('/subscribedSkus').get().catch(e => ({ value: [] })),
+                graphService.getDirectoryRoles(),
+                graphService.getApplications(),
+                graphService.getDomains(),
+                graphService.getDeletedUsers(),
+                graphService.getConditionalAccessPolicies(),
+                graphService.getServiceIssues(),
+                graphService.getTotalDevicesCount()
+            ]);
 
 
-                // --- Processing Data ---
+            // --- Processing Data ---
 
-                // Entra
-                const userList = users.value || [];
-                const groupList = groups.value || [];
-                const skuList = skus.value || [];
-                const roleList = directoryRoles || [];
+            // Entra
+            const userList = users.value || [];
+            const groupList = groups.value || [];
+            const skuList = skus.value || [];
+            const roleList = directoryRoles || [];
 
-                // Admin Roles Processing
-                const importantRoles = ['Global Administrator', 'Security Administrator', 'Exchange Administrator', 'SharePoint Administrator', 'User Administrator', 'Intune Administrator'];
-                const adminStats = roleList
-                    .filter(r => importantRoles.includes(r.displayName))
-                    .map(r => ({ name: r.displayName.replace(' Administrator', ''), count: r.members?.length || 0 }))
-                    .filter(r => r.count > 0)
-                    .sort((a, b) => b.count - a.count);
+            // Admin Roles Processing
+            const importantRoles = ['Global Administrator', 'Security Administrator', 'Exchange Administrator', 'SharePoint Administrator', 'User Administrator', 'Intune Administrator'];
+            const adminStats = roleList
+                .filter(r => importantRoles.includes(r.displayName))
+                .map(r => ({ name: r.displayName.replace(' Administrator', ''), count: r.members?.length || 0 }))
+                .filter(r => r.count > 0)
+                .sort((a, b) => b.count - a.count);
 
-                const userStats = {
-                    users: userList.length,
-                    signin: userList.filter(u => u.accountEnabled).length,
-                    licensed: userList.filter(u => u.assignedLicenses?.length > 0).length,
-                    guest: userList.filter(u => u.userType === 'Guest').length,
-                    groups: groupList.length,
-                    securityGroups: groupList.filter(g => g.securityEnabled && !g.mailEnabled).length,
-                    distGroups: groupList.filter(g => g.mailEnabled && !g.groupTypes?.includes('Unified')).length,
-                    unifiedGroups: groupList.filter(g => g.groupTypes?.includes('Unified')).length,
-                    admins: adminStats,
-                    apps: apps.length,
-                    domains: domains.length,
-                    deletedUsers: deletedUsers.length
-                };
+            const userStats = {
+                users: userList.length,
+                signin: userList.filter(u => u.accountEnabled).length,
+                licensed: userList.filter(u => u.assignedLicenses?.length > 0).length,
+                guest: userList.filter(u => u.userType === 'Guest').length,
+                groups: groupList.length,
+                securityGroups: groupList.filter(g => g.securityEnabled && !g.mailEnabled).length,
+                distGroups: groupList.filter(g => g.mailEnabled && !g.groupTypes?.includes('Unified')).length,
+                unifiedGroups: groupList.filter(g => g.groupTypes?.includes('Unified')).length,
+                admins: adminStats,
+                apps: apps.length,
+                domains: domains.length,
+                deletedUsers: deletedUsers.length
+            };
 
-                // Licenses
-                const topSkus = skuList
-                    .sort((a, b) => (b.consumedUnits || 0) - (a.consumedUnits || 0))
-                    .slice(0, 3)
-                    .map(s => ({ name: s.skuPartNumber, count: s.consumedUnits || 0 }));
+            // Licenses
+            const topSkus = skuList
+                .sort((a, b) => (b.consumedUnits || 0) - (a.consumedUnits || 0))
+                .slice(0, 3)
+                .map(s => ({ name: s.skuPartNumber, count: s.consumedUnits || 0 }));
 
-                const licenseStats = {
-                    purchased: skuList.reduce((acc, sku) => acc + (sku.prepaidUnits?.enabled || 0), 0),
-                    assigned: skuList.reduce((acc, sku) => acc + (sku.consumedUnits || 0), 0),
-                    total: skuList.length,
-                    topSkus: topSkus
-                };
+            const licenseStats = {
+                purchased: skuList.reduce((acc, sku) => acc + (sku.prepaidUnits?.enabled || 0), 0),
+                assigned: skuList.reduce((acc, sku) => acc + (sku.consumedUnits || 0), 0),
+                total: skuList.length,
+                topSkus: topSkus
+            };
 
-                // Teams
-                const teamsGroups = groupList.filter(g => g.resourceProvisioningOptions?.includes('Team'));
-                const teamsCount = teamsGroups.length;
-                const privateTeams = teamsGroups.filter(g => g.visibility === 'Private').length;
-                const publicTeams = teamsGroups.filter(g => g.visibility === 'Public').length;
+            // Teams
+            const teamsGroups = groupList.filter(g => g.resourceProvisioningOptions?.includes('Team'));
+            const teamsCount = teamsGroups.length;
+            const privateTeams = teamsGroups.filter(g => g.visibility === 'Private').length;
+            const publicTeams = teamsGroups.filter(g => g.visibility === 'Public').length;
 
-                // Security Extras
-                const activeIssues = serviceIssues.length;
-                const enabledCaPolicies = (caPolicies || []).filter(p => p.state === 'enabled').length;
+            // Security Extras
+            const activeIssues = serviceIssues.length;
+            const enabledCaPolicies = (caPolicies || []).filter(p => p.state === 'enabled').length;
 
-                const newStats = {
-                    entra: userStats,
-                    licenses: licenseStats,
-                    devices: { ...devices, entraTotal: entraDevicesCount }, // { total, compliant, osSummary }
-                    security: {
-                        score: secureScore?.currentScore || 0,
-                        max: secureScore?.maxScore || 0,
-                        caPolicies: enabledCaPolicies,
-                        healthIssues: activeIssues
-                    },
-                    exchange: { mailboxes: userStats.licensed }, // Proxy
-                    teams: { total: teamsCount, private: privateTeams, public: publicTeams },
-                    sharepoint: { sites: 0 } // Placeholder
-                };
+            const newStats = {
+                entra: userStats,
+                licenses: licenseStats,
+                devices: { ...devices, entraTotal: entraDevicesCount }, // { total, compliant, osSummary }
+                security: {
+                    score: secureScore?.currentScore || 0,
+                    max: secureScore?.maxScore || 0,
+                    caPolicies: enabledCaPolicies,
+                    healthIssues: activeIssues
+                },
+                exchange: { mailboxes: userStats.licensed }, // Proxy
+                teams: { total: teamsCount, private: privateTeams, public: publicTeams },
+                sharepoint: { sites: 0 } // Placeholder
+            };
 
-                setStats(newStats);
-                await DataPersistenceService.save('BirdsEyeView', newStats);
+            setStats(newStats);
+            await DataPersistenceService.save('BirdsEyeView', newStats);
 
-            } catch (error) {
-                console.error("Failed to fetch Bird's Eye data", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+        } catch (error) {
+            console.error("Failed to fetch Bird's Eye data", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         if (accounts.length > 0) {
             fetchData();
         }
@@ -329,6 +333,26 @@ const BirdsEyeView = () => {
                     </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '14px', color: 'var(--text-dim)' }}>
+                    <button
+                        onClick={() => fetchData(true)}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            background: 'var(--glass-bg)',
+                            border: '1px solid var(--glass-border)',
+                            color: 'var(--text-secondary)',
+                            padding: '8px 12px',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontSize: '13px',
+                            fontWeight: 500,
+                            transition: 'all 0.2s ease'
+                        }}
+                    >
+                        <RefreshCw size={14} className={loading && "animate-spin"} />
+                        Refresh
+                    </button>
                     <span>Live Monitor</span>
                     <div style={{ display: 'flex', marginLeft: '-8px' }}>
                         {sections.map((s, i) => (
