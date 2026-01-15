@@ -4,7 +4,7 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2, Shield, Archive, Database, HelpCircle, X, ArrowLeft, Mail, Trash2, Search } from 'lucide-react';
+import { RefreshCw, Download, AlertCircle, Loader2, Shield, ArrowLeft, Mail, Search } from 'lucide-react';
 
 const ExchangeReport = () => {
     const navigate = useNavigate();
@@ -15,7 +15,6 @@ const ExchangeReport = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const [isRunningMFA, setIsRunningMFA] = useState(false);
     const [isConcealed, setIsConcealed] = useState(false);
 
     // Filter states

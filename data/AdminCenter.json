@@ -1,5 +1,5 @@
 {
-  "timestamp": 1768476145197,
+  "timestamp": 1768478061489,
   "data": {
     "admincenter": {
       "mailboxes": {
@@ -1929,16 +1929,16 @@
       ],
       "failedSignIns": [
         {
-          "id": "c3872ba4-6d5b-43cc-bbe6-2145c30a2e00",
-          "createdDateTime": "2026-01-15T10:05:46Z",
-          "userDisplayName": "Demo User",
-          "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
-          "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
-          "appId": "0fb1ce07-0af3-4192-a8bf-d8b3cce097fc",
-          "appDisplayName": "M365Portal-Purview-Service",
+          "id": "7b06e4f9-f03f-40eb-b2a8-5c31a9940700",
+          "createdDateTime": "2026-01-15T11:32:28Z",
+          "userDisplayName": "Vivek Kumar",
+          "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+          "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+          "appId": "38aa3b87-a06d-4817-b275-7a316988d93b",
+          "appDisplayName": "Windows Sign In",
           "ipAddress": "122.184.91.214",
-          "clientAppUsed": "Browser",
-          "correlationId": "019bc11e-405a-79f8-893d-65ab1a83b607",
+          "clientAppUsed": "Mobile Apps and Desktop clients",
+          "correlationId": "20e80a25-d2ad-4f0f-a5ae-7eaa7deae43e",
           "conditionalAccessStatus": "notApplied",
           "isInteractive": true,
           "riskDetail": "none",
@@ -1947,18 +1947,112 @@
           "riskState": "none",
           "riskEventTypes": [],
           "riskEventTypes_v2": [],
-          "resourceDisplayName": "Microsoft Graph",
-          "resourceId": "00000003-0000-0000-c000-000000000000",
+          "resourceDisplayName": "Windows Azure Active Directory",
+          "resourceId": "00000002-0000-0000-c000-000000000000",
           "status": {
-            "errorCode": 65001,
-            "failureReason": "The user or administrator has not consented to use the application with ID '{identifier}'{namePhrase}. Send an interactive authorization request for this user and resource.",
-            "additionalDetails": null
+            "errorCode": 50013,
+            "failureReason": "Assertion failed signature validation. Possibly because the token issuer doesn't match the API version within its valid time range, it's expired or malformed, or the refresh token in the assertion is not a primary refresh token.",
+            "additionalDetails": "Application error. Contact the app developer and ask them to debug this issue."
+          },
+          "deviceDetail": {
+            "deviceId": "44bf0d36-7bfe-472a-89d3-960b4d14c989",
+            "displayName": "DESKTOP-R1VICQD",
+            "operatingSystem": "Windows",
+            "browser": "",
+            "isCompliant": true,
+            "isManaged": true,
+            "trustType": "Azure AD joined"
+          },
+          "location": {
+            "city": "New Delhi",
+            "state": "Delhi",
+            "countryOrRegion": "IN",
+            "geoCoordinates": {
+              "altitude": null,
+              "latitude": 28.6353,
+              "longitude": 77.225
+            }
+          },
+          "appliedConditionalAccessPolicies": []
+        },
+        {
+          "id": "29197a50-d01b-47c5-ab8c-46ab5f282700",
+          "createdDateTime": "2026-01-15T11:26:44Z",
+          "userDisplayName": "Vivek Kumar",
+          "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+          "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+          "appId": "38aa3b87-a06d-4817-b275-7a316988d93b",
+          "appDisplayName": "Windows Sign In",
+          "ipAddress": "122.184.91.214",
+          "clientAppUsed": "Mobile Apps and Desktop clients",
+          "correlationId": "ba7cc13a-8c23-4570-8069-8691174a8a03",
+          "conditionalAccessStatus": "notApplied",
+          "isInteractive": true,
+          "riskDetail": "none",
+          "riskLevelAggregated": "none",
+          "riskLevelDuringSignIn": "none",
+          "riskState": "none",
+          "riskEventTypes": [],
+          "riskEventTypes_v2": [],
+          "resourceDisplayName": "Windows Azure Active Directory",
+          "resourceId": "00000002-0000-0000-c000-000000000000",
+          "status": {
+            "errorCode": 50013,
+            "failureReason": "Assertion failed signature validation. Possibly because the token issuer doesn't match the API version within its valid time range, it's expired or malformed, or the refresh token in the assertion is not a primary refresh token.",
+            "additionalDetails": "Application error. Contact the app developer and ask them to debug this issue."
+          },
+          "deviceDetail": {
+            "deviceId": "44bf0d36-7bfe-472a-89d3-960b4d14c989",
+            "displayName": "DESKTOP-R1VICQD",
+            "operatingSystem": "Windows",
+            "browser": "",
+            "isCompliant": true,
+            "isManaged": true,
+            "trustType": "Azure AD joined"
+          },
+          "location": {
+            "city": "New Delhi",
+            "state": "Delhi",
+            "countryOrRegion": "IN",
+            "geoCoordinates": {
+              "altitude": null,
+              "latitude": 28.6353,
+              "longitude": 77.225
+            }
+          },
+          "appliedConditionalAccessPolicies": []
+        },
+        {
+          "id": "c3794609-bb9e-40c5-a156-1a30b8d40700",
+          "createdDateTime": "2026-01-15T11:23:40Z",
+          "userDisplayName": "Demo User",
+          "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+          "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+          "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
+          "appDisplayName": "Azure Portal",
+          "ipAddress": "122.184.91.214",
+          "clientAppUsed": "Unknown",
+          "correlationId": "019bc164-becc-70e4-ab60-a27743a6a10e",
+          "conditionalAccessStatus": "notApplied",
+          "isInteractive": true,
+          "riskDetail": "none",
+          "riskLevelAggregated": "none",
+          "riskLevelDuringSignIn": "none",
+          "riskState": "none",
+          "riskEventTypes": [],
+          "riskEventTypes_v2": [],
+          "resourceDisplayName": "Azure Resource Manager",
+          "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
+          "status": {
+            "errorCode": 90072,
+            "failureReason": "User account '{user}' from identity provider '{idp}' does not exist in tenant '{tenant}' and cannot access the application '{application}'({appName}) in that tenant. The account needs to be added as an external user in the tenant first. Sign out and sign in again with a different Azure Active Directory user account",
+            "additionalDetails": "The account needs to be added as an external user in the tenant first. Sign out and sign in again with a different Azure Active Directory user account"
           },
           "deviceDetail": {
             "deviceId": "",
             "displayName": "",
             "operatingSystem": "Windows10",
-            "browser": "Edge 143.0.0",
+            "browser": "Chrome 143.0.0",
             "isCompliant": false,
             "isManaged": false,
             "trustType": null
@@ -1973,92 +2067,19 @@
               "longitude": 77.225
             }
           },
-          "appliedConditionalAccessPolicies": [
-            {
-              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-              "displayName": "Mac Require",
-              "enforcedGrantControls": [
-                "RequireCompliantDevice"
-              ],
-              "enforcedSessionControls": [],
-              "result": "notApplied"
-            },
-            {
-              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-              "displayName": "Require phishing-resistant multifactor authentication for admins",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [],
-              "result": "reportOnlyInterrupted"
-            },
-            {
-              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-              "displayName": "Use application enforced restrictions for O365 apps",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [
-                "AppEnforcedRestrictions"
-              ],
-              "result": "reportOnlySuccess"
-            }
-          ]
-        },
-        {
-          "id": "83f3d2e4-132d-453b-a649-05a4378c1200",
-          "createdDateTime": "2026-01-15T09:53:04Z",
-          "userDisplayName": "Vivek Kumar",
-          "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
-          "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
-          "appId": "38aa3b87-a06d-4817-b275-7a316988d93b",
-          "appDisplayName": "Windows Sign In",
-          "ipAddress": "122.184.91.214",
-          "clientAppUsed": "Mobile Apps and Desktop clients",
-          "correlationId": "2f343b1f-d611-49ed-b952-10fa71db3617",
-          "conditionalAccessStatus": "notApplied",
-          "isInteractive": true,
-          "riskDetail": "none",
-          "riskLevelAggregated": "none",
-          "riskLevelDuringSignIn": "none",
-          "riskState": "none",
-          "riskEventTypes": [],
-          "riskEventTypes_v2": [],
-          "resourceDisplayName": "Windows Azure Active Directory",
-          "resourceId": "00000002-0000-0000-c000-000000000000",
-          "status": {
-            "errorCode": 50013,
-            "failureReason": "Assertion failed signature validation. Possibly because the token issuer doesn't match the API version within its valid time range, it's expired or malformed, or the refresh token in the assertion is not a primary refresh token.",
-            "additionalDetails": "Application error. Contact the app developer and ask them to debug this issue."
-          },
-          "deviceDetail": {
-            "deviceId": "44bf0d36-7bfe-472a-89d3-960b4d14c989",
-            "displayName": "DESKTOP-R1VICQD",
-            "operatingSystem": "Windows",
-            "browser": "",
-            "isCompliant": true,
-            "isManaged": true,
-            "trustType": "Azure AD joined"
-          },
-          "location": {
-            "city": "New Delhi",
-            "state": "Delhi",
-            "countryOrRegion": "IN",
-            "geoCoordinates": {
-              "altitude": null,
-              "latitude": 28.6353,
-              "longitude": 77.225
-            }
-          },
           "appliedConditionalAccessPolicies": []
         },
         {
-          "id": "78c8034a-a1dc-48ca-964b-eabb752f2600",
-          "createdDateTime": "2026-01-15T09:34:17Z",
+          "id": "e91ca165-56b5-4e41-9131-122a592e0600",
+          "createdDateTime": "2026-01-15T11:22:58Z",
           "userDisplayName": "Demo User",
           "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
           "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
-          "appId": "0000000c-0000-0000-c000-000000000000",
-          "appDisplayName": "Microsoft App Access Panel",
-          "ipAddress": "106.221.225.41",
-          "clientAppUsed": "Browser",
-          "correlationId": "df11e2c2-fc53-4cdb-a534-c1383eda66b2",
+          "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
+          "appDisplayName": "Azure Portal",
+          "ipAddress": "122.184.91.214",
+          "clientAppUsed": "Unknown",
+          "correlationId": "019bc164-becc-70e4-ab60-a27743a6a10e",
           "conditionalAccessStatus": "notApplied",
           "isInteractive": true,
           "riskDetail": "none",
@@ -2067,94 +2088,21 @@
           "riskState": "none",
           "riskEventTypes": [],
           "riskEventTypes_v2": [],
-          "resourceDisplayName": "Windows Azure Active Directory",
-          "resourceId": "00000002-0000-0000-c000-000000000000",
+          "resourceDisplayName": "Azure Resource Manager",
+          "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
           "status": {
-            "errorCode": 50140,
-            "failureReason": "This occurred due to 'Keep me signed in' interrupt when the user was signing in.",
-            "additionalDetails": "This is an expected part of the login flow, where a user is asked if they want to remain signed into this browser to make further logins easier. For more details, see https://techcommunity.microsoft.com/t5/microsoft-entra/the-new-azure-ad-sign-in-and-keep-me-signed-in-experiences/td-p/128267"
+            "errorCode": 90072,
+            "failureReason": "User account '{user}' from identity provider '{idp}' does not exist in tenant '{tenant}' and cannot access the application '{application}'({appName}) in that tenant. The account needs to be added as an external user in the tenant first. Sign out and sign in again with a different Azure Active Directory user account",
+            "additionalDetails": "The account needs to be added as an external user in the tenant first. Sign out and sign in again with a different Azure Active Directory user account"
           },
           "deviceDetail": {
             "deviceId": "",
             "displayName": "",
-            "operatingSystem": "Android",
-            "browser": "Chrome Mobile 143.0.7499",
+            "operatingSystem": "Windows10",
+            "browser": "Chrome 143.0.0",
             "isCompliant": false,
             "isManaged": false,
             "trustType": null
-          },
-          "location": {
-            "city": "Nauroji Nagar",
-            "state": "Delhi",
-            "countryOrRegion": "IN",
-            "geoCoordinates": {
-              "altitude": null,
-              "latitude": 28.5675,
-              "longitude": 77.1952
-            }
-          },
-          "appliedConditionalAccessPolicies": [
-            {
-              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-              "displayName": "Mac Require",
-              "enforcedGrantControls": [
-                "RequireCompliantDevice"
-              ],
-              "enforcedSessionControls": [],
-              "result": "notApplied"
-            },
-            {
-              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-              "displayName": "Require phishing-resistant multifactor authentication for admins",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [],
-              "result": "reportOnlySuccess"
-            },
-            {
-              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-              "displayName": "Use application enforced restrictions for O365 apps",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [
-                "AppEnforcedRestrictions"
-              ],
-              "result": "reportOnlyNotApplied"
-            }
-          ]
-        },
-        {
-          "id": "801bee65-ec1e-41b7-9bfc-2abee6f42200",
-          "createdDateTime": "2026-01-15T09:31:35Z",
-          "userDisplayName": "Vivek Kumar",
-          "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
-          "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
-          "appId": "38aa3b87-a06d-4817-b275-7a316988d93b",
-          "appDisplayName": "Windows Sign In",
-          "ipAddress": "122.184.91.214",
-          "clientAppUsed": "Mobile Apps and Desktop clients",
-          "correlationId": "a7982d1a-c184-495b-973c-2d918965e40c",
-          "conditionalAccessStatus": "notApplied",
-          "isInteractive": true,
-          "riskDetail": "none",
-          "riskLevelAggregated": "none",
-          "riskLevelDuringSignIn": "none",
-          "riskState": "none",
-          "riskEventTypes": [],
-          "riskEventTypes_v2": [],
-          "resourceDisplayName": "Windows Azure Active Directory",
-          "resourceId": "00000002-0000-0000-c000-000000000000",
-          "status": {
-            "errorCode": 50013,
-            "failureReason": "Assertion failed signature validation. Possibly because the token issuer doesn't match the API version within its valid time range, it's expired or malformed, or the refresh token in the assertion is not a primary refresh token.",
-            "additionalDetails": "Application error. Contact the app developer and ask them to debug this issue."
-          },
-          "deviceDetail": {
-            "deviceId": "44bf0d36-7bfe-472a-89d3-960b4d14c989",
-            "displayName": "DESKTOP-R1VICQD",
-            "operatingSystem": "Windows",
-            "browser": "",
-            "isCompliant": true,
-            "isManaged": true,
-            "trustType": "Azure AD joined"
           },
           "location": {
             "city": "New Delhi",
@@ -2169,16 +2117,16 @@
           "appliedConditionalAccessPolicies": []
         },
         {
-          "id": "bc52582c-e89f-4440-8ddd-a87549441d00",
-          "createdDateTime": "2026-01-15T09:25:00Z",
-          "userDisplayName": "Vivek Kumar",
-          "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
-          "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
-          "appId": "38aa3b87-a06d-4817-b275-7a316988d93b",
-          "appDisplayName": "Windows Sign In",
+          "id": "2e335991-e8df-44de-bb5e-8fa60aef0800",
+          "createdDateTime": "2026-01-15T11:22:01Z",
+          "userDisplayName": "Demo User",
+          "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+          "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+          "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
+          "appDisplayName": "Azure Portal",
           "ipAddress": "122.184.91.214",
-          "clientAppUsed": "Mobile Apps and Desktop clients",
-          "correlationId": "0bb6b56f-e3be-4e70-b3f0-fbd28cf5d3c1",
+          "clientAppUsed": "Unknown",
+          "correlationId": "019bc163-9a22-7cf7-bfc6-f2df03de492a",
           "conditionalAccessStatus": "notApplied",
           "isInteractive": true,
           "riskDetail": "none",
@@ -2187,21 +2135,21 @@
           "riskState": "none",
           "riskEventTypes": [],
           "riskEventTypes_v2": [],
-          "resourceDisplayName": "Windows Azure Active Directory",
-          "resourceId": "00000002-0000-0000-c000-000000000000",
+          "resourceDisplayName": "Azure Resource Manager",
+          "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
           "status": {
-            "errorCode": 50013,
-            "failureReason": "Assertion failed signature validation. Possibly because the token issuer doesn't match the API version within its valid time range, it's expired or malformed, or the refresh token in the assertion is not a primary refresh token.",
-            "additionalDetails": "Application error. Contact the app developer and ask them to debug this issue."
+            "errorCode": 90072,
+            "failureReason": "User account '{user}' from identity provider '{idp}' does not exist in tenant '{tenant}' and cannot access the application '{application}'({appName}) in that tenant. The account needs to be added as an external user in the tenant first. Sign out and sign in again with a different Azure Active Directory user account",
+            "additionalDetails": "The account needs to be added as an external user in the tenant first. Sign out and sign in again with a different Azure Active Directory user account"
           },
           "deviceDetail": {
-            "deviceId": "44bf0d36-7bfe-472a-89d3-960b4d14c989",
-            "displayName": "DESKTOP-R1VICQD",
-            "operatingSystem": "Windows",
-            "browser": "",
-            "isCompliant": true,
-            "isManaged": true,
-            "trustType": "Azure AD joined"
+            "deviceId": "",
+            "displayName": "",
+            "operatingSystem": "Windows10",
+            "browser": "Chrome 143.0.0",
+            "isCompliant": false,
+            "isManaged": false,
+            "trustType": null
           },
           "location": {
             "city": "New Delhi",
