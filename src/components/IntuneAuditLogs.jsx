@@ -89,36 +89,36 @@ const IntuneAuditLogs = () => {
                     </div>
 
                     {filteredEvents.length > 0 ? (
-                        <div className={styles.tableContainer}>
+                        <div className={styles.tableContainer} style={{ zoom: '89%' }}>
                             <table className={styles.table}>
                                 <thead className={styles.tableHead}>
                                     <tr>
-                                        <th>Activity</th>
-                                        <th>Type</th>
-                                        <th>Category</th>
-                                        <th>Actor</th>
-                                        <th>Date & Time</th>
+                                        <th style={{ padding: '0.75rem 1rem', paddingLeft: '1.5rem' }}>Activity</th>
+                                        <th style={{ whiteSpace: 'nowrap', padding: '0.75rem 1rem' }}>Type</th>
+                                        <th style={{ whiteSpace: 'nowrap', padding: '0.75rem 1rem' }}>Category</th>
+                                        <th style={{ whiteSpace: 'nowrap', padding: '0.75rem 1rem' }}>Actor</th>
+                                        <th style={{ whiteSpace: 'nowrap', padding: '0.75rem 1rem' }}>Date & Time</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {filteredEvents.map((event, i) => (
                                         <tr key={i} className={styles.tableRow}>
-                                            <td>
+                                            <td style={{ padding: '0.75rem 1rem', paddingLeft: '1.5rem' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                                     <FileText style={{ width: '1.25rem', height: '1.25rem', color: '#9ca3af' }} />
-                                                    <span style={{ fontWeight: 500, color: 'var(--text-primary)' }}>{event.displayName || 'Unknown Activity'}</span>
+                                                    <span style={{ fontWeight: 500, color: 'var(--text-primary)', fontSize: '0.8rem' }}>{event.displayName || 'Unknown Activity'}</span>
                                                 </div>
                                             </td>
-                                            <td>
+                                            <td style={{ whiteSpace: 'nowrap', padding: '0.75rem 1rem' }}>
                                                 <span className={`${styles.badge} ${styles.badgeNeutral}`}>
                                                     {event.activityType || 'Unknown'}
                                                 </span>
                                             </td>
-                                            <td style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{event.category || 'N/A'}</td>
-                                            <td style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>
+                                            <td style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', whiteSpace: 'nowrap', padding: '0.75rem 1rem' }}>{event.category || 'N/A'}</td>
+                                            <td style={{ color: 'var(--text-dim)', fontSize: '0.8rem', whiteSpace: 'nowrap', padding: '0.75rem 1rem' }}>
                                                 {event.actor?.userPrincipalName || 'System'}
                                             </td>
-                                            <td style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>
+                                            <td style={{ color: 'var(--text-dim)', fontSize: '0.8rem', whiteSpace: 'nowrap', padding: '0.75rem 1rem' }}>
                                                 {event.activityDateTime ? new Date(event.activityDateTime).toLocaleString() : 'Unknown'}
                                             </td>
                                         </tr>

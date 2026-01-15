@@ -1,5 +1,5 @@
 {
-  "timestamp": 1768305891560,
+  "timestamp": 1768470799360,
   "data": {
     "intune": {
       "devices": {
@@ -9,7 +9,7 @@
       },
       "policies": {
         "compliance": 2,
-        "configuration": 9
+        "configuration": 8
       },
       "apps": {
         "total_managed": 6
@@ -24,7 +24,7 @@
       "nonCompliantDevices": 1,
       "inactiveDevices": 1,
       "compliancePolicies": 2,
-      "configProfiles": 9,
+      "configProfiles": 8,
       "mobileApps": 6,
       "securityBaselines": 0,
       "adminRoles": 0

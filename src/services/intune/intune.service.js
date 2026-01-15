@@ -244,6 +244,21 @@ export const IntuneService = {
         }
     },
 
+    // Get users list
+    async getUsers(client, top = 50) {
+        try {
+            const response = await client.api('/users')
+                .top(top)
+                .select('id,displayName,userPrincipalName,mail')
+                .orderby('displayName')
+                .get();
+            return response.value || [];
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            return [];
+        }
+    },
+
     // Search users for user-devices view
     async searchUsers(client, searchText) {
         try {

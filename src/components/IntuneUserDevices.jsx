@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
@@ -15,10 +15,38 @@ const IntuneUserDevices = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [userDevices, setUserDevices] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [users, setUsers] = useState([]);
     const [loadingDevices, setLoadingDevices] = useState(false);
 
+    useEffect(() => {
+        const fetchUsers = async () => {
+            setLoading(true);
+            try {
+                const response = await instance.acquireTokenSilent({
+                    ...loginRequest,
+                    account: accounts[0]
+                });
+                const client = new GraphService(response.accessToken).client;
+                const fetchedUsers = await IntuneService.getUsers(client);
+                setUsers(fetchedUsers);
+                setSearchResults(fetchedUsers);
+            } catch (error) {
+                console.error("Users fetch error:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (accounts.length > 0) {
+            fetchUsers();
+        }
+    }, [accounts, instance]);
+
     const handleSearch = async () => {
-        if (!searchText || searchText.length < 2) return;
+        if (!searchText) {
+            setSearchResults(users);
+            return;
+        }
 
         setLoading(true);
         try {
@@ -91,10 +119,10 @@ const IntuneUserDevices = () => {
                     </button>
                 </div>
 
-                {searchResults.length > 0 && !selectedUser && (
+                {!selectedUser && (
                     <div className={styles.card} style={{ marginBottom: '2rem' }}>
                         <div className={styles.cardHeader}>
-                            <h2 className={styles.cardTitle}>Search Results</h2>
+                            <h2 className={styles.cardTitle}>{searchText ? 'Search Results' : 'All Users'}</h2>
                             <span className={`${styles.badge} ${styles.badgeInfo}`}>
                                 {searchResults.length} USERS
                             </span>
@@ -205,19 +233,7 @@ const IntuneUserDevices = () => {
                     </div>
                 )}
 
-                {!selectedUser && searchResults.length === 0 && (
-                    <div className={styles.card}>
-                        <div className={styles.emptyState}>
-                            <div className={styles.emptyIcon}>
-                                <Users style={{ width: '2.5rem', height: '2.5rem', color: '#6b7280' }} />
-                            </div>
-                            <h3 className={styles.emptyTitle}>Search for a User</h3>
-                            <p className={styles.emptyDescription}>
-                                Enter a user's name or email address to view their assigned devices.
-                            </p>
-                        </div>
-                    </div>
-                )}
+
             </div>
         </div>
     );
