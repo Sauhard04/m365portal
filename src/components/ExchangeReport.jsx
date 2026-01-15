@@ -14,7 +14,7 @@ const ExchangeReport = () => {
     const [filterText, setFilterText] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [selectedUsers, setSelectedUsers] = useState(new Set());
+
     const [isRunningMFA, setIsRunningMFA] = useState(false);
     const [isConcealed, setIsConcealed] = useState(false);
 
@@ -22,17 +22,7 @@ const ExchangeReport = () => {
     const [archiveFilter, setArchiveFilter] = useState('all');
     const [migrationFilter, setMigrationFilter] = useState('all');
 
-    const toggleUserSelection = (email) => {
-        const newSelection = new Set(selectedUsers);
-        if (newSelection.has(email)) newSelection.delete(email);
-        else newSelection.add(email);
-        setSelectedUsers(newSelection);
-    };
 
-    const toggleAllSelection = () => {
-        if (selectedUsers.size === filteredData.length) setSelectedUsers(new Set());
-        else setSelectedUsers(new Set(filteredData.map(u => u.emailAddress)));
-    };
 
     const filteredData = reportData.filter(item => {
         if (filterText) {
@@ -193,13 +183,7 @@ const ExchangeReport = () => {
                     <table className="modern-table">
                         <thead>
                             <tr>
-                                <th style={{ width: '50px' }}>
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedUsers.size === filteredData.length && filteredData.length > 0}
-                                        onChange={toggleAllSelection}
-                                    />
-                                </th>
+
                                 <th>Display Name</th>
                                 <th>Primary Email Address</th>
                                 <th>Archive Status</th>
@@ -211,19 +195,13 @@ const ExchangeReport = () => {
                         <tbody>
                             {loading ? (
                                 <tr>
-                                    <td colSpan="7" style={{ textAlign: 'center', padding: '100px' }}>
+                                    <td colSpan="6" style={{ textAlign: 'center', padding: '100px' }}>
                                         <Loader2 className="animate-spin" size={32} color="var(--accent-blue)" />
                                     </td>
                                 </tr>
                             ) : filteredData.length > 0 ? filteredData.map((mb, i) => (
-                                <tr key={i} className={selectedUsers.has(mb.emailAddress) ? 'active-row' : ''}>
-                                    <td>
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedUsers.has(mb.emailAddress)}
-                                            onChange={() => toggleUserSelection(mb.emailAddress)}
-                                        />
-                                    </td>
+                                <tr key={i}>
+
                                     <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{mb.displayName}</td>
                                     <td style={{ fontSize: '12px', opacity: 0.8 }}>{mb.emailAddress}</td>
                                     <td>
@@ -243,7 +221,7 @@ const ExchangeReport = () => {
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan="7" style={{ textAlign: 'center', padding: '100px', color: 'var(--text-dim)' }}>
+                                    <td colSpan="6" style={{ textAlign: 'center', padding: '100px', color: 'var(--text-dim)' }}>
                                         <Mail size={40} style={{ opacity: 0.2, marginBottom: '16px' }} />
                                         <p>No mailbox data available for current selection.</p>
                                     </td>
@@ -254,26 +232,7 @@ const ExchangeReport = () => {
                 </div>
             </div>
 
-            {selectedUsers.size > 0 && (
-                <motion.div initial={{ y: 100 }} animate={{ y: 0 }} className="bulk-action-bar">
-                    <div className="flex-between">
-                        <div className="flex-center flex-gap-4">
-                            <span className="font-bold">{selectedUsers.size} Users Selected</span>
-                            <button className="btn btn-secondary" style={{ padding: '8px 16px' }} onClick={() => setSelectedUsers(new Set())}>Clear</button>
-                        </div>
-                        <div className="flex-gap-4">
-                            <button className="btn btn-primary" style={{ background: 'var(--accent-purple)' }}>
-                                <Shield size={16} />
-                                Run Multi-Factor Command
-                            </button>
-                            <button className="btn btn-primary">
-                                <Archive size={16} />
-                                Generate Archive Script
-                            </button>
-                        </div>
-                    </div>
-                </motion.div>
-            )}
+
 
             <style dangerouslySetInnerHTML={{
                 __html: `
