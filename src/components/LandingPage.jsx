@@ -9,21 +9,28 @@ import Logo from './Logo';
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const { instance } = useMsal();
+  const { instance, accounts } = useMsal();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Automatically redirect if already signed in
+  React.useEffect(() => {
+    if (accounts.length > 0) {
+      const username = accounts[0].name || accounts[0].username.split('@')[0];
+      localStorage.setItem('m365_user', username);
+      navigate('/service/overview');
+    }
+  }, [accounts, navigate]);
 
   const handleLogin = async () => {
     setLoading(true);
     setError('');
     try {
-      const loginResponse = await instance.loginPopup(loginRequest);
-      localStorage.setItem('m365_user', loginResponse.account.name || loginResponse.account.username.split('@')[0]);
-      navigate('/service/overview');
+      await instance.loginRedirect(loginRequest);
+      // Logic after redirect happens when component remounts
     } catch (err) {
       console.error(err);
       setError('Login failed. Please ensure your Azure App Registration is configured correctly.');
-    } finally {
       setLoading(false);
     }
   };

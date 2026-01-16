@@ -160,17 +160,19 @@ const ServicePage = ({ serviceId: propServiceId }) => {
     };
 
     const fetchPurviewViaTerminal = async () => {
+        const timestamp = new Date().toISOString();
+        console.log(`[Purview Sync] Starting sync... (Version: ${timestamp})`);
         setLoading(true);
         setError('');
         try {
-            // 1. Get Exchange Online Token (works for both EXO and SCC)
-            console.log("[Purview Sync] Requesting Exchange Online token...");
-            let exoResponse = null;
+            // 1. Get SCC Token (specifically for Connect-IPPSSession)
+            console.log("[Purview Sync] Requesting SCC token (ps.compliance)...");
+            let sccResponse = null;
 
             try {
                 // Try silent authentication first
-                exoResponse = await instance.acquireTokenSilent({
-                    scopes: ["https://outlook.office365.com/.default"],
+                sccResponse = await instance.acquireTokenSilent({
+                    scopes: ["https://ps.compliance.protection.outlook.com/.default"],
                     account: accounts[0]
                 });
                 console.log("[Purview Sync] Token acquired silently");
@@ -179,7 +181,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 try {
                     // If silent fails, use redirect
                     await instance.acquireTokenRedirect({
-                        scopes: ["https://outlook.office365.com/.default"],
+                        scopes: ["https://ps.compliance.protection.outlook.com/.default"],
                         account: accounts[0]
                     });
                     // This will redirect the page, so code below won't execute
@@ -190,8 +192,8 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 }
             }
 
-            if (!exoResponse || !exoResponse.accessToken) {
-                throw new Error("Could not acquire Exchange Online access token. Check your Azure AD permissions.");
+            if (!sccResponse || !sccResponse.accessToken) {
+                throw new Error("Could not acquire SCC access token. Check your Azure AD permissions.");
             }
             console.log(`[Purview Sync] Token acquired (${exoResponse.accessToken.length} chars)`);
 
@@ -251,8 +253,8 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     command: script,
-                    token: exoResponse.accessToken,
-                    tokenType: 'exo',
+                    token: sccResponse.accessToken,
+                    tokenType: 'scc',
                     organization: organization || undefined,
                     userUpn: userUpn || undefined
                 }),
