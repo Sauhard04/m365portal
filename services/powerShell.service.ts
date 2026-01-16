@@ -63,11 +63,11 @@ export class PowerShellService {
         try {
             // 1. Trigger the workflow
             const inputs: any = { command };
-            if (token && tokenType === 'scc') {
+            if (token && (tokenType === 'scc' || tokenType === 'exo')) {
                 inputs.scc_token = token;
                 if (organization) inputs.organization = organization;
                 if (userUpn) inputs.user_upn = userUpn;
-                this.lastStatus = 'Triggering SCC-authenticated workflow...';
+                this.lastStatus = `Triggering ${tokenType.toUpperCase()}-authenticated workflow...`;
             }
 
             console.log(`[PS Remote] Triggering workflow with inputs: ${Object.keys(inputs).join(', ')}`);

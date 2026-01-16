@@ -163,23 +163,23 @@ const ServicePage = ({ serviceId: propServiceId }) => {
         setLoading(true);
         setError('');
         try {
-            // 1. Get SCC Token (using silent auth with redirect fallback)
-            console.log("[Purview Sync] Requesting SCC token...");
-            let sccResponse = null;
+            // 1. Get Exchange Online Token (works for both EXO and SCC)
+            console.log("[Purview Sync] Requesting Exchange Online token...");
+            let exoResponse = null;
 
             try {
                 // Try silent authentication first
-                sccResponse = await instance.acquireTokenSilent({
-                    scopes: ["https://ps.compliance.protection.outlook.com/.default"],
+                exoResponse = await instance.acquireTokenSilent({
+                    scopes: ["https://outlook.office365.com/.default"],
                     account: accounts[0]
                 });
                 console.log("[Purview Sync] Token acquired silently");
             } catch (silentError) {
                 console.log("[Purview Sync] Silent auth failed, trying redirect...");
                 try {
-                    // If silent fails, use redirect (more reliable than popup)
+                    // If silent fails, use redirect
                     await instance.acquireTokenRedirect({
-                        scopes: ["https://ps.compliance.protection.outlook.com/.default"],
+                        scopes: ["https://outlook.office365.com/.default"],
                         account: accounts[0]
                     });
                     // This will redirect the page, so code below won't execute
@@ -190,10 +190,10 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 }
             }
 
-            if (!sccResponse || !sccResponse.accessToken) {
-                throw new Error("Could not acquire SCC access token. Check your Azure AD permissions.");
+            if (!exoResponse || !exoResponse.accessToken) {
+                throw new Error("Could not acquire Exchange Online access token. Check your Azure AD permissions.");
             }
-            console.log(`[Purview Sync] Token acquired (${sccResponse.accessToken.length} chars)`);
+            console.log(`[Purview Sync] Token acquired (${exoResponse.accessToken.length} chars)`);
 
             // 2. Define the Purview script that outputs JSON
             const script = `
@@ -223,10 +223,26 @@ const ServicePage = ({ serviceId: propServiceId }) => {
             // 3. Extract organization info
             const userUpn = accounts[0]?.username;
             const tenantId = accounts[0]?.tenantId;
-            // Try to get organization from the account's home account ID or username domain
-            const organization = userUpn ? userUpn.split('@')[1] : null;
 
-            console.log(`[Purview Sync] User: ${userUpn}, Org: ${organization}`);
+            // Get organization from username domain or use tenant domain from env
+            let organization = userUpn ? userUpn.split('@')[1] : null;
+
+            // Fallback: Use the tenant domain from .env if available
+            if (!organization) {
+                const tenantDomain = import.meta.env.VITE_TENANT_DOMAIN;
+                if (tenantDomain) {
+                    organization = tenantDomain;
+                } else {
+                    // Last resort: construct from tenant ID (not ideal but works)
+                    organization = `${tenantId}.onmicrosoft.com`;
+                }
+            }
+
+            console.log(`[Purview Sync] User: ${userUpn || 'N/A'}, Org: ${organization || 'N/A'}, Tenant: ${tenantId}`);
+
+            if (!organization && !userUpn) {
+                throw new Error("Could not determine organization or user principal name. Please check your account information.");
+            }
 
             // 4. Connect to backend to run it on GitHub Actions
             console.log("[Purview Sync] Sending command to backend...");
@@ -235,10 +251,10 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     command: script,
-                    token: sccResponse.accessToken,
-                    tokenType: 'scc',
-                    organization: organization,
-                    userUpn: userUpn
+                    token: exoResponse.accessToken,
+                    tokenType: 'exo',
+                    organization: organization || undefined,
+                    userUpn: userUpn || undefined
                 }),
             });
 

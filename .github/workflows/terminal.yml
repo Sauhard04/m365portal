@@ -90,10 +90,29 @@ jobs:
                   
                   Connect-IPPSSession @connectParams
                   Write-Host "Connected to Security & Compliance Center."
+                  
+                  # Verify cmdlets are available
+                  $labelCmd = Get-Command Get-Label -ErrorAction SilentlyContinue
+                  $caseCmd = Get-Command Get-ComplianceCase -ErrorAction SilentlyContinue
+                  
+                  if ($labelCmd) {
+                      Write-Host "✓ Get-Label cmdlet is available"
+                  } else {
+                      Write-Warning "Get-Label cmdlet not found after connection"
+                  }
+                  
+                  if ($caseCmd) {
+                      Write-Host "✓ Get-ComplianceCase cmdlet is available"
+                  } else {
+                      Write-Warning "Get-ComplianceCase cmdlet not found after connection"
+                  }
+                  
               } catch {
                   Write-Error "Failed to connect to SCC: $($_.Exception.Message)"
                   exit 1
               }
+          } else {
+              Write-Host "No token provided - running command without SCC authentication"
           }
           
           Write-Host "Executing command..."
