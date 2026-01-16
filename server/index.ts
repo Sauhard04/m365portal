@@ -54,13 +54,13 @@ app.get('/api/audits', async (req, res) => {
  */
 app.post('/api/script/run', async (req, res) => {
     try {
-        const { command } = req.body;
+        const { command, token, tokenType, organization, userUpn } = req.body;
         if (!command) {
             return res.status(400).json({ success: false, error: 'Missing command' });
         }
 
-        console.log(`Executing script: ${command}`);
-        const result = await PowerShellService.runScript(command);
+        console.log(`Executing script (Remote): ${command.substring(0, 50)}... with token: ${!!token}, org: ${organization || 'N/A'}, upn: ${userUpn || 'N/A'}`);
+        const result = await PowerShellService.runScript(command, token, tokenType, organization, userUpn);
         res.json(result);
     } catch (err: any) {
         console.error('Script execution error:', err);

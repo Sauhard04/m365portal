@@ -163,13 +163,37 @@ const ServicePage = ({ serviceId: propServiceId }) => {
         setLoading(true);
         setError('');
         try {
-            // 1. Get SCC Token
-            const sccResponse = await instance.acquireTokenPopup({
-                scopes: ["https://ps.compliance.protection.outlook.com/.default"],
-                account: accounts[0]
-            });
+            // 1. Get SCC Token (using silent auth with redirect fallback)
+            console.log("[Purview Sync] Requesting SCC token...");
+            let sccResponse = null;
 
-            if (!sccResponse) throw new Error("Could not acquire SCC token.");
+            try {
+                // Try silent authentication first
+                sccResponse = await instance.acquireTokenSilent({
+                    scopes: ["https://ps.compliance.protection.outlook.com/.default"],
+                    account: accounts[0]
+                });
+                console.log("[Purview Sync] Token acquired silently");
+            } catch (silentError) {
+                console.log("[Purview Sync] Silent auth failed, trying redirect...");
+                try {
+                    // If silent fails, use redirect (more reliable than popup)
+                    await instance.acquireTokenRedirect({
+                        scopes: ["https://ps.compliance.protection.outlook.com/.default"],
+                        account: accounts[0]
+                    });
+                    // This will redirect the page, so code below won't execute
+                    return;
+                } catch (redirectError) {
+                    console.error("[Purview Sync] Redirect auth failed:", redirectError);
+                    throw new Error(`Authentication failed: ${redirectError.message}`);
+                }
+            }
+
+            if (!sccResponse || !sccResponse.accessToken) {
+                throw new Error("Could not acquire SCC access token. Check your Azure AD permissions.");
+            }
+            console.log(`[Purview Sync] Token acquired (${sccResponse.accessToken.length} chars)`);
 
             // 2. Define the Purview script that outputs JSON
             const script = `
@@ -196,16 +220,29 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 $results | ConvertTo-Json -Depth 3 -Compress
             `;
 
-            // 3. Connect to backend to run it on GitHub Actions
+            // 3. Extract organization info
+            const userUpn = accounts[0]?.username;
+            const tenantId = accounts[0]?.tenantId;
+            // Try to get organization from the account's home account ID or username domain
+            const organization = userUpn ? userUpn.split('@')[1] : null;
+
+            console.log(`[Purview Sync] User: ${userUpn}, Org: ${organization}`);
+
+            // 4. Connect to backend to run it on GitHub Actions
+            console.log("[Purview Sync] Sending command to backend...");
             const response = await fetch('http://localhost:4000/api/script/run', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     command: script,
                     token: sccResponse.accessToken,
-                    tokenType: 'scc'
+                    tokenType: 'scc',
+                    organization: organization,
+                    userUpn: userUpn
                 }),
             });
+
+            console.log("[Purview Sync] Backend response status:", response.status);
 
             const result = await response.json();
             console.log("[Purview Sync] Result:", result.success ? "Success" : "Failed", result);

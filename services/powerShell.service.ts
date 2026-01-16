@@ -1,5 +1,7 @@
-import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 import { v4 as uuidv4 } from 'uuid';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export interface ScriptResult {
     success: boolean;
@@ -8,168 +10,234 @@ export interface ScriptResult {
     code: number | null;
     error?: string;
     jobId: string;
+    workflowUrl?: string;
+    data?: any;
 }
 
 export class PowerShellService {
-    private static process: ChildProcessWithoutNullStreams | null = null;
-    private static currentResolve: ((result: ScriptResult) => void) | null = null;
-    private static stdoutBuffer = '';
-    private static stderrBuffer = '';
-    private static delimiter = '<<<END_OF_COMMAND>>>';
+    private static GITHUB_PAT = process.env.GITHUB_PAT;
+    private static GITHUB_REPO = process.env.GITHUB_REPO; // owner/repo
+    private static WORKFLOW_FILENAME = 'terminal.yml';
 
-    private static initialize() {
-        if (this.process) return;
+    private static isBusy = false;
+    private static lastStatus = 'Idle';
 
-        console.log('[PS] Initializing persistent PowerShell session...');
-        this.process = spawn('powershell', ['-NoProfile', '-Command', '-'], {
-            windowsHide: false
-        });
-
-        // Pre-import the management module to ensure it's loaded in the session
-        this.process.stdin.write('Import-Module ExchangeOnlineManagement -ErrorAction SilentlyContinue\n');
-
-        this.process.stdout.on('data', (data) => {
-            const chunk = data.toString();
-            console.log(`[PS STDOUT]: ${chunk}`);
-            this.stdoutBuffer += chunk;
-            this.checkOutput();
-        });
-
-        this.process.stderr.on('data', (data) => {
-            const chunk = data.toString();
-            console.warn(`[PS STDERR]: ${chunk}`);
-            this.stderrBuffer += chunk;
-        });
-
-        this.process.on('close', (code) => {
-            console.log(`[PS] Process closed with code ${code}`);
-            this.process = null;
-            if (this.currentResolve) {
-                this.currentResolve({
-                    success: false,
-                    stdout: this.stdoutBuffer,
-                    stderr: this.stderrBuffer || 'PowerShell process closed unexpectedly.',
-                    code,
-                    jobId: uuidv4()
-                });
-                this.currentResolve = null;
-            }
-        });
-    }
-
-    private static checkOutput() {
-        if (this.stdoutBuffer.includes(this.delimiter)) {
-            const parts = this.stdoutBuffer.split(this.delimiter);
-            const output = parts[0];
-            // Keep the rest in the buffer for next command
-            this.stdoutBuffer = parts.slice(1).join(this.delimiter);
-
-            if (this.currentResolve) {
-                console.log(`[PS] Command finished. Output length: ${output.length}`);
-                this.currentResolve({
-                    success: true,
-                    stdout: output.trim(),
-                    stderr: this.stderrBuffer.trim(),
-                    code: 0,
-                    jobId: uuidv4()
-                });
-
-                this.currentResolve = null;
-                this.stderrBuffer = '';
-            }
-        }
-    }
-
-    /**
-     * Returns the current contents of the stdout/stderr buffers.
-     * Useful for peeking at long-running commands like device login.
-     */
     static getLiveOutput() {
         return {
-            stdout: this.stdoutBuffer,
-            stderr: this.stderrBuffer,
-            isBusy: !!this.currentResolve
+            stdout: `Status: ${this.lastStatus}`,
+            stderr: '',
+            isBusy: this.isBusy
         };
     }
 
-    /**
-     * Resets the persistent PowerShell session.
-     */
     static resetSession() {
-        if (this.process) {
-            console.log('[PS] Resetting session. Killing process...');
-            this.process.kill('SIGTERM');
-            this.process = null;
-        }
-        if (this.currentResolve) {
-            this.currentResolve({
-                success: false,
-                stdout: this.stdoutBuffer,
-                stderr: 'Session reset by user.',
-                code: -1,
-                jobId: uuidv4()
-            });
-            this.currentResolve = null;
-        }
-        this.stdoutBuffer = '';
-        this.stderrBuffer = '';
+        this.isBusy = false;
+        this.lastStatus = 'Session reset';
     }
 
-    /**
-     * Executes a PowerShell script or command in the PERSISTENT session.
-     * @param command The PowerShell command or script block to execute.
-     * @returns Promise resolving to the execution result.
-     */
-    static async runScript(command: string): Promise<ScriptResult> {
-        this.initialize();
-
-        if (this.currentResolve) {
-            console.warn('[PS] Busy: Rejecting command because another is running.');
+    static async runScript(command: string, token?: string, tokenType?: string, organization?: string, userUpn?: string): Promise<ScriptResult> {
+        if (this.isBusy) {
             return {
                 success: false,
                 stdout: '',
-                stderr: 'Busy: Another command is executing.',
+                stderr: 'Busy: Another workflow is currently running.',
                 code: -1,
                 jobId: uuidv4()
             };
         }
 
-        return new Promise((resolve) => {
-            // Add a 60-second timeout
-            const timeout = setTimeout(() => {
-                if (this.currentResolve === resolve) {
-                    console.error('[PS] Command timeout reached (60s).');
-                    resolve({
-                        success: false,
-                        stdout: this.stdoutBuffer.trim(),
-                        stderr: (this.stderrBuffer + '\nError: Execution timed out. If you were connecting, please check for a login popup on your screen.').trim(),
-                        code: -1,
-                        jobId: uuidv4()
-                    });
-                    this.currentResolve = null;
-                    this.stdoutBuffer = '';
-                    this.stderrBuffer = '';
-                }
-            }, 60000);
-
-            this.currentResolve = (res) => {
-                clearTimeout(timeout);
-                resolve(res);
+        if (!this.GITHUB_PAT || !this.GITHUB_REPO) {
+            return {
+                success: false,
+                stdout: '',
+                stderr: 'GitHub credentials (GITHUB_PAT, GITHUB_REPO) not configured in .env',
+                code: -1,
+                jobId: uuidv4()
             };
+        }
 
-            const wrappedCommand = `
-                $ErrorActionPreference = 'Continue'
-                try {
-                    ${command} | Out-String -Width 160
-                } catch {
-                    Write-Error $_
-                } finally {
-                    Write-Output "${this.delimiter}"
+        this.isBusy = true;
+        this.lastStatus = 'Triggering GitHub Action...';
+        const trackingJobId = uuidv4();
+
+        try {
+            // 1. Trigger the workflow
+            const inputs: any = { command };
+            if (token && tokenType === 'scc') {
+                inputs.scc_token = token;
+                if (organization) inputs.organization = organization;
+                if (userUpn) inputs.user_upn = userUpn;
+                this.lastStatus = 'Triggering SCC-authenticated workflow...';
+            }
+
+            console.log(`[PS Remote] Triggering workflow with inputs: ${Object.keys(inputs).join(', ')}`);
+
+            const triggerRes = await fetch(
+                `https://api.github.com/repos/${this.GITHUB_REPO}/actions/workflows/${this.WORKFLOW_FILENAME}/dispatches`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/vnd.github+json',
+                        'Authorization': `Bearer ${this.GITHUB_PAT}`,
+                        'X-GitHub-Api-Version': '2022-11-28'
+                    },
+                    body: JSON.stringify({
+                        ref: 'main',
+                        inputs
+                    })
                 }
-            `;
+            );
 
-            console.log(`[PS] Executing: ${command.substring(0, 100)}${command.length > 100 ? '...' : ''}`);
-            this.process?.stdin.write(wrappedCommand + '\n');
-        });
+            if (!triggerRes.ok) {
+                const errorText = await triggerRes.text();
+                console.error(`[PS Remote] Trigger failed: ${triggerRes.status} ${errorText}`);
+                throw new Error(`GitHub trigger failed: ${errorText}`);
+            }
+
+            console.log(`[PS Remote] Workflow dispatch successful.`);
+
+            this.lastStatus = 'Workflow triggered. Waiting for run to start...';
+
+            // 2. Poll for the latest run
+            let runId = null;
+            for (let i = 0; i < 15; i++) {
+                await new Promise(r => setTimeout(r, 2000));
+                const runsRes = await fetch(
+                    `https://api.github.com/repos/${this.GITHUB_REPO}/actions/runs?event=workflow_dispatch&per_page=5`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${this.GITHUB_PAT}`,
+                        }
+                    }
+                );
+                const runsData = await runsRes.json();
+                if (runsData.workflow_runs) {
+                    const latestRun = runsData.workflow_runs.find((r: any) =>
+                        r.status !== 'completed' && (Date.now() - new Date(r.created_at).getTime() < 120000)
+                    );
+                    if (latestRun) {
+                        runId = latestRun.id;
+                        this.lastStatus = `Workflow running (ID: ${runId})...`;
+                        break;
+                    }
+                }
+            }
+
+            if (!runId) {
+                this.isBusy = false;
+                return {
+                    success: false,
+                    stdout: 'Workflow triggered but could not track execution.',
+                    stderr: 'Run ID not found after 30s. Check GitHub Actions tab manually.',
+                    code: -1,
+                    jobId: trackingJobId
+                };
+            }
+
+            // 3. Wait for completion
+            let finalStatus = 'in_progress';
+            let conclusion = null;
+            const startTime = Date.now();
+            while (finalStatus !== 'completed' && (Date.now() - startTime < 600000)) { // 10 min timeout
+                await new Promise(r => setTimeout(r, 5000));
+                const statusRes = await fetch(
+                    `https://api.github.com/repos/${this.GITHUB_REPO}/actions/runs/${runId}`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${this.GITHUB_PAT}`,
+                        }
+                    }
+                );
+                const statusData = await statusRes.json();
+                finalStatus = statusData.status;
+                conclusion = statusData.conclusion;
+                this.lastStatus = `Workflow status: ${finalStatus}... (${Math.round((Date.now() - startTime) / 1000)}s)`;
+            }
+
+            // 4. Fetch Logs and Result
+            this.lastStatus = 'Run completed. Fetching logs...';
+            const jobsRes = await fetch(
+                `https://api.github.com/repos/${this.GITHUB_REPO}/actions/runs/${runId}/jobs`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${this.GITHUB_PAT}`,
+                        'Accept': 'application/vnd.github+json'
+                    }
+                }
+            );
+            const jobsData = await jobsRes.json();
+            const actionJobId = jobsData.jobs && jobsData.jobs[0] ? jobsData.jobs[0].id : null;
+
+            let stdout = 'Workflow finished.';
+            let parsedData = null;
+
+            if (actionJobId) {
+                const logsRes = await fetch(
+                    `https://api.github.com/repos/${this.GITHUB_REPO}/actions/jobs/${actionJobId}/logs`,
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${this.GITHUB_PAT}`,
+                        }
+                    }
+                );
+                const logsText = await logsRes.text();
+
+                // Look for our delimiter or just take the output
+                const startMarker = 'Executing command...\r\n';
+                const endMarker = '---END_OF_COMMAND---';
+
+                const startIndex = logsText.lastIndexOf(startMarker);
+                const endIndex = logsText.lastIndexOf(endMarker);
+
+                if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+                    stdout = logsText.substring(startIndex + startMarker.length, endIndex).trim();
+                    // Clean up GitHub log timestamps (e.g. "2024-01...Z ")
+                    stdout = stdout.replace(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+Z /gm, '');
+
+                    if (stdout.startsWith('{') || stdout.startsWith('[')) {
+                        try {
+                            parsedData = JSON.parse(stdout);
+                        } catch (e) {
+                            console.warn('Failed to parse output as JSON');
+                        }
+                    }
+                }
+            }
+
+            this.isBusy = false;
+            const workflowUrl = `https://github.com/${this.GITHUB_REPO}/actions/runs/${runId}`;
+
+            if (conclusion === 'success') {
+                return {
+                    success: true,
+                    stdout: stdout,
+                    data: parsedData,
+                    stderr: '',
+                    code: 0,
+                    jobId: trackingJobId,
+                    workflowUrl
+                };
+            } else {
+                return {
+                    success: false,
+                    stdout: stdout,
+                    stderr: `Check GitHub for details: ${workflowUrl}`,
+                    code: 1,
+                    jobId: trackingJobId,
+                    workflowUrl
+                };
+            }
+
+        } catch (error: any) {
+            this.isBusy = false;
+            this.lastStatus = `Error: ${error.message}`;
+            return {
+                success: false,
+                stdout: '',
+                stderr: error.message,
+                code: -1,
+                jobId: trackingJobId
+            };
+        }
     }
 }

@@ -1,5 +1,5 @@
 {
-  "timestamp": 1768476138836,
+  "timestamp": 1768538685023,
   "data": {
     "overview": {
       "statistics": {
@@ -9,7 +9,7 @@
         "secure_score": 181.5
       },
       "health_and_security": {
-        "failed_signins": 15,
+        "failed_signins": 23,
         "compliance_rate": 67
       }
     },
@@ -25,12 +25,12 @@
         "serviceHealth": [
           {
             "name": "Operational",
-            "value": 23,
+            "value": 22,
             "color": "var(--accent-success)"
           },
           {
             "name": "Issues",
-            "value": 6,
+            "value": 7,
             "color": "var(--accent-error)"
           }
         ],
@@ -93,8 +93,8 @@
         "signIns": [
           {
             "name": "Last 24h",
-            "failed": 15,
-            "successful": 45
+            "failed": 23,
+            "successful": 49
           }
         ],
         "emailTrend": [
@@ -127,7 +127,7 @@
           },
           {
             "subject": "Sign-in Success",
-            "value": 75,
+            "value": 68,
             "fullMark": 100
           }
         ],

@@ -11,6 +11,14 @@ on:
         description: 'Access token for Security & Compliance Center'
         required: false
         type: string
+      organization:
+        description: 'Organization name (tenant domain)'
+        required: false
+        type: string
+      user_upn:
+        description: 'User Principal Name'
+        required: false
+        type: string
 
 jobs:
   execute:
@@ -52,14 +60,35 @@ jobs:
         env:
           INPUT_COMMAND: ${{ github.event.inputs.command }}
           INPUT_TOKEN: ${{ github.event.inputs.scc_token }}
+          INPUT_ORG: ${{ github.event.inputs.organization }}
+          INPUT_UPN: ${{ github.event.inputs.user_upn }}
         run: |
           $command = $env:INPUT_COMMAND
           $sccToken = $env:INPUT_TOKEN
+          $organization = $env:INPUT_ORG
+          $userUpn = $env:INPUT_UPN
           
           if ($sccToken) {
               Write-Host "Authenticating to Purview (SCC) using provided token..."
               try {
-                  Connect-IPPSSession -AccessToken $sccToken -ErrorAction Stop
+                  $connectParams = @{
+                      AccessToken = $sccToken
+                      ErrorAction = 'Stop'
+                  }
+                  
+                  # Add Organization or UserPrincipalName based on what's provided
+                  if ($organization) {
+                      $connectParams.Organization = $organization
+                      Write-Host "Using Organization: $organization"
+                  } elseif ($userUpn) {
+                      $connectParams.UserPrincipalName = $userUpn
+                      Write-Host "Using UserPrincipalName: $userUpn"
+                  } else {
+                      Write-Error "Either Organization or UserPrincipalName must be provided with AccessToken"
+                      exit 1
+                  }
+                  
+                  Connect-IPPSSession @connectParams
                   Write-Host "Connected to Security & Compliance Center."
               } catch {
                   Write-Error "Failed to connect to SCC: $($_.Exception.Message)"
