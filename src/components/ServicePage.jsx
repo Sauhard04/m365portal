@@ -208,20 +208,27 @@ const ServicePage = ({ serviceId: propServiceId }) => {
             });
 
             const result = await response.json();
+            console.log("[Purview Sync] Result:", result.success ? "Success" : "Failed", result);
+
             if (result.success && result.data) {
                 // Map the PowerShell data to our dashboard structure
                 const data = result.data;
+                console.log("[Purview Sync] Parsed data:", data);
+
                 const stats = {
                     sensitivityLabels: Array.isArray(data.sensitivityLabels) ? data.sensitivityLabels.length : (data.sensitivityLabels ? 1 : 0),
-                    retentionLabels: 0, // Simplified for now
-                    dlpPolicies: 0,
+                    retentionLabels: 0,
+                    dlpPolicies: data.dlpPolicies || 0,
                     dlpAlerts: Array.isArray(data.eDiscoveryCases) ? data.eDiscoveryCases.length : (data.eDiscoveryCases ? 1 : 0),
                     rawLabels: data.sensitivityLabels,
                     rawCases: data.eDiscoveryCases
                 };
+                console.log("[Purview Sync] Setting stats:", stats);
                 setPurviewStats(stats);
             } else {
-                throw new Error(result.error || result.stderr || "Terminal sync failed.");
+                const errorMsg = result.error || result.stderr || result.stdout || "Terminal sync failed.";
+                console.error("[Purview Sync] Error:", errorMsg);
+                throw new Error(errorMsg);
             }
         } catch (err) {
             console.error("Terminal sync error:", err);

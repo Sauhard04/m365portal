@@ -22,10 +22,26 @@ jobs:
       - name: Setup PowerShell Modules
         shell: pwsh
         run: |
-          if (-not (Get-Module -ListAvailable ExchangeOnlineManagement)) {
+          Write-Host "Checking for ExchangeOnlineManagement module..."
+          $module = Get-Module -ListAvailable -Name ExchangeOnlineManagement
+          
+          if (-not $module) {
+              Write-Host "Installing NuGet provider..."
+              Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Scope CurrentUser
+              
+              Write-Host "Setting PSGallery as trusted..."
+              Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+              
               Write-Host "Installing ExchangeOnlineManagement module..."
-              Install-Module -Name ExchangeOnlineManagement -Force -AllowClobber -Scope CurrentUser -Confirm:$false
+              Install-Module -Name ExchangeOnlineManagement -Repository PSGallery -Force -AllowClobber -Scope CurrentUser -SkipPublisherCheck
+              
+              Write-Host "Module installed successfully."
+          } else {
+              Write-Host "ExchangeOnlineManagement module already available."
           }
+          
+          Write-Host "Importing module..."
+          Import-Module ExchangeOnlineManagement -Force
 
       - name: Run PowerShell Command
         shell: pwsh
