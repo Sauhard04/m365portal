@@ -1,5 +1,5 @@
 {
-  "timestamp": 1768795605680,
+  "timestamp": 1768800173041,
   "data": {
     "overview": {
       "statistics": {
@@ -94,7 +94,7 @@
           {
             "name": "Last 24h",
             "failed": 0,
-            "successful": 0
+            "successful": 5
           }
         ],
         "emailTrend": [
@@ -127,7 +127,7 @@
           },
           {
             "subject": "Sign-in Success",
-            "value": 96,
+            "value": 100,
             "fullMark": 100
           }
         ],
