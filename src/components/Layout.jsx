@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../contexts/ThemeContext';
 import { useMsal } from '@azure/msal-react';
 import {
-    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, BarChart3, Command, BookOpen, Sun, Moon, Eye
+    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, BarChart3, Command, BookOpen, Sun, Moon, Eye, User
 } from 'lucide-react';
 import SearchModal from './SearchModal';
 import Logo from './Logo';
@@ -16,6 +16,7 @@ const ServiceLayout = () => {
     const { theme, toggleTheme } = useTheme();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
     const [unresolvedAlertsCount, setUnresolvedAlertsCount] = useState(0);
     const username = localStorage.getItem('m365_user') || 'Admin';
 
@@ -70,7 +71,9 @@ const ServiceLayout = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('m365_user');
-        navigate('/');
+        instance.logoutRedirect({
+            postLogoutRedirectUri: window.location.origin
+        });
     };
 
     const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');
@@ -208,32 +211,74 @@ const ServiceLayout = () => {
                             )}
                         </button>
                         <div style={{ width: '1px', height: '16px', background: 'var(--glass-border)' }}></div>
-                        <button
-                            onClick={() => navigate('/service/admin/profile')}
-                            className="flex-center flex-gap-2"
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '8px', transition: 'background 0.2s' }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = 'hsla(0,0%,100%,0.05)'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
-                        >
-                            <div style={{ textAlign: 'right' }}>
-                                <div className="font-semibold" style={{ fontSize: '11px', color: '#fff' }}>{username}</div>
-                                <div style={{ fontSize: '10px', color: '#9ca3af', textTransform: 'uppercase', fontWeight: 700 }}>Global Admin</div>
-                            </div>
-                            <div className="avatar" style={{
-                                width: '24px',
-                                height: '24px',
-                                background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-indigo))',
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontWeight: 700,
-                                fontSize: '9px',
-                                border: '1px solid var(--glass-border)'
-                            }}>
-                                {username.substring(0, 2).toUpperCase()}
-                            </div>
-                        </button>
+                        <div style={{ position: 'relative' }}>
+                            <button
+                                onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                                className="flex-center flex-gap-2"
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '8px', transition: 'background 0.2s' }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = 'hsla(0,0%,100%,0.05)'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                            >
+                                <div style={{ textAlign: 'right' }}>
+                                    <div className="font-semibold" style={{ fontSize: '11px', color: '#fff' }}>{username}</div>
+                                    <div style={{ fontSize: '10px', color: '#9ca3af', textTransform: 'uppercase', fontWeight: 700 }}>Global Admin</div>
+                                </div>
+                                <div className="avatar" style={{
+                                    width: '24px',
+                                    height: '24px',
+                                    background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-indigo))',
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontWeight: 700,
+                                    fontSize: '9px',
+                                    border: '1px solid var(--glass-border)'
+                                }}>
+                                    {username.substring(0, 2).toUpperCase()}
+                                </div>
+                            </button>
+
+                            {/* Profile Dropdown */}
+                            {isProfileMenuOpen && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: 'calc(100% + 8px)',
+                                    right: 0,
+                                    width: '180px',
+                                    background: '#1e293b',
+                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    borderRadius: '12px',
+                                    padding: '6px',
+                                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)',
+                                    zIndex: 100,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '2px'
+                                }}>
+                                    <button
+                                        onClick={() => {
+                                            navigate('/service/admin/profile');
+                                            setIsProfileMenuOpen(false);
+                                        }}
+                                        className="flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-all hover:bg-white/5 text-gray-300 hover:text-white"
+                                        style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+                                    >
+                                        <User size={15} />
+                                        <span>Profile</span>
+                                    </button>
+                                    <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', margin: '4px 0' }} />
+                                    <button
+                                        onClick={handleLogout}
+                                        className="flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-all hover:bg-red-500/10 text-red-400 hover:text-red-300"
+                                        style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+                                    >
+                                        <LogOut size={15} />
+                                        <span>Sign Out</span>
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </header>
 

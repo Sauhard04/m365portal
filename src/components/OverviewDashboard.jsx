@@ -12,9 +12,10 @@ import {
 } from 'recharts';
 import {
     Users, Smartphone, CreditCard, Shield, Activity,
-    TrendingUp, AlertTriangle, Mail, Loader2, Download,
+    TrendingUp, AlertTriangle, Mail, Download,
     ShieldCheck, Lock, LayoutGrid, RefreshCw
 } from 'lucide-react';
+import Loader3D from './Loader3D';
 import { DataPersistenceService } from '../services/dataPersistence';
 import { MiniSparkline, MiniProgressBar, MiniSegmentedBar } from './charts/MicroCharts';
 import { CustomTooltip, ChartHeader } from './charts/CustomTooltip';
@@ -29,6 +30,9 @@ const OverviewDashboard = () => {
     const fetchOverviewData = async (isManual = false) => {
         if (accounts.length === 0) return;
         setLoading(true);
+
+        const startTime = Date.now();
+
         try {
             const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
             const client = new GraphService(response.accessToken).client;
@@ -59,7 +63,15 @@ const OverviewDashboard = () => {
             console.error('Overview fetch error:', err);
             setError('Failed to load overview data');
         } finally {
-            setLoading(false);
+            if (isManual) {
+                const elapsedTime = Date.now() - startTime;
+                const remainingTime = Math.max(0, 2000 - elapsedTime);
+                setTimeout(() => {
+                    setLoading(false);
+                }, remainingTime);
+            } else {
+                setLoading(false);
+            }
         }
     };
 
@@ -84,9 +96,7 @@ const OverviewDashboard = () => {
 
     if (loading) {
         return (
-            <div className="flex-center" style={{ height: '60vh' }}>
-                <Loader2 className="animate-spin" size={48} color="var(--accent-purple)" />
-            </div>
+            <Loader3D showOverlay={true} />
         );
     }
 

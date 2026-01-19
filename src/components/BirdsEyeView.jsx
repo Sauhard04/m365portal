@@ -10,6 +10,7 @@ import {
     Laptop, CheckCircle, AlertTriangle, FileWarning,
     Smartphone, Monitor, Command, RefreshCw
 } from 'lucide-react';
+import Loader3D from './Loader3D';
 
 const BirdsEyeView = () => {
     const { instance, accounts } = useMsal();
@@ -45,6 +46,8 @@ const BirdsEyeView = () => {
         }
 
         if (isManual) setLoading(true);
+
+        const startTime = Date.now();
 
         try {
             const request = {
@@ -159,7 +162,15 @@ const BirdsEyeView = () => {
         } catch (error) {
             console.error("Failed to fetch Bird's Eye data", error);
         } finally {
-            setLoading(false);
+            if (isManual) {
+                const elapsedTime = Date.now() - startTime;
+                const remainingTime = Math.max(0, 2000 - elapsedTime);
+                setTimeout(() => {
+                    setLoading(false);
+                }, remainingTime);
+            } else {
+                setLoading(false);
+            }
         }
     };
 
@@ -168,10 +179,6 @@ const BirdsEyeView = () => {
             fetchData();
         }
     }, [instance, accounts]);
-
-    if (loading) {
-        return <div className="p-10 text-slate-500">Loading Overview...</div>;
-    }
 
     const sections = [
         {
@@ -323,6 +330,7 @@ const BirdsEyeView = () => {
 
     return (
         <div style={{ padding: '24px', height: '100%', overflowY: 'auto', backgroundColor: 'var(--bg-darker)', color: 'var(--text-primary)', fontFamily: 'Inter, sans-serif' }}>
+            {loading && <Loader3D showOverlay={true} />}
             <header style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--glass-bg)', padding: '16px', borderRadius: '12px', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--glass-border)' }}>
                 <div>
                     <h1 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
@@ -351,16 +359,9 @@ const BirdsEyeView = () => {
                         }}
                     >
                         <RefreshCw size={14} className={loading && "animate-spin"} />
-                        Refresh
+
                     </button>
-                    <span>Live Monitor</span>
-                    <div style={{ display: 'flex', marginLeft: '-8px' }}>
-                        {sections.map((s, i) => (
-                            <div key={i} style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--glass-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--glass-border)', boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', position: 'relative', zIndex: 10, marginLeft: i > 0 ? '-8px' : 0 }}>
-                                <s.icon size={14} style={{ color: s.color }} />
-                            </div>
-                        ))}
-                    </div>
+
                 </div>
             </header>
 

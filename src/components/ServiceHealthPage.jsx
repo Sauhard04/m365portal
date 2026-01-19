@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
-import { Activity, Loader2, CheckCircle2, AlertTriangle, ArrowLeft, ChevronDown, ChevronRight, AlertOctagon, Info, XCircle, ExternalLink } from 'lucide-react';
+import { Activity, CheckCircle2, AlertTriangle, ArrowLeft, ChevronDown, ChevronRight, AlertOctagon, Info, XCircle, ExternalLink } from 'lucide-react';
+import Loader3D from './Loader3D';
 
 const ServiceHealthPage = () => {
     const { instance, accounts } = useMsal();
@@ -41,9 +42,7 @@ const ServiceHealthPage = () => {
 
     if (loading) {
         return (
-            <div className="flex-center" style={{ height: '60vh' }}>
-                <Loader2 className="animate-spin" size={40} color="var(--accent-success)" />
-            </div>
+            <Loader3D showOverlay={true} />
         );
     }
 

@@ -5,7 +5,8 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { DataPersistenceService } from '../services/dataPersistence';
 import { motion } from 'framer-motion';
-import { Settings, RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Loader2, Shield, Activity, AlertTriangle, Users, Mail, Globe, CreditCard, LayoutGrid, Trash2, ArrowRight, Lock, Terminal } from 'lucide-react';
+import { Settings, RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCircle, Shield, Activity, AlertTriangle, Users, Mail, Globe, CreditCard, LayoutGrid, Trash2, ArrowRight, Lock, Terminal } from 'lucide-react';
+import Loader3D from './Loader3D';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, ResponsiveContainer } from 'recharts';
 import { MiniSparkline, MiniProgressBar, MiniSegmentedBar } from './charts/MicroCharts';
 
@@ -52,6 +53,9 @@ const ServicePage = ({ serviceId: propServiceId }) => {
     const fetchData = async (isManual = false) => {
         if (accounts.length === 0) return;
         setLoading(true);
+
+        const startTime = Date.now();
+
         setError(null);
         try {
             const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
@@ -131,7 +135,15 @@ const ServicePage = ({ serviceId: propServiceId }) => {
             console.error("Fetch error:", err);
             setError("Connectivity issue with Microsoft Graph.");
         } finally {
-            setLoading(false);
+            if (isManual) {
+                const elapsedTime = Date.now() - startTime;
+                const remainingTime = Math.max(0, 2000 - elapsedTime);
+                setTimeout(() => {
+                    setLoading(false);
+                }, remainingTime);
+            } else {
+                setLoading(false);
+            }
         }
     };
 
@@ -527,9 +539,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
             )}
 
             {loading && (
-                <div className="flex-center" style={{ padding: '60px' }}>
-                    <Loader2 className="animate-spin" size={40} color="var(--accent-blue)" />
-                </div>
+                <Loader3D showOverlay={true} />
             )}
         </div>
     );

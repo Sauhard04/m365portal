@@ -6,7 +6,8 @@ import { GraphService } from '../services/graphService';
 import { UsersService, GroupsService, DevicesService, SubscriptionsService, RolesService } from '../services/entra';
 import { DataPersistenceService } from '../services/dataPersistence';
 import { motion } from 'framer-motion';
-import { Users, Shield, Smartphone, CreditCard, Loader2, LayoutGrid, ArrowRight, ShieldCheck, Activity, RefreshCw } from 'lucide-react';
+import { Users, Shield, Smartphone, CreditCard, LayoutGrid, ArrowRight, ShieldCheck, Activity, RefreshCw } from 'lucide-react';
+import Loader3D from './Loader3D';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { MiniSegmentedBar, MiniSeverityStrip } from './charts/MicroCharts';
 
@@ -28,6 +29,9 @@ const EntraDashboard = () => {
     const fetchDashboardData = async (isManual = false) => {
         if (accounts.length === 0) return;
         setLoading(true);
+
+        const startTime = Date.now();
+
         try {
             const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
             const client = new GraphService(response.accessToken).client;
@@ -86,7 +90,15 @@ const EntraDashboard = () => {
         } catch (error) {
             console.error("Dashboard fetch error:", error);
         } finally {
-            setLoading(false);
+            if (isManual) {
+                const elapsedTime = Date.now() - startTime;
+                const remainingTime = Math.max(0, 2000 - elapsedTime);
+                setTimeout(() => {
+                    setLoading(false);
+                }, remainingTime);
+            } else {
+                setLoading(false);
+            }
         }
     };
 
@@ -151,9 +163,7 @@ const EntraDashboard = () => {
             </header>
 
             {loading ? (
-                <div className="flex-center" style={{ height: '400px' }}>
-                    <Loader2 className="animate-spin" size={40} color="var(--accent-blue)" />
-                </div>
+                <Loader3D showOverlay={true} />
             ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px', alignItems: 'start' }}>
                     {/* Left Grid with Micro Figures */}
