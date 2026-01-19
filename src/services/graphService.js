@@ -373,4 +373,32 @@ export class GraphService {
             return [];
         }
     }
+
+    async getPurviewStats() {
+        try {
+            const [labels, retention, cases] = await Promise.all([
+                this.client.api("/beta/security/informationProtection/sensitivityLabels").get().catch(() => ({ value: [] })),
+                this.client.api("/beta/security/labels/retentionLabels").get().catch(() => ({ value: [] })),
+                this.client.api("/beta/compliance/ediscovery/cases").get().catch(() => ({ value: [] }))
+            ]);
+
+            // Attempt to fetch searches for the first case if any exist
+            let searchCount = 0;
+            if (cases.value && cases.value.length > 0) {
+                const caseId = cases.value[0].id;
+                const searches = await this.client.api(`/beta/compliance/ediscovery/cases/${caseId}/searches`).get().catch(() => ({ value: [] }));
+                searchCount = searches.value?.length || 0;
+            }
+
+            return {
+                labels: labels.value?.length || 0,
+                retentionPolicies: retention.value?.length || 0,
+                dlpPolicies: searchCount,
+                dlpAlerts: cases.value?.length || 0
+            };
+        } catch (error) {
+            console.error("Purview Graph Fetch Failure:", error);
+            return { labels: 0, retentionPolicies: 0, dlpPolicies: 0, dlpAlerts: 0 };
+        }
+    }
 }

@@ -1,0 +1,127 @@
+name: Remote PowerShell Terminal
+
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: 'PowerShell command to execute'
+        required: true
+        type: string
+      scc_token:
+        description: 'Access token for Security & Compliance Center'
+        required: false
+        type: string
+      organization:
+        description: 'Organization name (tenant domain)'
+        required: false
+        type: string
+      user_upn:
+        description: 'User Principal Name'
+        required: false
+        type: string
+
+jobs:
+  execute:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PowerShell Modules
+        shell: pwsh
+        run: |
+          Write-Host "Setting up PowerShell environment..."
+          
+          # Set TLS to 1.2 for secure downloads
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          
+          Write-Host "Checking for ExchangeOnlineManagement module..."
+          $module = Get-Module -ListAvailable -Name ExchangeOnlineManagement
+          
+          if (-not $module) {
+              Write-Host "Installing ExchangeOnlineManagement module..."
+              
+              # Direct installation without NuGet provider setup
+              Install-Module -Name ExchangeOnlineManagement -Force -AllowClobber -Scope CurrentUser -SkipPublisherCheck -AcceptLicense -ErrorAction Stop
+              
+              Write-Host "Module installed successfully."
+          } else {
+              Write-Host "ExchangeOnlineManagement module already available (version: $($module.Version))."
+          }
+          
+          Write-Host "Importing module..."
+          Import-Module ExchangeOnlineManagement -Force -ErrorAction Stop
+          
+          Write-Host "Module imported. Available cmdlets:"
+          Get-Command -Module ExchangeOnlineManagement | Select-Object -First 5 | ForEach-Object { Write-Host "  - $($_.Name)" }
+
+      - name: Run PowerShell Command
+        shell: pwsh
+        env:
+          INPUT_COMMAND: ${{ github.event.inputs.command }}
+          INPUT_TOKEN: ${{ github.event.inputs.scc_token }}
+          INPUT_ORG: ${{ github.event.inputs.organization }}
+          INPUT_UPN: ${{ github.event.inputs.user_upn }}
+        run: |
+          $command = $env:INPUT_COMMAND
+          $sccToken = $env:INPUT_TOKEN
+          $organization = $env:INPUT_ORG
+          $userUpn = $env:INPUT_UPN
+          
+          if ($sccToken) {
+              Write-Host "Authenticating to Purview (SCC) using provided token..."
+              try {
+                  $connectParams = @{
+                      AccessToken = $sccToken
+                      ErrorAction = 'Stop'
+                  }
+                  
+                  # Add Organization or UserPrincipalName based on what's provided
+                  if ($organization) {
+                      $connectParams.Organization = $organization
+                      Write-Host "Using Organization: $organization"
+                  } elseif ($userUpn) {
+                      $connectParams.UserPrincipalName = $userUpn
+                      Write-Host "Using UserPrincipalName: $userUpn"
+                  } else {
+                      Write-Error "Either Organization or UserPrincipalName must be provided with AccessToken"
+                      exit 1
+                  }
+                  
+                  Connect-IPPSSession @connectParams
+                  Write-Host "Connected to Security & Compliance Center."
+                  
+                  # Verify cmdlets are available
+                  $labelCmd = Get-Command Get-Label -ErrorAction SilentlyContinue
+                  $caseCmd = Get-Command Get-ComplianceCase -ErrorAction SilentlyContinue
+                  
+                  if ($labelCmd) {
+                      Write-Host "✓ Get-Label cmdlet is available"
+                  } else {
+                      Write-Warning "Get-Label cmdlet not found after connection"
+                  }
+                  
+                  if ($caseCmd) {
+                      Write-Host "✓ Get-ComplianceCase cmdlet is available"
+                  } else {
+                      Write-Warning "Get-ComplianceCase cmdlet not found after connection"
+                  }
+                  
+              } catch {
+                  Write-Error "Failed to connect to SCC: $($_.Exception.Message)"
+                  exit 1
+              }
+          } else {
+              Write-Host "No token provided - running command without SCC authentication"
+          }
+          
+          Write-Host "Executing command..."
+          $ErrorActionPreference = 'Continue'
+          try {
+              Invoke-Expression $command | Out-String -Width 160
+          } catch {
+              Write-Error $_
+              exit 1
+          } finally {
+              Write-Host "---END_OF_COMMAND---"
+          }

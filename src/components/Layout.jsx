@@ -216,8 +216,8 @@ const ServiceLayout = () => {
                             onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
                         >
                             <div style={{ textAlign: 'right' }}>
-                                <div className="font-semibold" style={{ fontSize: '11px', color: 'var(--text-primary)' }}>{username}</div>
-                                <div style={{ fontSize: '7px', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700 }}>Global Admin</div>
+                                <div className="font-semibold" style={{ fontSize: '11px', color: '#fff' }}>{username}</div>
+                                <div style={{ fontSize: '10px', color: '#9ca3af', textTransform: 'uppercase', fontWeight: 700 }}>Global Admin</div>
                             </div>
                             <div className="avatar" style={{
                                 width: '24px',

@@ -143,15 +143,7 @@ const OverviewDashboard = () => {
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    style={{
-                        background: 'linear-gradient(135deg, rgba(17, 24, 39, 0.98), rgba(31, 41, 55, 0.98))',
-                        padding: '18px 20px',
-                        border: '1.5px solid rgba(139, 92, 246, 0.3)',
-                        borderRadius: '16px',
-                        backdropFilter: 'blur(30px)',
-                        boxShadow: '0 12px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(139, 92, 246, 0.1), 0 0 20px rgba(139, 92, 246, 0.15)',
-                        minWidth: '180px'
-                    }}
+                    className="recharts-custom-tooltip"
                 >
                     {label && (
                         <p style={{

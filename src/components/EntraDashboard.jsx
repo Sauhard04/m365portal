@@ -302,7 +302,7 @@ const EntraDashboard = () => {
                                 transform: 'translate(-50%, -50%)',
                                 textAlign: 'center'
                             }}>
-                                <span style={{ fontSize: '42px', fontWeight: 800, display: 'block', lineHeight: 1, background: 'linear-gradient(135deg, #fff, #888)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                                <span className="compliance-score-text" style={{ fontSize: '42px', fontWeight: 800, display: 'block', lineHeight: 1 }}>
                                     {scorePercentage}%
                                 </span>
                                 <span style={{ fontSize: '11px', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>Secure</span>

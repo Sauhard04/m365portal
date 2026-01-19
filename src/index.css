@@ -169,6 +169,19 @@ h6 {
   -webkit-text-fill-color: transparent;
 }
 
+.compliance-score-text {
+  background: linear-gradient(135deg, #fff, #888);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+[data-theme="light"] .compliance-score-text {
+  background: none;
+  -webkit-text-fill-color: black;
+  color: black;
+}
+
 .primary-gradient-text {
   background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-cyan) 100%);
   -webkit-background-clip: text;
@@ -616,6 +629,38 @@ select.input option {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-dim);
+}
+
+/* Chart Tooltips */
+.recharts-custom-tooltip {
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.98), rgba(31, 41, 55, 0.98));
+  padding: 18px 20px;
+  border: 1.5px solid rgba(139, 92, 246, 0.3);
+  border-radius: 16px;
+  backdrop-filter: blur(30px);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(139, 92, 246, 0.1), 0 0 20px rgba(139, 92, 246, 0.15);
+  min-width: 180px;
+}
+
+.recharts-custom-tooltip p {
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .recharts-custom-tooltip {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .recharts-custom-tooltip p {
+  color: black !important;
+  border-bottom-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="light"] .recharts-custom-tooltip span {
+  color: #333 !important;
+  -webkit-text-fill-color: #333 !important;
+  background: none !important;
 }
 
 /* Animations */

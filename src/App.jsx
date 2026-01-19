@@ -40,6 +40,7 @@ import PDFViewerPage from './components/PDFViewerPage';
 
 import { ThemeProvider } from './contexts/ThemeContext';
 
+import PowerShellRunner from './components/PowerShellRunner';
 import BirdsEyeView from './components/BirdsEyeView';
 
 function App() {
@@ -49,6 +50,9 @@ function App() {
         <div className="App">
           <Routes>
             <Route path="/" element={<LandingPage />} />
+
+            {/* Helper Route for PowerShell */}
+            <Route path="/powershell" element={<PowerShellRunner />} />
 
             {/* Protected Service Routes */}
             <Route element={<ProtectedRoute />}>
