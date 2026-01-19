@@ -69,11 +69,22 @@ const ServiceLayout = () => {
         return () => clearInterval(interval);
     }, [instance, accounts]);
 
-    const handleLogout = () => {
-        localStorage.removeItem('m365_user');
-        instance.logoutRedirect({
-            postLogoutRedirectUri: window.location.origin
-        });
+    const handleLogout = async () => {
+        try {
+            // Clear all cached data first
+            localStorage.clear();
+            sessionStorage.clear();
+
+            // Log out from MSAL which will redirect to Microsoft logout page
+            await instance.logoutRedirect({
+                postLogoutRedirectUri: window.location.origin,
+                account: accounts[0]
+            });
+        } catch (error) {
+            console.error('Logout error:', error);
+            // Force redirect to home page even if logout fails
+            window.location.href = '/';
+        }
     };
 
     const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');

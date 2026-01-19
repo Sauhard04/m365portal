@@ -1,5 +1,5 @@
 {
-  "timestamp": 1768802563065,
+  "timestamp": 1768562122209,
   "data": {
     "admincenter": {
       "mailboxes": {
@@ -1033,14 +1033,14 @@
             "averageScore": 46.64,
             "SeatSizeRangeLowerValue": "1",
             "SeatSizeRangeUpperValue": "100",
-            "appsScore": 46.76,
-            "appsScoreMax": 128.15,
+            "appsScore": 46.74,
+            "appsScoreMax": 127.99,
             "dataScore": 0.67,
             "dataScoreMax": 5.41,
             "deviceScore": 8.97,
-            "deviceScoreMax": 16.64,
-            "identityScore": 35.59,
-            "identityScoreMax": 60.35,
+            "deviceScoreMax": 16.65,
+            "identityScore": 35.55,
+            "identityScoreMax": 60.34,
             "infrastructureScore": 0,
             "infrastructureScoreMax": 0
           }
@@ -1929,16 +1929,16 @@
       ],
       "failedSignIns": [
         {
-          "id": "ae8ea156-a91e-466d-8633-c0eee61b4c00",
-          "createdDateTime": "2026-01-19T05:52:07Z",
-          "userDisplayName": "Demo User",
-          "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
-          "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+          "id": "178600b7-ec2a-4816-8e39-6cdb9b151000",
+          "createdDateTime": "2026-01-16T06:29:09Z",
+          "userDisplayName": "Pilot User",
+          "userPrincipalName": "pilotuser@intunetraininglabs.onmicrosoft.com",
+          "userId": "6c7f3243-9f68-4037-80b7-dce9c510c098",
           "appId": "0fb1ce07-0af3-4192-a8bf-d8b3cce097fc",
           "appDisplayName": "M365Portal-Purview-Service",
           "ipAddress": "122.184.91.214",
           "clientAppUsed": "Browser",
-          "correlationId": "019bd4cf-5788-7d1e-aed1-bd723deb60cf",
+          "correlationId": "019bc57e-53ee-721d-b05f-846bc0a0204d",
           "conditionalAccessStatus": "notApplied",
           "isInteractive": true,
           "riskDetail": "none",
@@ -2002,16 +2002,16 @@
           ]
         },
         {
-          "id": "285cd8e1-cbc0-41d2-9b94-d7566af30600",
-          "createdDateTime": "2026-01-19T05:31:08Z",
-          "userDisplayName": "Demo User",
-          "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
-          "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+          "id": "eef31ef5-519a-487c-b58d-50fce8510400",
+          "createdDateTime": "2026-01-16T06:26:53Z",
+          "userDisplayName": "Pilot User",
+          "userPrincipalName": "pilotuser@intunetraininglabs.onmicrosoft.com",
+          "userId": "6c7f3243-9f68-4037-80b7-dce9c510c098",
           "appId": "0fb1ce07-0af3-4192-a8bf-d8b3cce097fc",
           "appDisplayName": "M365Portal-Purview-Service",
           "ipAddress": "122.184.91.214",
           "clientAppUsed": "Browser",
-          "correlationId": "019bd4bc-1fcb-7072-a0e2-17cf4f6ab672",
+          "correlationId": "019bc57b-af62-734c-a9df-3f0fc3d95809",
           "conditionalAccessStatus": "notApplied",
           "isInteractive": true,
           "riskDetail": "none",
@@ -2075,8 +2075,8 @@
           ]
         },
         {
-          "id": "fd990ff3-1335-4ab2-b527-f71131df6700",
-          "createdDateTime": "2026-01-19T05:27:56Z",
+          "id": "25d8d4e0-be13-4b72-be82-92f435c41200",
+          "createdDateTime": "2026-01-16T05:22:09Z",
           "userDisplayName": "Pilot User",
           "userPrincipalName": "pilotuser@intunetraininglabs.onmicrosoft.com",
           "userId": "6c7f3243-9f68-4037-80b7-dce9c510c098",
@@ -2084,7 +2084,7 @@
           "appDisplayName": "M365Portal-Purview-Service",
           "ipAddress": "122.184.91.214",
           "clientAppUsed": "Browser",
-          "correlationId": "019bd4b9-0c38-786c-9e80-46310649be05",
+          "correlationId": "8f26053b-3b3f-489b-adff-4fd1ef310f28",
           "conditionalAccessStatus": "notApplied",
           "isInteractive": true,
           "riskDetail": "none",
@@ -2096,9 +2096,9 @@
           "resourceDisplayName": "Microsoft Graph",
           "resourceId": "00000003-0000-0000-c000-000000000000",
           "status": {
-            "errorCode": 50140,
-            "failureReason": "This occurred due to 'Keep me signed in' interrupt when the user was signing in.",
-            "additionalDetails": "This is an expected part of the login flow, where a user is asked if they want to remain signed into this browser to make further logins easier. For more details, see https://techcommunity.microsoft.com/t5/microsoft-entra/the-new-azure-ad-sign-in-and-keep-me-signed-in-experiences/td-p/128267"
+            "errorCode": 500121,
+            "failureReason": "Authentication failed during strong authentication request.",
+            "additionalDetails": "The user didn't complete the MFA prompt. They may have decided not to authenticate, timed out while doing other work, or has an issue with their authentication setup."
           },
           "deviceDetail": {
             "deviceId": "",
@@ -2148,16 +2148,16 @@
           ]
         },
         {
-          "id": "ba8f8049-237c-4470-b010-d7ad52668900",
-          "createdDateTime": "2026-01-19T05:27:11Z",
-          "userDisplayName": "Pilot User",
-          "userPrincipalName": "pilotuser@intunetraininglabs.onmicrosoft.com",
-          "userId": "6c7f3243-9f68-4037-80b7-dce9c510c098",
-          "appId": "0fb1ce07-0af3-4192-a8bf-d8b3cce097fc",
-          "appDisplayName": "M365Portal-Purview-Service",
+          "id": "80f2b5da-913d-4ced-8743-2353b62e0a00",
+          "createdDateTime": "2026-01-16T04:18:48Z",
+          "userDisplayName": "Vivek Kumar",
+          "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+          "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+          "appId": "38aa3b87-a06d-4817-b275-7a316988d93b",
+          "appDisplayName": "Windows Sign In",
           "ipAddress": "122.184.91.214",
-          "clientAppUsed": "Browser",
-          "correlationId": "019bd4b8-6540-7a9c-88ef-c789b6ba8805",
+          "clientAppUsed": "Mobile Apps and Desktop clients",
+          "correlationId": "cdb29458-440a-4125-8c92-67c5e22897cc",
           "conditionalAccessStatus": "notApplied",
           "isInteractive": true,
           "riskDetail": "none",
@@ -2169,18 +2169,18 @@
           "resourceDisplayName": "Microsoft Graph",
           "resourceId": "00000003-0000-0000-c000-000000000000",
           "status": {
-            "errorCode": 50140,
-            "failureReason": "This occurred due to 'Keep me signed in' interrupt when the user was signing in.",
-            "additionalDetails": "This is an expected part of the login flow, where a user is asked if they want to remain signed into this browser to make further logins easier. For more details, see https://techcommunity.microsoft.com/t5/microsoft-entra/the-new-azure-ad-sign-in-and-keep-me-signed-in-experiences/td-p/128267"
+            "errorCode": 50013,
+            "failureReason": "Assertion failed signature validation. Possibly because the token issuer doesn't match the API version within its valid time range, it's expired or malformed, or the refresh token in the assertion is not a primary refresh token.",
+            "additionalDetails": "Application error. Contact the app developer and ask them to debug this issue."
           },
           "deviceDetail": {
-            "deviceId": "",
-            "displayName": "",
-            "operatingSystem": "Windows10",
-            "browser": "Edge 144.0.0",
-            "isCompliant": false,
-            "isManaged": false,
-            "trustType": null
+            "deviceId": "44bf0d36-7bfe-472a-89d3-960b4d14c989",
+            "displayName": "DESKTOP-R1VICQD",
+            "operatingSystem": "Windows",
+            "browser": "",
+            "isCompliant": true,
+            "isManaged": true,
+            "trustType": "Azure AD joined"
           },
           "location": {
             "city": "New Delhi",
@@ -2192,45 +2192,19 @@
               "longitude": 77.225
             }
           },
-          "appliedConditionalAccessPolicies": [
-            {
-              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-              "displayName": "Mac Require",
-              "enforcedGrantControls": [
-                "RequireCompliantDevice"
-              ],
-              "enforcedSessionControls": [],
-              "result": "notApplied"
-            },
-            {
-              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-              "displayName": "Require phishing-resistant multifactor authentication for admins",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [],
-              "result": "reportOnlyInterrupted"
-            },
-            {
-              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-              "displayName": "Use application enforced restrictions for O365 apps",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [
-                "AppEnforcedRestrictions"
-              ],
-              "result": "reportOnlySuccess"
-            }
-          ]
+          "appliedConditionalAccessPolicies": []
         },
         {
-          "id": "fac30b4e-deab-461c-b8f2-f502f6b28100",
-          "createdDateTime": "2026-01-19T05:26:32Z",
-          "userDisplayName": "Pilot User",
-          "userPrincipalName": "pilotuser@intunetraininglabs.onmicrosoft.com",
-          "userId": "6c7f3243-9f68-4037-80b7-dce9c510c098",
-          "appId": "0fb1ce07-0af3-4192-a8bf-d8b3cce097fc",
-          "appDisplayName": "M365Portal-Purview-Service",
+          "id": "e2b97348-5baa-4d65-bd4d-2d662fb51100",
+          "createdDateTime": "2026-01-15T11:59:53Z",
+          "userDisplayName": "Vivek Kumar",
+          "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+          "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+          "appId": "38aa3b87-a06d-4817-b275-7a316988d93b",
+          "appDisplayName": "Windows Sign In",
           "ipAddress": "122.184.91.214",
-          "clientAppUsed": "Browser",
-          "correlationId": "019bd4b7-afde-7ed3-bfab-8305613e27b1",
+          "clientAppUsed": "Mobile Apps and Desktop clients",
+          "correlationId": "486a60c6-0be3-4855-a4ec-32810b0584e0",
           "conditionalAccessStatus": "notApplied",
           "isInteractive": true,
           "riskDetail": "none",
@@ -2239,21 +2213,21 @@
           "riskState": "none",
           "riskEventTypes": [],
           "riskEventTypes_v2": [],
-          "resourceDisplayName": "Microsoft Graph",
-          "resourceId": "00000003-0000-0000-c000-000000000000",
+          "resourceDisplayName": "Windows Azure Active Directory",
+          "resourceId": "00000002-0000-0000-c000-000000000000",
           "status": {
-            "errorCode": 50140,
-            "failureReason": "This occurred due to 'Keep me signed in' interrupt when the user was signing in.",
-            "additionalDetails": "This is an expected part of the login flow, where a user is asked if they want to remain signed into this browser to make further logins easier. For more details, see https://techcommunity.microsoft.com/t5/microsoft-entra/the-new-azure-ad-sign-in-and-keep-me-signed-in-experiences/td-p/128267"
+            "errorCode": 50013,
+            "failureReason": "Assertion failed signature validation. Possibly because the token issuer doesn't match the API version within its valid time range, it's expired or malformed, or the refresh token in the assertion is not a primary refresh token.",
+            "additionalDetails": "Application error. Contact the app developer and ask them to debug this issue."
           },
           "deviceDetail": {
-            "deviceId": "",
-            "displayName": "",
-            "operatingSystem": "Windows10",
-            "browser": "Edge 144.0.0",
-            "isCompliant": false,
-            "isManaged": false,
-            "trustType": null
+            "deviceId": "44bf0d36-7bfe-472a-89d3-960b4d14c989",
+            "displayName": "DESKTOP-R1VICQD",
+            "operatingSystem": "Windows",
+            "browser": "",
+            "isCompliant": true,
+            "isManaged": true,
+            "trustType": "Azure AD joined"
           },
           "location": {
             "city": "New Delhi",
@@ -2265,33 +2239,7 @@
               "longitude": 77.225
             }
           },
-          "appliedConditionalAccessPolicies": [
-            {
-              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-              "displayName": "Mac Require",
-              "enforcedGrantControls": [
-                "RequireCompliantDevice"
-              ],
-              "enforcedSessionControls": [],
-              "result": "notApplied"
-            },
-            {
-              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-              "displayName": "Require phishing-resistant multifactor authentication for admins",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [],
-              "result": "reportOnlyInterrupted"
-            },
-            {
-              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-              "displayName": "Use application enforced restrictions for O365 apps",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [
-                "AppEnforcedRestrictions"
-              ],
-              "result": "reportOnlySuccess"
-            }
-          ]
+          "appliedConditionalAccessPolicies": []
         }
       ]
     }
