@@ -1,18 +1,18 @@
 {
-  "timestamp": 1768474586014,
+  "timestamp": 1768799167047,
   "data": {
     "intune": {
       "devices": {
         "total": 3,
-        "non_compliant": 1,
-        "inactive": 1
+        "non_compliant": 2,
+        "inactive": 2
       },
       "policies": {
         "compliance": 2,
         "configuration": 8
       },
       "apps": {
-        "total_managed": 6
+        "total_managed": 7
       },
       "security": {
         "baselines": 0,
@@ -21,11 +21,11 @@
     },
     "raw": {
       "totalDevices": 3,
-      "nonCompliantDevices": 1,
-      "inactiveDevices": 1,
+      "nonCompliantDevices": 2,
+      "inactiveDevices": 2,
       "compliancePolicies": 2,
       "configProfiles": 8,
-      "mobileApps": 6,
+      "mobileApps": 7,
       "securityBaselines": 0,
       "adminRoles": 0
     }

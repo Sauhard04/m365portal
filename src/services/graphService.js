@@ -224,4 +224,153 @@ export class GraphService {
             return { total: 0, compliant: 0, osSummary: null };
         }
     }
+
+    /**
+     * Get active user trends over a period
+     * @param {string} period - D7, D30, D90, D180
+     */
+    async getActiveUserTrends(period = 'D30') {
+        try {
+            const response = await this.client
+                .api(`/reports/getOffice365ActiveUserCounts(period='${period}')`)
+                .version('beta')
+                .get();
+
+            // The response is CSV format, we need to parse it
+            if (response && response.value) {
+                return response.value;
+            }
+            return [];
+        } catch (error) {
+            console.warn('Active user trends fetch failed:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Get security alerts with severity breakdown
+     */
+    async getSecurityAlerts() {
+        try {
+            const response = await this.client
+                .api('/security/alerts')
+                .top(100)
+                .orderby('createdDateTime desc')
+                .get();
+
+            return response.value || [];
+        } catch (error) {
+            console.warn('Security alerts fetch failed:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Get mailbox activity trends
+     * @param {string} period - D7, D30
+     */
+    async getMailboxActivityTrend(period = 'D30') {
+        try {
+            const response = await this.client
+                .api(`/reports/getEmailActivityCounts(period='${period}')`)
+                .version('beta')
+                .get();
+
+            return response.value || [];
+        } catch (error) {
+            console.warn('Mailbox activity trend fetch failed:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Get user type distribution (Member vs Guest)
+     */
+    async getUserTypeDistribution() {
+        try {
+            const [members, guests] = await Promise.all([
+                this.client.api('/users/$count')
+                    .header('ConsistencyLevel', 'eventual')
+                    .filter('userType eq \'Member\'')
+                    .get()
+                    .catch(() => 0),
+                this.client.api('/users/$count')
+                    .header('ConsistencyLevel', 'eventual')
+                    .filter('userType eq \'Guest\'')
+                    .get()
+                    .catch(() => 0)
+            ]);
+
+            return { members, guests };
+        } catch (error) {
+            console.warn('User type distribution fetch failed:', error);
+            return { members: 0, guests: 0 };
+        }
+    }
+
+    /**
+     * Get MFA status for users
+     */
+    async getMFAStatus() {
+        try {
+            const response = await this.client
+                .api('/reports/authenticationMethods/userRegistrationDetails')
+                .version('beta')
+                .top(999)
+                .get();
+
+            const details = response.value || [];
+
+            // Categorize users
+            const mfaEnabled = details.filter(u => u.isMfaRegistered).length;
+            const mfaDisabled = details.filter(u => !u.isMfaRegistered).length;
+            const risky = details.filter(u => u.isAdmin && !u.isMfaRegistered).length;
+
+            return { mfaEnabled, mfaDisabled, risky, total: details.length };
+        } catch (error) {
+            console.warn('MFA status fetch failed:', error);
+            return { mfaEnabled: 0, mfaDisabled: 0, risky: 0, total: 0 };
+        }
+    }
+
+    /**
+     * Get sign-in trends (success vs failure)
+     * @param {number} days - Number of days to look back
+     */
+    async getSignInTrends(days = 14) {
+        try {
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - days);
+            const isoDate = startDate.toISOString();
+
+            const response = await this.client
+                .api('/auditLogs/signIns')
+                .filter(`createdDateTime ge ${isoDate}`)
+                .top(999)
+                .orderby('createdDateTime desc')
+                .get();
+
+            const signIns = response.value || [];
+
+            // Group by date and success/failure
+            const trendMap = new Map();
+            signIns.forEach(signIn => {
+                const date = new Date(signIn.createdDateTime).toLocaleDateString();
+                if (!trendMap.has(date)) {
+                    trendMap.set(date, { date, success: 0, failure: 0 });
+                }
+                const entry = trendMap.get(date);
+                if (signIn.status.errorCode === 0) {
+                    entry.success++;
+                } else {
+                    entry.failure++;
+                }
+            });
+
+            return Array.from(trendMap.values()).reverse();
+        } catch (error) {
+            console.warn('Sign-in trends fetch failed:', error);
+            return [];
+        }
+    }
 }

@@ -1,5 +1,5 @@
 {
-  "timestamp": 1768476138836,
+  "timestamp": 1768795605680,
   "data": {
     "overview": {
       "statistics": {
@@ -9,8 +9,8 @@
         "secure_score": 181.5
       },
       "health_and_security": {
-        "failed_signins": 15,
-        "compliance_rate": 67
+        "failed_signins": 0,
+        "compliance_rate": 33
       }
     },
     "raw": {
@@ -25,12 +25,12 @@
         "serviceHealth": [
           {
             "name": "Operational",
-            "value": 23,
+            "value": 22,
             "color": "var(--accent-success)"
           },
           {
             "name": "Issues",
-            "value": 6,
+            "value": 7,
             "color": "var(--accent-error)"
           }
         ],
@@ -44,23 +44,23 @@
         "deviceCompliance": [
           {
             "name": "Compliant",
-            "value": 2,
+            "value": 1,
             "color": "var(--accent-success)"
           },
           {
             "name": "Non-Compliant",
-            "value": 1,
+            "value": 2,
             "color": "var(--accent-error)"
           }
         ],
         "deviceByPlatform": [
           {
-            "name": "macOS",
-            "value": 1
-          },
-          {
             "name": "Windows",
             "value": 2
+          },
+          {
+            "name": "macOS",
+            "value": 1
           }
         ],
         "licenseUsage": [
@@ -93,8 +93,8 @@
         "signIns": [
           {
             "name": "Last 24h",
-            "failed": 15,
-            "successful": 45
+            "failed": 0,
+            "successful": 0
           }
         ],
         "emailTrend": [
@@ -112,7 +112,7 @@
           },
           {
             "subject": "Compliance",
-            "value": 67,
+            "value": 33,
             "fullMark": 100
           },
           {
@@ -127,7 +127,7 @@
           },
           {
             "subject": "Sign-in Success",
-            "value": 75,
+            "value": 96,
             "fullMark": 100
           }
         ],
