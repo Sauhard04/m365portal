@@ -7,6 +7,7 @@ const Loader3D = ({ text = "Loading", scale = 1, showOverlay = false }) => {
         <div className={styles.wrapper}>
             <div className={styles.loaderContainer} style={{ transform: `scale(${scale})` }}>
                 <div className={styles.cube}>
+                    <div className={styles.core}></div>
                     <div className={`${styles.face} ${styles.face1}`}></div>
                     <div className={`${styles.face} ${styles.face2}`}></div>
                     <div className={`${styles.face} ${styles.face3}`}></div>
