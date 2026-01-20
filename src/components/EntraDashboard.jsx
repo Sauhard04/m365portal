@@ -300,39 +300,51 @@ const EntraDashboard = () => {
 
                     {/* Right Chart (1:1 Aspect Ratio) */}
                     <motion.div
+                        initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         className="glass-card"
-                        style={{ padding: '24px', position: 'sticky', top: '24px', minHeight: '480px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+                        style={{
+                            padding: '24px',
+                            position: 'sticky',
+                            top: '24px',
+                            minHeight: '520px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            overflow: 'hidden',
+                            background: 'rgba(15, 23, 42, 0.4)',
+                            backdropFilter: 'blur(20px)',
+                            border: '1px solid rgba(255, 255, 255, 0.08)'
+                        }}
                     >
                         <div className="flex-center flex-gap-4 spacing-v-8" style={{ width: '100%', marginBottom: '16px', flexShrink: 0 }}>
                             <div style={{ padding: '10px', background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-indigo))', borderRadius: '12px', boxShadow: '0 8px 16px rgba(59, 130, 246, 0.2)' }}>
                                 <ShieldCheck size={24} color="white" />
                             </div>
                             <div style={{ flex: 1 }}>
-                                <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0 }}>Compliance Score</h3>
+                                <h3 style={{ fontSize: '18px', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>Compliance Score</h3>
                             </div>
                             <Activity size={18} color="var(--accent-success)" />
                         </div>
 
-                        <div style={{ flex: 1, position: 'relative', width: '100%', minHeight: 0 }}>
+                        <div style={{ flex: 1, position: 'relative', width: '100%', minHeight: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <defs>
                                         <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stopColor="#3b82f6" />
-                                            <stop offset="100%" stopColor="#8b5cf6" />
+                                            <stop offset="0%" stopColor="#60a5fa" />
+                                            <stop offset="100%" stopColor="#3b82f6" />
                                         </linearGradient>
                                     </defs>
                                     <Pie
                                         data={scoreData}
                                         cx="50%"
                                         cy="50%"
-                                        innerRadius="65%"
-                                        outerRadius="85%"
+                                        innerRadius="70%"
+                                        outerRadius="90%"
                                         paddingAngle={0}
                                         dataKey="value"
-                                        startAngle={240}
-                                        endAngle={-60}
+                                        startAngle={90}
+                                        endAngle={-270}
                                         stroke="none"
                                         cornerRadius={10}
                                     >
@@ -349,23 +361,24 @@ const EntraDashboard = () => {
                                 left: '50%',
                                 transform: 'translate(-50%, -50%)',
                                 textAlign: 'center',
-                                pointerEvents: 'none'
+                                pointerEvents: 'none',
+                                animation: 'fadeIn 1s ease-out'
                             }}>
-                                <span className="compliance-score-text" style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, display: 'block', lineHeight: 1 }}>
+                                <span className="compliance-score-text" style={{ fontSize: '48px', fontWeight: 800, display: 'block', lineHeight: 1, color: 'var(--text-primary)', letterSpacing: '-1px' }}>
                                     {scorePercentage}%
                                 </span>
-                                <span style={{ fontSize: '10px', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>Secure</span>
+                                <span style={{ fontSize: '12px', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 700, marginTop: '4px', display: 'block' }}>Secure</span>
                             </div>
                         </div>
 
-                        <div style={{ width: '100%', marginTop: '16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', flexShrink: 0 }}>
-                            <div style={{ textAlign: 'center', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                <p style={{ fontSize: '10px', color: 'var(--text-dim)', marginBottom: '4px' }}>CURRENT</p>
-                                <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>{secureScore.current}</p>
+                        <div style={{ width: '100%', marginTop: 'auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', flexShrink: 0, paddingTop: '24px' }}>
+                            <div style={{ textAlign: 'center', padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                <p style={{ fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px', fontWeight: 600 }}>CURRENT POINTS</p>
+                                <p style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)' }}>{secureScore.current}</p>
                             </div>
-                            <div style={{ textAlign: 'center', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                <p style={{ fontSize: '10px', color: 'var(--text-dim)', marginBottom: '4px' }}>TOTAL</p>
-                                <p style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-dim)' }}>{secureScore.max}</p>
+                            <div style={{ textAlign: 'center', padding: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                <p style={{ fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px', fontWeight: 600 }}>TOTAL POSSIBLE</p>
+                                <p style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-dim)' }}>{secureScore.max}</p>
                             </div>
                         </div>
                     </motion.div>
