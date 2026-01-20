@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import Loader3D from './Loader3D';
 
+import styles from './BirdsEyeView.module.css';
+
 const BirdsEyeView = () => {
     const { instance, accounts } = useMsal();
     const navigate = useNavigate();
@@ -20,12 +22,12 @@ const BirdsEyeView = () => {
         entra: {
             users: 0, signin: 0, licensed: 0, guest: 0,
             groups: 0, securityGroups: 0, distGroups: 0, unifiedGroups: 0,
-            admins: [], // Array of { name, count }
+            admins: [],
             apps: 0, domains: 0, deletedUsers: 0
         },
         licenses: {
             purchased: 0, assigned: 0, total: 0,
-            topSkus: [] // Array of { name, count }
+            topSkus: []
         },
         devices: { total: 0, compliant: 0, entraTotal: 0, osSummary: null },
         security: { score: 0, max: 0, caPolicies: 0, healthIssues: 0 },
@@ -36,9 +38,8 @@ const BirdsEyeView = () => {
 
     const fetchData = async (isManual = false) => {
         if (!isManual) {
-            // Check cache first
             const cached = await DataPersistenceService.load('BirdsEyeView');
-            if (cached && !DataPersistenceService.isExpired('BirdsEyeView', 15)) { // 15 min cache
+            if (cached && !DataPersistenceService.isExpired('BirdsEyeView', 15)) {
                 setStats(cached);
                 setLoading(false);
                 return;
@@ -46,7 +47,6 @@ const BirdsEyeView = () => {
         }
 
         if (isManual) setLoading(true);
-
         const startTime = Date.now();
 
         try {
@@ -57,20 +57,10 @@ const BirdsEyeView = () => {
             const response = await instance.acquireTokenSilent(request);
             const graphService = new GraphService(response.accessToken);
 
-            // Parallel Fetching of Expanded Data
             const [
-                users,
-                groups,
-                devices,
-                secureScore,
-                skus,
-                directoryRoles, // Now fetches all roles
-                apps,
-                domains,
-                deletedUsers,
-                caPolicies,
-                serviceIssues,
-                entraDevicesCount
+                users, groups, devices, secureScore, skus,
+                directoryRoles, apps, domains, deletedUsers,
+                caPolicies, serviceIssues, entraDevicesCount
             ] = await Promise.all([
                 graphService.client.api('/users').select('id,accountEnabled,userType,assignedLicenses').top(999).get().catch(e => ({ value: [] })),
                 graphService.client.api('/groups').select('id,groupTypes,mailEnabled,securityEnabled,resourceProvisioningOptions,visibility').top(999).get().catch(e => ({ value: [] })),
@@ -86,16 +76,11 @@ const BirdsEyeView = () => {
                 graphService.getTotalDevicesCount()
             ]);
 
-
-            // --- Processing Data ---
-
-            // Entra
             const userList = users.value || [];
             const groupList = groups.value || [];
             const skuList = skus.value || [];
             const roleList = directoryRoles || [];
 
-            // Admin Roles Processing
             const importantRoles = ['Global Administrator', 'Security Administrator', 'Exchange Administrator', 'SharePoint Administrator', 'User Administrator', 'Intune Administrator'];
             const adminStats = roleList
                 .filter(r => importantRoles.includes(r.displayName))
@@ -118,7 +103,6 @@ const BirdsEyeView = () => {
                 deletedUsers: deletedUsers.length
             };
 
-            // Licenses
             const topSkus = skuList
                 .sort((a, b) => (b.consumedUnits || 0) - (a.consumedUnits || 0))
                 .slice(0, 3)
@@ -131,29 +115,27 @@ const BirdsEyeView = () => {
                 topSkus: topSkus
             };
 
-            // Teams
             const teamsGroups = groupList.filter(g => g.resourceProvisioningOptions?.includes('Team'));
             const teamsCount = teamsGroups.length;
             const privateTeams = teamsGroups.filter(g => g.visibility === 'Private').length;
             const publicTeams = teamsGroups.filter(g => g.visibility === 'Public').length;
 
-            // Security Extras
             const activeIssues = serviceIssues.length;
             const enabledCaPolicies = (caPolicies || []).filter(p => p.state === 'enabled').length;
 
             const newStats = {
                 entra: userStats,
                 licenses: licenseStats,
-                devices: { ...devices, entraTotal: entraDevicesCount }, // { total, compliant, osSummary }
+                devices: { ...devices, entraTotal: entraDevicesCount },
                 security: {
                     score: secureScore?.currentScore || 0,
                     max: secureScore?.maxScore || 0,
                     caPolicies: enabledCaPolicies,
                     healthIssues: activeIssues
                 },
-                exchange: { mailboxes: userStats.licensed }, // Proxy
+                exchange: { mailboxes: userStats.licensed },
                 teams: { total: teamsCount, private: privateTeams, public: publicTeams },
-                sharepoint: { sites: 0 } // Placeholder
+                sharepoint: { sites: 0 }
             };
 
             setStats(newStats);
@@ -184,257 +166,176 @@ const BirdsEyeView = () => {
         {
             title: "Entra ID",
             icon: ShieldCheck,
-            color: "#0078D4", // Microsoft Blue
-            stats: [
-                { label: "Users", value: stats.entra.users, icon: Users, large: true, path: '/service/entra/users' },
+            color: "#3b82f6",
+            blocks: [
                 {
-                    group: true,
+                    label: "Directory Identities",
+                    value: stats.entra.users,
                     path: '/service/entra/users',
-                    items: [
-                        { label: "Sign-in Enabled", value: stats.entra.signin },
-                        { label: "Licensed Users", value: stats.entra.licensed },
-                        { label: "Guest Users", value: stats.entra.guest },
+                    subValues: [
+                        { label: "Active", value: stats.entra.signin },
+                        { label: "Licensed", value: stats.entra.licensed },
+                        { label: "Guests", value: stats.entra.guest },
                     ]
                 },
                 {
-                    label: "Groups", value: stats.entra.groups, icon: Users, path: '/service/entra/groups',
-                    subtext: `M365 ${stats.entra.unifiedGroups}\nSecurity ${stats.entra.securityGroups}\nDist ${stats.entra.distGroups}`
+                    label: "Resource Distribution",
+                    value: stats.entra.groups,
+                    path: '/service/entra/groups',
+                    subValues: [
+                        { label: "M365", value: stats.entra.unifiedGroups },
+                        { label: "Security", value: stats.entra.securityGroups },
+                        { label: "Dist", value: stats.entra.distGroups }
+                    ]
                 },
                 {
-                    label: "Subscriptions", value: stats.licenses.total, icon: CreditCard, path: '/service/entra/subscriptions',
-                    customRender: (
-                        <div style={{ marginTop: '8px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '11px', color: 'var(--text-dim)' }}>
-                                <span>{stats.licenses.assigned} assigned / {stats.licenses.purchased} total</span>
+                    label: "Licenses",
+                    value: stats.licenses.total,
+                    path: '/service/entra/subscriptions',
+                    custom: (
+                        <div>
+                            <div className={styles.progressBarContainer}>
+                                <div
+                                    className={styles.progressBarFill}
+                                    style={{ width: `${(stats.licenses.assigned / stats.licenses.purchased) * 100 || 0}%`, background: 'var(--accent-blue)' }}
+                                />
                             </div>
-                            {stats.licenses.topSkus.map((sku, i) => (
-                                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '2px' }}>
-                                    <span style={{ overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', maxWidth: '140px' }} title={sku.name}>{sku.name}</span>
-                                    <span style={{ fontWeight: 600 }}>{sku.count}</span>
-                                </div>
-                            ))}
+                            <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
+                                {stats.licenses.assigned} assigned / {stats.licenses.purchased} seats
+                            </div>
                         </div>
                     )
                 },
                 {
-                    label: "Admin Roles", value: stats.entra.admins.reduce((sum, r) => sum + r.count, 0), icon: UserCog, path: '/service/entra/admins',
-                    customRender: (
-                        <div style={{ marginTop: '8px' }}>
-                            {stats.entra.admins.slice(0, 3).map((role, i) => (
-                                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '2px' }}>
-                                    <span>{role.name}</span>
-                                    <span style={{ fontWeight: 600 }}>{role.count}</span>
-                                </div>
-                            ))}
-                            {stats.entra.admins.length > 3 && <div style={{ fontSize: '10px', textAlign: 'right', color: 'var(--text-dim)' }}>+ {stats.entra.admins.length - 3} more roles</div>}
-                        </div>
-                    )
-                },
-                {
-                    group: true,
-                    items: [
-                        { label: "Applications", value: stats.entra.apps, icon: AppWindow, path: '/service/entra/apps' },
-                        { label: "Domains", value: stats.entra.domains, icon: Globe, path: '/service/admin/domains' },
-                        { label: "Deleted Users", value: stats.entra.deletedUsers, icon: UserX, path: '/service/admin/deleted-users' }
-                    ]
+                    label: "Privileged Access",
+                    value: stats.entra.admins.reduce((sum, r) => sum + r.count, 0),
+                    path: '/service/entra/admins',
+                    subValues: stats.entra.admins.slice(0, 3).map(r => ({ label: r.name, value: r.count }))
                 }
             ]
         },
         {
-            title: "Device Management",
+            title: "Endpoint Management",
             icon: Laptop,
-            color: "#9332BF", // Intune Purple
-            stats: [
-                { label: "Total Devices", value: stats.devices.entraTotal, icon: Laptop, large: true, path: '/service/intune/devices' },
+            color: "#a855f7",
+            blocks: [
                 {
-                    label: "OS Breakdown", value: stats.devices.total > 0 ? "" : "No Data", icon: Command, path: '/service/intune/devices',
-                    customRender: stats.devices.osSummary ? (
-                        <div style={{ marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Monitor size={12} /> Windows</div>
-                                <span style={{ fontWeight: 600 }}>{stats.devices.osSummary.windowsCount}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Smartphone size={12} /> iOS</div>
-                                <span style={{ fontWeight: 600 }}>{stats.devices.osSummary.iosCount}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Smartphone size={12} /> Android</div>
-                                <span style={{ fontWeight: 600 }}>{stats.devices.osSummary.androidCount}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Laptop size={12} /> macOS</div>
-                                <span style={{ fontWeight: 600 }}>{stats.devices.osSummary.macOSCount}</span>
-                            </div>
-                        </div>
-                    ) : (
-                        <div style={{ fontSize: '12px', color: 'var(--text-dim)' }}>Use Intune for OS details</div>
-                    )
+                    label: "Fleet Inventory",
+                    value: stats.devices.entraTotal,
+                    path: '/service/intune/devices',
+                    subValues: stats.devices.osSummary ? [
+                        { label: "Windows", value: stats.devices.osSummary.windowsCount },
+                        { label: "iOS", value: stats.devices.osSummary.iosCount },
+                        { label: "macOS", value: stats.devices.osSummary.macOSCount }
+                    ] : []
                 },
                 {
-                    label: "Intune Status", value: `${stats.devices.compliant}/${stats.devices.total}`, icon: CheckCircle, path: '/service/intune/devices',
-                    subtext: `Managed ${stats.devices.total}\nCompliant ${stats.devices.compliant}`
+                    label: "Intune Compliance",
+                    value: `${stats.devices.compliant}/${stats.devices.total}`,
+                    path: '/service/intune/devices',
+                    subValues: [
+                        { label: "Managed", value: stats.devices.total },
+                        { label: "Healthy", value: stats.devices.compliant }
+                    ]
                 }
             ]
         },
         {
-            title: "Teams & Groups",
+            title: "Collaboration",
             icon: Users,
-            color: "#5059C9", // Teams Purple
-            customIcon: (props) => (
-                <div style={{ backgroundColor: '#5059C9', color: 'white', padding: '4px', borderRadius: '6px' }}>
-                    <span style={{ fontWeight: 'bold', fontSize: '12px' }}>T</span>
-                </div>
-            ),
-            stats: [
-                { label: "Total Teams", value: stats.teams.total, large: true, path: '/service/entra/groups' },
+            color: "#6366f1",
+            blocks: [
                 {
-                    label: "Visibility", value: "", icon: Globe,
-                    customRender: (
-                        <div style={{ marginTop: '0px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                                <span>Private</span>
-                                <span style={{ fontWeight: 600 }}>{stats.teams.private}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                                <span>Public</span>
-                                <span style={{ fontWeight: 600 }}>{stats.teams.public}</span>
-                            </div>
-                        </div>
-                    )
+                    label: "Teams Infrastructure",
+                    value: stats.teams.total,
+                    path: '/service/entra/groups',
+                    subValues: [
+                        { label: "Private", value: stats.teams.private },
+                        { label: "Public", value: stats.teams.public }
+                    ]
                 }
             ]
         },
         {
-            title: "Security & Health",
+            title: "Tenant Posture",
             icon: Shield,
-            color: "#D83B01", // Microsoft Security Red/Orange
-            stats: [
-                { label: "Secure Score", value: `${stats.security.score}/${stats.security.max}`, icon: ShieldCheck, large: true, path: '/service/admin/secure-score' },
+            color: "#f59e0b",
+            blocks: [
                 {
-                    label: "Health Status", value: stats.security.healthIssues > 0 ? "Alert" : "Healthy", icon: Activity, path: '/service/admin/service-health',
-                    customRender: (
-                        <div style={{ marginTop: '4px', fontSize: '12px', color: 'var(--text-dim)', textAlign: 'right' }}>
-                            {stats.security.healthIssues > 0 ? (
-                                <span style={{ fontWeight: 600, color: '#ef4444' }}>{stats.security.healthIssues} Active Issues</span>
-                            ) : (
-                                <span style={{ fontWeight: 600, color: '#10b981' }}>All Systems Operational</span>
-                            )}
+                    label: "Secure Score",
+                    value: `${stats.security.score}/${stats.security.max}`,
+                    path: '/service/admin/secure-score',
+                    custom: (
+                        <div className={styles.progressBarContainer}>
+                            <div
+                                className={styles.progressBarFill}
+                                style={{ width: `${(stats.security.score / stats.security.max) * 100 || 0}%`, background: 'var(--accent-warning)' }}
+                            />
                         </div>
                     )
                 },
-                { label: "Active CA Policies", value: stats.security.caPolicies, icon: FileWarning, path: '/service/entra' } // CA Policies usually in Entra/Security
+                {
+                    label: "Service Health",
+                    value: stats.security.healthIssues > 0 ? "Alert" : "Healthy",
+                    path: '/service/admin/service-health',
+                    custom: (
+                        <span className={styles.statusText} style={{ color: stats.security.healthIssues > 0 ? '#ef4444' : '#10b981' }}>
+                            {stats.security.healthIssues > 0 ? `${stats.security.healthIssues} Active Issues` : "All Systems Operational"}
+                        </span>
+                    )
+                }
             ]
         }
     ];
 
     return (
-        <div style={{ padding: '24px', height: '100%', overflowY: 'auto', backgroundColor: 'var(--bg-darker)', color: 'var(--text-primary)', fontFamily: 'Inter, sans-serif' }}>
+        <div className={styles.container}>
             {loading && <Loader3D showOverlay={true} />}
-            <header style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--glass-bg)', padding: '16px', borderRadius: '12px', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--glass-border)' }}>
+
+            <header className={styles.header}>
                 <div>
-                    <h1 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
-                        Microsoft 365 - Bird's Eye View
-                    </h1>
-                    <p style={{ fontSize: '14px', color: 'var(--text-dim)' }}>
-                        Deep-dive overview of your organization's Microsoft 365 environment.
-                    </p>
+                    <h1 className={styles.title}>M365 Bird's Eye</h1>
+                    <p className={styles.subtitle}>Real-time environment telemetry and resource mapping.</p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '14px', color: 'var(--text-dim)' }}>
-                    <button
-                        onClick={() => fetchData(true)}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            background: 'var(--glass-bg)',
-                            border: '1px solid var(--glass-border)',
-                            color: 'var(--text-secondary)',
-                            padding: '8px 12px',
-                            borderRadius: '8px',
-                            cursor: 'pointer',
-                            fontSize: '13px',
-                            fontWeight: 500,
-                            transition: 'all 0.2s ease'
-                        }}
-                    >
-                        <RefreshCw size={14} className={loading && "animate-spin"} />
-
-                    </button>
-
-                </div>
+                <button onClick={() => fetchData(true)} className={styles.refreshBtn}>
+                    <RefreshCw size={14} className={loading ? styles.spinning : ""} />
+                    <span>Refresh</span>
+                </button>
             </header>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', alignItems: 'start' }}>
-                {sections.map((section, index) => (
-                    <div key={index} style={{ backgroundColor: 'var(--glass-bg)', borderRadius: '12px', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--glass-border)', borderTop: `6px solid ${section.color}` }}>
-                        <div style={{ padding: '16px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                                <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-secondary)' }}>{section.title}</h3>
-                                {section.customIcon ? section.customIcon() : (
-                                    <section.icon size={24} style={{ color: section.color }} />
-                                )}
+            <div className={styles.cardGrid}>
+                {sections.map((section, idx) => (
+                    <div key={idx} className={styles.card} style={{ borderTopColor: section.color }}>
+                        <div className={styles.cardContent}>
+                            <div className={styles.cardHeader}>
+                                <h3 className={styles.cardTitle}>{section.title}</h3>
+                                <section.icon size={18} style={{ color: section.color }} />
                             </div>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                                {section.stats.map((stat, sIdx) => {
-                                    if (stat.group) {
-                                        return (
-                                            <div
-                                                key={sIdx}
-                                                style={{ display: 'flex', flexDirection: 'column', gap: '8px', textAlign: 'right' }}
-                                            >
-                                                {stat.items.map((item, i) => (
-                                                    <div
-                                                        key={i}
-                                                        onClick={() => item.path && navigate(item.path)}
-                                                        style={{ fontSize: '14px', display: 'flex', justifyContent: 'flex-end', gap: '8px', color: 'var(--text-dim)', cursor: item.path ? 'pointer' : 'default', alignItems: 'center' }}
-                                                        className={item.path ? "hover:text-blue-600 dark:hover:text-blue-400" : ""}
-                                                    >
-                                                        <span>{item.label}</span>
-                                                        <span style={{ fontWeight: 600, color: 'var(--text-secondary)', minWidth: '20px', textAlign: 'right' }}>{item.value}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        );
-                                    }
-                                    return (
-                                        <div
-                                            key={sIdx}
-                                            onClick={() => stat.path && navigate(stat.path)}
-                                            style={{ position: 'relative', cursor: stat.path ? 'pointer' : 'default', transition: 'opacity 0.2s' }}
-                                            className={stat.path ? "hover:opacity-75" : ""}
-                                        >
-                                            {/* Header Label */}
-                                            {stat.label && <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>{stat.label}</div>}
-
-                                            {/* Main Value Row */}
-                                            {(stat.value !== undefined) && (
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                                    <div style={{ fontSize: '28px', fontWeight: 300, color: 'var(--text-primary)', lineHeight: 1 }}>{stat.value}</div>
-                                                    {stat.icon && <stat.icon size={28} style={{ color: 'var(--glass-border-hover)', strokeWidth: 1.5 }} />}
+                            <div className={styles.statSection}>
+                                {section.blocks.map((block, bIdx) => (
+                                    <div
+                                        key={bIdx}
+                                        className={`${styles.statBlock} ${block.path ? styles.interactive : ""}`}
+                                        onClick={() => block.path && navigate(block.path)}
+                                    >
+                                        <div className={styles.statLabel}>{block.label}</div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                                            <div className={styles.statValue}>{block.value}</div>
+                                            {block.subValues && (
+                                                <div className={styles.subValueGroup}>
+                                                    {block.subValues.map((sv, svi) => (
+                                                        <div key={svi} className={styles.subValueLine}>
+                                                            <span className={styles.subValueLabel}>{sv.label}</span>
+                                                            <span className={styles.subValueNumber}>{sv.value}</span>
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             )}
-
-                                            {/* Subtext Paragraph */}
-                                            {stat.subtext && (
-                                                <div style={{ display: 'flex', justifyContent: 'flex-end', fontSize: '12px', color: 'var(--text-dim)', marginTop: '-8px', textAlign: 'right' }}>
-                                                    <pre style={{ fontFamily: 'Inter, sans-serif', whiteSpace: 'pre-line', lineHeight: 1.2 }}>
-                                                        {stat.subtext.split('\n').map((line, l) => (
-                                                            <div key={l} style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                                                                <span style={{ color: 'var(--text-dim)' }}>{line.split(' ')[0]}</span>
-                                                                <span style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>{line.split(' ')[1]}</span>
-                                                            </div>
-                                                        ))}
-                                                    </pre>
-                                                </div>
-                                            )}
-
-                                            {/* Custom Render */}
-                                            {stat.customRender}
                                         </div>
-                                    );
-                                })}
+                                        {block.custom}
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
