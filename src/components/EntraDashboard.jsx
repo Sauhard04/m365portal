@@ -326,48 +326,47 @@ const EntraDashboard = () => {
                             <Activity size={18} color="var(--accent-success)" />
                         </div>
 
-                        <div style={{ flex: 1, position: 'relative', width: '100%', minHeight: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <defs>
-                                        <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stopColor="#60a5fa" />
-                                            <stop offset="100%" stopColor="#3b82f6" />
-                                        </linearGradient>
-                                    </defs>
-                                    <Pie
-                                        data={scoreData}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius="70%"
-                                        outerRadius="90%"
-                                        paddingAngle={0}
-                                        dataKey="value"
-                                        startAngle={90}
-                                        endAngle={-270}
-                                        stroke="none"
-                                        cornerRadius={10}
-                                    >
-                                        {scoreData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip content={<CustomTooltip />} />
-                                </PieChart>
-                            </ResponsiveContainer>
+                        <div style={{ flex: 1, position: 'relative', width: '100%', minHeight: '340px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                            <PieChart width={320} height={320}>
+                                <defs>
+                                    <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stopColor="#60a5fa" />
+                                        <stop offset="100%" stopColor="#3b82f6" />
+                                    </linearGradient>
+                                </defs>
+                                <Pie
+                                    data={scoreData}
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={95}
+                                    outerRadius={125}
+                                    paddingAngle={0}
+                                    dataKey="value"
+                                    startAngle={90}
+                                    endAngle={-270}
+                                    stroke="none"
+                                    cornerRadius={10}
+                                    isAnimationActive={true}
+                                >
+                                    {scoreData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={entry.color} />
+                                    ))}
+                                </Pie>
+                                <Tooltip content={<CustomTooltip />} />
+                            </PieChart>
                             <div style={{
                                 position: 'absolute',
-                                top: '50%',
+                                top: '50.5%',
                                 left: '50%',
                                 transform: 'translate(-50%, -50%)',
                                 textAlign: 'center',
                                 pointerEvents: 'none',
-                                animation: 'fadeIn 1s ease-out'
+                                zIndex: 10
                             }}>
-                                <span className="compliance-score-text" style={{ fontSize: '48px', fontWeight: 800, display: 'block', lineHeight: 1, color: 'var(--text-primary)', letterSpacing: '-1px' }}>
+                                <span className="compliance-score-text" style={{ fontSize: '48px', fontWeight: 800, display: 'block', lineHeight: 1, color: 'var(--text-primary)', letterSpacing: '-1.5px' }}>
                                     {scorePercentage}%
                                 </span>
-                                <span style={{ fontSize: '12px', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '2px', fontWeight: 700, marginTop: '4px', display: 'block' }}>Secure</span>
+                                <span style={{ fontSize: '11px', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '2.5px', fontWeight: 700, marginTop: '8px', display: 'block', opacity: 0.8 }}>Secure</span>
                             </div>
                         </div>
 
