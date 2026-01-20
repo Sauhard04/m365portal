@@ -310,10 +310,7 @@ const EntraDashboard = () => {
                             minHeight: '520px',
                             display: 'flex',
                             flexDirection: 'column',
-                            overflow: 'hidden',
-                            background: 'rgba(15, 23, 42, 0.4)',
-                            backdropFilter: 'blur(20px)',
-                            border: '1px solid rgba(255, 255, 255, 0.08)'
+                            overflow: 'hidden'
                         }}
                     >
                         <div className="flex-center flex-gap-4 spacing-v-8" style={{ width: '100%', marginBottom: '16px', flexShrink: 0 }}>
