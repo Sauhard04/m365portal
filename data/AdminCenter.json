@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
-  "timestamp": 1768980680302,
-=======
-  "timestamp": 1768905250246,
->>>>>>> origin/main
+  "timestamp": 1768992255796,
   "data": {
     "admincenter": {
       "mailboxes": {
@@ -51,11 +47,7 @@
           "accountEnabled": "Yes",
           "createdDateTime": "2025-10-28T05:18:28Z",
           "lastActivityDate": "2025-12-30",
-<<<<<<< HEAD
           "itemCount": 2254,
-=======
-          "itemCount": 2252,
->>>>>>> origin/main
           "archivePolicy": true,
           "mailboxSize": "0.01 GB",
           "migrationStatus": "Cloud Native",
@@ -109,11 +101,7 @@
           "accountEnabled": "Yes",
           "createdDateTime": "2025-12-03T05:52:13Z",
           "lastActivityDate": "N/A",
-<<<<<<< HEAD
           "itemCount": 247,
-=======
-          "itemCount": 245,
->>>>>>> origin/main
           "archivePolicy": true,
           "mailboxSize": "0.00 GB",
           "migrationStatus": "Cloud Native",
@@ -131,11 +119,7 @@
           "accountEnabled": "Yes",
           "createdDateTime": "2025-09-16T05:08:37Z",
           "lastActivityDate": "2026-01-15",
-<<<<<<< HEAD
           "itemCount": 12237,
-=======
-          "itemCount": 12258,
->>>>>>> origin/main
           "archivePolicy": true,
           "mailboxSize": "3.53 GB",
           "migrationStatus": "Cloud Native",
@@ -153,11 +137,7 @@
           "accountEnabled": "Yes",
           "createdDateTime": "2025-11-20T09:40:42Z",
           "lastActivityDate": "N/A",
-<<<<<<< HEAD
           "itemCount": 2097,
-=======
-          "itemCount": 2081,
->>>>>>> origin/main
           "archivePolicy": false,
           "mailboxSize": "0.01 GB",
           "migrationStatus": "Cloud Native",
@@ -175,11 +155,7 @@
           "accountEnabled": "Yes",
           "createdDateTime": "2024-04-24T06:33:25Z",
           "lastActivityDate": "2025-11-25",
-<<<<<<< HEAD
           "itemCount": 2893,
-=======
-          "itemCount": 2905,
->>>>>>> origin/main
           "archivePolicy": true,
           "mailboxSize": "0.00 GB",
           "migrationStatus": "Cloud Native",
@@ -215,11 +191,7 @@
           "accountEnabled": "Yes",
           "createdDateTime": "2025-10-01T06:47:25Z",
           "lastActivityDate": "2025-12-30",
-<<<<<<< HEAD
           "itemCount": 37684,
-=======
-          "itemCount": 37658,
->>>>>>> origin/main
           "archivePolicy": false,
           "mailboxSize": "16.49 GB",
           "migrationStatus": "Cloud Native",
@@ -237,11 +209,7 @@
           "accountEnabled": "Yes",
           "createdDateTime": "2025-09-08T10:33:29Z",
           "lastActivityDate": "2025-12-13",
-<<<<<<< HEAD
           "itemCount": 4894,
-=======
-          "itemCount": 4870,
->>>>>>> origin/main
           "archivePolicy": false,
           "mailboxSize": "0.00 GB",
           "migrationStatus": "Cloud Native",
@@ -259,11 +227,7 @@
           "accountEnabled": "Yes",
           "createdDateTime": "2026-01-09T12:05:35Z",
           "lastActivityDate": "N/A",
-<<<<<<< HEAD
           "itemCount": 1233,
-=======
-          "itemCount": 1203,
->>>>>>> origin/main
           "archivePolicy": false,
           "mailboxSize": "0.00 GB",
           "migrationStatus": "Cloud Native",
@@ -281,11 +245,7 @@
           "accountEnabled": "Yes",
           "createdDateTime": "2023-10-02T14:54:35Z",
           "lastActivityDate": "2025-12-18",
-<<<<<<< HEAD
           "itemCount": 20037,
-=======
-          "itemCount": 20466,
->>>>>>> origin/main
           "archivePolicy": true,
           "mailboxSize": "0.51 GB",
           "migrationStatus": "Cloud Native",
@@ -1026,19 +986,11 @@
       "groupsCount": 58,
       "deletedUsersCount": 1,
       "secureScore": {
-<<<<<<< HEAD
         "id": "3163c13f-b80f-426c-94b0-fa4c0bf66ad7_2026-01-21",
         "azureTenantId": "3163c13f-b80f-426c-94b0-fa4c0bf66ad7",
         "activeUserCount": 10,
         "createdDateTime": "2026-01-21T00:00:00Z",
         "currentScore": 183.92,
-=======
-        "id": "3163c13f-b80f-426c-94b0-fa4c0bf66ad7_2026-01-20",
-        "azureTenantId": "3163c13f-b80f-426c-94b0-fa4c0bf66ad7",
-        "activeUserCount": 10,
-        "createdDateTime": "2026-01-20T00:00:00Z",
-        "currentScore": 181.5,
->>>>>>> origin/main
         "enabledServices": [
           "HasAADP1",
           "HasAADP2",
@@ -1064,7 +1016,6 @@
         "averageComparativeScores": [
           {
             "basis": "AllTenants",
-<<<<<<< HEAD
             "averageScore": 53.35,
             "appsScore": 40.33,
             "appsScoreMax": 103.97,
@@ -1072,15 +1023,6 @@
             "dataScoreMax": 4.33,
             "deviceScore": 11.28,
             "deviceScoreMax": 20.87,
-=======
-            "averageScore": 53.34,
-            "appsScore": 40.35,
-            "appsScoreMax": 104.04,
-            "dataScore": 0.67,
-            "dataScoreMax": 4.34,
-            "deviceScore": 11.29,
-            "deviceScoreMax": 20.88,
->>>>>>> origin/main
             "identityScore": 37.11,
             "identityScoreMax": 60.07,
             "infrastructureScore": 0,
@@ -1091,25 +1033,14 @@
             "averageScore": 46.66,
             "SeatSizeRangeLowerValue": "1",
             "SeatSizeRangeUpperValue": "100",
-<<<<<<< HEAD
-            "appsScore": 46.64,
-            "appsScoreMax": 127.9,
+            "appsScore": 46.63,
+            "appsScoreMax": 127.88,
             "dataScore": 0.66,
             "dataScoreMax": 5.4,
             "deviceScore": 8.94,
             "deviceScoreMax": 16.59,
             "identityScore": 35.61,
             "identityScoreMax": 60.33,
-=======
-            "appsScore": 46.69,
-            "appsScoreMax": 128.02,
-            "dataScore": 0.66,
-            "dataScoreMax": 5.41,
-            "deviceScore": 8.95,
-            "deviceScoreMax": 16.6,
-            "identityScore": 35.6,
-            "identityScoreMax": 60.34,
->>>>>>> origin/main
             "infrastructureScore": 0,
             "infrastructureScoreMax": 0
           }
@@ -1290,11 +1221,7 @@
             "controlName": "spo_idle_session_timeout",
             "description": "\r\n\t\t\tIdle session sign-out lets you specify a time at which users are warned and are later signed out of Microsoft 365 after a period of browser inactivity in SharePoint and OneDrive.\r\n            <br/>\r\n\t\t\tThis policy is one of several you can use with SharePoint and OneDrive to balance security and user productivity and help keep your data safe, regardless  of where users access the data from, what device they're working on, and how secure their network connection is.\r\n\t\t",
             "score": 0,
-<<<<<<< HEAD
             "lastSynced": "2026-01-21T00:36:08Z",
-=======
-            "lastSynced": "2026-01-20T03:45:53Z",
->>>>>>> origin/main
             "implementationStatus": "The setting is not compliant.",
             "on": "false",
             "scoreInPercentage": 0
@@ -1304,11 +1231,7 @@
             "controlName": "spo_legacy_auth",
             "description": "\r\n\t\t\tModern authentication in Microsoft 365 enables authentication features like multifactor authentication (MFA) using smart cards, certificate-based authentication (CBA), and third-party SAML identity providers.\r\n\t\t\t<br/>\r\n\t\t\tStrong authentication controls, such as the use of multifactor authentication, may be circumvented if basic authentication is used by SharePoint applications. Requiring modern authentication for SharePoint applications ensures strong authentication mechanisms are used when establishing sessions between these applications, SharePoint, and connecting users.\r\n\t\t\t<br/>\r\n\t\t\t<i>This information was taken from Center for Internet Security (CIS).</i>\r\n\t\t",
             "score": 0,
-<<<<<<< HEAD
             "lastSynced": "2026-01-21T00:36:08Z",
-=======
-            "lastSynced": "2026-01-20T03:45:53Z",
->>>>>>> origin/main
             "implementationStatus": "The setting is not compliant.",
             "on": "false",
             "scoreInPercentage": 0
@@ -1318,7 +1241,7 @@
             "controlName": "McasFirewallLogUpload",
             "description": "Log collectors provide visibility into cloud app usage so you can identify if there are any apps that run without official approval, or if there is anomalous behavior. Log collectors automatically upload reports and parse the firewall/ proxy traffic logs to see if there is a match with your services in the Cloud App Catalog.",
             "score": 0,
-            "lastSynced": "2026-01-20T06:26:01Z",
+            "lastSynced": "2026-01-21T07:40:41Z",
             "implementationStatus": "Feature in place: false.",
             "on": "false",
             "scoreInPercentage": 0
@@ -1879,11 +1802,7 @@
             "controlName": "AATP_AccountWithLeakedCredentials",
             "description": "\r\n\t\tThis report lists users whose valid credentials have been leaked. \r\n\t\tWhen cybercriminals compromise valid passwords of legitimate users, the criminals often share those credentials. \r\n\t\tThis is usually done by posting them publicly on the dark web or paste sites or by trading or selling the credentials on the black market.<br><br>\r\n\t\tThe Microsoft leaked credentials service acquires username/password pairs by monitoring public and dark websites and by working with:<br><br>\r\n\t\t• Researchers<br>\r\n\t\t• Law enforcement<br>\r\n\t\t• Security teams at Microsoft<br>\r\n\t\t• Other trusted sources<br>\r\n\t",
             "score": 5,
-<<<<<<< HEAD
-            "lastSynced": "2026-01-21T07:00:17Z",
-=======
-            "lastSynced": "2026-01-19T23:32:09Z",
->>>>>>> origin/main
+            "lastSynced": "2026-01-21T10:41:59Z",
             "implementationStatus": "",
             "on": "true",
             "scoreInPercentage": 100
@@ -2010,86 +1929,8 @@
       ],
       "failedSignIns": [
         {
-<<<<<<< HEAD
-          "id": "85cc1b66-9aa5-4525-85b6-fd56d8df3100",
-          "createdDateTime": "2026-01-21T05:24:54Z",
-          "userDisplayName": "Vishal",
-          "userPrincipalName": "vishal@intunetraininglabs.onmicrosoft.com",
-          "userId": "99ff6360-9526-4142-81bc-f8abe5d3bf78",
-          "appId": "4765445b-32c6-49b0-83e6-1d93765276ca",
-          "appDisplayName": "OfficeHome",
-          "ipAddress": "103.158.120.197",
-          "clientAppUsed": "Browser",
-          "correlationId": "6bc0f7f3-8aa6-4d4f-83a4-63a3acdcc41c",
-          "conditionalAccessStatus": "notApplied",
-          "isInteractive": true,
-          "riskDetail": "none",
-          "riskLevelAggregated": "none",
-          "riskLevelDuringSignIn": "none",
-          "riskState": "none",
-          "riskEventTypes": [],
-          "riskEventTypes_v2": [],
-          "resourceDisplayName": "OfficeHome",
-          "resourceId": "4765445b-32c6-49b0-83e6-1d93765276ca",
-          "status": {
-            "errorCode": 50201,
-            "failureReason": "This message prompt interrupt will be shown to the user during login when additional information should be provided to user.",
-            "additionalDetails": null
-          },
-          "deviceDetail": {
-            "deviceId": "",
-            "displayName": "",
-            "operatingSystem": "Windows10",
-            "browser": "Edge 144.0.0",
-            "isCompliant": false,
-            "isManaged": false,
-            "trustType": null
-          },
-          "location": {
-            "city": "Azad Nagar",
-            "state": "Delhi",
-            "countryOrRegion": "IN",
-            "geoCoordinates": {
-              "altitude": null,
-              "latitude": 28.6673,
-              "longitude": 77.1951
-            }
-          },
-          "appliedConditionalAccessPolicies": [
-            {
-              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-              "displayName": "Mac Require",
-              "enforcedGrantControls": [
-                "RequireCompliantDevice"
-              ],
-              "enforcedSessionControls": [],
-              "result": "notApplied"
-            },
-            {
-              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-              "displayName": "Require phishing-resistant multifactor authentication for admins",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [],
-              "result": "reportOnlyInterrupted"
-            },
-            {
-              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-              "displayName": "Use application enforced restrictions for O365 apps",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [
-                "AppEnforcedRestrictions"
-              ],
-              "result": "reportOnlySuccess"
-            }
-          ]
-        },
-        {
-          "id": "9d3cc118-f6a6-41e5-b842-a423da822500",
-          "createdDateTime": "2026-01-20T12:14:02Z",
-=======
-          "id": "b09735f8-f008-479b-8cd2-fb2489c43d00",
-          "createdDateTime": "2026-01-20T10:04:13Z",
->>>>>>> origin/main
+          "id": "4f879731-2104-46b9-b489-1d0edd1a1300",
+          "createdDateTime": "2026-01-21T10:40:12Z",
           "userDisplayName": "Demo User",
           "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
           "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
@@ -2097,11 +1938,7 @@
           "appDisplayName": "M365Portal-Purview-Service",
           "ipAddress": "122.184.91.214",
           "clientAppUsed": "Browser",
-<<<<<<< HEAD
-          "correlationId": "019bdb53-5fa7-714a-ae3e-572aefc800bb",
-=======
-          "correlationId": "019bdadc-9250-749e-9d19-154b7a7b916a",
->>>>>>> origin/main
+          "correlationId": "019be023-ceae-7a09-bda2-ca9bd5880d05",
           "conditionalAccessStatus": "notApplied",
           "isInteractive": true,
           "riskDetail": "none",
@@ -2121,7 +1958,7 @@
             "deviceId": "",
             "displayName": "",
             "operatingSystem": "Windows10",
-            "browser": "Chrome 144.0.0",
+            "browser": "Edge 143.0.0",
             "isCompliant": false,
             "isManaged": false,
             "trustType": null
@@ -2165,9 +2002,8 @@
           ]
         },
         {
-<<<<<<< HEAD
-          "id": "b09735f8-f008-479b-8cd2-fb2489c43d00",
-          "createdDateTime": "2026-01-20T10:04:13Z",
+          "id": "73ef4a95-cd14-45d6-947b-e8e568ed1200",
+          "createdDateTime": "2026-01-21T10:37:00Z",
           "userDisplayName": "Demo User",
           "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
           "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
@@ -2175,19 +2011,7 @@
           "appDisplayName": "M365Portal-Purview-Service",
           "ipAddress": "122.184.91.214",
           "clientAppUsed": "Browser",
-          "correlationId": "019bdadc-9250-749e-9d19-154b7a7b916a",
-=======
-          "id": "15705eb8-1fea-4a2d-ace9-99b413619c00",
-          "createdDateTime": "2026-01-20T07:19:43Z",
-          "userDisplayName": "Vishal",
-          "userPrincipalName": "vishal@intunetraininglabs.onmicrosoft.com",
-          "userId": "99ff6360-9526-4142-81bc-f8abe5d3bf78",
-          "appId": "c9a559d2-7aab-4f13-a6ed-e7e9c52aec87",
-          "appDisplayName": "Microsoft Forms",
-          "ipAddress": "122.184.91.214",
-          "clientAppUsed": "Browser",
-          "correlationId": "019bda46-1476-7fb4-b3b5-cde2c19fb41a",
->>>>>>> origin/main
+          "correlationId": "019be020-ebaf-73b7-947f-5b941b4649a2",
           "conditionalAccessStatus": "notApplied",
           "isInteractive": true,
           "riskDetail": "none",
@@ -2199,7 +2023,6 @@
           "resourceDisplayName": "Microsoft Graph",
           "resourceId": "00000003-0000-0000-c000-000000000000",
           "status": {
-<<<<<<< HEAD
             "errorCode": 50140,
             "failureReason": "This occurred due to 'Keep me signed in' interrupt when the user was signing in.",
             "additionalDetails": "This is an expected part of the login flow, where a user is asked if they want to remain signed into this browser to make further logins easier. For more details, see https://techcommunity.microsoft.com/t5/microsoft-entra/the-new-azure-ad-sign-in-and-keep-me-signed-in-experiences/td-p/128267"
@@ -2208,154 +2031,6 @@
             "deviceId": "",
             "displayName": "",
             "operatingSystem": "Windows10",
-            "browser": "Chrome 144.0.0",
-            "isCompliant": false,
-            "isManaged": false,
-            "trustType": null
-          },
-          "location": {
-            "city": "New Delhi",
-            "state": "Delhi",
-            "countryOrRegion": "IN",
-            "geoCoordinates": {
-              "altitude": null,
-              "latitude": 28.6353,
-              "longitude": 77.225
-            }
-          },
-          "appliedConditionalAccessPolicies": [
-            {
-              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-              "displayName": "Mac Require",
-              "enforcedGrantControls": [
-                "RequireCompliantDevice"
-              ],
-              "enforcedSessionControls": [],
-              "result": "notApplied"
-            },
-            {
-              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-              "displayName": "Require phishing-resistant multifactor authentication for admins",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [],
-              "result": "reportOnlyInterrupted"
-            },
-            {
-              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-              "displayName": "Use application enforced restrictions for O365 apps",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [
-                "AppEnforcedRestrictions"
-              ],
-              "result": "reportOnlySuccess"
-            }
-          ]
-        },
-        {
-          "id": "15705eb8-1fea-4a2d-ace9-99b413619c00",
-          "createdDateTime": "2026-01-20T07:19:43Z",
-          "userDisplayName": "Vishal",
-          "userPrincipalName": "vishal@intunetraininglabs.onmicrosoft.com",
-          "userId": "99ff6360-9526-4142-81bc-f8abe5d3bf78",
-          "appId": "c9a559d2-7aab-4f13-a6ed-e7e9c52aec87",
-          "appDisplayName": "Microsoft Forms",
-          "ipAddress": "122.184.91.214",
-          "clientAppUsed": "Browser",
-          "correlationId": "019bda46-1476-7fb4-b3b5-cde2c19fb41a",
-          "conditionalAccessStatus": "notApplied",
-          "isInteractive": true,
-          "riskDetail": "none",
-          "riskLevelAggregated": "none",
-          "riskLevelDuringSignIn": "none",
-          "riskState": "none",
-          "riskEventTypes": [],
-          "riskEventTypes_v2": [],
-          "resourceDisplayName": "Microsoft Graph",
-          "resourceId": "00000003-0000-0000-c000-000000000000",
-          "status": {
-=======
->>>>>>> origin/main
-            "errorCode": 700003,
-            "failureReason": "Device object was not found in the tenant '{tenantName}' directory.",
-            "additionalDetails": "Invalid grant due to the following reasons:\n      - Requested SAML 2.0 assertion has invalid Subject Confirmation Method\n      - Application On-Behalf-Of flow is not supported on V2\n      - Primary refresh token is not signed with session key\n      - Invalid external refresh token\n      - The access grant was obtained for a different tenant"
-          },
-          "deviceDetail": {
-            "deviceId": "",
-            "displayName": "",
-            "operatingSystem": "Windows10",
-            "browser": "Edge 144.0.0",
-            "isCompliant": false,
-            "isManaged": false,
-            "trustType": null
-          },
-          "location": {
-            "city": "New Delhi",
-            "state": "Delhi",
-            "countryOrRegion": "IN",
-            "geoCoordinates": {
-              "altitude": null,
-              "latitude": 28.6353,
-              "longitude": 77.225
-            }
-          },
-          "appliedConditionalAccessPolicies": [
-            {
-              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-              "displayName": "Mac Require",
-              "enforcedGrantControls": [
-                "RequireCompliantDevice"
-              ],
-              "enforcedSessionControls": [],
-              "result": "notApplied"
-            },
-            {
-              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-              "displayName": "Require phishing-resistant multifactor authentication for admins",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [],
-              "result": "reportOnlyInterrupted"
-            },
-            {
-              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-              "displayName": "Use application enforced restrictions for O365 apps",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [
-                "AppEnforcedRestrictions"
-              ],
-              "result": "reportOnlySuccess"
-            }
-          ]
-        },
-        {
-          "id": "f72d69c1-5a7c-4eb9-a4f5-f7093c800a00",
-          "createdDateTime": "2026-01-20T04:46:00Z",
-          "userDisplayName": "Demo User",
-          "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
-          "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
-          "appId": "0fb1ce07-0af3-4192-a8bf-d8b3cce097fc",
-          "appDisplayName": "M365Portal-Purview-Service",
-          "ipAddress": "122.184.91.214",
-          "clientAppUsed": "Browser",
-          "correlationId": "019bd9b9-5365-7a1c-af6c-657fe9064972",
-          "conditionalAccessStatus": "notApplied",
-          "isInteractive": true,
-          "riskDetail": "none",
-          "riskLevelAggregated": "none",
-          "riskLevelDuringSignIn": "none",
-          "riskState": "none",
-          "riskEventTypes": [],
-          "riskEventTypes_v2": [],
-          "resourceDisplayName": "Microsoft Graph",
-          "resourceId": "00000003-0000-0000-c000-000000000000",
-          "status": {
-            "errorCode": 650053,
-            "failureReason": "The application '{name}' asked for scope '{scope}' that doesn't exist on the resource '{resource}'. Contact the app vendor.",
-            "additionalDetails": null
-          },
-          "deviceDetail": {
-            "deviceId": "",
-            "displayName": "",
-            "operatingSystem": "Windows10",
             "browser": "Edge 143.0.0",
             "isCompliant": false,
             "isManaged": false,
@@ -2398,12 +2073,10 @@
               "result": "reportOnlySuccess"
             }
           ]
-<<<<<<< HEAD
-=======
         },
         {
-          "id": "915bf7fa-9df9-4978-b6a8-bb17bc630a00",
-          "createdDateTime": "2026-01-20T04:34:35Z",
+          "id": "a2ff00d6-8592-47e7-a384-0d5318085600",
+          "createdDateTime": "2026-01-21T10:34:13Z",
           "userDisplayName": "Demo User",
           "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
           "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
@@ -2411,7 +2084,7 @@
           "appDisplayName": "M365Portal-Purview-Service",
           "ipAddress": "122.184.91.214",
           "clientAppUsed": "Browser",
-          "correlationId": "019bd9ae-df2e-7181-9802-1c11176a395e",
+          "correlationId": "019be01e-5d83-74d0-b9f1-b84939d2f006",
           "conditionalAccessStatus": "notApplied",
           "isInteractive": true,
           "riskDetail": "none",
@@ -2423,9 +2096,9 @@
           "resourceDisplayName": "Microsoft Graph",
           "resourceId": "00000003-0000-0000-c000-000000000000",
           "status": {
-            "errorCode": 650053,
-            "failureReason": "The application '{name}' asked for scope '{scope}' that doesn't exist on the resource '{resource}'. Contact the app vendor.",
-            "additionalDetails": null
+            "errorCode": 50140,
+            "failureReason": "This occurred due to 'Keep me signed in' interrupt when the user was signing in.",
+            "additionalDetails": "This is an expected part of the login flow, where a user is asked if they want to remain signed into this browser to make further logins easier. For more details, see https://techcommunity.microsoft.com/t5/microsoft-entra/the-new-azure-ad-sign-in-and-keep-me-signed-in-experiences/td-p/128267"
           },
           "deviceDetail": {
             "deviceId": "",
@@ -2475,8 +2148,8 @@
           ]
         },
         {
-          "id": "1bf00b2d-b074-403f-bd88-de4f77cd7d00",
-          "createdDateTime": "2026-01-20T04:34:25Z",
+          "id": "05426b8d-8bdf-4b4e-8182-9ca58faa1900",
+          "createdDateTime": "2026-01-21T10:30:27Z",
           "userDisplayName": "Demo User",
           "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
           "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
@@ -2484,7 +2157,7 @@
           "appDisplayName": "M365Portal-Purview-Service",
           "ipAddress": "122.184.91.214",
           "clientAppUsed": "Browser",
-          "correlationId": "019bd9ae-b0aa-7d5c-839b-5c09445fd5b6",
+          "correlationId": "019be01a-b01a-7e35-a554-a8d51c4761ab",
           "conditionalAccessStatus": "notApplied",
           "isInteractive": true,
           "riskDetail": "none",
@@ -2496,8 +2169,81 @@
           "resourceDisplayName": "Microsoft Graph",
           "resourceId": "00000003-0000-0000-c000-000000000000",
           "status": {
-            "errorCode": 650053,
-            "failureReason": "The application '{name}' asked for scope '{scope}' that doesn't exist on the resource '{resource}'. Contact the app vendor.",
+            "errorCode": 50140,
+            "failureReason": "This occurred due to 'Keep me signed in' interrupt when the user was signing in.",
+            "additionalDetails": "This is an expected part of the login flow, where a user is asked if they want to remain signed into this browser to make further logins easier. For more details, see https://techcommunity.microsoft.com/t5/microsoft-entra/the-new-azure-ad-sign-in-and-keep-me-signed-in-experiences/td-p/128267"
+          },
+          "deviceDetail": {
+            "deviceId": "",
+            "displayName": "",
+            "operatingSystem": "Windows10",
+            "browser": "Edge 143.0.0",
+            "isCompliant": false,
+            "isManaged": false,
+            "trustType": null
+          },
+          "location": {
+            "city": "New Delhi",
+            "state": "Delhi",
+            "countryOrRegion": "IN",
+            "geoCoordinates": {
+              "altitude": null,
+              "latitude": 28.6353,
+              "longitude": 77.225
+            }
+          },
+          "appliedConditionalAccessPolicies": [
+            {
+              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+              "displayName": "Mac Require",
+              "enforcedGrantControls": [
+                "RequireCompliantDevice"
+              ],
+              "enforcedSessionControls": [],
+              "result": "notApplied"
+            },
+            {
+              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+              "displayName": "Require phishing-resistant multifactor authentication for admins",
+              "enforcedGrantControls": [],
+              "enforcedSessionControls": [],
+              "result": "reportOnlyInterrupted"
+            },
+            {
+              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+              "displayName": "Use application enforced restrictions for O365 apps",
+              "enforcedGrantControls": [],
+              "enforcedSessionControls": [
+                "AppEnforcedRestrictions"
+              ],
+              "result": "reportOnlySuccess"
+            }
+          ]
+        },
+        {
+          "id": "b10c160f-b177-44df-8db7-11565ec51300",
+          "createdDateTime": "2026-01-21T10:19:34Z",
+          "userDisplayName": "Demo User",
+          "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+          "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+          "appId": "0fb1ce07-0af3-4192-a8bf-d8b3cce097fc",
+          "appDisplayName": "M365Portal-Purview-Service",
+          "ipAddress": "122.184.91.214",
+          "clientAppUsed": "Browser",
+          "correlationId": "019be011-10a7-72a6-a568-9bade343ab64",
+          "conditionalAccessStatus": "notApplied",
+          "isInteractive": true,
+          "riskDetail": "none",
+          "riskLevelAggregated": "none",
+          "riskLevelDuringSignIn": "none",
+          "riskState": "none",
+          "riskEventTypes": [],
+          "riskEventTypes_v2": [],
+          "resourceDisplayName": "Microsoft Graph",
+          "resourceId": "00000003-0000-0000-c000-000000000000",
+          "status": {
+            "errorCode": 65001,
+            "failureReason": "The user or administrator has not consented to use the application with ID '{identifier}'{namePhrase}. Send an interactive authorization request for this user and resource.",
             "additionalDetails": null
           },
           "deviceDetail": {
@@ -2546,7 +2292,6 @@
               "result": "reportOnlySuccess"
             }
           ]
->>>>>>> origin/main
         }
       ]
     }

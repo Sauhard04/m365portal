@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
-  "timestamp": 1768981760731,
-=======
-  "timestamp": 1768905427615,
->>>>>>> origin/main
+  "timestamp": 1768990739945,
   "data": {
     "overview": {
       "statistics": {
@@ -13,11 +9,7 @@
         "secure_score": 183.92
       },
       "health_and_security": {
-<<<<<<< HEAD
-        "failed_signins": 4,
-=======
-        "failed_signins": 29,
->>>>>>> origin/main
+        "failed_signins": 3,
         "compliance_rate": 33
       }
     },
@@ -63,12 +55,12 @@
         ],
         "deviceByPlatform": [
           {
-            "name": "macOS",
-            "value": 1
-          },
-          {
             "name": "Windows",
             "value": 2
+          },
+          {
+            "name": "macOS",
+            "value": 1
           }
         ],
         "licenseUsage": [
@@ -101,13 +93,8 @@
         "signIns": [
           {
             "name": "Last 24h",
-<<<<<<< HEAD
-            "failed": 4,
-            "successful": 19
-=======
-            "failed": 29,
-            "successful": 31
->>>>>>> origin/main
+            "failed": 3,
+            "successful": 16
           }
         ],
         "emailTrend": [
@@ -140,11 +127,7 @@
           },
           {
             "subject": "Sign-in Success",
-<<<<<<< HEAD
-            "value": 83,
-=======
-            "value": 52,
->>>>>>> origin/main
+            "value": 84,
             "fullMark": 100
           }
         ],

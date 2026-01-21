@@ -30,6 +30,7 @@ import IntuneRBAC from './components/IntuneRBAC';
 import IntuneAuditLogs from './components/IntuneAuditLogs';
 import IntuneReports from './components/IntuneReports';
 import EmailActivityPage from './components/EmailActivityPage';
+import UsageReports from './components/UsageReports';
 import OverviewDashboard from './components/OverviewDashboard';
 import AlertsPage from './components/AlertsPage';
 import UserDetailsPage from './components/UserDetailsPage';
@@ -59,6 +60,7 @@ function App() {
               <Route path="/service" element={<ServiceLayout />}>
                 {/* Overview Dashboard */}
                 <Route path="overview" element={<OverviewDashboard />} />
+                <Route path="usage" element={<UsageReports />} />
                 <Route path="birdseye" element={<BirdsEyeView />} />
 
                 {/* Admin Center Routes */}

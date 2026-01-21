@@ -622,6 +622,12 @@ select.input option {
   gap: 8px;
 }
 
+.flex-gap-3 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .flex-gap-4 {
   display: flex;
   align-items: center;
