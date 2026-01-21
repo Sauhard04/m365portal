@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../contexts/ThemeContext';
 import { useMsal } from '@azure/msal-react';
 import {
-    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, BarChart3, Command, BookOpen, Sun, Moon, Eye, User
+    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, BarChart3, Command, BookOpen, Sun, Moon, User
 } from 'lucide-react';
 import SearchModal from './SearchModal';
 import Logo from './Logo';

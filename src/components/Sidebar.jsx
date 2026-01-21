@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     ShieldCheck, Smartphone, Lock,
-    LayoutDashboard, Eye
+    LayoutDashboard
 } from 'lucide-react';
 
 const Sidebar = ({ isSidebarOpen }) => {
@@ -37,21 +37,6 @@ const Sidebar = ({ isSidebarOpen }) => {
                     />
                 </div>
 
-                {/* Section: Overview */}
-                <div className="space-y-1">
-                    {isSidebarOpen && (
-                        <h3 className="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-[0.15em] mb-4">
-                            Overview
-                        </h3>
-                    )}
-                    <SidebarItem
-                        icon={Eye}
-                        label="Bird's Eye View"
-                        active={isActive('/service/birdseye')}
-                        isOpen={isSidebarOpen}
-                        onClick={() => navigate('/service/birdseye')}
-                    />
-                </div>
 
                 {/* Section: Governance */}
                 <div className="space-y-1">
