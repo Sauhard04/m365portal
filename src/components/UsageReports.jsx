@@ -19,6 +19,7 @@ const UsageReports = () => {
     const { instance, accounts } = useMsal();
     const [loading, setLoading] = useState(true);
     const [period, setPeriod] = useState('D7');
+    const [isPeriodDropdownOpen, setIsPeriodDropdownOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('teams');
     const [data, setData] = useState({
         teams: { detail: [], counts: [] },
@@ -359,22 +360,82 @@ const UsageReports = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '13px' }}>Monitor resource consumption across Teams, Exchange, and SharePoint.</p>
                 </div>
                 <div className="flex-gap-3">
-                    <select
-                        value={period}
-                        onChange={(e) => setPeriod(e.target.value)}
-                        className="input"
-                        style={{
-                            padding: '8px 16px',
-                            fontSize: '12px',
-                            fontWeight: 600,
-                            minWidth: '150px',
-                            cursor: 'pointer'
-                        }}
-                    >
-                        <option value="D7">Last 7 days</option>
-                        <option value="D30">Last 30 days</option>
-                        <option value="D90">Last 90 days</option>
-                    </select>
+                    <div style={{ position: 'relative' }}>
+                        <button
+                            onClick={() => setIsPeriodDropdownOpen(!isPeriodDropdownOpen)}
+                            className="input flex-center"
+                            style={{
+                                padding: '8px 16px',
+                                fontSize: '12px',
+                                fontWeight: 600,
+                                minWidth: '160px',
+                                cursor: 'pointer',
+                                justifyContent: 'space-between',
+                                display: 'flex',
+                                alignItems: 'center'
+                            }}
+                        >
+                            {period === 'D7' ? 'Last 7 days' : period === 'D30' ? 'Last 30 days' : 'Last 90 days'}
+                            {isPeriodDropdownOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                        </button>
+
+                        <AnimatePresence>
+                            {isPeriodDropdownOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 5 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 5 }}
+                                    className="glass-card"
+                                    style={{
+                                        position: 'absolute',
+                                        top: '100%',
+                                        right: 0,
+                                        marginTop: '4px',
+                                        minWidth: '160px',
+                                        zIndex: 100,
+                                        padding: '4px',
+                                        overflow: 'hidden'
+                                    }}
+                                >
+                                    {[
+                                        { label: 'Last 7 days', value: 'D7' },
+                                        { label: 'Last 30 days', value: 'D30' },
+                                        { label: 'Last 90 days', value: 'D90' }
+                                    ].map(opt => (
+                                        <div
+                                            key={opt.value}
+                                            onClick={() => { setPeriod(opt.value); setIsPeriodDropdownOpen(false); }}
+                                            style={{
+                                                padding: '8px 12px',
+                                                fontSize: '12px',
+                                                cursor: 'pointer',
+                                                borderRadius: '6px',
+                                                background: period === opt.value ? 'rgba(59, 130, 246, 0.15)' : 'transparent',
+                                                color: period === opt.value ? 'var(--accent-blue)' : 'var(--text-secondary)',
+                                                fontWeight: period === opt.value ? 700 : 500,
+                                                marginBottom: '2px',
+                                                textAlign: 'left'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                if (period !== opt.value) {
+                                                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                                                    e.currentTarget.style.color = 'var(--text-primary)';
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (period !== opt.value) {
+                                                    e.currentTarget.style.background = 'transparent';
+                                                    e.currentTarget.style.color = 'var(--text-secondary)';
+                                                }
+                                            }}
+                                        >
+                                            {opt.label}
+                                        </div>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
                     <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={fetchData} style={{ marginTop: '2px' }}>
                         <RefreshCw size={14} />
                     </button>

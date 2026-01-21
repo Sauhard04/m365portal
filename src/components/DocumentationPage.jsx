@@ -204,11 +204,7 @@ const DocumentationPage = () => {
                     </div>
                 )}
 
-                <div className="doc-footer">
-                    <p className="doc-content">
-                        Need additional documentation? Contact your administrator.
-                    </p>
-                </div>
+
             </div>
         </div>
     );
