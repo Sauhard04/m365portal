@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useMsal } from "@azure/msal-react";
+import { useSearchParams } from 'react-router-dom';
 import { UsageService } from '../services/usage.service';
 import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
 import {
@@ -17,10 +18,11 @@ import Loader3D from './Loader3D';
 
 const UsageReports = () => {
     const { instance, accounts } = useMsal();
+    const [searchParams] = useSearchParams();
     const [loading, setLoading] = useState(true);
     const [period, setPeriod] = useState('D7');
     const [isPeriodDropdownOpen, setIsPeriodDropdownOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState('teams');
+    const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'teams');
     const [data, setData] = useState({
         teams: { detail: [], counts: [] },
         exchange: { detail: [], counts: [] },
@@ -97,6 +99,13 @@ const UsageReports = () => {
             fetchData();
         }
     }, [instance, accounts, period]);
+
+    useEffect(() => {
+        const tab = searchParams.get('tab');
+        if (tab && ['teams', 'exchange', 'sharepoint', 'onedrive'].includes(tab)) {
+            setActiveTab(tab);
+        }
+    }, [searchParams]);
 
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {

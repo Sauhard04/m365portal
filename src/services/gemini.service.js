@@ -51,6 +51,8 @@ GUIDELINES FOR RESPONSES:
 - If a user asks something outside the portal's scope, politely redirect them to portal features.
 - Structure your response using Markdown for clarity.
 - IMPORTANT: You provide extremely fast, high-quality responses.
+- DATA-DRIVEN REPORTS: When provided with raw data snippets (like JSON license lists), perform precise mathematical calculations. For license available counts, explicitly show the step-by-step summation of (Total - Consumed) across all SKUs to arrive at the final available license sum.
+- EXACTNESS: Do not approximate numbers from provided data; use the exact integers provided.
 `;
 
 export class GeminiService {
