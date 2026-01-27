@@ -1,5 +1,5 @@
 {
-  "timestamp": 1769157711915,
+  "timestamp": 1769503804063,
   "data": {
     "entra": {
       "users": 12,
@@ -22,7 +22,7 @@
       ],
       "apps": 31,
       "domains": 5,
-      "deletedUsers": 1
+      "deletedUsers": 0
     },
     "licenses": {
       "purchased": 30026,
@@ -70,7 +70,7 @@
       "score": 183.92,
       "max": 283,
       "caPolicies": 1,
-      "healthIssues": 10
+      "healthIssues": 6
     },
     "exchange": {
       "mailboxes": 12

@@ -38,6 +38,13 @@ import ServiceLayout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import DocumentationPage from './components/DocumentationPage';
 import PDFViewerPage from './components/PDFViewerPage';
+import PurviewDashboard from './components/PurviewDashboard';
+import DataCatalogPage from './components/DataCatalogPage';
+import LineagePage from './components/LineagePage';
+import GlossaryPage from './components/GlossaryPage';
+import ScanningPage from './components/ScanningPage';
+import CollectionsPage from './components/CollectionsPage';
+import PoliciesPage from './components/PoliciesPage';
 
 import { ThemeProvider } from './contexts/ThemeContext';
 
@@ -99,6 +106,15 @@ function App() {
                 <Route path="intune/rbac" element={<IntuneRBAC />} />
                 <Route path="intune/audit-logs" element={<IntuneAuditLogs />} />
                 <Route path="intune/reports" element={<IntuneReports />} />
+
+                {/* Purview Routes */}
+                <Route path="purview" element={<PurviewDashboard />} />
+                <Route path="purview/catalog" element={<DataCatalogPage />} />
+                <Route path="purview/lineage" element={<LineagePage />} />
+                <Route path="purview/glossary" element={<GlossaryPage />} />
+                <Route path="purview/scanning" element={<ScanningPage />} />
+                <Route path="purview/collections" element={<CollectionsPage />} />
+                <Route path="purview/policies" element={<PoliciesPage />} />
 
 
                 <Route path="documentation" element={<DocumentationPage />} />
