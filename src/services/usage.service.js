@@ -77,12 +77,22 @@ export class UsageService {
             // For counts, we might need a different endpoint or aggregate from detail
             // getEmailActivityCounts provides daily totals
             const countsData = await this.fetchReport('getEmailActivityCounts', period);
-            const counts = countsData ? countsData.map(c => ({
-                reportDate: c.reportRefreshDate,
-                sendCount: parseInt(c.sendCount) || 0,
-                receiveCount: parseInt(c.receiveCount) || 0,
-                readCount: parseInt(c.readCount) || 0
-            })) : [];
+            const counts = countsData ? countsData.map((c, i) => {
+                // Synthesize date if missing (Graph API sometimes omits reportDate in beta)
+                let rDate = c.reportDate;
+                if (!rDate && c.reportRefreshDate) {
+                    const d = new Date(c.reportRefreshDate);
+                    d.setDate(d.getDate() - (countsData.length - 1 - i));
+                    rDate = d.toISOString().split('T')[0];
+                }
+
+                return {
+                    reportDate: rDate || c.reportRefreshDate,
+                    sendCount: parseInt(c.send || c.sendCount) || 0,
+                    receiveCount: parseInt(c.receive || c.receiveCount) || 0,
+                    readCount: parseInt(c.read || c.readCount) || 0
+                };
+            }) : [];
 
             return { detail, counts };
         } catch {
@@ -118,13 +128,22 @@ export class UsageService {
             }));
 
             const countsData = await this.fetchReport('getTeamsUserActivityCounts', period);
-            const counts = countsData ? countsData.map(c => ({
-                reportDate: c.reportRefreshDate,
-                teamChatMessages: parseInt(c.teamChatMessageCount) || 0,
-                privateChatMessages: parseInt(c.privateChatMessageCount) || 0,
-                calls: parseInt(c.callCount) || 0,
-                meetings: parseInt(c.meetingCount) || 0
-            })) : [];
+            const counts = countsData ? countsData.map((c, i) => {
+                let rDate = c.reportDate;
+                if (!rDate && c.reportRefreshDate) {
+                    const d = new Date(c.reportRefreshDate);
+                    d.setDate(d.getDate() - (countsData.length - 1 - i));
+                    rDate = d.toISOString().split('T')[0];
+                }
+
+                return {
+                    reportDate: rDate || c.reportRefreshDate,
+                    teamChatMessages: parseInt(c.teamChatMessages || c.teamChatMessageCount) || 0,
+                    privateChatMessages: parseInt(c.privateChatMessages || c.privateChatMessageCount) || 0,
+                    calls: parseInt(c.calls || c.callCount) || 0,
+                    meetings: parseInt(c.meetings || c.meetingCount) || 0
+                };
+            }) : [];
 
             return { detail, counts };
         } catch {
@@ -161,11 +180,20 @@ export class UsageService {
             }));
 
             const countsData = await this.fetchReport('getSharePointSiteUsageFileCounts', period);
-            const counts = countsData ? countsData.map(c => ({
-                reportDate: c.reportRefreshDate,
-                viewedOrEditedFileCount: parseInt(c.viewedOrEditedFileCount) || 0,
-                syncedFileCount: parseInt(c.syncedFileCount) || 0
-            })) : [];
+            const counts = countsData ? countsData.map((c, i) => {
+                let rDate = c.reportDate;
+                if (!rDate && c.reportRefreshDate) {
+                    const d = new Date(c.reportRefreshDate);
+                    d.setDate(d.getDate() - (countsData.length - 1 - i));
+                    rDate = d.toISOString().split('T')[0];
+                }
+
+                return {
+                    reportDate: rDate || c.reportRefreshDate,
+                    viewedOrEditedFileCount: parseInt(c.viewedOrEdited || c.viewedOrEditedFileCount) || 0,
+                    syncedFileCount: parseInt(c.synced || c.syncedFileCount) || 0
+                };
+            }) : [];
 
             return { detail, counts };
         } catch {

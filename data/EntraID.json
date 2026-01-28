@@ -1,5 +1,5 @@
 {
-  "timestamp": 1769579956302,
+  "timestamp": 1769585292247,
   "data": {
     "entra_id": {
       "identities": {
@@ -73,7 +73,7 @@
       "signInTrends": [
         {
           "date": "14/1/2026",
-          "success": 60,
+          "success": 36,
           "failure": 8
         },
         {
@@ -133,7 +133,7 @@
         },
         {
           "date": "28/1/2026",
-          "success": 21,
+          "success": 27,
           "failure": 1
         }
       ]

@@ -472,11 +472,17 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                                 { name: 'Groups', count: groupsCount },
                                 { name: 'Domains', count: domainsCount }
                             ]} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
+                                <defs>
+                                    <linearGradient id="gradEntity" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stopColor="#3b82f6" />
+                                        <stop offset="100%" stopColor="#2563eb" />
+                                    </linearGradient>
+                                </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                                 <XAxis dataKey="name" stroke="var(--text-dim)" />
                                 <YAxis stroke="var(--text-dim)" />
-                                <Tooltip />
-                                <Bar dataKey="count" fill="#3b82f6" radius={[8, 8, 0, 0]} />
+                                <Tooltip contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#f3f4f6' }} />
+                                <Bar dataKey="count" fill="url(#gradEntity)" radius={[8, 8, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>

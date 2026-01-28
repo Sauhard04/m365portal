@@ -375,16 +375,34 @@ const IntuneMonitoring = () => {
                                 inGrace: stats.inGracePeriodDevices || 0,
                                 unknown: stats.unknownComplianceDevices || 0
                             }
-                        ]} margin={{ top: 20, right: 20, left: 0, bottom: 20 }} layout="vertical">
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                            <XAxis type="number" stroke="var(--text-dim)" />
-                            <YAxis type="category" dataKey="name" stroke="var(--text-dim)" />
-                            <Tooltip />
-                            <Legend />
-                            <Bar dataKey="compliant" stackId="compliance" fill="#10b981" name="Compliant" radius={[0, 8, 8, 0]} />
-                            <Bar dataKey="inGrace" stackId="compliance" fill="#f59e0b" name="In-Grace" />
-                            <Bar dataKey="nonCompliant" stackId="compliance" fill="#ef4444" name="Non-Compliant" />
-                            <Bar dataKey="unknown" stackId="compliance" fill="#6b7280" name="Unknown" />
+                        ]} margin={{ top: 20, right: 20, left: 0, bottom: 20 }} layout="vertical" barSize={30}>
+                            <defs>
+                                <linearGradient id="gradComplaint" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stopColor="#10b981" />
+                                    <stop offset="100%" stopColor="#34d399" />
+                                </linearGradient>
+                                <linearGradient id="gradNonCompliant" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stopColor="#ef4444" />
+                                    <stop offset="100%" stopColor="#f87171" />
+                                </linearGradient>
+                                <linearGradient id="gradGrace" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stopColor="#f59e0b" />
+                                    <stop offset="100%" stopColor="#fbbf24" />
+                                </linearGradient>
+                                <linearGradient id="gradUnknown" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stopColor="#6b7280" />
+                                    <stop offset="100%" stopColor="#9ca3af" />
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
+                            <XAxis type="number" stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
+                            <YAxis type="category" dataKey="name" stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} width={50} />
+                            <Tooltip contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#f3f4f6' }} />
+                            <Legend iconType="circle" />
+                            <Bar dataKey="compliant" stackId="compliance" fill="url(#gradComplaint)" name="Compliant" radius={[0, 0, 0, 0]} />
+                            <Bar dataKey="inGrace" stackId="compliance" fill="url(#gradGrace)" name="In-Grace" />
+                            <Bar dataKey="nonCompliant" stackId="compliance" fill="url(#gradNonCompliant)" name="Non-Compliant" />
+                            <Bar dataKey="unknown" stackId="compliance" fill="url(#gradUnknown)" name="Unknown" radius={[0, 4, 4, 0]} />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
@@ -397,15 +415,23 @@ const IntuneMonitoring = () => {
                     </h3>
                     <ResponsiveContainer width="100%" height={250}>
                         <BarChart data={Object.entries(stats.osDistribution || {}).map(([name, count]) => ({ name, count }))} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                            <XAxis dataKey="name" stroke="var(--text-dim)" />
-                            <YAxis stroke="var(--text-dim)" />
-                            <Tooltip />
-                            <Bar dataKey="count" radius={[8, 8, 0, 0]}>
-                                <Cell fill="#0078d4" />
-                                <Cell fill="#a3aaae" />
-                                <Cell fill="#3ddc84" />
-                                <Cell fill="#000000" />
+                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                            <XAxis dataKey="name" stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
+                            <YAxis stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
+                            <Tooltip contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#f3f4f6' }} />
+                            <Bar dataKey="count" radius={[6, 6, 0, 0]}>
+                                {
+                                    Object.entries(stats.osDistribution || {}).map(([name, count], index) => {
+                                        let color = '#64748b';
+                                        const n = name.toLowerCase();
+                                        if (n.includes('window')) color = '#3b82f6';
+                                        else if (n.includes('ios') || n.includes('iphone')) color = '#6366f1';
+                                        else if (n.includes('android')) color = '#10b981';
+                                        else if (n.includes('mac')) color = '#d946ef';
+                                        else if (n.includes('linux')) color = '#f97316';
+                                        return <Cell key={`cell-${index}`} fill={color} />;
+                                    })
+                                }
                             </Bar>
                         </BarChart>
                     </ResponsiveContainer>

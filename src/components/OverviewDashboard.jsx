@@ -61,7 +61,7 @@ const OverviewDashboard = () => {
             };
 
             // Save to Cache & JSON
-            await DataPersistenceService.save('Overview', persistenceData);
+            await DataPersistenceService.save('Overview_v2', persistenceData);
             setData(overviewData);
         } catch (err) {
             console.error('Overview fetch error:', err);
@@ -80,13 +80,13 @@ const OverviewDashboard = () => {
     };
 
     const loadData = async () => {
-        const cached = await DataPersistenceService.load('Overview');
+        const cached = await DataPersistenceService.load('Overview_v2');
         if (cached && cached.raw) {
             setData(cached.raw);
             setLoading(false);
 
             // Background revalidate if stale (30 mins)
-            if (DataPersistenceService.isExpired('Overview', 30)) {
+            if (DataPersistenceService.isExpired('Overview_v2', 30)) {
                 fetchOverviewData(false);
             }
         } else {
@@ -146,10 +146,27 @@ const OverviewDashboard = () => {
             color: 'var(--accent-success)',
             gradient: 'linear-gradient(135deg, #10b981, #059669)',
             path: '/service/admin/secure-score'
+        },
+        {
+            label: 'MFA Enrollment',
+            value: data?.quickStats.mfaRegistered && data?.quickStats.mfaTotal ? `${Math.round((data.quickStats.mfaRegistered / data.quickStats.mfaTotal) * 100)}%` : '0%',
+            icon: Lock,
+            color: 'var(--accent-success)',
+            gradient: 'linear-gradient(135deg, #059669, #047857)',
+            path: null
+        },
+        {
+            label: 'Active Roles',
+            value: data?.quickStats.activeRoles || 0,
+            icon: Shield,
+            color: 'var(--accent-warning)',
+            gradient: 'linear-gradient(135deg, #f59e0b, #d97706)',
+            path: null
         }
     ];
 
 
+    // Enhanced Premium Tooltip with Glassmorphism
     // Enhanced Premium Tooltip with Glassmorphism
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
@@ -157,13 +174,21 @@ const OverviewDashboard = () => {
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="recharts-custom-tooltip"
+                    style={{
+                        background: 'rgba(31, 41, 55, 0.9)', // Dark background for contrast
+                        backdropFilter: 'blur(8px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        borderRadius: '8px',
+                        padding: '12px',
+                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                        minWidth: '150px'
+                    }}
                 >
                     {label && (
                         <p style={{
                             fontWeight: 700,
                             marginBottom: '12px',
-                            color: 'var(--text-primary)',
+                            color: '#f3f4f6', // Light text
                             fontSize: '14px',
                             letterSpacing: '0.3px',
                             borderBottom: '1px solid rgba(255,255,255,0.1)',
@@ -172,41 +197,46 @@ const OverviewDashboard = () => {
                             {label}
                         </p>
                     )}
-                    {payload.map((entry, index) => (
-                        <div key={index} style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px',
-                            marginTop: index === 0 ? '0' : '8px'
-                        }}>
-                            <div style={{
-                                width: '10px',
-                                height: '10px',
-                                borderRadius: '50%',
-                                background: entry.color || entry.fill,
-                                boxShadow: `0 0 10px ${entry.color || entry.fill}50`,
-                                flexShrink: 0
-                            }}></div>
-                            <span style={{
-                                fontSize: '13px',
-                                color: 'var(--text-secondary)',
-                                flex: 1,
-                                fontWeight: 500
+                    {payload.map((entry, index) => {
+                        // Safe color extraction: prefer stroke, then color, ignore URL fills
+                        let color = entry.stroke || entry.color || '#fff';
+                        if (color && typeof color === 'string' && color.startsWith('url(#')) {
+                            color = 'var(--text-primary)';
+                        }
+
+                        return (
+                            <div key={index} style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '10px',
+                                marginTop: index === 0 ? '0' : '8px'
                             }}>
-                                {entry.name}:
-                            </span>
-                            <span style={{
-                                fontSize: '15px',
-                                fontWeight: 700,
-                                color: 'var(--text-primary)',
-                                background: `linear-gradient(135deg, ${entry.color || entry.fill}, ${entry.color || entry.fill}cc)`,
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent'
-                            }}>
-                                {typeof entry.value === 'number' ? entry.value.toLocaleString() : entry.value}
-                            </span>
-                        </div>
-                    ))}
+                                <div style={{
+                                    width: '10px',
+                                    height: '10px',
+                                    borderRadius: '50%',
+                                    background: color,
+                                    boxShadow: `0 0 10px ${color}50`,
+                                    flexShrink: 0
+                                }}></div>
+                                <span style={{
+                                    fontSize: '13px',
+                                    color: '#d1d5db', // Light grey for label
+                                    flex: 1,
+                                    fontWeight: 500
+                                }}>
+                                    {entry.name}:
+                                </span>
+                                <span style={{
+                                    fontSize: '15px',
+                                    fontWeight: 700,
+                                    color: color // Use the same color as the dot
+                                }}>
+                                    {typeof entry.value === 'number' ? entry.value.toLocaleString() : entry.value}
+                                </span>
+                            </div>
+                        );
+                    })}
                 </motion.div>
             );
         }
@@ -384,7 +414,13 @@ const OverviewDashboard = () => {
                         }}>
                             {/* User Distribution */}
                             {data?.charts.userDistribution?.length > 0 && (
-                                <div className="glass-card" style={{ padding: '14px' }}>
+                                <div
+                                    className="glass-card"
+                                    style={{ padding: '14px', cursor: 'pointer', transition: 'transform 0.2s' }}
+                                    onClick={() => navigate('/service/entra/users')}
+                                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                >
                                     <div className="flex-center justify-start flex-gap-4 spacing-v-8">
                                         <div style={{ padding: '6px', background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-indigo))', borderRadius: '6px' }}>
                                             <Users size={14} color="white" />
@@ -410,7 +446,13 @@ const OverviewDashboard = () => {
 
                             {/* Device Compliance */}
                             {data?.charts.deviceCompliance?.length > 0 && (
-                                <div className="glass-card" style={{ padding: '14px' }}>
+                                <div
+                                    className="glass-card"
+                                    style={{ padding: '14px', cursor: 'pointer', transition: 'transform 0.2s' }}
+                                    onClick={() => navigate('/service/intune')}
+                                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                >
                                     <div className="flex-center justify-start flex-gap-4 spacing-v-8">
                                         <div style={{ padding: '6px', background: 'linear-gradient(135deg, var(--accent-purple), var(--accent-indigo))', borderRadius: '6px' }}>
                                             <Shield size={14} color="white" />
@@ -422,11 +464,17 @@ const OverviewDashboard = () => {
                                     </div>
                                     <ResponsiveContainer width="100%" height={240}>
                                         <BarChart data={data.charts.deviceCompliance} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                                            <defs>
+                                                <linearGradient id="compGrad" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="0%" stopColor="var(--accent-indigo)" />
+                                                    <stop offset="100%" stopColor="var(--accent-purple)" />
+                                                </linearGradient>
+                                            </defs>
                                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
                                             <XAxis dataKey="name" stroke="var(--text-dim)" fontSize={11} tickLine={false} axisLine={false} />
                                             <YAxis stroke="var(--text-dim)" fontSize={11} tickLine={false} axisLine={false} />
                                             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
-                                            <Bar dataKey="value" fill="var(--accent-indigo)" radius={[6, 6, 0, 0]} />
+                                            <Bar dataKey="value" fill="url(#compGrad)" radius={[6, 6, 0, 0]} />
                                         </BarChart>
                                     </ResponsiveContainer>
                                 </div>
@@ -434,7 +482,13 @@ const OverviewDashboard = () => {
 
                             {/* License Utilization */}
                             {data?.charts.licenseUsage?.length > 0 && (
-                                <div className="glass-card" style={{ padding: '14px' }}>
+                                <div
+                                    className="glass-card"
+                                    style={{ padding: '14px', cursor: 'pointer', transition: 'transform 0.2s' }}
+                                    onClick={() => navigate('/service/admin/licenses')}
+                                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                >
                                     <div className="flex-center justify-start flex-gap-4 spacing-v-8" style={{ marginBottom: '16px' }}>
                                         <div style={{ padding: '6px', background: 'linear-gradient(135deg, var(--accent-cyan), var(--accent-blue))', borderRadius: '6px' }}>
                                             <CreditCard size={14} color="white" />
@@ -462,7 +516,13 @@ const OverviewDashboard = () => {
 
                             {/* Email Activity */}
                             {data?.charts.emailTrend?.length > 0 && (
-                                <div className="glass-card" style={{ padding: '14px' }}>
+                                <div
+                                    className="glass-card"
+                                    style={{ padding: '14px', cursor: 'pointer', transition: 'transform 0.2s' }}
+                                    onClick={() => navigate('/service/admin/emails')}
+                                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
+                                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                >
                                     <div className="flex-center justify-start flex-gap-4 spacing-v-8">
                                         <div style={{ padding: '6px', background: 'linear-gradient(135deg, var(--accent-indigo), var(--accent-purple))', borderRadius: '6px' }}>
                                             <Mail size={14} color="white" />
@@ -482,8 +542,8 @@ const OverviewDashboard = () => {
                                             </defs>
                                             <XAxis dataKey="name" hide />
                                             <Tooltip content={<CustomTooltip />} />
-                                            <Area type="monotone" dataKey="sent" stroke="var(--accent-indigo)" fillOpacity={1} fill="url(#emailGrad)" strokeWidth={2} />
-                                            <Area type="monotone" dataKey="received" stroke="var(--accent-cyan)" fillOpacity={0} strokeWidth={2} />
+                                            <Area type="monotone" dataKey="sent" name="Sent" stroke="var(--accent-indigo)" fillOpacity={1} fill="url(#emailGrad)" strokeWidth={2} />
+                                            <Area type="monotone" dataKey="received" name="Received" stroke="var(--accent-cyan)" fillOpacity={0} strokeWidth={2} />
                                         </AreaChart>
                                     </ResponsiveContainer>
                                 </div>
@@ -496,7 +556,13 @@ const OverviewDashboard = () => {
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
                                 {/* Security Radar */}
                                 {data?.charts.securityRadar && (
-                                    <div className="glass-card" style={{ padding: '14px' }}>
+                                    <div
+                                        className="glass-card"
+                                        style={{ padding: '14px', cursor: 'pointer', transition: 'transform 0.2s' }}
+                                        onClick={() => navigate('/service/admin/secure-score')}
+                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                    >
                                         <div className="flex-center justify-start flex-gap-4 spacing-v-8">
                                             <div style={{ padding: '6px', background: 'linear-gradient(135deg, var(--accent-error), var(--accent-warning))', borderRadius: '6px' }}>
                                                 <Shield size={14} color="white" />
@@ -517,7 +583,13 @@ const OverviewDashboard = () => {
                                 {/* Growth Trends */}
                                 {/* Growth Trends - Only show if data is available */}
                                 {data?.charts.userGrowthTrend?.length > 1 && (
-                                    <div className="glass-card" style={{ padding: '14px' }}>
+                                    <div
+                                        className="glass-card"
+                                        style={{ padding: '14px', cursor: 'pointer', transition: 'transform 0.2s' }}
+                                        onClick={() => navigate('/service/usage')}
+                                        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                    >
                                         <div className="flex-center justify-start flex-gap-4 spacing-v-8">
                                             <div style={{ padding: '6px', background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-purple))', borderRadius: '6px' }}>
                                                 <TrendingUp size={14} color="white" />
@@ -525,13 +597,19 @@ const OverviewDashboard = () => {
                                             <h3 style={{ fontSize: '12px', fontWeight: 700 }}>Active User Trends</h3>
                                         </div>
                                         <ResponsiveContainer width="100%" height={260}>
-                                            <LineChart data={data.charts.userGrowthTrend}>
+                                            <AreaChart data={data.charts.userGrowthTrend}>
+                                                <defs>
+                                                    <linearGradient id="growthGrad" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="var(--accent-blue)" stopOpacity={0.3} />
+                                                        <stop offset="95%" stopColor="var(--accent-blue)" stopOpacity={0} />
+                                                    </linearGradient>
+                                                </defs>
                                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
                                                 <XAxis dataKey="week" hide />
                                                 <YAxis hide />
                                                 <Tooltip content={<CustomTooltip />} />
-                                                <Line type="monotone" dataKey="active" stroke="var(--accent-blue)" strokeWidth={3} dot={false} />
-                                            </LineChart>
+                                                <Area type="monotone" dataKey="active" stroke="var(--accent-blue)" fillOpacity={1} fill="url(#growthGrad)" strokeWidth={3} />
+                                            </AreaChart>
                                         </ResponsiveContainer>
                                     </div>
                                 )}

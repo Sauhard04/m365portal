@@ -1,5 +1,5 @@
 {
-  "timestamp": 1769584183815,
+  "timestamp": 1769585572497,
   "data": {
     "overview": {
       "statistics": {
@@ -58,12 +58,12 @@
         ],
         "deviceByPlatform": [
           {
-            "name": "macOS",
-            "value": 1
-          },
-          {
             "name": "Windows",
             "value": 2
+          },
+          {
+            "name": "macOS",
+            "value": 1
           }
         ],
         "licenseUsage": [
@@ -97,37 +97,37 @@
           {
             "name": "Last 24h",
             "failed": 3,
-            "successful": 31
+            "successful": 37
           }
         ],
         "emailTrend": [
           {
-            "name": "2026-01-26",
+            "name": "2026-01-20",
             "sent": 0,
             "received": 1
           },
           {
-            "name": "2026-01-26",
+            "name": "2026-01-21",
             "sent": 0,
             "received": 6
           },
           {
-            "name": "2026-01-26",
+            "name": "2026-01-22",
             "sent": 0,
             "received": 0
           },
           {
-            "name": "2026-01-26",
+            "name": "2026-01-23",
             "sent": 1,
             "received": 0
           },
           {
-            "name": "2026-01-26",
+            "name": "2026-01-24",
             "sent": 0,
             "received": 0
           },
           {
-            "name": "2026-01-26",
+            "name": "2026-01-25",
             "sent": 0,
             "received": 0
           },
@@ -160,7 +160,7 @@
           },
           {
             "subject": "Sign-in Success",
-            "value": 91,
+            "value": 93,
             "fullMark": 100
           }
         ],

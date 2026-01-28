@@ -1,5 +1,5 @@
 {
-  "timestamp": 1769579868398,
+  "timestamp": 1769585263068,
   "data": {
     "admincenter": {
       "mailboxes": {
@@ -1036,11 +1036,11 @@
             "basis": "AllTenants",
             "averageScore": 53.39,
             "appsScore": 40.64,
-            "appsScoreMax": 104.26,
+            "appsScoreMax": 104.25,
             "dataScore": 0.68,
             "dataScoreMax": 4.35,
             "deviceScore": 11.34,
-            "deviceScoreMax": 21,
+            "deviceScoreMax": 21.01,
             "identityScore": 37.12,
             "identityScoreMax": 60.08,
             "infrastructureScore": 0,
@@ -1052,7 +1052,7 @@
             "SeatSizeRangeLowerValue": "1",
             "SeatSizeRangeUpperValue": "100",
             "appsScore": 46.72,
-            "appsScoreMax": 128.16,
+            "appsScoreMax": 128.15,
             "dataScore": 0.66,
             "dataScoreMax": 5.42,
             "deviceScore": 9.01,
@@ -1820,7 +1820,7 @@
             "controlName": "AATP_AccountWithLeakedCredentials",
             "description": "\r\n\t\tThis report lists users whose valid credentials have been leaked. \r\n\t\tWhen cybercriminals compromise valid passwords of legitimate users, the criminals often share those credentials. \r\n\t\tThis is usually done by posting them publicly on the dark web or paste sites or by trading or selling the credentials on the black market.<br><br>\r\n\t\tThe Microsoft leaked credentials service acquires username/password pairs by monitoring public and dark websites and by working with:<br><br>\r\n\t\t• Researchers<br>\r\n\t\t• Law enforcement<br>\r\n\t\t• Security teams at Microsoft<br>\r\n\t\t• Other trusted sources<br>\r\n\t",
             "score": 5,
-            "lastSynced": "2026-01-28T05:17:45Z",
+            "lastSynced": "2026-01-28T06:30:46Z",
             "implementationStatus": "",
             "on": "true",
             "scoreInPercentage": 100
