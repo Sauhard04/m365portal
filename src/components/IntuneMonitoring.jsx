@@ -279,9 +279,7 @@ const IntuneMonitoring = () => {
                     // Generic fallback -> Upgrade to Rich Visuals
                     if (!microFigure) {
                         // Generate consistent "random" data for sparklines based on index
-                        const sparkData = Array.from({ length: 15 }, (_, j) => ({
-                            value: 20 + Math.random() * 30 + (j * 2) + (i * 5)
-                        }));
+                        // Removed fake sparkData generator
 
                         if (tile.label.includes('Policies') || tile.label.includes('Baselines')) {
                             // Progress bar for "Health/Security" type tiles
@@ -295,11 +293,11 @@ const IntuneMonitoring = () => {
                                 </div>
                             );
                         } else if (tile.label.includes('Applications') || tile.label.includes('Configuration') || tile.label.includes('Audit')) {
-                            // Sparkline for "Activity/Count" type tiles
+                            // Removed fake sparkline
                             microFigure = (
                                 <div style={{ marginTop: '12px' }}>
                                     <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '4px' }}>7-Day Activity</div>
-                                    <MiniSparkline data={sparkData} color={tile.color} height={30} />
+                                    <div style={{ fontSize: '14px', fontWeight: 600 }}>Overview</div>
                                 </div>
                             );
                         } else {
@@ -372,10 +370,10 @@ const IntuneMonitoring = () => {
                         <BarChart data={[
                             {
                                 name: 'Devices',
-                                compliant: stats.totalDevices - stats.nonCompliantDevices - Math.floor(stats.totalDevices * 0.05),
-                                nonCompliant: stats.nonCompliantDevices,
-                                inGrace: Math.floor(stats.totalDevices * 0.05),
-                                unknown: Math.floor(stats.totalDevices * 0.02)
+                                compliant: stats.compliantDevices || 0,
+                                nonCompliant: stats.nonCompliantDevices || 0,
+                                inGrace: stats.inGracePeriodDevices || 0,
+                                unknown: stats.unknownComplianceDevices || 0
                             }
                         ]} margin={{ top: 20, right: 20, left: 0, bottom: 20 }} layout="vertical">
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
@@ -398,12 +396,7 @@ const IntuneMonitoring = () => {
                         Operating System Distribution
                     </h3>
                     <ResponsiveContainer width="100%" height={250}>
-                        <BarChart data={[
-                            { name: 'Windows', count: Math.floor(stats.totalDevices * 0.55) },
-                            { name: 'iOS', count: Math.floor(stats.totalDevices * 0.25) },
-                            { name: 'Android', count: Math.floor(stats.totalDevices * 0.15) },
-                            { name: 'macOS', count: Math.floor(stats.totalDevices * 0.05) }
-                        ]} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
+                        <BarChart data={Object.entries(stats.osDistribution || {}).map(([name, count]) => ({ name, count }))} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                             <XAxis dataKey="name" stroke="var(--text-dim)" />
                             <YAxis stroke="var(--text-dim)" />

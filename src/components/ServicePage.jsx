@@ -295,19 +295,11 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                                 );
                             }
                         } else if (i === 6) {
-                            // Failed Logins - Mini Trend
-                            const trendData = [
-                                { value: Math.max(0, failedSignIns.length - 10) },
-                                { value: Math.max(0, failedSignIns.length - 6) },
-                                { value: Math.max(0, failedSignIns.length - 3) },
-                                { value: Math.max(0, failedSignIns.length - 1) },
-                                { value: failedSignIns.length }
-                            ];
-
+                            // Removed fake trend data generation for Failed Logins
                             microFigure = (
                                 <div style={{ marginTop: '12px' }}>
-                                    <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '4px' }}>Last 24h Trend</div>
-                                    <MiniSparkline data={trendData} color={stat.color} height={30} />
+                                    <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '4px' }}>Last 24h</div>
+                                    <div style={{ fontSize: '16px', fontWeight: 600 }}>{failedSignIns.length}</div>
                                 </div>
                             );
                         }
@@ -322,15 +314,8 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                                 </div>
                             );
                         } else if (stat.label.includes('Requests') || stat.label.includes('Groups')) {
-                            const sparkData = Array.from({ length: 10 }, (_, j) => ({
-                                value: 10 + Math.random() * 20
-                            }));
-                            microFigure = (
-                                <div style={{ marginTop: '12px' }}>
-                                    <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '4px' }}>Activity Trend</div>
-                                    <MiniSparkline data={sparkData} color={stat.color} height={30} />
-                                </div>
-                            );
+                            // Removed fake sparkData 
+                            microFigure = null;
                         } else {
                             microFigure = (
                                 <div style={{ marginTop: '12px' }}>
@@ -496,26 +481,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                         </ResponsiveContainer>
                     </div>
 
-                    {/* Line Chart: User Growth */}
-                    <div className="glass-card" style={{ padding: '14px' }}>
-                        <h3 style={{ fontSize: '12px', fontWeight: 700, marginBottom: '16px' }}>
-                            User Activity Trend
-                        </h3>
-                        <ResponsiveContainer width="100%" height={250}>
-                            <LineChart data={[
-                                { week: 'W1', users: Math.floor(exchangeData.length * 0.85) },
-                                { week: 'W2', users: Math.floor(exchangeData.length * 0.9) },
-                                { week: 'W3', users: Math.floor(exchangeData.length * 0.95) },
-                                { week: 'W4', users: exchangeData.length }
-                            ]} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                <XAxis dataKey="week" stroke="var(--text-dim)" />
-                                <YAxis stroke="var(--text-dim)" />
-                                <Tooltip />
-                                <Line type="monotone" dataKey="users" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981', r: 5 }} />
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </div>
+                    {/* User Growth Trend Removed (was using fake data) */}
                 </div>
             )}
 

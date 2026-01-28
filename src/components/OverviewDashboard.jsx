@@ -300,14 +300,15 @@ const OverviewDashboard = () => {
                             {quickStats.map((stat, idx) => {
                                 let microFigure = null;
                                 if (idx === 0) {
-                                    const userTrendData = data?.charts.userGrowthTrend?.map(d => ({ value: d.active })) ||
-                                        [{ value: 400 }, { value: 420 }, { value: 435 }, { value: 445 }, { value: 450 }];
-                                    microFigure = (
-                                        <div style={{ marginTop: '12px' }}>
-                                            <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '4px' }}>Active Users Trend</div>
-                                            <MiniSparkline data={userTrendData} color={stat.color} height={30} />
-                                        </div>
-                                    );
+                                    if (data?.charts.userGrowthTrend?.length > 1) {
+                                        const userTrendData = data.charts.userGrowthTrend.map(d => ({ value: d.active }));
+                                        microFigure = (
+                                            <div style={{ marginTop: '12px' }}>
+                                                <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '4px' }}>Active Users Trend</div>
+                                                <MiniSparkline data={userTrendData} color={stat.color} height={30} />
+                                            </div>
+                                        );
+                                    }
                                 } else if (idx === 1) {
                                     const compliantCount = data?.charts.deviceCompliance?.find(d => d.name === 'Compliant')?.value || 0;
                                     const totalDevices = data?.quickStats.totalDevices || 0;
@@ -331,20 +332,22 @@ const OverviewDashboard = () => {
                                     );
                                 } else if (idx === 2) {
                                     const topLicenses = (data?.charts.licenseUsage || []).slice(0, 3);
-                                    microFigure = (
-                                        <div style={{ marginTop: '12px' }}>
-                                            <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>Top License Usage</div>
-                                            {(() => {
-                                                const colors = ['#3b82f6', '#10b981', '#f59e0b'];
-                                                const segments = topLicenses.map((lic, idx) => ({
-                                                    label: lic.name,
-                                                    value: lic.assigned,
-                                                    color: colors[idx % colors.length]
-                                                }));
-                                                return <MiniSegmentedBar segments={segments} height={10} />;
-                                            })()}
-                                        </div>
-                                    );
+                                    if (topLicenses.length > 0) {
+                                        microFigure = (
+                                            <div style={{ marginTop: '12px' }}>
+                                                <div style={{ fontSize: '9px', color: 'var(--text-dim)', marginBottom: '6px' }}>Top License Usage</div>
+                                                {(() => {
+                                                    const colors = ['#3b82f6', '#10b981', '#f59e0b'];
+                                                    const segments = topLicenses.map((lic, idx) => ({
+                                                        label: lic.name,
+                                                        value: lic.assigned,
+                                                        color: colors[idx % colors.length]
+                                                    }));
+                                                    return <MiniSegmentedBar segments={segments} height={10} />;
+                                                })()}
+                                            </div>
+                                        );
+                                    }
                                 }
 
                                 return (
@@ -512,23 +515,26 @@ const OverviewDashboard = () => {
                                 )}
 
                                 {/* Growth Trends */}
-                                <div className="glass-card" style={{ padding: '14px' }}>
-                                    <div className="flex-center justify-start flex-gap-4 spacing-v-8">
-                                        <div style={{ padding: '6px', background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-purple))', borderRadius: '6px' }}>
-                                            <TrendingUp size={14} color="white" />
+                                {/* Growth Trends - Only show if data is available */}
+                                {data?.charts.userGrowthTrend?.length > 1 && (
+                                    <div className="glass-card" style={{ padding: '14px' }}>
+                                        <div className="flex-center justify-start flex-gap-4 spacing-v-8">
+                                            <div style={{ padding: '6px', background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-purple))', borderRadius: '6px' }}>
+                                                <TrendingUp size={14} color="white" />
+                                            </div>
+                                            <h3 style={{ fontSize: '12px', fontWeight: 700 }}>Active User Trends</h3>
                                         </div>
-                                        <h3 style={{ fontSize: '12px', fontWeight: 700 }}>Active User Trends</h3>
+                                        <ResponsiveContainer width="100%" height={260}>
+                                            <LineChart data={data.charts.userGrowthTrend}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+                                                <XAxis dataKey="week" hide />
+                                                <YAxis hide />
+                                                <Tooltip content={<CustomTooltip />} />
+                                                <Line type="monotone" dataKey="active" stroke="var(--accent-blue)" strokeWidth={3} dot={false} />
+                                            </LineChart>
+                                        </ResponsiveContainer>
                                     </div>
-                                    <ResponsiveContainer width="100%" height={260}>
-                                        <LineChart data={data?.charts.userGrowthTrend || []}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
-                                            <XAxis dataKey="week" hide />
-                                            <YAxis hide />
-                                            <Tooltip content={<CustomTooltip />} />
-                                            <Line type="monotone" dataKey="active" stroke="var(--accent-blue)" strokeWidth={3} dot={false} />
-                                        </LineChart>
-                                    </ResponsiveContainer>
-                                </div>
+                                )}
                             </div>
                         </div>
                     </motion.div>

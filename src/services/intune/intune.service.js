@@ -11,7 +11,7 @@ export const IntuneService = {
                 configProfilesResponse,
                 mobileAppsResponse
             ] = await Promise.all([
-                client.api('/deviceManagement/managedDevices').select('id,operatingSystem').top(999).get().catch((err) => { console.debug('Managed devices fetch failed:', err.statusCode); return { value: [] }; }),
+                client.api('/deviceManagement/managedDevices').select('id,operatingSystem,complianceState').top(999).get().catch((err) => { console.debug('Managed devices fetch failed:', err.statusCode); return { value: [] }; }),
                 client.api('/deviceManagement/deviceCompliancePolicies').select('id').top(999).get().catch((err) => { console.debug('Compliance policies fetch failed:', err.statusCode); return { value: [] }; }),
                 client.api('/deviceManagement/deviceConfigurations').select('id').top(999).get().catch((err) => { console.debug('Device configurations fetch failed:', err.statusCode); return { value: [] }; }),
                 client.api('/deviceAppManagement/mobileApps').select('id').top(999).get().catch((err) => { console.debug('Mobile apps fetch failed:', err.statusCode); return { value: [] }; })
@@ -22,12 +22,24 @@ export const IntuneService = {
             const configProfiles = configProfilesResponse.value ? configProfilesResponse.value.length : 0;
             const mobileApps = mobileAppsResponse.value ? mobileAppsResponse.value.length : 0;
 
-            // Compute OS Distribution
+            // Compute OS Distribution and Compliance Distribution
             const osDistribution = {};
+            let compliantCount = 0;
+            let inGracePeriodCount = 0;
+            let unknownCount = 0;
+            let configManagerCount = 0;
+
             if (managedDevicesResponse.value) {
                 managedDevicesResponse.value.forEach(device => {
                     const os = device.operatingSystem || 'Unknown';
                     osDistribution[os] = (osDistribution[os] || 0) + 1;
+
+                    // Compliance State
+                    const state = (device.complianceState || 'unknown').toLowerCase();
+                    if (state === 'compliant') compliantCount++;
+                    else if (state === 'ingraceperiod') inGracePeriodCount++;
+                    else if (state === 'unknown') unknownCount++;
+                    else if (state === 'configmanager') configManagerCount++;
                 });
             }
 
@@ -57,7 +69,11 @@ export const IntuneService = {
                 totalDevices: managedDevices,
                 osDistribution,
                 nonCompliantDevices,
+                nonCompliantDevices,
                 inactiveDevices,
+                compliantDevices: compliantCount,
+                inGracePeriodDevices: inGracePeriodCount,
+                unknownComplianceDevices: unknownCount,
                 compliancePolicies,
                 configProfiles,
                 mobileApps,

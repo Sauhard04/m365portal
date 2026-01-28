@@ -82,22 +82,12 @@ export class AggregationService {
                 value
             }));
 
-            // License Utilization Chart Data - with fallbacks to ensure bars show
-            let licenseData = licenses.value?.map(sku => ({
+            // License Utilization Chart Data - Real data only
+            const licenseData = licenses.value?.map(sku => ({
                 name: sku.skuPartNumber?.replace(/_/g, ' ').substring(0, 20) || 'Unknown',
                 assigned: sku.consumedUnits || 0,
                 available: Math.max(0, (sku.prepaidUnits?.enabled || 0) - (sku.consumedUnits || 0))
             })).filter(l => l.assigned > 0 || l.available > 0).slice(0, 5) || [];
-
-            if (licenseData.length === 0) {
-                licenseData = [
-                    { name: 'Microsoft 365 E5', assigned: 45, available: 5 },
-                    { name: 'Office 365 E3', assigned: 78, available: 22 },
-                    { name: 'EMS E5', assigned: 40, available: 10 },
-                    { name: 'Power BI Pro', assigned: 25, available: 25 },
-                    { name: 'Visio Plan 2', assigned: 12, available: 18 }
-                ];
-            }
 
             // Failed Sign-ins Chart Data
             const failedSignIns = signIns.value?.filter(s => s.status?.errorCode !== 0) || [];
@@ -150,11 +140,7 @@ export class AggregationService {
             }
 
             if (emailTrendData.length === 0) {
-                emailTrendData = [{
-                    name: 'Last 7 Days',
-                    sent: 1250,
-                    received: 2870
-                }];
+                emailTrendData = [];
             }
 
             // Security Posture Radar Chart Data
@@ -166,70 +152,21 @@ export class AggregationService {
                 { subject: 'Sign-in Success', value: signIns.value && signIns.value.length > 0 ? Math.round(((signIns.value.length - failedSignIns.length) / signIns.value.length) * 100) : 96, fullMark: 100 }
             ];
 
-            // License Distribution Treemap Data - Ensure non-zero values
+            // License Distribution Treemap Data
             const treemapData = licenses.value?.map((sku, idx) => ({
                 name: sku.skuPartNumber?.replace(/_/g, ' ').substring(0, 25) || `License ${idx + 1}`,
-                size: (sku.consumedUnits || 0) > 0 ? sku.consumedUnits : [45, 78, 92, 34, 61, 28, 19, 53][idx] || 10,
+                size: (sku.consumedUnits || 0) > 0 ? sku.consumedUnits : 0,
                 fill: ['#3b82f6', '#a855f7', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6'][idx % 8]
-            })).filter(d => d.size > 0).slice(0, 8) || [
-                    { name: 'Office 365 E3', size: 145, fill: '#3b82f6' },
-                    { name: 'Microsoft 365 E5', size: 89, fill: '#a855f7' },
-                    { name: 'Power BI Pro', size: 67, fill: '#06b6d4' },
-                    { name: 'Azure Active Directory', size: 234, fill: '#10b981' },
-                    { name: 'Exchange Online Plan 1', size: 112, fill: '#f59e0b' },
-                    { name: 'SharePoint Online', size: 178, fill: '#ef4444' }
-                ];
+            })).filter(d => d.size > 0).slice(0, 8) || [];
 
-            // User Growth Trend - Realistic weekly data with trends
-            const baseActive = activeUsers || 450;
-            const baseInactive = (totalUsers - activeUsers) || 50;
-            const weeklyUserGrowth = [
-                { week: '4 weeks ago', active: Math.max(10, Math.floor(baseActive * 0.88)), inactive: Math.max(5, Math.floor(baseInactive * 1.15)) },
-                { week: '3 weeks ago', active: Math.max(10, Math.floor(baseActive * 0.92)), inactive: Math.max(5, Math.floor(baseInactive * 1.08)) },
-                { week: '2 weeks ago', active: Math.max(10, Math.floor(baseActive * 0.96)), inactive: Math.max(5, Math.floor(baseInactive * 1.04)) },
-                { week: 'Last week', active: Math.max(10, Math.floor(baseActive * 0.98)), inactive: Math.max(5, Math.floor(baseInactive * 1.02)) },
-                { week: 'This week', active: Math.max(10, baseActive), inactive: Math.max(5, baseInactive) }
-            ];
+            // User Growth Trend - Placeholder or Real if available (removed fake extrapolated data)
+            const weeklyUserGrowth = [];
 
-            // Device Enrollment Funnel - Realistic conversion funnel
-            const funnelTotal = totalUsers || 500;
-            const enrollmentFunnel = [
-                { stage: 'Total Users', count: funnelTotal, fill: '#3b82f6' },
-                { stage: 'License Assigned', count: Math.min(funnelTotal, Math.max(totalLicenses, Math.floor(funnelTotal * 0.85))), fill: '#a855f7' },
-                { stage: 'Device Enrolled', count: Math.max(totalDevices, Math.floor(funnelTotal * 0.72)), fill: '#06b6d4' },
-                { stage: 'Compliant', count: Math.max(compliantDevices, Math.floor(funnelTotal * 0.65)), fill: '#10b981' }
-            ];
+            // Device Enrollment Funnel - Removed fake extrapolated data
+            const enrollmentFunnel = [];
 
-            // License Trend Composed Chart - Realistic trend data
-            const currentAssigned = totalLicenses || 450;
-            const currentAvailable = licenses.value?.reduce((acc, sku) => acc + ((sku.prepaidUnits?.enabled || 0) - (sku.consumedUnits || 0)), 0) || 150;
-            const totalCapacity = currentAssigned + currentAvailable;
-            const licenseTrendData = [
-                {
-                    month: '3 Mon Ago',
-                    assigned: Math.max(10, Math.floor(currentAssigned * 0.82)),
-                    available: Math.max(5, Math.floor(currentAvailable * 1.12)),
-                    utilization: 68
-                },
-                {
-                    month: '2 Mon Ago',
-                    assigned: Math.max(10, Math.floor(currentAssigned * 0.89)),
-                    available: Math.max(5, Math.floor(currentAvailable * 1.06)),
-                    utilization: 74
-                },
-                {
-                    month: 'Last Month',
-                    assigned: Math.max(10, Math.floor(currentAssigned * 0.95)),
-                    available: Math.max(5, Math.floor(currentAvailable * 1.02)),
-                    utilization: 79
-                },
-                {
-                    month: 'This Month',
-                    assigned: Math.max(10, currentAssigned),
-                    available: Math.max(5, currentAvailable),
-                    utilization: totalCapacity > 0 ? Math.min(95, Math.round((currentAssigned / totalCapacity) * 100)) : 82
-                }
-            ];
+            // License Trend - Removed fake extrapolated data
+            const licenseTrendData = [];
 
             return {
                 quickStats: {

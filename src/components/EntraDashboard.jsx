@@ -24,6 +24,8 @@ const EntraDashboard = () => {
         apps: { total: 0, growth: 'Enterprise' }
     });
     const [secureScore, setSecureScore] = useState({ current: 0, max: 100 });
+    const [mfaStats, setMfaStats] = useState(null);
+    const [signInTrends, setSignInTrends] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const fetchDashboardData = async (isManual = false) => {
@@ -34,17 +36,20 @@ const EntraDashboard = () => {
 
         try {
             const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-            const client = new GraphService(response.accessToken).client;
+            const graphService = new GraphService(response.accessToken);
+            const client = graphService.client;
 
             // Parallel Fetch
-            const [userCounts, groupCounts, deviceCounts, subCounts, adminCounts, appsResponse, scoreResponse] = await Promise.all([
+            const [userCounts, groupCounts, deviceCounts, subCounts, adminCounts, appsResponse, scoreResponse, mfaData, signInsData] = await Promise.all([
                 UsersService.getUserCounts(client),
                 GroupsService.getGroupCounts(client),
                 DevicesService.getDeviceCounts(client),
                 SubscriptionsService.getSubscriptionCounts(client),
                 RolesService.getAdminCounts(client),
                 client.api("/applications").select('id').top(999).get().catch(() => ({ value: [] })),
-                client.api('/security/secureScores').top(1).get().catch(() => ({ value: [] }))
+                client.api('/security/secureScores').top(1).get().catch(() => ({ value: [] })),
+                graphService.getMFAStatus(),
+                graphService.getSignInTrends(14)
             ]);
 
             const appsCount = appsResponse.value ? appsResponse.value.length : 0;
@@ -80,13 +85,20 @@ const EntraDashboard = () => {
                         status: "Identity Guard"
                     }
                 },
-                raw: { stats: dashboardStats, secureScore: scoreInfo }
+                raw: {
+                    stats: dashboardStats,
+                    secureScore: scoreInfo,
+                    mfaStats: mfaData,
+                    signInTrends: signInsData
+                }
             };
 
             await DataPersistenceService.save('EntraID', persistenceData);
 
             setStats(dashboardStats);
             setSecureScore(scoreInfo);
+            setMfaStats(mfaData);
+            setSignInTrends(signInsData);
         } catch (error) {
             console.error("Dashboard fetch error:", error);
         } finally {
@@ -107,6 +119,8 @@ const EntraDashboard = () => {
         if (cached && cached.raw) {
             setStats(cached.raw.stats);
             setSecureScore(cached.raw.secureScore);
+            setMfaStats(cached.raw.mfaStats || null);
+            setSignInTrends(cached.raw.signInTrends || []);
             setLoading(false);
 
             if (DataPersistenceService.isExpired('EntraID', 30)) {
@@ -381,8 +395,8 @@ const EntraDashboard = () => {
                 </div>
             )}
 
-            {/* NEW: Main Analytics for Entra ID */}
-            {!loading && stats.users.total > 0 && (
+            {/* NEW: Main Analytics for Entra ID - Only show if data is available */}
+            {!loading && (mfaStats?.total > 0 || signInTrends.length > 0) && (
                 <div style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
@@ -390,56 +404,54 @@ const EntraDashboard = () => {
                     marginTop: '24px'
                 }}>
                     {/* Stacked Bar: MFA Status */}
-                    <div className="glass-card" style={{ padding: '14px' }}>
-                        <h3 style={{ fontSize: '12px', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Shield size={14} color="var(--accent-success)" />
-                            MFA Enrollment Status
-                        </h3>
-                        <ResponsiveContainer width="100%" height={250}>
-                            <BarChart data={[
-                                {
-                                    name: 'Users',
-                                    enabled: Math.floor(stats.users.total * 0.65),
-                                    disabled: Math.floor(stats.users.total * 0.30),
-                                    risky: Math.floor(stats.users.total * 0.05)
-                                }
-                            ]} margin={{ top: 20, right: 20, left: 0, bottom: 20 }} layout="vertical">
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                <XAxis type="number" stroke="var(--text-dim)" />
-                                <YAxis type="category" dataKey="name" stroke="var(--text-dim)" />
-                                <Tooltip />
-                                <Legend />
-                                <Bar dataKey="enabled" stackId="mfa" fill="#10b981" name="MFA Enabled" radius={[0, 8, 8, 0]} />
-                                <Bar dataKey="disabled" stackId="mfa" fill="#f59e0b" name="MFA Disabled" />
-                                <Bar dataKey="risky" stackId="mfa" fill="#ef4444" name="Risky (Admin)" />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
+                    {mfaStats?.total > 0 && (
+                        <div className="glass-card" style={{ padding: '14px' }}>
+                            <h3 style={{ fontSize: '12px', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <Shield size={14} color="var(--accent-success)" />
+                                MFA Enrollment Status
+                            </h3>
+                            <ResponsiveContainer width="100%" height={250}>
+                                <BarChart data={[
+                                    {
+                                        name: 'Users',
+                                        enabled: mfaStats.mfaEnabled,
+                                        disabled: mfaStats.mfaDisabled,
+                                        risky: mfaStats.risky
+                                    }
+                                ]} margin={{ top: 20, right: 20, left: 0, bottom: 20 }} layout="vertical">
+                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                                    <XAxis type="number" stroke="var(--text-dim)" />
+                                    <YAxis type="category" dataKey="name" stroke="var(--text-dim)" />
+                                    <Tooltip contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#f3f4f6' }} />
+                                    <Legend />
+                                    <Bar dataKey="enabled" stackId="mfa" fill="#10b981" name="MFA Enabled" radius={[0, 8, 8, 0]} />
+                                    <Bar dataKey="disabled" stackId="mfa" fill="#f59e0b" name="MFA Disabled" />
+                                    <Bar dataKey="risky" stackId="mfa" fill="#ef4444" name="Risky (Admin)" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    )}
 
                     {/* Line Chart: Sign-in Trends */}
-                    <div className="glass-card" style={{ padding: '14px' }}>
-                        <h3 style={{ fontSize: '12px', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Activity size={14} color="var(--accent-blue)" />
-                            Sign-in Activity (14 Days)
-                        </h3>
-                        <ResponsiveContainer width="100%" height={250}>
-                            <LineChart data={[
-                                { day: 'Day 1', success: 450, failure: 12 },
-                                { day: 'Day 4', success: 520, failure: 8 },
-                                { day: 'Day 7', success: 480, failure: 15 },
-                                { day: 'Day 10', success: 510, failure: 6 },
-                                { day: 'Day 14', success: 550, failure: 10 }
-                            ]} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                <XAxis dataKey="day" stroke="var(--text-dim)" />
-                                <YAxis stroke="var(--text-dim)" />
-                                <Tooltip />
-                                <Legend />
-                                <Line type="monotone" dataKey="success" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981', r: 5 }} name="Success" />
-                                <Line type="monotone" dataKey="failure" stroke="#ef4444" strokeWidth={3} dot={{ fill: '#ef4444', r: 5 }} name="Failure" />
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </div>
+                    {signInTrends.length > 0 && (
+                        <div className="glass-card" style={{ padding: '14px' }}>
+                            <h3 style={{ fontSize: '12px', fontWeight: 700, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <Activity size={14} color="var(--accent-blue)" />
+                                Sign-in Activity (14 Days)
+                            </h3>
+                            <ResponsiveContainer width="100%" height={250}>
+                                <LineChart data={signInTrends} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                                    <XAxis dataKey="date" stroke="var(--text-dim)" />
+                                    <YAxis stroke="var(--text-dim)" />
+                                    <Tooltip contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#f3f4f6' }} />
+                                    <Legend />
+                                    <Line type="monotone" dataKey="success" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981', r: 5 }} name="Success" />
+                                    <Line type="monotone" dataKey="failure" stroke="#ef4444" strokeWidth={3} dot={{ fill: '#ef4444', r: 5 }} name="Failure" />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

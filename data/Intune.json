@@ -1,1 +1,40 @@
-{}
+{
+  "timestamp": 1769579975445,
+  "data": {
+    "intune": {
+      "devices": {
+        "total": 3,
+        "non_compliant": 2,
+        "inactive": 2
+      },
+      "policies": {
+        "compliance": 2,
+        "configuration": 8
+      },
+      "apps": {
+        "total_managed": 7
+      },
+      "security": {
+        "baselines": 0,
+        "admin_roles": 0
+      }
+    },
+    "raw": {
+      "totalDevices": 3,
+      "osDistribution": {
+        "Windows": 2,
+        "macOS": 1
+      },
+      "nonCompliantDevices": 2,
+      "inactiveDevices": 2,
+      "compliantDevices": 1,
+      "inGracePeriodDevices": 0,
+      "unknownComplianceDevices": 0,
+      "compliancePolicies": 2,
+      "configProfiles": 8,
+      "mobileApps": 7,
+      "securityBaselines": 0,
+      "adminRoles": 0
+    }
+  }
+}

@@ -1,13 +1,13 @@
 {
-  "timestamp": 1769574629385,
+  "timestamp": 1769579868398,
   "data": {
     "admincenter": {
       "mailboxes": {
-        "total": 12,
+        "total": 13,
         "status": "Live"
       },
       "licenses": {
-        "used": 14,
+        "used": 18,
         "status": "Active"
       },
       "groups": {
@@ -35,6 +35,24 @@
     },
     "raw": {
       "exchangeData": [
+        {
+          "displayName": "anje",
+          "userPrincipalName": "anje@intunetraininglabs.onmicrosoft.com",
+          "emailAddress": "anje@intunetraininglabs.onmicrosoft.com",
+          "jobTitle": "",
+          "department": "",
+          "officeLocation": "",
+          "city": "",
+          "country": "",
+          "accountEnabled": "Yes",
+          "createdDateTime": "2026-01-28T05:33:06Z",
+          "lastActivityDate": "N/A",
+          "itemCount": 0,
+          "archivePolicy": false,
+          "mailboxSize": "0.00 GB",
+          "migrationStatus": "Cloud Native",
+          "dataMigrated": "N/A"
+        },
         {
           "displayName": "Demo User",
           "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
@@ -258,7 +276,7 @@
           "accountId": "3163c13f-b80f-426c-94b0-fa4c0bf66ad7",
           "appliesTo": "User",
           "capabilityStatus": "Enabled",
-          "consumedUnits": 2,
+          "consumedUnits": 3,
           "id": "3163c13f-b80f-426c-94b0-fa4c0bf66ad7_f30db892-07e9-47e9-837c-80727f46fd3d",
           "skuId": "f30db892-07e9-47e9-837c-80727f46fd3d",
           "skuPartNumber": "FLOW_FREE",
@@ -300,7 +318,7 @@
           "accountId": "3163c13f-b80f-426c-94b0-fa4c0bf66ad7",
           "appliesTo": "User",
           "capabilityStatus": "Enabled",
-          "consumedUnits": 1,
+          "consumedUnits": 2,
           "id": "3163c13f-b80f-426c-94b0-fa4c0bf66ad7_606b54a9-78d8-4298-ad8b-df6ef4481c80",
           "skuId": "606b54a9-78d8-4298-ad8b-df6ef4481c80",
           "skuPartNumber": "CCIBOTS_PRIVPREV_VIRAL",
@@ -342,7 +360,7 @@
           "accountId": "3163c13f-b80f-426c-94b0-fa4c0bf66ad7",
           "appliesTo": "User",
           "capabilityStatus": "Enabled",
-          "consumedUnits": 10,
+          "consumedUnits": 11,
           "id": "3163c13f-b80f-426c-94b0-fa4c0bf66ad7_c42b9cae-ea4f-4ab7-9717-81576235ccac",
           "skuId": "c42b9cae-ea4f-4ab7-9717-81576235ccac",
           "skuPartNumber": "DEVELOPERPACK_E5",
@@ -937,7 +955,7 @@
           "accountId": "3163c13f-b80f-426c-94b0-fa4c0bf66ad7",
           "appliesTo": "User",
           "capabilityStatus": "Enabled",
-          "consumedUnits": 1,
+          "consumedUnits": 2,
           "id": "3163c13f-b80f-426c-94b0-fa4c0bf66ad7_5b631642-bd26-49fe-bd20-1daaa972ef80",
           "skuId": "5b631642-bd26-49fe-bd20-1daaa972ef80",
           "skuPartNumber": "POWERAPPS_DEV",
@@ -1038,7 +1056,7 @@
             "dataScore": 0.66,
             "dataScoreMax": 5.42,
             "deviceScore": 9.01,
-            "deviceScoreMax": 16.73,
+            "deviceScoreMax": 16.74,
             "identityScore": 35.65,
             "identityScoreMax": 60.34,
             "infrastructureScore": 0,
@@ -1251,7 +1269,7 @@
             "controlName": "AATP_DefenderForIdentityIsNotInstalled",
             "description": "Installing Microsoft Defender for Identity sensors provides you with the ability to detect advanced threats in your entire identity infrastructure. Actionable security alerts are generated through the analysis of network traffic and security events.",
             "score": 0,
-            "lastSynced": "2026-01-27T11:22:31Z",
+            "lastSynced": "2026-01-28T05:01:55Z",
             "implementationStatus": "",
             "on": "false",
             "scoreInPercentage": 0
@@ -1802,7 +1820,7 @@
             "controlName": "AATP_AccountWithLeakedCredentials",
             "description": "\r\n\t\tThis report lists users whose valid credentials have been leaked. \r\n\t\tWhen cybercriminals compromise valid passwords of legitimate users, the criminals often share those credentials. \r\n\t\tThis is usually done by posting them publicly on the dark web or paste sites or by trading or selling the credentials on the black market.<br><br>\r\n\t\tThe Microsoft leaked credentials service acquires username/password pairs by monitoring public and dark websites and by working with:<br><br>\r\n\t\t• Researchers<br>\r\n\t\t• Law enforcement<br>\r\n\t\t• Security teams at Microsoft<br>\r\n\t\t• Other trusted sources<br>\r\n\t",
             "score": 5,
-            "lastSynced": "2026-01-28T03:47:30Z",
+            "lastSynced": "2026-01-28T05:17:45Z",
             "implementationStatus": "",
             "on": "true",
             "scoreInPercentage": 100
@@ -1928,6 +1946,93 @@
         }
       ],
       "failedSignIns": [
+        {
+          "id": "0bfa058b-efe8-421f-8c67-41fb678f6f00",
+          "createdDateTime": "2026-01-28T04:23:24Z",
+          "userDisplayName": "Pilot User",
+          "userPrincipalName": "pilotuser@intunetraininglabs.onmicrosoft.com",
+          "userId": "6c7f3243-9f68-4037-80b7-dce9c510c098",
+          "appId": "0fb1ce07-0af3-4192-a8bf-d8b3cce097fc",
+          "appDisplayName": "M365Portal-Purview-Service",
+          "ipAddress": "122.184.91.214",
+          "clientAppUsed": "Browser",
+          "correlationId": "019c02d7-1a11-7591-844a-64ae65cec7e3",
+          "conditionalAccessStatus": "notApplied",
+          "isInteractive": true,
+          "riskDetail": "none",
+          "riskLevelAggregated": "none",
+          "riskLevelDuringSignIn": "none",
+          "riskState": "none",
+          "riskEventTypes": [],
+          "riskEventTypes_v2": [],
+          "resourceDisplayName": "Microsoft Graph",
+          "resourceId": "00000003-0000-0000-c000-000000000000",
+          "status": {
+            "errorCode": 50140,
+            "failureReason": "This occurred due to 'Keep me signed in' interrupt when the user was signing in.",
+            "additionalDetails": "This is an expected part of the login flow, where a user is asked if they want to remain signed into this browser to make further logins easier. For more details, see https://techcommunity.microsoft.com/t5/microsoft-entra/the-new-azure-ad-sign-in-and-keep-me-signed-in-experiences/td-p/128267"
+          },
+          "deviceDetail": {
+            "deviceId": "",
+            "displayName": "",
+            "operatingSystem": "Windows10",
+            "browser": "Edge 144.0.0",
+            "isCompliant": false,
+            "isManaged": false,
+            "trustType": null
+          },
+          "location": {
+            "city": "Delhi",
+            "state": "Delhi",
+            "countryOrRegion": "IN",
+            "geoCoordinates": {
+              "altitude": null,
+              "latitude": 28.6353,
+              "longitude": 77.225
+            }
+          },
+          "appliedConditionalAccessPolicies": [
+            {
+              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+              "displayName": "Mac Require",
+              "enforcedGrantControls": [
+                "RequireCompliantDevice"
+              ],
+              "enforcedSessionControls": [],
+              "result": "notApplied"
+            },
+            {
+              "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+              "displayName": "Microsoft-managed: Block legacy authentication",
+              "enforcedGrantControls": [],
+              "enforcedSessionControls": [],
+              "result": "notEnabled"
+            },
+            {
+              "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+              "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+              "enforcedGrantControls": [],
+              "enforcedSessionControls": [],
+              "result": "notEnabled"
+            },
+            {
+              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+              "displayName": "Require phishing-resistant multifactor authentication for admins",
+              "enforcedGrantControls": [],
+              "enforcedSessionControls": [],
+              "result": "reportOnlyInterrupted"
+            },
+            {
+              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+              "displayName": "Use application enforced restrictions for O365 apps",
+              "enforcedGrantControls": [],
+              "enforcedSessionControls": [
+                "AppEnforcedRestrictions"
+              ],
+              "result": "reportOnlySuccess"
+            }
+          ]
+        },
         {
           "id": "74e0c4d4-58ef-4afd-8f3f-7b0f8f511000",
           "createdDateTime": "2026-01-27T09:30:52Z",
@@ -2155,93 +2260,6 @@
             }
           },
           "appliedConditionalAccessPolicies": []
-        },
-        {
-          "id": "f09cdeef-9d03-4630-ab92-3ae1ee8c4700",
-          "createdDateTime": "2026-01-27T06:33:38Z",
-          "userDisplayName": "Demo User",
-          "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
-          "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
-          "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
-          "appDisplayName": "Azure Portal",
-          "ipAddress": "122.184.91.214",
-          "clientAppUsed": "Browser",
-          "correlationId": "019bfe28-4e43-7b96-bdf9-a8149a84d58e",
-          "conditionalAccessStatus": "notApplied",
-          "isInteractive": true,
-          "riskDetail": "none",
-          "riskLevelAggregated": "none",
-          "riskLevelDuringSignIn": "none",
-          "riskState": "none",
-          "riskEventTypes": [],
-          "riskEventTypes_v2": [],
-          "resourceDisplayName": "Azure Resource Manager",
-          "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
-          "status": {
-            "errorCode": 50140,
-            "failureReason": "This occurred due to 'Keep me signed in' interrupt when the user was signing in.",
-            "additionalDetails": "This is an expected part of the login flow, where a user is asked if they want to remain signed into this browser to make further logins easier. For more details, see https://techcommunity.microsoft.com/t5/microsoft-entra/the-new-azure-ad-sign-in-and-keep-me-signed-in-experiences/td-p/128267"
-          },
-          "deviceDetail": {
-            "deviceId": "",
-            "displayName": "",
-            "operatingSystem": "Windows10",
-            "browser": "Chrome 144.0.0",
-            "isCompliant": false,
-            "isManaged": false,
-            "trustType": null
-          },
-          "location": {
-            "city": "New Delhi",
-            "state": "Delhi",
-            "countryOrRegion": "IN",
-            "geoCoordinates": {
-              "altitude": null,
-              "latitude": 28.6353,
-              "longitude": 77.225
-            }
-          },
-          "appliedConditionalAccessPolicies": [
-            {
-              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-              "displayName": "Mac Require",
-              "enforcedGrantControls": [
-                "RequireCompliantDevice"
-              ],
-              "enforcedSessionControls": [],
-              "result": "notApplied"
-            },
-            {
-              "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
-              "displayName": "Microsoft-managed: Block legacy authentication",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [],
-              "result": "notEnabled"
-            },
-            {
-              "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
-              "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [],
-              "result": "notEnabled"
-            },
-            {
-              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-              "displayName": "Require phishing-resistant multifactor authentication for admins",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [],
-              "result": "reportOnlyInterrupted"
-            },
-            {
-              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-              "displayName": "Use application enforced restrictions for O365 apps",
-              "enforcedGrantControls": [],
-              "enforcedSessionControls": [
-                "AppEnforcedRestrictions"
-              ],
-              "result": "reportOnlyNotApplied"
-            }
-          ]
         }
       ]
     }

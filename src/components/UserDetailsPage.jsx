@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -8,11 +8,16 @@ import {
     LogOut, ExternalLink
 } from 'lucide-react';
 import { useMsal } from '@azure/msal-react';
+import { GraphService } from '../services/graphService';
+import { loginRequest } from '../authConfig';
 
 const UserDetailsPage = () => {
     const navigate = useNavigate();
     const { accounts, instance } = useMsal();
-    const user = accounts[0] || { name: 'Admin User', username: 'admin@company.onmicrosoft.com' };
+    const [userProfile, setUserProfile] = useState(accounts[0] || { name: 'Admin User', username: 'admin@company.onmicrosoft.com' });
+    const [securityInfo, setSecurityInfo] = useState({ passwordChanged: null, mfaStatus: null, mfaMethods: [] });
+    const [hasSecurityData, setHasSecurityData] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const handleLogout = () => {
         instance.logoutRedirect();
@@ -26,12 +31,82 @@ const UserDetailsPage = () => {
     ];
 
     const profileDetails = [
-        { icon: Mail, label: 'Email', value: user.username },
+        { icon: Mail, label: 'Email', value: userProfile.username || userProfile.userPrincipalName },
         { icon: Building, label: 'Organization', value: 'Meridian Solutions' },
-        { icon: Briefcase, label: 'Job Title', value: 'Security Specialist' },
-        { icon: Globe, label: 'Location', value: 'Gurugram, India' },
-        { icon: Phone, label: 'Mobile', value: '+91 98XXX XXXXX' },
+        { icon: Briefcase, label: 'Job Title', value: userProfile.jobTitle || 'Security Specialist' },
+        { icon: Globe, label: 'Location', value: userProfile.officeLocation || 'Gurugram, India' },
+        { icon: Phone, label: 'Mobile', value: userProfile.mobilePhone || '+91 98XXX XXXXX' },
     ];
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!accounts[0]) return;
+            setLoading(true);
+            try {
+                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+                const client = new GraphService(response.accessToken).client;
+
+                // Fetch User Details including password change
+                const userDetails = await client.api('/me')
+                    .select('displayName,userPrincipalName,mail,jobTitle,officeLocation,mobilePhone,lastPasswordChangeDateTime')
+                    .get()
+                    .catch(e => {
+                        console.warn("Failed to fetch user details", e);
+                        return null;
+                    });
+
+                if (userDetails) {
+                    setUserProfile(prev => ({ ...prev, ...userDetails }));
+                }
+
+                // Fetch MFA Methods - requires UserAuthenticationMethod.Read or similar
+                // If it fails, we assume we can't show the security card
+                const mfaMethods = await client.api('/me/authentication/methods')
+                    .get()
+                    .catch(e => {
+                        console.warn("Failed to fetch MFA methods", e);
+                        return null;
+                    });
+
+                if (userDetails?.lastPasswordChangeDateTime || mfaMethods) {
+                    setSecurityInfo({
+                        passwordChanged: userDetails?.lastPasswordChangeDateTime,
+                        mfaStatus: mfaMethods?.value?.length > 0 ? 'Enabled' : 'Not Registered',
+                        mfaMethods: mfaMethods?.value || []
+                    });
+                    setHasSecurityData(true);
+                }
+            } catch (error) {
+                console.error("Error fetching user details", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [accounts, instance]);
+
+    const formatTimeAgo = (dateString) => {
+        if (!dateString) return 'Unknown';
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffTime = Math.abs(now - date);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays === 0) return 'Today';
+        if (diffDays === 1) return 'Yesterday';
+        return `${diffDays} Days Ago`;
+    };
+
+    const getMFAContext = () => {
+        if (!securityInfo.mfaMethods.length) return 'Not configured';
+        const methods = securityInfo.mfaMethods.map(m => {
+            if (m['@odata.type'].includes('microsoftAuthenticator')) return 'Microsoft Authenticator';
+            if (m['@odata.type'].includes('phone')) return 'Phone';
+            if (m['@odata.type'].includes('fido2')) return 'FIDO2 Key';
+            return 'Method';
+        });
+        return [...new Set(methods)].join(', ');
+    };
 
     return (
         <div className="animate-in" style={{ maxWidth: '1000px', margin: '0 auto' }}>
@@ -73,11 +148,11 @@ const UserDetailsPage = () => {
                         boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
                         border: '2px solid rgba(255, 255, 255, 0.1)'
                     }}>
-                        {user.name.substring(0, 2).toUpperCase()}
+                        {userProfile.name?.substring(0, 2).toUpperCase() || 'US'}
                     </div>
                     <div style={{ flex: 1 }}>
-                        <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '4px' }}>{user.name}</h2>
-                        <p style={{ fontSize: '13px', color: 'var(--text-dim)' }}>{user.username}</p>
+                        <h2 style={{ fontSize: '24px', fontWeight: 700, marginBottom: '4px' }}>{userProfile.displayName || userProfile.name}</h2>
+                        <p style={{ fontSize: '13px', color: 'var(--text-dim)' }}>{userProfile.username || userProfile.userPrincipalName}</p>
                         <div style={{
                             marginTop: '12px',
                             padding: '4px 12px',
@@ -229,80 +304,86 @@ const UserDetailsPage = () => {
                 </div>
             </div>
 
-            {/* Session & Security Card */}
-            <div className="glass-card" style={{ padding: '32px', marginTop: '24px', marginBottom: '40px' }}>
-                <div className="flex-center flex-gap-3" style={{ marginBottom: '24px' }}>
-                    <div style={{
-                        padding: '10px',
-                        background: 'rgba(245, 158, 11, 0.1)',
-                        borderRadius: '10px',
-                        color: '#f59e0b',
-                        boxShadow: '0 0 15px rgba(245, 158, 11, 0.1)'
-                    }}>
-                        <Key size={20} />
-                    </div>
-                    <div>
-                        <h3 style={{ fontSize: '16px', fontWeight: 700 }}>Session & Security</h3>
-                        <p style={{ fontSize: '11px', color: 'var(--text-dim)', marginTop: '2px' }}>Authentication methods and history</p>
-                    </div>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
-                    <div style={{
-                        padding: '24px',
-                        background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.01))',
-                        borderRadius: '16px',
-                        border: '1px solid rgba(59, 130, 246, 0.1)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '20px'
-                    }}>
+            {/* Session & Security Card - Only shown if data is available */}
+            {hasSecurityData && (
+                <div className="glass-card" style={{ padding: '32px', marginTop: '24px', marginBottom: '40px' }}>
+                    <div className="flex-center flex-gap-3" style={{ marginBottom: '24px' }}>
                         <div style={{
-                            width: '48px',
-                            height: '48px',
-                            borderRadius: '12px',
-                            background: 'rgba(59, 130, 246, 0.1)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: '#3b82f6'
+                            padding: '10px',
+                            background: 'rgba(245, 158, 11, 0.1)',
+                            borderRadius: '10px',
+                            color: '#f59e0b',
+                            boxShadow: '0 0 15px rgba(245, 158, 11, 0.1)'
                         }}>
-                            <Key size={24} />
+                            <Key size={20} />
                         </div>
                         <div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Password Last Changed</div>
-                            <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>14 Days Ago</div>
+                            <h3 style={{ fontSize: '16px', fontWeight: 700 }}>Session & Security</h3>
+                            <p style={{ fontSize: '11px', color: 'var(--text-dim)', marginTop: '2px' }}>Authentication methods and history</p>
                         </div>
                     </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+                        <div style={{
+                            padding: '24px',
+                            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.01))',
+                            borderRadius: '16px',
+                            border: '1px solid rgba(59, 130, 246, 0.1)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '20px'
+                        }}>
+                            <div style={{
+                                width: '48px',
+                                height: '48px',
+                                borderRadius: '12px',
+                                background: 'rgba(59, 130, 246, 0.1)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#3b82f6'
+                            }}>
+                                <Key size={24} />
+                            </div>
+                            <div>
+                                <div style={{ fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Password Last Changed</div>
+                                <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>{formatTimeAgo(securityInfo.passwordChanged)}</div>
+                            </div>
+                        </div>
 
-                    <div style={{
-                        padding: '24px',
-                        background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.01))',
-                        borderRadius: '16px',
-                        border: '1px solid rgba(16, 185, 129, 0.1)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '20px'
-                    }}>
                         <div style={{
-                            width: '48px',
-                            height: '48px',
-                            borderRadius: '12px',
-                            background: 'rgba(16, 185, 129, 0.1)',
+                            padding: '24px',
+                            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.01))',
+                            borderRadius: '16px',
+                            border: '1px solid rgba(16, 185, 129, 0.1)',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
-                            color: '#10b981'
+                            gap: '20px'
                         }}>
-                            <ShieldCheck size={24} />
-                        </div>
-                        <div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>MFA Status</div>
-                            <div style={{ fontSize: '18px', fontWeight: 700, color: '#10b981' }}>Enabled</div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-dim)', marginTop: '2px' }}>via Microsoft Authenticator</div>
+                            <div style={{
+                                width: '48px',
+                                height: '48px',
+                                borderRadius: '12px',
+                                background: 'rgba(16, 185, 129, 0.1)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#10b981'
+                            }}>
+                                <ShieldCheck size={24} />
+                            </div>
+                            <div>
+                                <div style={{ fontSize: '11px', color: 'var(--text-dim)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>MFA Status</div>
+                                <div style={{ fontSize: '18px', fontWeight: 700, color: securityInfo.mfaStatus === 'Enabled' ? '#10b981' : '#f59e0b' }}>
+                                    {securityInfo.mfaStatus || 'Unknown'}
+                                </div>
+                                <div style={{ fontSize: '11px', color: 'var(--text-dim)', marginTop: '2px' }}>
+                                    {securityInfo.mfaStatus === 'Enabled' ? `via ${getMFAContext()}` : 'No methods registered'}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };

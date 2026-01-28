@@ -128,15 +128,7 @@ const UsageReports = () => {
     const renderTeamsDashboard = () => {
         const { detail, counts } = data.teams;
         const latestDetail = detail || [];
-        const dailyCounts = counts && counts.length > 0 ? counts : [
-            { reportDate: '2024-01-15', teamChatMessages: 45, privateChatMessages: 120, calls: 5, meetings: 3 },
-            { reportDate: '2024-01-16', teamChatMessages: 52, privateChatMessages: 135, calls: 8, meetings: 5 },
-            { reportDate: '2024-01-17', teamChatMessages: 48, privateChatMessages: 110, calls: 4, meetings: 2 },
-            { reportDate: '2024-01-18', teamChatMessages: 65, privateChatMessages: 180, calls: 12, meetings: 7 },
-            { reportDate: '2024-01-19', teamChatMessages: 70, privateChatMessages: 200, calls: 15, meetings: 10 },
-            { reportDate: '2024-01-20', teamChatMessages: 30, privateChatMessages: 90, calls: 3, meetings: 1 },
-            { reportDate: '2024-01-21', teamChatMessages: 25, privateChatMessages: 80, calls: 2, meetings: 1 }
-        ];
+        const dailyCounts = counts && counts.length > 0 ? counts : [];
 
         const teamStats = {
             totalChats: latestDetail.reduce((acc, curr) => acc + (curr.teamChatMessages || 0) + (curr.privateChatMessages || 0), 0),
@@ -180,51 +172,59 @@ const UsageReports = () => {
                         </div>
                         <Activity size={20} color="var(--accent-blue)" />
                     </div>
-                    <ResponsiveContainer width="100%" height={350}>
-                        <LineChart data={dailyCounts}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                            <XAxis
-                                dataKey="reportDate"
-                                stroke="var(--text-dim)"
-                                fontSize={10}
-                                tickLine={false}
-                                axisLine={false}
-                                tickFormatter={(val) => new Date(val).toLocaleDateString([], { month: 'short', day: 'numeric' })}
-                            />
-                            <YAxis stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
-                            <Tooltip content={<CustomTooltip />} />
-                            <Legend iconType="circle" />
-                            <Line type="monotone" dataKey="privateChatMessages" name="Private Chat" stroke="#6366f1" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
-                            <Line type="monotone" dataKey="teamChatMessages" name="Team Chat" stroke="#a855f7" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
-                            <Line type="monotone" dataKey="calls" name="Calls" stroke="#06b6d4" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
-                        </LineChart>
-                    </ResponsiveContainer>
+                    {dailyCounts.length > 0 ? (
+                        <ResponsiveContainer width="100%" height={350}>
+                            <LineChart data={dailyCounts}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                                <XAxis
+                                    dataKey="reportDate"
+                                    stroke="var(--text-dim)"
+                                    fontSize={10}
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickFormatter={(val) => new Date(val).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                                />
+                                <YAxis stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Legend iconType="circle" />
+                                <Line type="monotone" dataKey="privateChatMessages" name="Private Chat" stroke="#6366f1" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
+                                <Line type="monotone" dataKey="teamChatMessages" name="Team Chat" stroke="#a855f7" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
+                                <Line type="monotone" dataKey="calls" name="Calls" stroke="#06b6d4" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <div className="flex-center" style={{ height: '350px', color: 'var(--text-dim)' }}>No trend data available.</div>
+                    )}
                 </div>
 
                 <div className="glass-card" style={{ padding: '24px' }}>
                     <h3 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '20px' }}>Meeting Participation Trend</h3>
-                    <ResponsiveContainer width="100%" height={250}>
-                        <AreaChart data={dailyCounts}>
-                            <defs>
-                                <linearGradient id="colorMeetings" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                            <XAxis
-                                dataKey="reportDate"
-                                stroke="var(--text-dim)"
-                                fontSize={10}
-                                tickLine={false}
-                                axisLine={false}
-                                tickFormatter={(val) => new Date(val).toLocaleDateString([], { month: 'short', day: 'numeric' })}
-                            />
-                            <YAxis stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
-                            <Tooltip content={<CustomTooltip />} />
-                            <Area type="monotone" dataKey="meetings" name="Meetings" stroke="#10b981" fillOpacity={1} fill="url(#colorMeetings)" />
-                        </AreaChart>
-                    </ResponsiveContainer>
+                    {dailyCounts.length > 0 ? (
+                        <ResponsiveContainer width="100%" height={250}>
+                            <AreaChart data={dailyCounts}>
+                                <defs>
+                                    <linearGradient id="colorMeetings" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                                <XAxis
+                                    dataKey="reportDate"
+                                    stroke="var(--text-dim)"
+                                    fontSize={10}
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickFormatter={(val) => new Date(val).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                                />
+                                <YAxis stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
+                                <Tooltip content={<CustomTooltip />} />
+                                <Area type="monotone" dataKey="meetings" name="Meetings" stroke="#10b981" fillOpacity={1} fill="url(#colorMeetings)" />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    ) : (
+                        <div className="flex-center" style={{ height: '250px', color: 'var(--text-dim)' }}>No meeting data available.</div>
+                    )}
                 </div>
             </div>
         );
