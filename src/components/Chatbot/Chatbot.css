@@ -76,16 +76,18 @@
     overflow: hidden;
     /* Default Dark Mode Shadow */
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-    background: var(--bg-darker);
+    background: rgba(15, 23, 42, 0.45);
     /* Adaptive glass */
-    backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(25px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 20px rgba(59, 130, 246, 0.1);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-theme="light"] .chatbot-window {
-    box-shadow: var(--shadow-md);
-    background: #ffffff;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Explicit white to be safe */
@@ -98,8 +100,8 @@
 /* Header */
 .chatbot-header {
     padding: 16px 20px;
-    background: var(--header-bg);
-    border-bottom: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -170,8 +172,8 @@
 [data-theme="light"] .chatbot-header,
 [data-theme="light"] .chatbot-input,
 [data-theme="light"] .chat-suggestions {
-    background: rgba(255, 255, 255, 0.8) !important;
-    border-color: var(--glass-border);
+    background: rgba(255, 255, 255, 0.4) !important;
+    border-color: rgba(0, 0, 0, 0.08);
 }
 
 [data-theme="light"] .chatbot-header h3 {
@@ -246,9 +248,10 @@
 }
 
 .assistant .message-content {
-    background: var(--glass-bg);
+    background: rgba(255, 255, 255, 0.04);
     border-bottom-left-radius: 4px;
-    border: 1px solid var(--glass-border);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
 }
 
 .user .message-content {
@@ -357,8 +360,8 @@
 /* Input Area */
 .chatbot-input {
     padding: 16px 20px;
-    background: var(--header-bg);
-    border-top: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     gap: 12px;
     align-items: flex-end;
@@ -366,8 +369,8 @@
 
 .chatbot-input textarea {
     flex: 1;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     color: var(--text-primary);
     padding: 10px 14px;
@@ -414,7 +417,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    background: var(--header-bg);
+    background: rgba(255, 255, 255, 0.02);
 }
 
 .chat-suggestions button {

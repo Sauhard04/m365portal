@@ -1,1 +1,192 @@
-{}
+{
+  "timestamp": 1769666657066,
+  "data": {
+    "overview": {
+      "statistics": {
+        "total_users": 13,
+        "total_devices": 2,
+        "total_licenses": 18,
+        "secure_score": 183.92
+      },
+      "health_and_security": {
+        "failed_signins": 12,
+        "compliance_rate": 0
+      }
+    },
+    "raw": {
+      "quickStats": {
+        "totalUsers": 13,
+        "totalDevices": 2,
+        "totalLicenses": 18,
+        "secureScore": 183.92,
+        "maxSecureScore": 283
+      },
+      "charts": {
+        "serviceHealth": [
+          {
+            "name": "Operational",
+            "value": 22,
+            "color": "var(--accent-success)"
+          },
+          {
+            "name": "Issues",
+            "value": 7,
+            "color": "var(--accent-error)"
+          }
+        ],
+        "userDistribution": [
+          {
+            "name": "Active",
+            "value": 13,
+            "color": "var(--accent-success)"
+          }
+        ],
+        "deviceCompliance": [
+          {
+            "name": "Non-Compliant",
+            "value": 1,
+            "color": "var(--accent-error)"
+          },
+          {
+            "name": "Not Evaluated",
+            "value": 1,
+            "color": "var(--accent-warning)"
+          }
+        ],
+        "deviceByPlatform": [
+          {
+            "name": "Windows",
+            "value": 1
+          },
+          {
+            "name": "macOS",
+            "value": 1
+          }
+        ],
+        "licenseUsage": [
+          {
+            "name": "FLOW FREE",
+            "assigned": 3,
+            "available": 9997
+          },
+          {
+            "name": "CCIBOTS PRIVPREV VIR",
+            "assigned": 2,
+            "available": 9998
+          },
+          {
+            "name": "DEVELOPERPACK E5",
+            "assigned": 11,
+            "available": 14
+          },
+          {
+            "name": "RMSBASIC",
+            "assigned": 0,
+            "available": 1
+          },
+          {
+            "name": "POWERAPPS DEV",
+            "assigned": 2,
+            "available": 9998
+          }
+        ],
+        "signIns": [
+          {
+            "name": "Last 24h",
+            "failed": 12,
+            "successful": 47
+          }
+        ],
+        "emailTrend": [
+          {
+            "name": "2026-01-27",
+            "sent": 0,
+            "received": 0
+          },
+          {
+            "name": "2026-01-27",
+            "sent": 0,
+            "received": 0
+          },
+          {
+            "name": "2026-01-27",
+            "sent": 0,
+            "received": 0
+          },
+          {
+            "name": "2026-01-27",
+            "sent": 0,
+            "received": 0
+          },
+          {
+            "name": "2026-01-27",
+            "sent": 0,
+            "received": 0
+          },
+          {
+            "name": "2026-01-27",
+            "sent": 0,
+            "received": 0
+          },
+          {
+            "name": "2026-01-27",
+            "sent": 0,
+            "received": 0
+          }
+        ],
+        "securityRadar": [
+          {
+            "subject": "Secure Score",
+            "value": 65,
+            "fullMark": 100
+          },
+          {
+            "subject": "Compliance",
+            "value": 0,
+            "fullMark": 100
+          },
+          {
+            "subject": "Active Users",
+            "value": 100,
+            "fullMark": 100
+          },
+          {
+            "subject": "License Usage",
+            "value": 0,
+            "fullMark": 100
+          },
+          {
+            "subject": "Sign-in Success",
+            "value": 80,
+            "fullMark": 100
+          }
+        ],
+        "licenseTreemap": [
+          {
+            "name": "FLOW FREE",
+            "size": 3,
+            "fill": "#3b82f6"
+          },
+          {
+            "name": "CCIBOTS PRIVPREV VIRAL",
+            "size": 2,
+            "fill": "#a855f7"
+          },
+          {
+            "name": "DEVELOPERPACK E5",
+            "size": 11,
+            "fill": "#06b6d4"
+          },
+          {
+            "name": "POWERAPPS DEV",
+            "size": 2,
+            "fill": "#f59e0b"
+          }
+        ],
+        "userGrowthTrend": [],
+        "enrollmentFunnel": [],
+        "licenseTrendComposed": []
+      }
+    }
+  }
+}

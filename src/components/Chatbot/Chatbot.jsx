@@ -17,7 +17,7 @@ const Chatbot = () => {
     const [isMinimized, setIsMinimized] = useState(false);
     const [message, setMessage] = useState('');
     const [chatHistory, setChatHistory] = useState([
-        { role: 'assistant', content: 'Hello! I am AdminSphere AI. How can I assist you with the portal today?' }
+        { role: 'assistant', content: 'How can I assist you with the portal today?' }
     ]);
     const [isTyping, setIsTyping] = useState(false);
     const { instance, accounts } = useMsal();
@@ -51,17 +51,13 @@ const Chatbot = () => {
 
             // Use prompt refining for a more intelligent mailbox report
             const refinedPrompt = `
-                The user is asking: "${userQuery}"
+                User Query: "${userQuery}"
+                DATA:
+                Mailboxes: ${reports.length}
+                Storage: ${reports.reduce((acc, r) => acc + (parseFloat(r.mailboxSize) || 0), 0).toFixed(2)} GB
+                Details: ${reports.slice(0, 5).map(r => `${r.displayName}: ${r.mailboxSize}`).join(', ')}
                 
-                Here is the LIVE MAILBOX DATA:
-                Total Mailboxes: ${reports.length}
-                Total Storage Used: ${reports.reduce((acc, r) => acc + (parseFloat(r.mailboxSize) || 0), 0).toFixed(2)} GB
-                User Details: ${reports.slice(0, 5).map(r => `${r.displayName}: ${r.mailboxSize}`).join(', ')}
-                
-                Refine the output:
-                - Focus on summary stats (Count, Total Size, Avg).
-                - Highlight top consumers.
-                - Use professional Markdown.
+                Respond ONLY with the stats. Be brief.
             `;
 
             return await GeminiService.chat(refinedPrompt, chatHistory);
@@ -80,17 +76,11 @@ const Chatbot = () => {
 
             // Use prompt refining: Pass data to AI for a precise, formatted response
             const refinedPrompt = `
-                The user is asking: "${userQuery}"
+                User Query: "${userQuery}"
+                DATA:
+                ${skus.map(s => `- ${s.skuPartNumber}: ${s.consumedUnits}/${s.prepaidUnits.enabled}`).join('\n')}
                 
-                Here is the LIVE LICENSE DATA from Microsoft Graph:
-                ${skus.map(s => `- ${s.skuPartNumber}: Consumed=${s.consumedUnits}, Total=${s.prepaidUnits.enabled}`).join('\n')}
-                
-                Refine the output for the user:
-                1. List each license with its usage (Consumed / Total) and Available count.
-                2. Calculate the PERCENTAGE usage for each.
-                3. CRITICAL: Show a step-by-step summation of all "Available" licenses.
-                4. Provide the final "Total Available Licenses" sum clearly.
-                5. Maintain your persona as AdminSphere AI and use professional Markdown.
+                Respond ONLY with a concise summary of usage and total available units. No fluff.
             `;
 
             return await GeminiService.chat(refinedPrompt, chatHistory);
@@ -111,11 +101,11 @@ const Chatbot = () => {
             const totalMessages = detail.reduce((acc, u) => acc + (u.teamChatMessages + u.privateChatMessages), 0);
             const totalMeetings = detail.reduce((acc, u) => acc + u.meetings, 0);
 
-            let report = `### 👥 Teams Activity Report (Last 30 Days)\n\n`;
-            report += `* **Active Users:** ${totalUsers}\n`;
-            report += `* **Total Messages:** ${totalMessages}\n`;
-            report += `* **Total Meetings:** ${totalMeetings}\n\n`;
-            report += `**Most Active Participant:** ${detail.sort((a, b) => (b.teamChatMessages + b.privateChatMessages) - (a.teamChatMessages + a.privateChatMessages))[0]?.displayName}\n`;
+            let report = `### Teams Study (30D)\n`;
+            report += `- Users: ${totalUsers}\n`;
+            report += `- Messages: ${totalMessages}\n`;
+            report += `- Meetings: ${totalMeetings}\n`;
+            report += `- Top: ${detail.sort((a, b) => (b.teamChatMessages + b.privateChatMessages) - (a.teamChatMessages + a.privateChatMessages))[0]?.displayName}`;
 
             return report;
         } catch (error) {
@@ -135,11 +125,11 @@ const Chatbot = () => {
             const totalFiles = detail.reduce((acc, s) => acc + s.viewedOrEditedFileCount, 0);
             const totalStorage = detail.reduce((acc, s) => acc + s.storageUsedInBytes, 0) / (1024 * 1024 * 1024);
 
-            let report = `### 📁 SharePoint Usage Report\n\n`;
-            report += `* **Total Sites:** ${totalSites}\n`;
-            report += `* **Files Viewed/Edited:** ${totalFiles}\n`;
-            report += `* **Total Storage Used:** ${totalStorage.toFixed(2)} GB\n\n`;
-            report += `**Most Active Site:** ${detail.sort((a, b) => b.viewedOrEditedFileCount - a.viewedOrEditedFileCount)[0]?.displayName}\n`;
+            let report = `### SharePoint Study\n`;
+            report += `- Sites: ${totalSites}\n`;
+            report += `- Files: ${totalFiles}\n`;
+            report += `- Storage: ${totalStorage.toFixed(2)} GB\n`;
+            report += `- Top Site: ${detail.sort((a, b) => b.viewedOrEditedFileCount - a.viewedOrEditedFileCount)[0]?.displayName}`;
 
             return report;
         } catch (error) {
@@ -159,11 +149,10 @@ const Chatbot = () => {
             const exchangeActive = data.filter(u => u.hasExchangeLicense === "Yes" && u.exchangeLastActivityDate !== "None").length;
             const teamsActive = data.filter(u => u.hasTeamsLicense === "Yes" && u.teamsLastActivityDate !== "None").length;
 
-            let report = `### 👥 Active Users Summary (Last 30 Days)\n\n`;
-            report += `* **Total Active Users:** ${totalActive}\n`;
-            report += `* **Active in Exchange:** ${exchangeActive}\n`;
-            report += `* **Active in Teams:** ${teamsActive}\n\n`;
-            report += `*Note: Active users are those who performed at least one activity (email, chat, file access) in the selected period.*`;
+            let report = `### Active Users (30D)\n`;
+            report += `- Total: ${totalActive}\n`;
+            report += `- Exchange: ${exchangeActive}\n`;
+            report += `- Teams: ${teamsActive}`;
 
             return report;
         } catch (error) {
@@ -178,7 +167,7 @@ const Chatbot = () => {
             const users = await graph.client.api('/users').select('id').top(999).get();
             const count = users.value?.length || 0;
 
-            return `There are currently **${count}** total users registered in your directory (Entra ID).`;
+            return `Total users: **${count}**`;
         } catch (error) {
             return `Failed to fetch total users: ${error.message}`;
         }
@@ -190,7 +179,7 @@ const Chatbot = () => {
             const newHistory = [...prev];
             newHistory[index] = {
                 ...newHistory[index],
-                content: `Navigating to ${path}...`,
+                content: `Navigating...`,
                 type: 'text_disabled',
                 actionsDisabled: true
             };
@@ -261,7 +250,7 @@ const Chatbot = () => {
                 // Add confirmation request
                 setChatHistory(prev => [...prev, {
                     role: 'assistant',
-                    content: `I can take you to the ${targetPath} page. Should I proceed?`,
+                    content: `Go to ${targetPath}?`,
                     type: 'navigation_confirm',
                     targetPath: targetPath
                 }]);
@@ -287,7 +276,7 @@ const Chatbot = () => {
 
     const clearChat = () => {
         setChatHistory([
-            { role: 'assistant', content: 'Chat cleared. How can I help you now?' }
+            { role: 'assistant', content: 'Cleared.' }
         ]);
     };
 
