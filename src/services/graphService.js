@@ -159,8 +159,25 @@ export class GraphService {
     }
 
     async getSecureScore() {
-        const res = await this.client.api("/security/secureScores").top(1).select("currentScore,maxScore,createdDateTime").orderby("createdDateTime desc").get().catch(() => ({ value: [] }));
+        const res = await this.client.api("/security/secureScores").top(1).select("currentScore,maxScore,createdDateTime,controlScores").orderby("createdDateTime desc").get().catch(() => ({ value: [] }));
         return res.value?.[0] || null;
+    }
+
+    /**
+     * Get Secure Score control profiles (detailed recommendations with descriptions)
+     */
+    async getSecureScoreControlProfiles() {
+        try {
+            const res = await this.client
+                .api("/security/secureScoreControlProfiles")
+                .top(200)
+                .select("id,title,maxScore,actionType,service,tier,implementationCost,userImpact,threats,remediation,actionUrl,controlCategory,deprecated")
+                .get();
+            return res.value || [];
+        } catch (error) {
+            console.warn('Secure Score Control Profiles fetch failed:', error);
+            return [];
+        }
     }
 
     async getServiceHealth() {
@@ -399,6 +416,116 @@ export class GraphService {
         } catch (error) {
             console.error("Purview Graph Fetch Failure:", error);
             return { labels: 0, retentionPolicies: 0, dlpPolicies: 0, dlpAlerts: 0 };
+        }
+    }
+
+    async getSharePointSiteCount() {
+        try {
+            // Using search to get an approximate count of all sites
+            const response = await this.client.api("/sites")
+                .search("*")
+                .select("id")
+                .top(1) // We only need the payload to see if there's a count, but search usually returns list
+                .get();
+
+            // Search API doesn't always return total count directly in standard response wrapper
+            // without specific headers, but let's try a different approach if that fails:
+            // Fetching root site and then maybe some logic, but usually Search is best.
+            // Actually, querying for all sites with a small top might give us the @odata.count if requested
+
+            const countResponse = await this.client.api("/sites")
+                .filter("siteCollection/root ne null")
+                .select("id")
+                .top(1)
+                .count(true)
+                .header('ConsistencyLevel', 'eventual')
+                .get();
+
+            return countResponse['@odata.count'] || 0;
+        } catch (error) {
+            console.warn("SharePoint site count fetch failed:", error);
+            return 0;
+        }
+    }
+
+    async getSecurityIncidents() {
+        try {
+            const response = await this.client
+                .api('/security/incidents')
+                .top(100)
+                .get();
+            return response.value || [];
+        } catch (error) {
+            console.warn('Security incidents fetch failed:', error);
+            return [];
+        }
+    }
+
+    async getConfigurationProfiles() {
+        try {
+            const response = await this.client
+                .api('/deviceManagement/deviceConfigurations')
+                .select('id,displayName,lastModifiedDateTime')
+                .top(100)
+                .get();
+            return response.value || [];
+        } catch (error) {
+            console.warn('Configuration profiles fetch failed:', error);
+            return [];
+        }
+    }
+
+    async getIntuneApplications() {
+        try {
+            const response = await this.client
+                .api('/deviceAppManagement/mobileApps')
+                .select('id,displayName,publisher')
+                .top(100)
+                .get();
+            return response.value || [];
+        } catch (error) {
+            console.warn('Intune applications fetch failed:', error);
+            return [];
+        }
+    }
+
+    async getOneDriveUsage() {
+        try {
+            const response = await this.client
+                .api('/reports/getOneDriveUsageAccountDetail(period=\'D7\')')
+                .version('beta')
+                .get();
+            return response.value || [];
+        } catch (error) {
+            console.warn('OneDrive usage fetch failed:', error);
+            return [];
+        }
+    }
+
+    async getActiveUsersCount(period = 'D7') {
+        try {
+            const response = await this.client
+                .api(`/reports/getOffice365ActiveUserDetail(period='${period}')`)
+                .version('beta')
+                .get();
+            return response.value || [];
+        } catch (error) {
+            console.warn('Active users count fetch failed:', error);
+            return [];
+        }
+    }
+
+    async getRiskyUsersCount() {
+        try {
+            const response = await this.client
+                .api('/identityProtection/riskyUsers')
+                .filter('riskState eq \'atRisk\'')
+                .top(100)
+                .get();
+            return response.value?.length || 0;
+        } catch (error) {
+            console.warn('Risky users count fetch failed:', error);
+            return 0;
         }
     }
 }

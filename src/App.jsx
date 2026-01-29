@@ -46,6 +46,25 @@ import ScanningPage from './components/ScanningPage';
 import CollectionsPage from './components/CollectionsPage';
 import PoliciesPage from './components/PoliciesPage';
 
+// Security Module
+import SecurityDashboard from './components/SecurityDashboard';
+import SecurityAlertsPage from './components/SecurityAlertsPage';
+import SecurityIncidentsPage from './components/SecurityIncidentsPage';
+import RiskyUsersPage from './components/RiskyUsersPage';
+
+// Governance Module
+import GovernanceDashboard from './components/GovernanceDashboard';
+import ConditionalAccessPage from './components/ConditionalAccessPage';
+import PIMRolesPage from './components/PIMRolesPage';
+
+// SharePoint & OneDrive Module
+import SharePointDashboard from './components/SharePointDashboard';
+import SharePointSitesPage from './components/SharePointSitesPage';
+
+// Teams & Collaboration Module
+import TeamsDashboard from './components/TeamsDashboard';
+import TeamsListPage from './components/TeamsListPage';
+
 import { ThemeProvider } from './contexts/ThemeContext';
 
 import PowerShellRunner from './components/PowerShellRunner';
@@ -116,6 +135,24 @@ function App() {
                 <Route path="purview/collections" element={<CollectionsPage />} />
                 <Route path="purview/policies" element={<PoliciesPage />} />
 
+                {/* Security Routes */}
+                <Route path="security" element={<SecurityDashboard />} />
+                <Route path="security/alerts" element={<SecurityAlertsPage />} />
+                <Route path="security/incidents" element={<SecurityIncidentsPage />} />
+                <Route path="security/risky-users" element={<RiskyUsersPage />} />
+
+                {/* Governance Routes */}
+                <Route path="governance" element={<GovernanceDashboard />} />
+                <Route path="governance/conditional-access" element={<ConditionalAccessPage />} />
+                <Route path="governance/pim-roles" element={<PIMRolesPage />} />
+
+                {/* SharePoint & OneDrive Routes */}
+                <Route path="sharepoint" element={<SharePointDashboard />} />
+                <Route path="sharepoint/sites" element={<SharePointSitesPage />} />
+
+                {/* Teams & Collaboration Routes */}
+                <Route path="teams" element={<TeamsDashboard />} />
+                <Route path="teams/list" element={<TeamsListPage />} />
 
                 <Route path="documentation" element={<DocumentationPage />} />
                 <Route path="documentation/view/:id" element={<PDFViewerPage />} />

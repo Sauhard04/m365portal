@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
-import { Loader2, ArrowLeft, Download, AlertCircle, CreditCard, TrendingUp, Search } from 'lucide-react';
+import { Loader2, ArrowLeft, Download, AlertCircle, CreditCard, TrendingUp, Search, RefreshCw } from 'lucide-react';
 
 const LicensesPage = () => {
     const navigate = useNavigate();
@@ -14,32 +14,38 @@ const LicensesPage = () => {
     const [error, setError] = useState(null);
     const [filterText, setFilterText] = useState('');
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (accounts.length === 0) return;
-            setLoading(true);
-            try {
-                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                const graphService = new GraphService(response.accessToken);
-                const { skus, users } = await graphService.getLicensingData();
-                setLicensingSummary(skus || []);
+    const fetchData = async (isManual = false) => {
+        if (accounts.length === 0) return;
+        setLoading(true);
+        try {
+            const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+            const graphService = new GraphService(response.accessToken);
+            const { skus, users } = await graphService.getLicensingData();
+            setLicensingSummary(skus || []);
 
-                const skuMap = new Map();
-                (skus || []).forEach(sku => skuMap.set(sku.skuId, sku.skuPartNumber));
+            const skuMap = new Map();
+            (skus || []).forEach(sku => skuMap.set(sku.skuId, sku.skuPartNumber));
 
-                const processedUsers = (users || []).map(user => ({
-                    displayName: user.displayName,
-                    emailAddress: user.userPrincipalName,
-                    licenses: user.assignedLicenses.map(l => skuMap.get(l.skuId) || 'Unknown SKU').join(', ') || 'No License',
-                    licenseCount: user.assignedLicenses.length
-                }));
-                setReportData(processedUsers);
-            } catch (err) {
-                setError("Tenant licensing data could not be synchronized.");
-            } finally {
+            const processedUsers = (users || []).map(user => ({
+                displayName: user.displayName,
+                emailAddress: user.userPrincipalName,
+                licenses: user.assignedLicenses.map(l => skuMap.get(l.skuId) || 'Unknown SKU').join(', ') || 'No License',
+                licenseCount: user.assignedLicenses.length
+            }));
+            setReportData(processedUsers);
+        } catch (err) {
+            setError("Tenant licensing data could not be synchronized.");
+        } finally {
+            if (isManual) {
+                // Add a small delay for manual refresh to show the animation
+                setTimeout(() => setLoading(false), 500);
+            } else {
                 setLoading(false);
             }
-        };
+        }
+    };
+
+    useEffect(() => {
         fetchData();
     }, [instance, accounts]);
 
@@ -56,7 +62,7 @@ const LicensesPage = () => {
             `"${row.displayName}"`, `"${row.emailAddress}"`, `"${row.licenses}"`, `"${row.licenseCount}"`
         ].join(','))].join('\n');
 
-        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const blob = new Blob([csvRows], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -64,7 +70,7 @@ const LicensesPage = () => {
         link.click();
     };
 
-    if (loading) {
+    if (loading && reportData.length === 0) {
         return (
             <div className="flex-center" style={{ height: '60vh' }}>
                 <Loader2 className="animate-spin" size={40} color="var(--accent-blue)" />
@@ -84,10 +90,15 @@ const LicensesPage = () => {
                     <h1 className="title-gradient" style={{ fontSize: '32px' }}>Licensing & Inventory</h1>
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Tenant subscription management and individual license attribution</p>
                 </div>
-                <button className="btn btn-primary" onClick={handleDownloadCSV}>
-                    <Download size={16} />
-                    Export Audit
-                </button>
+                <div className="flex-gap-2">
+                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={() => fetchData(true)} title="Sync & Refresh">
+                        <RefreshCw size={16} />
+                    </button>
+                    <button className="btn btn-primary" onClick={handleDownloadCSV}>
+                        <Download size={16} />
+                        Export Audit
+                    </button>
+                </div>
             </header>
 
             {licensingSummary.length > 0 && (

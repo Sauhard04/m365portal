@@ -10,15 +10,18 @@ export class AggregationService {
                 licenses,
                 serviceHealth,
                 secureScore,
-                signIns
+                signIns,
+                mfaStats,
+                roles
             ] = await Promise.all([
                 client.api('/users').select('id,displayName,userPrincipalName,accountEnabled').top(999).get().catch(() => ({ value: [] })),
                 client.api('/deviceManagement/managedDevices').select('id,deviceName,complianceState,operatingSystem').top(999).get().catch(() => ({ value: [] })),
                 client.api('/subscribedSkus').get().catch(() => ({ value: [] })),
                 client.api('/admin/serviceAnnouncement/healthOverviews').get().catch(() => ({ value: [] })),
                 client.api('/security/secureScores').top(1).get().catch(() => ({ value: [] })),
-                client.api('/auditLogs/signIns').filter('createdDateTime ge ' + new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()).top(100).get().catch(() => ({ value: [] }))
-                // Note: Email activity endpoint removed due to CORS redirect issues with reportssea.office.com
+                client.api('/auditLogs/signIns').filter('createdDateTime ge ' + new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()).top(100).get().catch(() => ({ value: [] })),
+                client.api('/reports/getCredentialUserRegistrationCount').version('beta').get().catch(() => ({ value: [] })),
+                client.api('/directoryRoles').select('id,displayName').get().catch(() => ({ value: [] }))
             ]);
 
             // Process Quick Stats
@@ -28,6 +31,13 @@ export class AggregationService {
             const totalLicenses = licenses.value?.reduce((acc, sku) => acc + (sku.consumedUnits || 0), 0) || 0;
             const currentSecureScore = secureScore.value?.[0]?.currentScore || 0;
             const maxSecureScore = secureScore.value?.[0]?.maxScore || 100;
+
+            // Process MFA & Roles
+            const mfaData = mfaStats.value || [];
+            const mfaRegistered = mfaData.reduce((acc, curr) => acc + (curr.userRegistrationCount || 0), 0);
+            const mfaTotal = mfaData.reduce((acc, curr) => acc + (curr.totalUserCount || 0), totalUsers); // Fallback to totalUsers
+
+            const activeRoles = roles.value?.length || 0;
 
             // Service Health Chart Data
             const serviceHealthData = [{
@@ -110,11 +120,29 @@ export class AggregationService {
                     if (emailResponse && emailResponse.ok) {
                         const data = await emailResponse.json();
                         if (data && data.value) {
-                            emailTrendData = data.value.map(item => ({
-                                name: item.reportRefreshDate,
-                                sent: parseInt(item.sendCount) || 0,
-                                received: parseInt(item.receiveCount) || 0
-                            }));
+                            emailTrendData = data.value.map((item, index, array) => {
+                                // Force Date Synthesis: API often returns the same reportDate for all D7 items.
+                                // We calculate the date based on the index relative to the latest date (reportRefreshDate).
+
+                                const refreshDateStr = item.reportRefreshDate || new Date().toISOString().split('T')[0];
+                                const d = new Date(refreshDateStr);
+
+                                // Assuming array is ordered oldest to newest (standard Graph API behavior)
+                                // If array is [T-7, T-6, ... T-1] and we have reportRefreshDate (T)
+                                // Actually, 'D7' usually means the last 7 aggregations.
+                                // Let's assume the last item in the array is "yesterday" relative to refresh date, or "today".
+                                // Safety: Calculate based on offset from the end.
+                                const offsetFromEnd = array.length - 1 - index;
+                                d.setDate(d.getDate() - offsetFromEnd);
+
+                                const dateName = d.toISOString().split('T')[0];
+
+                                return {
+                                    name: dateName,
+                                    sent: parseInt(item.send || item.sendCount) || 0,
+                                    received: parseInt(item.receive || item.receiveCount) || 0
+                                };
+                            });
                         }
                     }
                 }
@@ -128,11 +156,25 @@ export class AggregationService {
                         .catch(() => null);
 
                     if (reportData && reportData.value) {
-                        emailTrendData = reportData.value.map(item => ({
-                            name: item.reportRefreshDate,
-                            sent: parseInt(item.sendCount) || 0,
-                            received: parseInt(item.receiveCount) || 0
-                        }));
+                        emailTrendData = reportData.value.map((item, index, array) => {
+                            // Force Date Synthesis: API often returns the same reportDate for all D7 items.
+                            // We calculate the date based on the index relative to the latest date (reportRefreshDate).
+
+                            const refreshDateStr = item.reportRefreshDate || new Date().toISOString().split('T')[0];
+                            const d = new Date(refreshDateStr);
+
+                            // Assuming array is ordered oldest to newest (standard Graph API behavior)
+                            const offsetFromEnd = array.length - 1 - index;
+                            d.setDate(d.getDate() - offsetFromEnd);
+
+                            const dateName = d.toISOString().split('T')[0];
+
+                            return {
+                                name: dateName,
+                                sent: parseInt(item.send || item.sendCount) || 0,
+                                received: parseInt(item.receive || item.receiveCount) || 0
+                            };
+                        });
                     }
                 }
             } catch (e) {
@@ -174,7 +216,10 @@ export class AggregationService {
                     totalDevices,
                     totalLicenses,
                     secureScore: currentSecureScore,
-                    maxSecureScore
+                    maxSecureScore,
+                    mfaRegistered,
+                    mfaTotal,
+                    activeRoles
                 },
                 charts: {
                     serviceHealth: serviceHealthData.filter(d => d.value > 0),

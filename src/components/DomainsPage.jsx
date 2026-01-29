@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
-import { Loader2, CheckCircle2, Globe, ShieldAlert, ArrowLeft, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Loader2, CheckCircle2, Globe, ShieldAlert, ArrowLeft, ShieldCheck, AlertCircle, RefreshCw } from 'lucide-react';
 
 const DomainsPage = () => {
     const navigate = useNavigate();
@@ -12,24 +12,30 @@ const DomainsPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchDomains = async () => {
-            if (accounts.length === 0) return;
-            try {
-                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                const graphService = new GraphService(response.accessToken);
-                const data = await graphService.getDomains();
-                setDomains(data);
-            } catch (err) {
-                setError("Organization domains could not be retrieved.");
-            } finally {
+    const fetchDomains = async (isManual = false) => {
+        if (accounts.length === 0) return;
+        setLoading(true);
+        try {
+            const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+            const graphService = new GraphService(response.accessToken);
+            const data = await graphService.getDomains();
+            setDomains(data);
+        } catch (err) {
+            setError("Organization domains could not be retrieved.");
+        } finally {
+            if (isManual) {
+                setTimeout(() => setLoading(false), 500);
+            } else {
                 setLoading(false);
             }
-        };
+        }
+    };
+
+    useEffect(() => {
         fetchDomains();
     }, [instance, accounts]);
 
-    if (loading) {
+    if (loading && domains.length === 0) {
         return (
             <div className="flex-center" style={{ height: '60vh' }}>
                 <Loader2 className="animate-spin" size={40} color="var(--accent-blue)" />
@@ -50,6 +56,11 @@ const DomainsPage = () => {
                 <div>
                     <h1 className="title-gradient" style={{ fontSize: '32px' }}>Organization Domains</h1>
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>DNS configuration and identity verification status</p>
+                </div>
+                <div className="flex-gap-2">
+                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={() => fetchDomains(true)} title="Sync & Refresh">
+                        <RefreshCw size={16} />
+                    </button>
                 </div>
             </header>
 

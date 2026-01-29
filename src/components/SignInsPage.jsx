@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
-import { AlertTriangle, Loader2, MapPin, User, Clock, ArrowLeft, XCircle, ShieldAlert } from 'lucide-react';
+import { AlertTriangle, Loader2, MapPin, User, Clock, ArrowLeft, XCircle, ShieldAlert, RefreshCw } from 'lucide-react';
 
 const SignInsPage = () => {
     const { instance, accounts } = useMsal();
@@ -11,25 +11,31 @@ const SignInsPage = () => {
     const [signIns, setSignIns] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (accounts.length > 0) {
-                try {
-                    const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                    const graphService = new GraphService(response.accessToken);
-                    const data = await graphService.getFailedSignIns();
-                    setSignIns(data || []);
-                } catch (err) {
-                    console.error(err);
-                } finally {
+    const fetchData = async (isManual = false) => {
+        if (accounts.length > 0) {
+            if (isManual) setLoading(true);
+            try {
+                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+                const graphService = new GraphService(response.accessToken);
+                const data = await graphService.getFailedSignIns();
+                setSignIns(data || []);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                if (isManual) {
+                    setTimeout(() => setLoading(false), 500);
+                } else {
                     setLoading(false);
                 }
             }
-        };
+        }
+    };
+
+    useEffect(() => {
         fetchData();
     }, [instance, accounts]);
 
-    if (loading) {
+    if (loading && signIns.length === 0) {
         return (
             <div className="flex-center" style={{ height: '60vh' }}>
                 <Loader2 className="animate-spin" size={40} color="var(--accent-warning)" />
@@ -48,6 +54,11 @@ const SignInsPage = () => {
                 <div>
                     <h1 className="title-gradient" style={{ fontSize: '32px' }}>Authentication Audit</h1>
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Real-time monitoring of failed identity verification attempts</p>
+                </div>
+                <div className="flex-gap-2">
+                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={() => fetchData(true)} title="Sync & Refresh">
+                        <RefreshCw size={16} />
+                    </button>
                 </div>
             </header>
 

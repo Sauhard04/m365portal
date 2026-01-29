@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
-import { Loader2, ArrowLeft, Users, Shield, Globe, Mail, Search } from 'lucide-react';
+import { Loader2, ArrowLeft, Users, Shield, Globe, Mail, Search, RefreshCw } from 'lucide-react';
 
 const GroupsPage = () => {
     const navigate = useNavigate();
@@ -14,20 +14,26 @@ const GroupsPage = () => {
     const [filterText, setFilterText] = useState('');
     const [filterType, setFilterType] = useState(null);
 
-    useEffect(() => {
-        const fetchGroups = async () => {
-            if (accounts.length === 0) return;
-            try {
-                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                const graphService = new GraphService(response.accessToken);
-                const data = await graphService.getGroups();
-                setGroups(data);
-            } catch (err) {
-                setError("Organization groups could not be fetched.");
-            } finally {
+    const fetchGroups = async (isManual = false) => {
+        if (accounts.length === 0) return;
+        setLoading(true);
+        try {
+            const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+            const graphService = new GraphService(response.accessToken);
+            const data = await graphService.getGroups();
+            setGroups(data);
+        } catch (err) {
+            setError("Organization groups could not be fetched.");
+        } finally {
+            if (isManual) {
+                setTimeout(() => setLoading(false), 500);
+            } else {
                 setLoading(false);
             }
-        };
+        }
+    };
+
+    useEffect(() => {
         fetchGroups();
     }, [instance, accounts]);
 
@@ -45,7 +51,7 @@ const GroupsPage = () => {
         return true;
     });
 
-    if (loading) {
+    if (loading && groups.length === 0) {
         return (
             <div className="flex-center" style={{ height: '60vh' }}>
                 <Loader2 className="animate-spin" size={40} color="var(--accent-blue)" />
@@ -64,6 +70,11 @@ const GroupsPage = () => {
                 <div>
                     <h1 className="title-gradient" style={{ fontSize: '32px' }}>Admin Groups</h1>
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Global directory group management and communication lists</p>
+                </div>
+                <div className="flex-gap-2">
+                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={() => fetchGroups(true)} title="Sync & Refresh">
+                        <RefreshCw size={16} />
+                    </button>
                 </div>
             </header>
 

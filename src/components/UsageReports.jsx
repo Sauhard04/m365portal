@@ -174,7 +174,21 @@ const UsageReports = () => {
                     </div>
                     {dailyCounts.length > 0 ? (
                         <ResponsiveContainer width="100%" height={350}>
-                            <LineChart data={dailyCounts}>
+                            <AreaChart data={dailyCounts}>
+                                <defs>
+                                    <linearGradient id="colorPrivate" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                                    </linearGradient>
+                                    <linearGradient id="colorTeam" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
+                                    </linearGradient>
+                                    <linearGradient id="colorCalls" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.1} />
+                                        <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                                 <XAxis
                                     dataKey="reportDate"
@@ -187,10 +201,10 @@ const UsageReports = () => {
                                 <YAxis stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
                                 <Tooltip content={<CustomTooltip />} />
                                 <Legend iconType="circle" />
-                                <Line type="monotone" dataKey="privateChatMessages" name="Private Chat" stroke="#6366f1" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
-                                <Line type="monotone" dataKey="teamChatMessages" name="Team Chat" stroke="#a855f7" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
-                                <Line type="monotone" dataKey="calls" name="Calls" stroke="#06b6d4" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
-                            </LineChart>
+                                <Area type="monotone" dataKey="privateChatMessages" name="Private Chat" stroke="#6366f1" fillOpacity={1} fill="url(#colorPrivate)" strokeWidth={2} />
+                                <Area type="monotone" dataKey="teamChatMessages" name="Team Chat" stroke="#a855f7" fillOpacity={1} fill="url(#colorTeam)" strokeWidth={2} />
+                                <Area type="monotone" dataKey="calls" name="Calls" stroke="#06b6d4" fillOpacity={1} fill="url(#colorCalls)" strokeWidth={2} strokeDasharray="4 4" />
+                            </AreaChart>
                         </ResponsiveContainer>
                     ) : (
                         <div className="flex-center" style={{ height: '350px', color: 'var(--text-dim)' }}>No trend data available.</div>
@@ -269,9 +283,24 @@ const UsageReports = () => {
 
                 <div className="glass-card" style={{ padding: '24px', marginBottom: '24px' }}>
                     <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '24px' }}>Email Traffic Analytics</h3>
+
                     {dailyCounts.length > 0 ? (
                         <ResponsiveContainer width="100%" height={350}>
-                            <LineChart data={dailyCounts}>
+                            <AreaChart data={dailyCounts}>
+                                <defs>
+                                    <linearGradient id="colorSent" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                    </linearGradient>
+                                    <linearGradient id="colorReceived" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                    </linearGradient>
+                                    <linearGradient id="colorRead" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.1} />
+                                        <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                                 <XAxis
                                     dataKey="reportDate"
@@ -284,10 +313,10 @@ const UsageReports = () => {
                                 <YAxis stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
                                 <Tooltip content={<CustomTooltip />} />
                                 <Legend iconType="circle" />
-                                <Line type="monotone" dataKey="sendCount" name="Sent" stroke="#3b82f6" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
-                                <Line type="monotone" dataKey="receiveCount" name="Received" stroke="#10b981" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
-                                <Line type="monotone" dataKey="readCount" name="Read" stroke="#f59e0b" strokeWidth={3} strokeDasharray="5 5" dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
-                            </LineChart>
+                                <Area type="monotone" dataKey="receiveCount" name="Received" stroke="#10b981" fillOpacity={1} fill="url(#colorReceived)" strokeWidth={2} />
+                                <Area type="monotone" dataKey="sendCount" name="Sent" stroke="#3b82f6" fillOpacity={1} fill="url(#colorSent)" strokeWidth={2} />
+                                <Area type="monotone" dataKey="readCount" name="Read" stroke="#f59e0b" fillOpacity={1} fill="url(#colorRead)" strokeWidth={2} strokeDasharray="4 4" />
+                            </AreaChart>
                         </ResponsiveContainer>
                     ) : (
                         <div className="flex-center" style={{ height: '350px', color: 'var(--text-dim)' }}>No trend data available.</div>
@@ -338,7 +367,17 @@ const UsageReports = () => {
                     <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '24px' }}>Content & Sync Dynamics</h3>
                     {dailyCounts.length > 0 ? (
                         <ResponsiveContainer width="100%" height={400}>
-                            <LineChart data={dailyCounts}>
+                            <AreaChart data={dailyCounts}>
+                                <defs>
+                                    <linearGradient id="colorViewed" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0} />
+                                    </linearGradient>
+                                    <linearGradient id="colorSynced" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#14b8a6" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                                 <XAxis
                                     dataKey="reportDate"
@@ -351,9 +390,9 @@ const UsageReports = () => {
                                 <YAxis stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
                                 <Tooltip content={<CustomTooltip />} />
                                 <Legend iconType="circle" />
-                                <Line type="stepAfter" dataKey="viewedOrEditedFileCount" name="Viewed/Edited" stroke="#0ea5e9" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
-                                <Line type="monotone" dataKey="syncedFileCount" name="Synced" stroke="#14b8a6" strokeWidth={3} dot={false} activeDot={{ r: 6, strokeWidth: 0 }} />
-                            </LineChart>
+                                <Area type="stepAfter" dataKey="viewedOrEditedFileCount" name="Viewed/Edited" stroke="#0ea5e9" fillOpacity={1} fill="url(#colorViewed)" strokeWidth={2} />
+                                <Area type="monotone" dataKey="syncedFileCount" name="Synced" stroke="#14b8a6" fillOpacity={1} fill="url(#colorSynced)" strokeWidth={2} />
+                            </AreaChart>
                         </ResponsiveContainer>
                     ) : (
                         <div className="flex-center" style={{ height: '400px', color: 'var(--text-dim)' }}>No trend data available.</div>

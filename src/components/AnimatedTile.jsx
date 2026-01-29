@@ -9,12 +9,16 @@ const AnimatedTile = ({
     children,
     onClick,
     index = 0,
+    delay = 0, // Alias for index
     accentColor = 'var(--accent-blue)',
     variant = 'default', // 'default', 'critical', 'success', 'warning'
     className = '',
     style = {}
 }) => {
     const [isHovered, setIsHovered] = useState(false);
+
+    // Use delay if provided, otherwise use index
+    const animationDelay = delay || index;
 
     // Variant-based color mapping
     const variantColors = {
@@ -32,7 +36,7 @@ const AnimatedTile = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{
                 duration: 0.5,
-                delay: index * 0.08, // Staggered animation
+                delay: animationDelay * 0.08, // Staggered animation
                 ease: [0.25, 0.46, 0.45, 0.94] // Custom bezier for smooth motion
             }}
             whileHover={{

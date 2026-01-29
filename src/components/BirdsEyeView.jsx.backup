@@ -20,7 +20,6 @@ const BirdsEyeView = ({ embedded = false }) => {
     const { instance, accounts } = useMsal();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [stats, setStats] = useState({
         admin: { mailboxes: 0, activeMail: 0, domains: 0, healthIssues: 0 },
         entra: {
@@ -37,60 +36,25 @@ const BirdsEyeView = ({ embedded = false }) => {
     });
 
     const fetchData = async (isManual = false) => {
-        setError(null);
         if (!isManual) {
             const cached = await DataPersistenceService.load('BirdsEyeView');
             if (cached && !DataPersistenceService.isExpired('BirdsEyeView', 15)) {
-                // Merge cached data with current structure to ensure all new comprehensive fields exist
-                const mergedStats = {
-                    admin: cached.admin || stats.admin,
-                    entra: { ...stats.entra, ...cached.entra },
-                    licenses: cached.licenses || stats.licenses,
-                    intune: cached.intune || stats.intune,
-                    security: cached.security || stats.security,
-                    collaboration: cached.collaboration || stats.collaboration,
-                    purview: cached.purview || stats.purview,
-                    usage: cached.usage || stats.usage
-                };
-                setStats(mergedStats);
+                // Merge cached data with current structure to ensure new fields (like purview) exist
+                setStats(prev => ({ ...prev, ...cached, purview: cached.purview || prev.purview, sharepoint: cached.sharepoint || prev.sharepoint, exchange: { ...prev.exchange, ...cached.exchange } }));
                 setLoading(false);
                 return;
             }
         }
 
-        if (isManual) {
-            setLoading(true);
-            // Clear broken cache
-            await DataPersistenceService.clear('BirdsEyeView');
-        }
-        console.log("BirdsEyeView: fetchData started", { isManual });
+        if (isManual) setLoading(true);
         const startTime = Date.now();
 
         try {
             const request = {
-                scopes: ["User.Read.All", "Directory.Read.All", "DeviceManagementManagedDevices.Read.All", "Reports.Read.All", "Policy.Read.All", "ServiceHealth.Read.All", "Sites.Read.All"],
+                scopes: ["User.Read.All", "Directory.Read.All", "DeviceManagementManagedDevices.Read.All", "Reports.Read.All", "Policy.Read.All", "ServiceHealth.Read.All", "Sites.Read.All", "InformationProtection.Read.All"],
                 account: accounts[0],
             };
-            let response;
-            try {
-                response = await instance.acquireTokenSilent(request);
-            } catch (error) {
-                if (error.name === "InteractionRequiredAuthError") {
-                    if (isManual) {
-                        // Only trigger popup if user explicitly asked for it (Refresh button)
-                        const interactiveRequest = { ...request, prompt: 'select_account' };
-                        response = await instance.acquireTokenPopup(interactiveRequest);
-                    } else {
-                        // On auto-load, don't popup. Show error asking user to click refresh.
-                        console.warn("Silent auth failed, user interaction required.");
-                        setError("InteractionRequired");
-                        setLoading(false);
-                        return;
-                    }
-                } else {
-                    throw error;
-                }
-            }
+            const response = await instance.acquireTokenSilent(request);
             const graphService = new GraphService(response.accessToken);
 
             const [
@@ -103,8 +67,8 @@ const BirdsEyeView = ({ embedded = false }) => {
             ] = await Promise.all([
                 graphService.client.api('/users').select('id,accountEnabled,userType,assignedLicenses').top(999).get().catch(e => ({ value: [] })),
                 graphService.client.api('/groups').select('id,groupTypes,mailEnabled,securityEnabled,resourceProvisioningOptions,visibility').top(999).get().catch(e => ({ value: [] })),
-                graphService.getDeviceComplianceStats().catch(() => ({ total: 0, compliant: 0, osSummary: null })),
-                graphService.getSecureScore().catch(() => ({ currentScore: 0, maxScore: 0 })),
+                graphService.getDeviceComplianceStats(),
+                graphService.getSecureScore(),
                 graphService.client.api('/subscribedSkus').get().catch(e => ({ value: [] })),
                 graphService.getDirectoryRoles(),
                 graphService.getApplications(),
@@ -124,16 +88,6 @@ const BirdsEyeView = ({ embedded = false }) => {
                 graphService.getActiveUsersCount('D7').catch(() => []),
                 graphService.getOneDriveUsage().catch(() => [])
             ]);
-
-            console.log("BirdsEyeView: Data fetched", {
-                usersLen: users?.value?.length,
-                groupsLen: groups?.value?.length,
-                devices,
-                secureScore,
-                sharePointSites,
-                purviewStats,
-                securityAlertsLen: securityAlerts?.length
-            });
 
             const userList = users.value || [];
             const groupList = groups.value || [];
@@ -230,7 +184,6 @@ const BirdsEyeView = ({ embedded = false }) => {
 
         } catch (error) {
             console.error("Failed to fetch Bird's Eye data", error);
-            setError(error.message || "Failed to load data");
         } finally {
             if (isManual) {
                 const elapsedTime = Date.now() - startTime;
@@ -250,7 +203,187 @@ const BirdsEyeView = ({ embedded = false }) => {
         }
     }, [instance, accounts]);
 
-    const sections = generateSections(stats, styles);
+    const sections = [
+        {
+            title: "Entra ID",
+            icon: ShieldCheck,
+            color: "#3b82f6",
+            blocks: [
+                {
+                    label: "Directory Identities",
+                    value: stats.entra.users,
+                    path: '/service/entra/users',
+                    subValues: [
+                        { label: "Active", value: stats.entra.signin },
+                        { label: "Licensed", value: stats.entra.licensed },
+                        { label: "Guests", value: stats.entra.guest },
+                    ]
+                },
+                {
+                    label: "Resource Distribution",
+                    value: stats.entra.groups,
+                    path: '/service/entra/groups',
+                    subValues: [
+                        { label: "M365", value: stats.entra.unifiedGroups },
+                        { label: "Security", value: stats.entra.securityGroups },
+                        { label: "Dist", value: stats.entra.distGroups }
+                    ]
+                },
+                {
+                    label: "Licenses",
+                    value: stats.licenses.total,
+                    path: '/service/entra/subscriptions',
+                    custom: (
+                        <div>
+                            <div className={styles.progressBarContainer}>
+                                <div
+                                    className={styles.progressBarFill}
+                                    style={{ width: `${(stats.licenses.assigned / stats.licenses.purchased) * 100 || 0}%`, background: 'var(--accent-blue)' }}
+                                />
+                            </div>
+                            <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
+                                {stats.licenses.assigned} assigned / {stats.licenses.purchased} seats
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    label: "Privileged Access",
+                    value: stats.entra.admins.reduce((sum, r) => sum + r.count, 0),
+                    path: '/service/entra/admins',
+                    subValues: stats.entra.admins.slice(0, 3).map(r => ({ label: r.name, value: r.count }))
+                }
+            ]
+        },
+        {
+            title: "Endpoint Management",
+            icon: Laptop,
+            color: "#a855f7",
+            blocks: [
+                {
+                    label: "Fleet Inventory",
+                    value: stats.devices.entraTotal,
+                    path: '/service/intune/devices',
+                    subValues: stats.devices.osSummary ? [
+                        { label: "Windows", value: stats.devices.osSummary.windowsCount },
+                        { label: "iOS", value: stats.devices.osSummary.iosCount },
+                        { label: "macOS", value: stats.devices.osSummary.macOSCount }
+                    ] : []
+                },
+                {
+                    label: "Intune Compliance",
+                    value: `${stats.devices.compliant}/${stats.devices.total}`,
+                    path: '/service/intune/devices',
+                    subValues: [
+                        { label: "Managed", value: stats.devices.total },
+                        { label: "Healthy", value: stats.devices.compliant }
+                    ]
+                }
+            ]
+        },
+        {
+            title: "Collaboration",
+            icon: Users,
+            color: "#6366f1",
+            blocks: [
+                {
+                    label: "Teams Infrastructure",
+                    value: stats.teams.total,
+                    path: '/service/entra/groups',
+                    subValues: [
+                        { label: "Private", value: stats.teams.private },
+                        { label: "Public", value: stats.teams.public }
+                    ]
+                },
+                {
+                    label: "Exchange Workloads",
+                    value: stats.exchange.mailboxes,
+                    path: '/service/admin/emails',
+                    subValues: [
+                        { label: "Active (7D)", value: stats.exchange.active },
+                        { label: "Mailboxes", value: stats.exchange.mailboxes }
+                    ]
+                },
+                {
+                    label: "SharePoint Sites",
+                    value: stats.sharepoint.sites || "N/A",
+                    path: null, // No specific SharePoint page yet
+                    custom: (
+                        <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
+                            Total Collections
+                        </div>
+                    )
+                }
+            ]
+        },
+        {
+            title: "Data Governance",
+            icon: FileText,
+            color: "#059669",
+            blocks: [
+                {
+                    label: "Information Protection",
+                    value: stats.purview.labels,
+                    path: null,
+                    subValues: [
+                        { label: "Sens. Labels", value: stats.purview.labels },
+                        { label: "Ret. Labels", value: stats.purview.retentionPolicies }
+                    ]
+                },
+                {
+                    label: "Data Loss Prevention",
+                    value: stats.purview.dlpPolicies,
+                    path: null,
+                    custom: (
+                        <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
+                            Active Policies & Searches
+                        </div>
+                    )
+                }
+            ]
+        },
+        {
+            title: "Tenant Posture",
+            icon: Shield,
+            color: "#f59e0b",
+            blocks: [
+                {
+                    label: "Secure Score",
+                    value: `${stats.security.score}/${stats.security.max}`,
+                    path: '/service/admin/secure-score',
+                    custom: (
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-20px' }}>
+                            <div className={styles.circularChartContainer}>
+                                <svg viewBox="0 0 36 36" className={styles.circularChart}>
+                                    <path className={styles.circularChartBg}
+                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    />
+                                    <path className={styles.circularChartFill}
+                                        strokeDasharray={`${(stats.security.score / stats.security.max) * 100 || 0}, 100`}
+                                        stroke="#f59e0b"
+                                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                    />
+                                </svg>
+                                <div className={styles.circularChartText}>
+                                    {Math.round((stats.security.score / stats.security.max) * 100 || 0)}%
+                                </div>
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    label: "Service Health",
+                    value: stats.security.healthIssues > 0 ? "Alert" : "Healthy",
+                    path: '/service/admin/service-health',
+                    custom: (
+                        <span className={styles.statusText} style={{ color: stats.security.healthIssues > 0 ? '#ef4444' : '#10b981' }}>
+                            {stats.security.healthIssues > 0 ? `${stats.security.healthIssues} Active Issues` : "All Systems Operational"}
+                        </span>
+                    )
+                }
+            ]
+        }
+    ];
 
     return (
         <div className={embedded ? styles.embeddedContainer : styles.container}>
@@ -261,66 +394,12 @@ const BirdsEyeView = ({ embedded = false }) => {
                     <div>
                         <h1 className={styles.title}>M365 Bird's Eye</h1>
                         <p className={styles.subtitle}>Real-time environment telemetry and resource mapping.</p>
-                        {error && error !== "InteractionRequired" && (
-                            <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '5px', padding: '8px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '4px' }}>
-                                ⚠️ Error: {error}
-                            </div>
-                        )}
-                        {error === "InteractionRequired" && (
-                            <div style={{ marginTop: '8px' }}>
-                                <button
-                                    onClick={() => fetchData(true)}
-                                    style={{
-                                        background: '#3b82f6', color: 'white', border: 'none', padding: '6px 12px',
-                                        borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer',
-                                        display: 'flex', alignItems: 'center', gap: '6px'
-                                    }}
-                                >
-                                    <ShieldCheck size={14} />
-                                    Connect M365 Data
-                                </button>
-                            </div>
-                        )}
                     </div>
                     <button onClick={() => fetchData(true)} className={styles.refreshBtn}>
                         <RefreshCw size={14} className={loading ? styles.spinning : ""} />
                         <span>Refresh</span>
                     </button>
                 </header>
-            )}
-
-            {embedded && error === "InteractionRequired" && (
-                <div style={{
-                    padding: '20px',
-                    textAlign: 'center',
-                    background: 'var(--glass-bg)',
-                    border: '1px solid var(--glass-border)',
-                    borderRadius: '12px',
-                    marginBottom: '16px'
-                }}>
-                    <p style={{ color: 'var(--text-secondary)', marginBottom: '12px', fontSize: '13px' }}>
-                        🔐 Additional permissions required to display M365 data
-                    </p>
-                    <button
-                        onClick={() => fetchData(true)}
-                        style={{
-                            background: '#3b82f6',
-                            color: 'white',
-                            border: 'none',
-                            padding: '10px 20px',
-                            borderRadius: '8px',
-                            fontSize: '13px',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '8px'
-                        }}
-                    >
-                        <ShieldCheck size={16} />
-                        Connect M365 Data
-                    </button>
-                </div>
             )}
 
             <div className={styles.cardGrid}>

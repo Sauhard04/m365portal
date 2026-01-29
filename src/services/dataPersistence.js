@@ -8,9 +8,9 @@ const MEMORY_CACHE = new Map();
  */
 export const DataPersistenceService = {
     /**
-     * Save data across all layers
+     * Save data across all layers (synchronous version - only L1 and L2)
      */
-    async save(filename, data) {
+    save(filename, data) {
         const cacheKey = `cache_${filename}`;
         const payload = {
             timestamp: Date.now(),
@@ -27,29 +27,26 @@ export const DataPersistenceService = {
             console.warn('LocalStorage save failed', e);
         }
 
-        // L3: JSON File persistence (Background)
-        try {
-            await fetch(`/api/data/${filename}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: payload }),
-            });
-        } catch (error) {
-            console.error(`Error persisting to JSON ${filename}:`, error);
-        }
-
         return data;
     },
 
     /**
-     * Load data from the fastest available layer
+     * Load data synchronously from L1/L2 with optional expiry check
+     * @param {string} filename - Cache key
+     * @param {number} maxAgeMs - Optional max age in milliseconds
      */
-    async load(filename) {
+    load(filename, maxAgeMs = null) {
         const cacheKey = `cache_${filename}`;
 
         // Try L1: Memory
         if (MEMORY_CACHE.has(filename)) {
-            return MEMORY_CACHE.get(filename).data;
+            const payload = MEMORY_CACHE.get(filename);
+            if (maxAgeMs && payload.timestamp) {
+                if (Date.now() - payload.timestamp > maxAgeMs) {
+                    return null; // Expired
+                }
+            }
+            return payload.data;
         }
 
         // Try L2: LocalStorage
@@ -57,29 +54,16 @@ export const DataPersistenceService = {
             const local = localStorage.getItem(cacheKey);
             if (local) {
                 const parsed = JSON.parse(local);
+                if (maxAgeMs && parsed.timestamp) {
+                    if (Date.now() - parsed.timestamp > maxAgeMs) {
+                        return null; // Expired
+                    }
+                }
                 MEMORY_CACHE.set(filename, parsed); // Hydrate L1
                 return parsed.data;
             }
         } catch (e) {
             console.warn('LocalStorage load failed', e);
-        }
-
-        // Try L3: JSON File
-        try {
-            const response = await fetch(`/api/data/${filename}`);
-            if (response.ok) {
-                const text = await response.text();
-                const parsed = JSON.parse(text);
-
-                // Hydrate L1 & L2
-                const payload = parsed.timestamp ? parsed : { timestamp: Date.now(), data: parsed };
-                MEMORY_CACHE.set(filename, payload);
-                localStorage.setItem(cacheKey, JSON.stringify(payload));
-
-                return payload.data;
-            }
-        } catch (error) {
-            console.warn(`Fallback to API for ${filename}`);
         }
 
         return null;
@@ -95,5 +79,19 @@ export const DataPersistenceService = {
         const ageInMs = Date.now() - payload.timestamp;
         const expiryInMs = minutes * 60 * 1000;
         return ageInMs > expiryInMs;
+    },
+
+    /**
+     * Clear specific cache entry
+     */
+    clear(filename) {
+        const cacheKey = `cache_${filename}`;
+        MEMORY_CACHE.delete(filename);
+        try {
+            localStorage.removeItem(cacheKey);
+        } catch (e) {
+            console.warn('LocalStorage clear failed', e);
+        }
     }
 };
+

@@ -8,7 +8,7 @@ import { DataPersistenceService } from '../services/dataPersistence';
 import { motion } from 'framer-motion';
 import { Users, Shield, Smartphone, CreditCard, LayoutGrid, ArrowRight, ShieldCheck, Activity, RefreshCw } from 'lucide-react';
 import Loader3D from './Loader3D';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { MiniSegmentedBar, MiniSeverityStrip, MiniStatusGeneric, MiniSparkline, MiniProgressBar } from './charts/MicroCharts';
 
 const EntraDashboard = () => {
@@ -418,15 +418,29 @@ const EntraDashboard = () => {
                                         disabled: mfaStats.mfaDisabled,
                                         risky: mfaStats.risky
                                     }
-                                ]} margin={{ top: 20, right: 20, left: 0, bottom: 20 }} layout="vertical">
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                    <XAxis type="number" stroke="var(--text-dim)" />
-                                    <YAxis type="category" dataKey="name" stroke="var(--text-dim)" />
-                                    <Tooltip contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#f3f4f6' }} />
-                                    <Legend />
-                                    <Bar dataKey="enabled" stackId="mfa" fill="#10b981" name="MFA Enabled" radius={[0, 8, 8, 0]} />
-                                    <Bar dataKey="disabled" stackId="mfa" fill="#f59e0b" name="MFA Disabled" />
-                                    <Bar dataKey="risky" stackId="mfa" fill="#ef4444" name="Risky (Admin)" />
+                                ]} margin={{ top: 20, right: 20, left: 0, bottom: 20 }} layout="vertical" barSize={20}>
+                                    <defs>
+                                        <linearGradient id="gradEnabled" x1="0" y1="0" x2="1" y2="0">
+                                            <stop offset="0%" stopColor="#10b981" />
+                                            <stop offset="100%" stopColor="#34d399" />
+                                        </linearGradient>
+                                        <linearGradient id="gradDisabled" x1="0" y1="0" x2="1" y2="0">
+                                            <stop offset="0%" stopColor="#f59e0b" />
+                                            <stop offset="100%" stopColor="#fbbf24" />
+                                        </linearGradient>
+                                        <linearGradient id="gradRisky" x1="0" y1="0" x2="1" y2="0">
+                                            <stop offset="0%" stopColor="#ef4444" />
+                                            <stop offset="100%" stopColor="#f87171" />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
+                                    <XAxis type="number" stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
+                                    <YAxis type="category" dataKey="name" stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} width={50} />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Legend iconType="circle" />
+                                    <Bar dataKey="enabled" stackId="mfa" fill="url(#gradEnabled)" name="MFA Enabled" radius={[0, 0, 0, 0]} />
+                                    <Bar dataKey="disabled" stackId="mfa" fill="url(#gradDisabled)" name="MFA Disabled" radius={[0, 0, 0, 0]} />
+                                    <Bar dataKey="risky" stackId="mfa" fill="url(#gradRisky)" name="Risky" radius={[0, 4, 4, 0]} />
                                 </BarChart>
                             </ResponsiveContainer>
                         </div>
@@ -440,15 +454,25 @@ const EntraDashboard = () => {
                                 Sign-in Activity (14 Days)
                             </h3>
                             <ResponsiveContainer width="100%" height={250}>
-                                <LineChart data={signInTrends} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                    <XAxis dataKey="date" stroke="var(--text-dim)" />
-                                    <YAxis stroke="var(--text-dim)" />
-                                    <Tooltip contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#f3f4f6' }} />
-                                    <Legend />
-                                    <Line type="monotone" dataKey="success" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981', r: 5 }} name="Success" />
-                                    <Line type="monotone" dataKey="failure" stroke="#ef4444" strokeWidth={3} dot={{ fill: '#ef4444', r: 5 }} name="Failure" />
-                                </LineChart>
+                                <AreaChart data={signInTrends} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
+                                    <defs>
+                                        <linearGradient id="colorSuccess" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                        </linearGradient>
+                                        <linearGradient id="colorFailure" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                                    <XAxis dataKey="date" stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
+                                    <YAxis stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Legend iconType="circle" />
+                                    <Area type="monotone" dataKey="success" stroke="#10b981" fillOpacity={1} fill="url(#colorSuccess)" strokeWidth={2} name="Success" />
+                                    <Area type="monotone" dataKey="failure" stroke="#ef4444" fillOpacity={1} fill="url(#colorFailure)" strokeWidth={2} name="Failure" />
+                                </AreaChart>
                             </ResponsiveContainer>
                         </div>
                     )}
