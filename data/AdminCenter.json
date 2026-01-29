@@ -1,5 +1,5 @@
 {
-  "timestamp": 1769585263068,
+  "timestamp": 1769592687878,
   "data": {
     "admincenter": {
       "mailboxes": {
@@ -1820,7 +1820,7 @@
             "controlName": "AATP_AccountWithLeakedCredentials",
             "description": "\r\n\t\tThis report lists users whose valid credentials have been leaked. \r\n\t\tWhen cybercriminals compromise valid passwords of legitimate users, the criminals often share those credentials. \r\n\t\tThis is usually done by posting them publicly on the dark web or paste sites or by trading or selling the credentials on the black market.<br><br>\r\n\t\tThe Microsoft leaked credentials service acquires username/password pairs by monitoring public and dark websites and by working with:<br><br>\r\n\t\t• Researchers<br>\r\n\t\t• Law enforcement<br>\r\n\t\t• Security teams at Microsoft<br>\r\n\t\t• Other trusted sources<br>\r\n\t",
             "score": 5,
-            "lastSynced": "2026-01-28T06:30:46Z",
+            "lastSynced": "2026-01-28T09:24:41Z",
             "implementationStatus": "",
             "on": "true",
             "scoreInPercentage": 100
@@ -1946,6 +1946,93 @@
         }
       ],
       "failedSignIns": [
+        {
+          "id": "1f021928-d5ae-48d1-a026-96ac31d02e00",
+          "createdDateTime": "2026-01-28T09:13:27Z",
+          "userDisplayName": "Demo User",
+          "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+          "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+          "appId": "0fb1ce07-0af3-4192-a8bf-d8b3cce097fc",
+          "appDisplayName": "M365Portal-Purview-Service",
+          "ipAddress": "122.184.91.214",
+          "clientAppUsed": "Browser",
+          "correlationId": "019c03e0-e74b-7ffe-a5a6-383d602c5dc3",
+          "conditionalAccessStatus": "notApplied",
+          "isInteractive": true,
+          "riskDetail": "none",
+          "riskLevelAggregated": "none",
+          "riskLevelDuringSignIn": "none",
+          "riskState": "none",
+          "riskEventTypes": [],
+          "riskEventTypes_v2": [],
+          "resourceDisplayName": "Microsoft Graph",
+          "resourceId": "00000003-0000-0000-c000-000000000000",
+          "status": {
+            "errorCode": 50140,
+            "failureReason": "This occurred due to 'Keep me signed in' interrupt when the user was signing in.",
+            "additionalDetails": "This is an expected part of the login flow, where a user is asked if they want to remain signed into this browser to make further logins easier. For more details, see https://techcommunity.microsoft.com/t5/microsoft-entra/the-new-azure-ad-sign-in-and-keep-me-signed-in-experiences/td-p/128267"
+          },
+          "deviceDetail": {
+            "deviceId": "",
+            "displayName": "",
+            "operatingSystem": "Windows10",
+            "browser": "Chrome 144.0.0",
+            "isCompliant": false,
+            "isManaged": false,
+            "trustType": null
+          },
+          "location": {
+            "city": "Delhi",
+            "state": "Delhi",
+            "countryOrRegion": "IN",
+            "geoCoordinates": {
+              "altitude": null,
+              "latitude": 28.6353,
+              "longitude": 77.225
+            }
+          },
+          "appliedConditionalAccessPolicies": [
+            {
+              "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+              "displayName": "Mac Require",
+              "enforcedGrantControls": [
+                "RequireCompliantDevice"
+              ],
+              "enforcedSessionControls": [],
+              "result": "notApplied"
+            },
+            {
+              "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+              "displayName": "Microsoft-managed: Block legacy authentication",
+              "enforcedGrantControls": [],
+              "enforcedSessionControls": [],
+              "result": "notEnabled"
+            },
+            {
+              "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+              "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+              "enforcedGrantControls": [],
+              "enforcedSessionControls": [],
+              "result": "notEnabled"
+            },
+            {
+              "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+              "displayName": "Require phishing-resistant multifactor authentication for admins",
+              "enforcedGrantControls": [],
+              "enforcedSessionControls": [],
+              "result": "reportOnlyInterrupted"
+            },
+            {
+              "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+              "displayName": "Use application enforced restrictions for O365 apps",
+              "enforcedGrantControls": [],
+              "enforcedSessionControls": [
+                "AppEnforcedRestrictions"
+              ],
+              "result": "reportOnlySuccess"
+            }
+          ]
+        },
         {
           "id": "0bfa058b-efe8-421f-8c67-41fb678f6f00",
           "createdDateTime": "2026-01-28T04:23:24Z",
@@ -2204,53 +2291,6 @@
           },
           "location": {
             "city": "Delhi",
-            "state": "Delhi",
-            "countryOrRegion": "IN",
-            "geoCoordinates": {
-              "altitude": null,
-              "latitude": 28.6353,
-              "longitude": 77.225
-            }
-          },
-          "appliedConditionalAccessPolicies": []
-        },
-        {
-          "id": "5ab14df6-905a-4450-9c06-1d95ac455400",
-          "createdDateTime": "2026-01-27T06:37:41Z",
-          "userDisplayName": "Pilot User",
-          "userPrincipalName": "pilotuser@intunetraininglabs.onmicrosoft.com",
-          "userId": "6c7f3243-9f68-4037-80b7-dce9c510c098",
-          "appId": "80ccca67-54bd-44ab-8625-4b79c4dc7775",
-          "appDisplayName": "Microsoft 365 Security and Compliance Center",
-          "ipAddress": "122.184.91.214",
-          "clientAppUsed": "Unknown",
-          "correlationId": "155e5c87-3016-402e-aa7a-8db42eba63de",
-          "conditionalAccessStatus": "notApplied",
-          "isInteractive": true,
-          "riskDetail": "none",
-          "riskLevelAggregated": "none",
-          "riskLevelDuringSignIn": "none",
-          "riskState": "none",
-          "riskEventTypes": [],
-          "riskEventTypes_v2": [],
-          "resourceDisplayName": "Windows Azure Active Directory",
-          "resourceId": "00000002-0000-0000-c000-000000000000",
-          "status": {
-            "errorCode": 16003,
-            "failureReason": "The user account does not exist in the directory or the user hasn't been explicitly added to the tenant. To sign into this application, the account must be added to the directory.",
-            "additionalDetails": "Invite the user to the tenant, or ignore this error if the user isn't supposed to be a member of the tenant. This can be the case when someone is sent to a login URL for your tenant without being a member, or picks the wrong user account."
-          },
-          "deviceDetail": {
-            "deviceId": "",
-            "displayName": "",
-            "operatingSystem": "Windows10",
-            "browser": "Edge 144.0.0",
-            "isCompliant": false,
-            "isManaged": false,
-            "trustType": null
-          },
-          "location": {
-            "city": "New Delhi",
             "state": "Delhi",
             "countryOrRegion": "IN",
             "geoCoordinates": {

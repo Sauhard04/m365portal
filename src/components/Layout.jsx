@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../contexts/ThemeContext';
 import { useMsal } from '@azure/msal-react';
 import {
-    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, BarChart3, Activity, Command, BookOpen, Sun, Moon, User
+    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, BarChart3, Activity, Command, BookOpen, Sun, Moon, User, Shield, Key, FolderOpen, MessageCircle
 } from 'lucide-react';
 import SearchModal from './SearchModal';
 import Logo from './Logo';
@@ -136,6 +136,34 @@ const ServiceLayout = () => {
                         active={isActive('/service/purview')}
                         isOpen={isSidebarOpen}
                         onClick={() => navigate('/service/purview')}
+                    />
+                    <NavItem
+                        icon={Shield}
+                        label="Security"
+                        active={isActive('/service/security')}
+                        isOpen={isSidebarOpen}
+                        onClick={() => navigate('/service/security')}
+                    />
+                    <NavItem
+                        icon={Key}
+                        label="Governance"
+                        active={isActive('/service/governance')}
+                        isOpen={isSidebarOpen}
+                        onClick={() => navigate('/service/governance')}
+                    />
+                    <NavItem
+                        icon={FolderOpen}
+                        label="SharePoint"
+                        active={isActive('/service/sharepoint')}
+                        isOpen={isSidebarOpen}
+                        onClick={() => navigate('/service/sharepoint')}
+                    />
+                    <NavItem
+                        icon={MessageCircle}
+                        label="Teams"
+                        active={isActive('/service/teams')}
+                        isOpen={isSidebarOpen}
+                        onClick={() => navigate('/service/teams')}
                     />
                     <NavItem
                         icon={Activity}
