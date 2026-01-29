@@ -5,6 +5,7 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, Download, AlertCircle, Loader2, Shield, ArrowLeft, Mail, Search } from 'lucide-react';
+import SiteDataStore from '../services/siteDataStore';
 
 const ExchangeReport = () => {
     const navigate = useNavigate();
@@ -102,6 +103,11 @@ const ExchangeReport = () => {
             const data = await graph.getExchangeMailboxReport();
             setReportData(data.reports || []);
             setIsConcealed(data.isConcealed);
+            SiteDataStore.store('mailboxes', {
+                reports: data.reports,
+                isConcealed: data.isConcealed,
+                totalMailboxes: data.reports?.length || 0
+            }, { source: 'ExchangeReport' });
         } catch (err) {
             setError("Failed to fetch operational data.");
         } finally {

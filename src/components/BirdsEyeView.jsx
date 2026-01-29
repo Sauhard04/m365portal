@@ -3,6 +3,7 @@ import { useMsal } from "@azure/msal-react";
 import { GraphService } from "../services/graphService";
 import { useNavigate } from 'react-router-dom';
 import { DataPersistenceService } from '../services/dataPersistence';
+import SiteDataStore from '../services/siteDataStore';
 import {
     Users, ShieldCheck, Mail, Globe,
     LayoutGrid, KeyRound, UserCog, Shield,
@@ -227,6 +228,7 @@ const BirdsEyeView = ({ embedded = false }) => {
 
             setStats(newStats);
             await DataPersistenceService.save('BirdsEyeView', newStats);
+            SiteDataStore.store('birdsEye', newStats, { source: 'BirdsEyeView' });
 
         } catch (error) {
             console.error("Failed to fetch Bird's Eye data", error);

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { UsageService } from '../services/usage.service';
 import { ArrowLeft, Mail, Activity, Send, Inbox, TrendingUp, Loader2, AlertCircle, Download } from 'lucide-react';
+import SiteDataStore from '../services/siteDataStore';
 
 const EmailActivityPage = () => {
     const navigate = useNavigate();
@@ -26,6 +27,12 @@ const EmailActivityPage = () => {
 
                 if (result && result.detail && result.detail.length > 0) {
                     setActivity(result.detail);
+                    SiteDataStore.store('emailActivity', {
+                        detail: result.detail,
+                        counts: result.counts,
+                        lastSent: result.detail.reduce((acc, curr) => acc + (Number(curr.sendCount) || 0), 0),
+                        lastReceived: result.detail.reduce((acc, curr) => acc + (Number(curr.receiveCount) || 0), 0)
+                    }, { source: 'EmailActivityPage', period: 'D7' });
                 } else {
                     setError("No detailed email activity record found for this period.");
                     setActivity([]);

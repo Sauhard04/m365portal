@@ -5,6 +5,7 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { Activity, CheckCircle2, AlertTriangle, ArrowLeft, ChevronDown, ChevronRight, AlertOctagon, Info, XCircle, ExternalLink } from 'lucide-react';
 import Loader3D from './Loader3D';
+import SiteDataStore from '../services/siteDataStore';
 
 const ServiceHealthPage = () => {
     const { instance, accounts } = useMsal();
@@ -27,6 +28,11 @@ const ServiceHealthPage = () => {
                     ]);
                     setHealth(healthData || []);
                     setIssues(issuesData || []);
+                    SiteDataStore.store('serviceHealth', {
+                        overview: healthData,
+                        issues: issuesData,
+                        unhealthyCount: (healthData || []).filter(s => s.status !== 'ServiceOperational').length
+                    }, { source: 'ServiceHealthPage' });
                 } catch (err) {
                     console.error(err);
                 } finally {

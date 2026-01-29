@@ -5,6 +5,7 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { UsersService } from '../services/entra';
 import { ArrowLeft, Search, Download, CheckCircle2, XCircle, Loader2, Users } from 'lucide-react';
+import SiteDataStore from '../services/siteDataStore';
 
 const EntraUsers = () => {
     const navigate = useNavigate();
@@ -24,6 +25,12 @@ const EntraUsers = () => {
                     const client = new GraphService(response.accessToken).client;
                     const data = await UsersService.getAllUsers(client, 100);
                     setUsers(data);
+                    SiteDataStore.store('entraUsers', {
+                        users: data,
+                        total: data.length,
+                        guests: data.filter(u => u.userType === 'Guest').length,
+                        disabled: data.filter(u => !u.accountEnabled).length
+                    }, { source: 'EntraUsers' });
                 } catch (error) {
                     console.error("User fetch error:", error);
                 } finally {

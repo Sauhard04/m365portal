@@ -9,6 +9,7 @@ import {
 import SearchModal from './SearchModal';
 import Logo from './Logo';
 import Chatbot from './Chatbot/Chatbot';
+import SiteDataStore from '../services/siteDataStore';
 
 const ServiceLayout = () => {
     const navigate = useNavigate();
@@ -20,6 +21,13 @@ const ServiceLayout = () => {
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
     const [unresolvedAlertsCount, setUnresolvedAlertsCount] = useState(0);
     const username = localStorage.getItem('m365_user') || 'Admin';
+
+    // Initialize SiteDataStore from server/localStorage
+    useEffect(() => {
+        SiteDataStore.ensureInitialized().then(() => {
+            console.log('SiteDataStore initialized in Layout');
+        });
+    }, []);
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 

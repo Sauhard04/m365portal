@@ -10,6 +10,7 @@ import { GraphService } from '../../services/graphService';
 import { UsageService } from '../../services/usage.service';
 import { useMsal } from '@azure/msal-react';
 import { useNavigate } from 'react-router-dom';
+import SiteDataStore from '../../services/siteDataStore';
 import './Chatbot.css';
 
 const Chatbot = () => {
@@ -60,6 +61,8 @@ const Chatbot = () => {
                 Respond ONLY with the stats. Be brief.
             `;
 
+            SiteDataStore.store('mailboxes', { reports }, { source: 'Chatbot' });
+
             return await GeminiService.chat(refinedPrompt, chatHistory);
         } catch (error) {
             return `Failed to fetch mailbox stats: ${error.message}`;
@@ -83,6 +86,8 @@ const Chatbot = () => {
                 Respond ONLY with a concise summary of usage and total available units. No fluff.
             `;
 
+            SiteDataStore.store('licenses', { skus }, { source: 'Chatbot' });
+
             return await GeminiService.chat(refinedPrompt, chatHistory);
         } catch (error) {
             return `Failed to fetch license stats: ${error.message}`;
@@ -100,6 +105,8 @@ const Chatbot = () => {
             const totalUsers = detail.length;
             const totalMessages = detail.reduce((acc, u) => acc + (u.teamChatMessages + u.privateChatMessages), 0);
             const totalMeetings = detail.reduce((acc, u) => acc + u.meetings, 0);
+
+            SiteDataStore.store('teamsUsage', { detail, totalUsers, totalMessages, totalMeetings }, { source: 'Chatbot' });
 
             let report = `### Teams Study (30D)\n`;
             report += `- Users: ${totalUsers}\n`;
@@ -124,6 +131,8 @@ const Chatbot = () => {
             const totalSites = detail.length;
             const totalFiles = detail.reduce((acc, s) => acc + s.viewedOrEditedFileCount, 0);
             const totalStorage = detail.reduce((acc, s) => acc + s.storageUsedInBytes, 0) / (1024 * 1024 * 1024);
+
+            SiteDataStore.store('sharepointUsage', { detail, totalSites, totalFiles, totalStorage }, { source: 'Chatbot' });
 
             let report = `### SharePoint Study\n`;
             report += `- Sites: ${totalSites}\n`;
@@ -154,6 +163,8 @@ const Chatbot = () => {
             report += `- Exchange: ${exchangeActive}\n`;
             report += `- Teams: ${teamsActive}`;
 
+            SiteDataStore.store('activeUsers', { totalActive, exchangeActive, teamsActive, raw: data }, { source: 'Chatbot' });
+
             return report;
         } catch (error) {
             return `Failed to fetch active users: ${error.message}`;
@@ -167,6 +178,7 @@ const Chatbot = () => {
             const users = await graph.client.api('/users').select('id').top(999).get();
             const count = users.value?.length || 0;
 
+            SiteDataStore.store('userCount', { count }, { source: 'Chatbot' });
             return `Total users: **${count}**`;
         } catch (error) {
             return `Failed to fetch total users: ${error.message}`;

@@ -4,6 +4,7 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { Loader2, ArrowLeft, Download, AlertCircle, CreditCard, TrendingUp, Search, RefreshCw } from 'lucide-react';
+import SiteDataStore from '../services/siteDataStore';
 
 const LicensesPage = () => {
     const navigate = useNavigate();
@@ -33,6 +34,11 @@ const LicensesPage = () => {
                 licenseCount: user.assignedLicenses.length
             }));
             setReportData(processedUsers);
+            SiteDataStore.store('licenses', {
+                summary: skus,
+                users: processedUsers,
+                totalConsumed: skus.reduce((acc, s) => acc + (s.consumedUnits || 0), 0)
+            }, { source: 'LicensesPage' });
         } catch (err) {
             setError("Tenant licensing data could not be synchronized.");
         } finally {

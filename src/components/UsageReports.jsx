@@ -15,6 +15,7 @@ import {
     Calendar, Filter, Download, Activity
 } from 'lucide-react';
 import Loader3D from './Loader3D';
+import SiteDataStore from '../services/siteDataStore';
 
 const UsageReports = () => {
     const { instance, accounts } = useMsal();
@@ -81,6 +82,28 @@ const UsageReports = () => {
             };
 
             setData({ teams, exchange, sharepoint, onedrive: formattedOneDrive });
+            SiteDataStore.store('usageReports', { teams, exchange, sharepoint, onedrive: formattedOneDrive }, { source: 'UsageReports', period });
+
+            // Proactive Background Fetch: If we just fetched D7, also fetch D180 for the AI cache
+            if (period === 'D7') {
+                console.log("Proactively fetching D180 data for AI context...");
+                Promise.all([
+                    usageService.getTeamsUsage('D180'),
+                    usageService.getExchangeUsage('D180'),
+                    usageService.getSharePointUsage('D180'),
+                    usageService.getOneDriveUsage('D180')
+                ]).then(([t180, e180, s180, o180]) => {
+                    const fO180 = { detail: o180 || [], counts: [] };
+                    SiteDataStore.store('usageReports_D180', {
+                        teams: t180,
+                        exchange: e180,
+                        sharepoint: s180,
+                        onedrive: fO180,
+                        period: 'D180'
+                    }, { source: 'UsageReports_Background', period: 'D180' });
+                    console.log("D180 data successfully cached for AI.");
+                }).catch(err => console.warn("Background D180 fetch failed", err));
+            }
         } catch (error) {
             console.error("Error fetching usage data:", error);
             setData({

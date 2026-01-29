@@ -1,7 +1,9 @@
+import SiteDataStore from './siteDataStore';
+
 const API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 
-const SYSTEM_PROMPT = `
+const BASE_SYSTEM_PROMPT = `
 You are "AdminSphere AI", a highly specialized assistant for the AdminSphere M365 Reporting Portal.
 YOUR GOAL: Provide only the direct answer to the user's query. No introductions, no conversational filler, no status updates, and no "helpful" explanations unless absolutely necessary for clarity.
 
@@ -9,6 +11,14 @@ CONCISENESS IS MANDATORY:
 - If asked for a count, give the number.
 - If asked for navigation, give the destination name and the command.
 - Avoid phrases like "Certainly!", "I can help with that", or "Here is the information".
+
+REAL-TIME DATA AWARENESS:
+You have access to real-time M365 environment data in the context below. 
+- ALWAYS use the real-time data if available. Cite it directly.
+- IF DATA IS MISSING OR NOT SUFFICIENT (e.g. user asks for 180-day data and only 7-day is available):
+  1. State that the specific detailed data is not currently in the cache.
+  2. SUGGEST NAVIGATING to the respective page to fetch/view the data. Use the ROUTE DIRECTORY.
+  3. Include the navigation command: [ACTION:NAVIGATE, PATH:/page/path]
 
 NAVIGATION CAPABILITY:
 When a user wants to go to a page, respond with a very brief confirmation (e.g., "Navigating to [Page Name]") AND append the hidden command:
@@ -70,6 +80,25 @@ ROUTE DIRECTORY:
 - The command [ACTION:NAVIGATE, PATH:...] must be on its own line at the end.
 `;
 
+/**
+ * Build the full system prompt with real-time data context
+ */
+function buildSystemPrompt() {
+    const aiSummary = SiteDataStore.getAISummary();
+
+    return `${BASE_SYSTEM_PROMPT}
+
+=== CURRENT M365 ENVIRONMENT CONTEXT ===
+The following is real-time data from the M365 environment. Use this to answer user questions accurately:
+
+${aiSummary}
+
+=== END OF CONTEXT ===
+
+Remember: Always prefer the real-time data above when answering questions about the M365 environment.
+`;
+}
+
 export class GeminiService {
     /**
      * We keep the name 'GeminiService' to avoid breaking existing imports, 
@@ -77,8 +106,14 @@ export class GeminiService {
      */
     static async chat(message, history = []) {
         try {
+            // Ensure data store is loaded from server/storage
+            await SiteDataStore.ensureInitialized();
+
+            // Build system prompt with real-time data
+            const systemPrompt = buildSystemPrompt();
+
             const messages = [
-                { role: "system", content: SYSTEM_PROMPT },
+                { role: "system", content: systemPrompt },
                 ...history.map(h => ({
                     role: h.role === 'user' ? 'user' : 'assistant',
                     content: h.content
@@ -118,5 +153,29 @@ export class GeminiService {
             console.error("Cloud AI Fetch Error:", error);
             throw error;
         }
+    }
+
+    /**
+     * Get a quick summary of the current environment state
+     * Useful for dashboard widgets or quick status checks
+     */
+    static getEnvironmentSummary() {
+        return SiteDataStore.getAISummary();
+    }
+
+    /**
+     * Check if we have real-time data available
+     */
+    static hasRealTimeData() {
+        const store = SiteDataStore.getAll();
+        return store && Object.keys(store.sections || {}).length > 0;
+    }
+
+    /**
+     * Get the last update timestamp
+     */
+    static getLastUpdateTime() {
+        const store = SiteDataStore.getAll();
+        return store?.lastUpdated ? new Date(store.lastUpdated) : null;
     }
 }

@@ -1,0 +1,1106 @@
+{
+  "lastUpdated": 1769680588285,
+  "sections": {
+    "overview": {
+      "data": {
+        "quickStats": {
+          "totalUsers": 12,
+          "totalDevices": 2,
+          "totalLicenses": 17,
+          "secureScore": 183.92,
+          "maxSecureScore": 283,
+          "mfaRegistered": 0,
+          "mfaTotal": 25,
+          "activeRoles": 12
+        },
+        "charts": {
+          "serviceHealth": [
+            {
+              "name": "Operational",
+              "value": 22,
+              "color": "var(--accent-success)"
+            },
+            {
+              "name": "Issues",
+              "value": 7,
+              "color": "var(--accent-error)"
+            }
+          ],
+          "userDistribution": [
+            {
+              "name": "Active",
+              "value": 12,
+              "color": "var(--accent-success)"
+            }
+          ],
+          "deviceCompliance": [
+            {
+              "name": "Non-Compliant",
+              "value": 1,
+              "color": "var(--accent-error)"
+            },
+            {
+              "name": "Not Evaluated",
+              "value": 1,
+              "color": "var(--accent-warning)"
+            }
+          ],
+          "deviceByPlatform": [
+            {
+              "name": "Windows",
+              "value": 1
+            },
+            {
+              "name": "macOS",
+              "value": 1
+            }
+          ],
+          "licenseUsage": [
+            {
+              "name": "FLOW FREE",
+              "assigned": 3,
+              "available": 9997
+            },
+            {
+              "name": "CCIBOTS PRIVPREV VIR",
+              "assigned": 2,
+              "available": 9998
+            },
+            {
+              "name": "DEVELOPERPACK E5",
+              "assigned": 10,
+              "available": 15
+            },
+            {
+              "name": "RMSBASIC",
+              "assigned": 0,
+              "available": 1
+            },
+            {
+              "name": "POWERAPPS DEV",
+              "assigned": 2,
+              "available": 9998
+            }
+          ],
+          "signIns": [
+            {
+              "name": "Last 24h",
+              "failed": 12,
+              "successful": 46
+            }
+          ],
+          "emailTrend": [
+            {
+              "name": "2026-01-21",
+              "sent": 0,
+              "received": 6
+            },
+            {
+              "name": "2026-01-22",
+              "sent": 0,
+              "received": 1
+            },
+            {
+              "name": "2026-01-23",
+              "sent": 0,
+              "received": 6
+            },
+            {
+              "name": "2026-01-24",
+              "sent": 0,
+              "received": 0
+            },
+            {
+              "name": "2026-01-25",
+              "sent": 1,
+              "received": 0
+            },
+            {
+              "name": "2026-01-26",
+              "sent": 0,
+              "received": 0
+            },
+            {
+              "name": "2026-01-27",
+              "sent": 0,
+              "received": 0
+            }
+          ],
+          "securityRadar": [
+            {
+              "subject": "Secure Score",
+              "value": 65,
+              "fullMark": 100
+            },
+            {
+              "subject": "Compliance",
+              "value": 0,
+              "fullMark": 100
+            },
+            {
+              "subject": "Active Users",
+              "value": 100,
+              "fullMark": 100
+            },
+            {
+              "subject": "License Usage",
+              "value": 0,
+              "fullMark": 100
+            },
+            {
+              "subject": "Sign-in Success",
+              "value": 79,
+              "fullMark": 100
+            }
+          ],
+          "licenseTreemap": [
+            {
+              "name": "FLOW FREE",
+              "size": 3,
+              "fill": "#3b82f6"
+            },
+            {
+              "name": "CCIBOTS PRIVPREV VIRAL",
+              "size": 2,
+              "fill": "#a855f7"
+            },
+            {
+              "name": "DEVELOPERPACK E5",
+              "size": 10,
+              "fill": "#06b6d4"
+            },
+            {
+              "name": "POWERAPPS DEV",
+              "size": 2,
+              "fill": "#f59e0b"
+            }
+          ],
+          "userGrowthTrend": [],
+          "enrollmentFunnel": [],
+          "licenseTrendComposed": []
+        }
+      },
+      "timestamp": 1769679022701,
+      "source": "OverviewDashboard",
+      "apiEndpoint": null
+    },
+    "birdsEye": {
+      "data": {
+        "admin": {
+          "mailboxes": 12,
+          "activeMail": 0,
+          "domains": 5,
+          "healthIssues": 6
+        },
+        "entra": {
+          "users": 12,
+          "signin": 12,
+          "licensed": 12,
+          "guest": 2,
+          "groups": 58,
+          "securityGroups": 40,
+          "distGroups": 6,
+          "unifiedGroups": 12,
+          "admins": [
+            {
+              "name": "Global",
+              "count": 6
+            },
+            {
+              "name": "Exchange",
+              "count": 3
+            }
+          ],
+          "apps": 31,
+          "domains": 5,
+          "deletedUsers": 1,
+          "caPolicies": 1,
+          "riskyUsers": 0
+        },
+        "licenses": {
+          "purchased": 30026,
+          "assigned": 17,
+          "total": 5,
+          "topSkus": [
+            {
+              "name": "DEVELOPERPACK_E5",
+              "count": 10
+            },
+            {
+              "name": "FLOW_FREE",
+              "count": 3
+            },
+            {
+              "name": "CCIBOTS_PRIVPREV_VIRAL",
+              "count": 2
+            }
+          ]
+        },
+        "intune": {
+          "total": 0,
+          "compliant": 0,
+          "osSummary": {
+            "androidCount": 0,
+            "iosCount": 0,
+            "macOSCount": 1,
+            "windowsMobileCount": 0,
+            "windowsCount": 1,
+            "unknownCount": 0,
+            "androidDedicatedCount": 0,
+            "androidDeviceAdminCount": 0,
+            "androidFullyManagedCount": 0,
+            "androidWorkProfileCount": 0,
+            "androidCorporateWorkProfileCount": 0,
+            "configMgrDeviceCount": 0,
+            "aospUserlessCount": 0,
+            "aospUserAssociatedCount": 0,
+            "linuxCount": 0,
+            "chromeOSCount": 0
+          },
+          "entraTotal": "18",
+          "configProfiles": 8,
+          "applications": 7
+        },
+        "security": {
+          "score": 183.92,
+          "max": 283,
+          "alerts": 0,
+          "incidents": 0,
+          "failedSignins": 0
+        },
+        "collaboration": {
+          "teams": 5,
+          "privateTeams": 1,
+          "publicTeams": 4,
+          "sharepoint": 0,
+          "onedrive": 0,
+          "mailboxes": 12,
+          "activeEmail": 0
+        },
+        "purview": {
+          "labels": 0,
+          "retentionPolicies": 0,
+          "dlpPolicies": 0,
+          "dlpAlerts": 0
+        },
+        "usage": {
+          "activeUsers7d": 0,
+          "activeUsers30d": 0,
+          "storage": 0
+        }
+      },
+      "timestamp": 1769679967247,
+      "source": "BirdsEyeView",
+      "apiEndpoint": null
+    },
+    "usageReports": {
+      "data": {
+        "teams": {
+          "detail": [
+            {
+              "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+              "displayName": "vivek",
+              "lastActivityDate": "2026-01-22",
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            },
+            {
+              "userPrincipalName": "Vishal@intunetraininglabs.onmicrosoft.com",
+              "displayName": "Vishal",
+              "lastActivityDate": null,
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            },
+            {
+              "userPrincipalName": "PN510950@sswari.onmicrosoft.com",
+              "displayName": "PN510950",
+              "lastActivityDate": "2024-05-13",
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            },
+            {
+              "userPrincipalName": "jitesh@intunetraininglabs.onmicrosoft.com",
+              "displayName": "jitesh",
+              "lastActivityDate": null,
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            },
+            {
+              "userPrincipalName": "jatin.kansal_onmeridian.com#EXT#@sswari.onmicrosoft.com",
+              "displayName": "jatin.kansal_onmeridian.com#EXT#",
+              "lastActivityDate": "2025-11-26",
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            },
+            {
+              "userPrincipalName": "pilotuser@intunetraininglabs.onmicrosoft.com",
+              "displayName": "pilotuser",
+              "lastActivityDate": "2025-12-13",
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            },
+            {
+              "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+              "displayName": "demouser",
+              "lastActivityDate": "2025-12-13",
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            },
+            {
+              "userPrincipalName": "pn@intunetraininglabs.onmicrosoft.com",
+              "displayName": "pn",
+              "lastActivityDate": null,
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            },
+            {
+              "userPrincipalName": "user@intunetraininglabs.onmicrosoft.com",
+              "displayName": "user",
+              "lastActivityDate": "2025-12-13",
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            },
+            {
+              "userPrincipalName": "test1@intunetraininglabs.onmicrosoft.com",
+              "displayName": "test1",
+              "lastActivityDate": null,
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            }
+          ],
+          "counts": [
+            {
+              "reportDate": "2026-01-27",
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            },
+            {
+              "reportDate": "2026-01-26",
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            },
+            {
+              "reportDate": "2026-01-25",
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            },
+            {
+              "reportDate": "2026-01-24",
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            },
+            {
+              "reportDate": "2026-01-23",
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            },
+            {
+              "reportDate": "2026-01-22",
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            },
+            {
+              "reportDate": "2026-01-21",
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 0
+            }
+          ]
+        },
+        "exchange": {
+          "detail": [
+            {
+              "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+              "displayName": "Vivek Kumar",
+              "lastActivityDate": "2025-12-18",
+              "sendCount": 0,
+              "receiveCount": 2,
+              "readCount": 0
+            },
+            {
+              "userPrincipalName": "Vishal@intunetraininglabs.onmicrosoft.com",
+              "displayName": "Vishal",
+              "lastActivityDate": null,
+              "sendCount": 0,
+              "receiveCount": 3,
+              "readCount": 0
+            },
+            {
+              "userPrincipalName": "PN510950@sswari.onmicrosoft.com",
+              "displayName": "PN",
+              "lastActivityDate": "2025-11-25",
+              "sendCount": 0,
+              "receiveCount": 2,
+              "readCount": 0
+            },
+            {
+              "userPrincipalName": "jitesh@intunetraininglabs.onmicrosoft.com",
+              "displayName": "Jitesh Devnani",
+              "lastActivityDate": null,
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
+            },
+            {
+              "userPrincipalName": "jatin.kansal_onmeridian.com#EXT#@sswari.onmicrosoft.com",
+              "displayName": "Jatin Kansal",
+              "lastActivityDate": null,
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
+            },
+            {
+              "userPrincipalName": "pilotuser@intunetraininglabs.onmicrosoft.com",
+              "displayName": "Pilot User",
+              "lastActivityDate": "2026-01-27",
+              "sendCount": 1,
+              "receiveCount": 2,
+              "readCount": 2
+            },
+            {
+              "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+              "displayName": "Demo User",
+              "lastActivityDate": "2025-12-30",
+              "sendCount": 0,
+              "receiveCount": 2,
+              "readCount": 0
+            },
+            {
+              "userPrincipalName": "pn@intunetraininglabs.onmicrosoft.com",
+              "displayName": "Parth Narang",
+              "lastActivityDate": null,
+              "sendCount": 0,
+              "receiveCount": 2,
+              "readCount": 0
+            },
+            {
+              "userPrincipalName": "user@intunetraininglabs.onmicrosoft.com",
+              "displayName": "User",
+              "lastActivityDate": "2025-12-13",
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
+            },
+            {
+              "userPrincipalName": "test1@intunetraininglabs.onmicrosoft.com",
+              "displayName": "Test",
+              "lastActivityDate": "2025-12-30",
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
+            }
+          ],
+          "counts": [
+            {
+              "reportDate": "2026-01-21",
+              "sendCount": 0,
+              "receiveCount": 6,
+              "readCount": 1
+            },
+            {
+              "reportDate": "2026-01-22",
+              "sendCount": 0,
+              "receiveCount": 1,
+              "readCount": 0
+            },
+            {
+              "reportDate": "2026-01-23",
+              "sendCount": 0,
+              "receiveCount": 6,
+              "readCount": 0
+            },
+            {
+              "reportDate": "2026-01-24",
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
+            },
+            {
+              "reportDate": "2026-01-25",
+              "sendCount": 1,
+              "receiveCount": 0,
+              "readCount": 1
+            },
+            {
+              "reportDate": "2026-01-26",
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
+            },
+            {
+              "reportDate": "2026-01-27",
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
+            }
+          ]
+        },
+        "sharepoint": {
+          "detail": [
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": "2025-02-06",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 1673367
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": "2025-11-28",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 1648466
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": "2025-12-12",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 2793565
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": "2025-02-06",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 1670945
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": "2024-12-30",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 1663472
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": "2025-04-16",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 1536658
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": "2024-12-30",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 2057958
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": "2025-04-16",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 1621201
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": "2025-04-16",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 1645496
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": "2025-11-12",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 1589924
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": "2025-02-06",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 1743351
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": "2024-12-30",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 1707839
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 602475
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 602475
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 602475
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": "2026-01-14",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 1821909
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": "2025-12-02",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 765097
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 602476
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 1154646
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 1591012
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": "2026-01-05",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 4806175
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 602475
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 602476
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 2223037
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 710483
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 602476
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 602476
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 602475
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": "2025-12-29",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 1759587
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 602476
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 602476
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": "2025-10-31",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 2988951
+            },
+            {
+              "siteUrl": "",
+              "displayName": "Unnamed Site",
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "storageUsedInBytes": 1758357
+            }
+          ],
+          "counts": [
+            {
+              "reportDate": "2026-01-27",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0
+            },
+            {
+              "reportDate": "2026-01-26",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0
+            },
+            {
+              "reportDate": "2026-01-25",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0
+            },
+            {
+              "reportDate": "2026-01-24",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0
+            },
+            {
+              "reportDate": "2026-01-23",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0
+            },
+            {
+              "reportDate": "2026-01-22",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0
+            },
+            {
+              "reportDate": "2026-01-21",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0
+            }
+          ]
+        },
+        "onedrive": {
+          "detail": [
+            {
+              "reportRefreshDate": "2026-01-27",
+              "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+              "isDeleted": false,
+              "deletedDate": null,
+              "lastActivityDate": "2026-01-26",
+              "viewedOrEditedFileCount": 1,
+              "syncedFileCount": 4,
+              "sharedInternallyFileCount": 0,
+              "sharedExternallyFileCount": 0,
+              "assignedProducts": [
+                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)",
+                "MICROSOFT COPILOT STUDIO VIRAL TRIAL"
+              ],
+              "reportPeriod": "7"
+            },
+            {
+              "reportRefreshDate": "2026-01-27",
+              "userPrincipalName": "Vishal@intunetraininglabs.onmicrosoft.com",
+              "isDeleted": false,
+              "deletedDate": null,
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternallyFileCount": 0,
+              "sharedExternallyFileCount": 0,
+              "assignedProducts": [
+                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
+              ],
+              "reportPeriod": "7"
+            },
+            {
+              "reportRefreshDate": "2026-01-27",
+              "userPrincipalName": "PN510950@sswari.onmicrosoft.com",
+              "isDeleted": false,
+              "deletedDate": null,
+              "lastActivityDate": "2024-05-07",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternallyFileCount": 0,
+              "sharedExternallyFileCount": 0,
+              "assignedProducts": [
+                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)",
+                "MICROSOFT POWER AUTOMATE FREE"
+              ],
+              "reportPeriod": "7"
+            },
+            {
+              "reportRefreshDate": "2026-01-27",
+              "userPrincipalName": "jitesh@intunetraininglabs.onmicrosoft.com",
+              "isDeleted": false,
+              "deletedDate": null,
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternallyFileCount": 0,
+              "sharedExternallyFileCount": 0,
+              "assignedProducts": [
+                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
+              ],
+              "reportPeriod": "7"
+            },
+            {
+              "reportRefreshDate": "2026-01-27",
+              "userPrincipalName": "jatin.kansal_onmeridian.com#EXT#@sswari.onmicrosoft.com",
+              "isDeleted": false,
+              "deletedDate": null,
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternallyFileCount": 0,
+              "sharedExternallyFileCount": 0,
+              "assignedProducts": [
+                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
+              ],
+              "reportPeriod": "7"
+            },
+            {
+              "reportRefreshDate": "2026-01-27",
+              "userPrincipalName": "pilotuser@intunetraininglabs.onmicrosoft.com",
+              "isDeleted": false,
+              "deletedDate": null,
+              "lastActivityDate": "2026-01-14",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternallyFileCount": 0,
+              "sharedExternallyFileCount": 0,
+              "assignedProducts": [
+                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
+              ],
+              "reportPeriod": "7"
+            },
+            {
+              "reportRefreshDate": "2026-01-27",
+              "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+              "isDeleted": false,
+              "deletedDate": null,
+              "lastActivityDate": "2025-12-30",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternallyFileCount": 0,
+              "sharedExternallyFileCount": 0,
+              "assignedProducts": [
+                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
+              ],
+              "reportPeriod": "7"
+            },
+            {
+              "reportRefreshDate": "2026-01-27",
+              "userPrincipalName": "pn@intunetraininglabs.onmicrosoft.com",
+              "isDeleted": false,
+              "deletedDate": null,
+              "lastActivityDate": null,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternallyFileCount": 0,
+              "sharedExternallyFileCount": 0,
+              "assignedProducts": [
+                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
+              ],
+              "reportPeriod": "7"
+            },
+            {
+              "reportRefreshDate": "2026-01-27",
+              "userPrincipalName": "user@intunetraininglabs.onmicrosoft.com",
+              "isDeleted": false,
+              "deletedDate": null,
+              "lastActivityDate": "2025-12-12",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternallyFileCount": 0,
+              "sharedExternallyFileCount": 0,
+              "assignedProducts": [
+                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
+              ],
+              "reportPeriod": "7"
+            },
+            {
+              "reportRefreshDate": "2026-01-27",
+              "userPrincipalName": "test1@intunetraininglabs.onmicrosoft.com",
+              "isDeleted": false,
+              "deletedDate": null,
+              "lastActivityDate": "2026-01-03",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternallyFileCount": 0,
+              "sharedExternallyFileCount": 0,
+              "assignedProducts": [
+                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
+              ],
+              "reportPeriod": "7"
+            }
+          ],
+          "counts": []
+        }
+      },
+      "timestamp": 1769680588285,
+      "source": "UsageReports",
+      "apiEndpoint": null,
+      "period": "D7"
+    }
+  }
+}

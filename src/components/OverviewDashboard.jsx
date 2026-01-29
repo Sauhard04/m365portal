@@ -19,6 +19,7 @@ import {
 import BirdsEyeView from './BirdsEyeView';
 import Loader3D from './Loader3D';
 import { DataPersistenceService } from '../services/dataPersistence';
+import SiteDataStore from '../services/siteDataStore';
 import { MiniSparkline, MiniProgressBar, MiniSegmentedBar } from './charts/MicroCharts';
 import { CustomTooltip, ChartHeader } from './charts/CustomTooltip';
 
@@ -62,6 +63,7 @@ const OverviewDashboard = () => {
 
             // Save to Cache & JSON
             await DataPersistenceService.save('Overview_v2', persistenceData);
+            SiteDataStore.store('overview', overviewData, { source: 'OverviewDashboard' });
             setData(overviewData);
         } catch (err) {
             console.error('Overview fetch error:', err);
