@@ -15,9 +15,21 @@ const SearchModal = ({ isOpen, onClose }) => {
 
     // Load recent searches from localStorage
     useEffect(() => {
-        const saved = localStorage.getItem('recentSearches');
-        if (saved) {
-            setRecentSearches(JSON.parse(saved));
+        try {
+            const saved = localStorage.getItem('recentSearches');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                // Handle both old format (full objects without icons) and new format (ids)
+                const hydrated = parsed.map(savedItem => {
+                    const id = typeof savedItem === 'string' ? savedItem : savedItem.id;
+                    return searchableItems.find(item => item.id === id);
+                }).filter(Boolean); // Remove items that couldn't be found
+
+                setRecentSearches(hydrated);
+            }
+        } catch (error) {
+            console.error('Failed to load recent searches:', error);
+            localStorage.removeItem('recentSearches');
         }
     }, []);
 
@@ -88,10 +100,13 @@ const SearchModal = ({ isOpen, onClose }) => {
     }, [selectedIndex]);
 
     const handleNavigate = (item) => {
-        // Save to recent searches
+        // Save to recent searches (update state with full item, localStorage with ID)
         const updated = [item, ...recentSearches.filter(r => r.id !== item.id)].slice(0, 5);
         setRecentSearches(updated);
-        localStorage.setItem('recentSearches', JSON.stringify(updated));
+
+        // Persist only IDs to avoid losing icon components
+        const ids = updated.map(i => i.id);
+        localStorage.setItem('recentSearches', JSON.stringify(ids));
 
         navigate(item.path);
         onClose();
@@ -175,7 +190,8 @@ const SearchModal = ({ isOpen, onClose }) => {
 };
 
 const ResultItem = ({ item, isSelected, onClick, query }) => {
-    const Icon = item.icon;
+    // Fallback if icon is missing
+    const Icon = item.icon || Search;
 
     const highlightText = (text, query) => {
         if (!query) return text;

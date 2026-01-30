@@ -372,16 +372,16 @@ export class GraphService {
     async getPurviewStats() {
         try {
             const [labels, retention, cases] = await Promise.all([
-                this.client.api("/beta/security/informationProtection/sensitivityLabels").get().catch(() => ({ value: [] })),
-                this.client.api("/beta/security/labels/retentionLabels").get().catch(() => ({ value: [] })),
-                this.client.api("/beta/compliance/ediscovery/cases").get().catch(() => ({ value: [] }))
+                this.client.api("/security/informationProtection/sensitivityLabels").version("beta").get().catch(() => ({ value: [] })),
+                this.client.api("/security/labels/retentionLabels").version("beta").get().catch(() => ({ value: [] })),
+                this.client.api("/compliance/ediscovery/cases").version("beta").get().catch(() => ({ value: [] }))
             ]);
 
             // Attempt to fetch searches for the first case if any exist
             let searchCount = 0;
             if (cases.value && cases.value.length > 0) {
                 const caseId = cases.value[0].id;
-                const searches = await this.client.api(`/beta/compliance/ediscovery/cases/${caseId}/searches`).get().catch(() => ({ value: [] }));
+                const searches = await this.client.api(`/compliance/ediscovery/cases/${caseId}/searches`).version("beta").get().catch(() => ({ value: [] }));
                 searchCount = searches.value?.length || 0;
             }
 
@@ -399,18 +399,7 @@ export class GraphService {
 
     async getSharePointSiteCount() {
         try {
-            // Using search to get an approximate count of all sites
-            const response = await this.client.api("/sites")
-                .search("*")
-                .select("id")
-                .top(1) // We only need the payload to see if there's a count, but search usually returns list
-                .get();
-
-            // Search API doesn't always return total count directly in standard response wrapper
-            // without specific headers, but let's try a different approach if that fails:
-            // Fetching root site and then maybe some logic, but usually Search is best.
-            // Actually, querying for all sites with a small top might give us the @odata.count if requested
-
+            // Fetching root site collections with count
             const countResponse = await this.client.api("/sites")
                 .filter("siteCollection/root ne null")
                 .select("id")
