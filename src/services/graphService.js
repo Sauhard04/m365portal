@@ -139,8 +139,8 @@ export class GraphService {
 
     async getServicePrincipals() {
         return this.client.api("/servicePrincipals")
-            .select("id,appId,displayName,createdDateTime,homepage,keyCredentials,passwordCredentials,tags")
-            .top(100)
+            .select("id,appId,displayName,createdDateTime,homepage,keyCredentials,passwordCredentials,tags,appOwnerOrganizationId,servicePrincipalType")
+            .top(999)
             .get()
             .then(r => r.value || [])
             .catch(() => []);

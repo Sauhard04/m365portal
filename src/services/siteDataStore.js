@@ -46,7 +46,7 @@ function initStore() {
  */
 async function syncWithServer() {
     try {
-        const response = await fetch('/api/sitedata/load');
+        const response = await fetch('/api/data/sitedata');
         if (response.ok) {
             const serverData = await response.json();
             if (serverData && serverData.sections) {
@@ -96,7 +96,7 @@ const persistToServer = async (sectionKey = null, sectionData = null) => {
             payload = memoryCache;
         }
 
-        const response = await fetch('/api/sitedata/save', {
+        const response = await fetch('/api/data/sitedata', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)

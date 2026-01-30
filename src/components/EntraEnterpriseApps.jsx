@@ -23,7 +23,13 @@ const EntraEnterpriseApps = () => {
                 const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
                 const graphService = new GraphService(response.accessToken);
                 const data = await graphService.getServicePrincipals();
-                setApps(data || []);
+                // Filter out noise to match "Enterprise Applications" view in portal
+                // Logic: "Enterprise Apps" (Service Principals) typically have the 'WindowsAzureActiveDirectoryIntegratedApp' tag.
+                const filteredData = data ? data.filter(sp => {
+                    const tags = sp.tags || [];
+                    return tags.includes('WindowsAzureActiveDirectoryIntegratedApp');
+                }) : [];
+                setApps(filteredData);
             } catch (error) {
                 console.error("Failed to fetch enterprise apps", error);
                 setApps([]);

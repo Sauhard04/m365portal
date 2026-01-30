@@ -49,14 +49,23 @@ const EntraDashboard = () => {
                 SubscriptionsService.getSubscriptionCounts(client),
                 RolesService.getAdminCounts(client),
                 client.api("/applications").select('id').top(999).get().catch(() => ({ value: [] })),
-                client.api("/servicePrincipals").select('id').top(999).get().catch(() => ({ value: [] })),
+                client.api("/servicePrincipals").select('id,appDisplayName,tags,appOwnerOrganizationId,servicePrincipalType').top(999).get().catch(() => ({ value: [] })),
                 client.api('/security/secureScores').top(1).get().catch(() => ({ value: [] })),
                 graphService.getMFAStatus(),
                 graphService.getSignInTrends(14)
             ]);
 
             const appsCount = appsResponse.value ? appsResponse.value.length : 0;
-            const spCount = spResponse.value ? spResponse.value.length : 0;
+
+            // Filter out noise to match "Enterprise Applications" view in portal
+            // Logic: "Enterprise Apps" (Service Principals) typically have the 'WindowsAzureActiveDirectoryIntegratedApp' tag.
+            // Infrastructure/Hidden MS apps usually do NOT have this tag.
+            const spCount = spResponse.value ? spResponse.value.filter(sp => {
+                const tags = sp.tags || [];
+                const isIntegratedApp = tags.includes('WindowsAzureActiveDirectoryIntegratedApp');
+                return isIntegratedApp;
+            }).length : 0;
+
             const scoreData = scoreResponse.value?.[0] || { currentScore: 78, maxScore: 100 };
 
             const dashboardStats = {
@@ -99,7 +108,7 @@ const EntraDashboard = () => {
                 }
             };
 
-            await DataPersistenceService.save('EntraID', persistenceData);
+            await DataPersistenceService.save('EntraID_v4', persistenceData);
 
             setStats(dashboardStats);
             setSecureScore(scoreInfo);
@@ -124,7 +133,7 @@ const EntraDashboard = () => {
 
     const loadData = async () => {
         try {
-            const cached = await DataPersistenceService.load('EntraID');
+            const cached = await DataPersistenceService.load('EntraID_v4');
             if (cached && cached.raw && cached.raw.stats) {
                 // Merge with defaults to ensure new keys exist
                 setStats(prev => ({
@@ -139,7 +148,7 @@ const EntraDashboard = () => {
                 setLoading(false);
 
                 // Fetch if expired OR if we are using stale data structure
-                if (DataPersistenceService.isExpired('EntraID', 30) || !cached.raw.stats.enterpriseApps) {
+                if (DataPersistenceService.isExpired('EntraID_v4', 30) || !cached.raw.stats.enterpriseApps) {
                     console.log("Cache expired or stale, refreshing...");
                     fetchDashboardData(false);
                 }
