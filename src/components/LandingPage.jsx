@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Zap, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { Shield, Zap, ArrowRight, AlertCircle } from 'lucide-react';
 import styles from './LandingPage.module.css';
 import Logo from './Logo';
+import Loader3D from './Loader3D';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -102,16 +103,11 @@ const LandingPage = () => {
               onClick={handleLogin}
               disabled={loading}
             >
-              {loading ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                <>
-                  <Shield size={22} className={styles.buttonIcon} />
-                  <span>Sign in with Microsoft</span>
-                  <ArrowRight size={20} className={styles.buttonIcon} style={{ marginLeft: 'auto' }} />
-                </>
-              )}
+              <Shield size={22} className={styles.buttonIcon} />
+              <span>Sign in with Microsoft</span>
+              <ArrowRight size={20} className={styles.buttonIcon} style={{ marginLeft: 'auto' }} />
             </motion.button>
+            {loading && <Loader3D showOverlay={true} text="Connecting to Microsoft..." />}
 
             <div className={styles.footerInfo}>
               <Zap size={14} className={styles.footerIcon} />

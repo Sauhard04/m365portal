@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
-import { Activity, CheckCircle2, AlertTriangle, ArrowLeft, ChevronDown, ChevronRight, AlertOctagon, Info, XCircle, ExternalLink } from 'lucide-react';
+import { Activity, CheckCircle2, AlertTriangle, ArrowLeft, ChevronDown, ChevronRight, AlertOctagon, Info, XCircle, ExternalLink, RefreshCw } from 'lucide-react';
 import Loader3D from './Loader3D';
 import SiteDataStore from '../services/siteDataStore';
 
@@ -13,33 +13,44 @@ const ServiceHealthPage = () => {
     const [health, setHealth] = useState([]);
     const [issues, setIssues] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [selectedService, setSelectedService] = useState('All');
     const [expandedIssue, setExpandedIssue] = useState(null);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (accounts.length > 0) {
-                try {
-                    const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                    const graphService = new GraphService(response.accessToken);
-                    const [healthData, issuesData] = await Promise.all([
-                        graphService.getServiceHealth(),
-                        graphService.getServiceIssues()
-                    ]);
-                    setHealth(healthData || []);
-                    setIssues(issuesData || []);
-                    SiteDataStore.store('serviceHealth', {
-                        overview: healthData,
-                        issues: issuesData,
-                        unhealthyCount: (healthData || []).filter(s => s.status !== 'ServiceOperational').length
-                    }, { source: 'ServiceHealthPage' });
-                } catch (err) {
-                    console.error(err);
-                } finally {
+    const fetchData = async (isManual = false) => {
+        if (accounts.length > 0) {
+            if (isManual) setRefreshing(true);
+            const startTime = Date.now();
+            try {
+                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+                const graphService = new GraphService(response.accessToken);
+                const [healthData, issuesData] = await Promise.all([
+                    graphService.getServiceHealth(),
+                    graphService.getServiceIssues()
+                ]);
+                setHealth(healthData || []);
+                setIssues(issuesData || []);
+                SiteDataStore.store('serviceHealth', {
+                    overview: healthData,
+                    issues: issuesData,
+                    unhealthyCount: (healthData || []).filter(s => s.status !== 'ServiceOperational').length
+                }, { source: 'ServiceHealthPage' });
+            } catch (err) {
+                console.error(err);
+            } finally {
+                if (isManual) {
+                    const elapsedTime = Date.now() - startTime;
+                    const remainingTime = Math.max(0, 1000 - elapsedTime);
+                    setTimeout(() => setRefreshing(false), remainingTime);
+                } else {
                     setLoading(false);
+                    setRefreshing(false);
                 }
             }
-        };
+        }
+    };
+
+    useEffect(() => {
         fetchData();
     }, [instance, accounts]);
 
@@ -65,23 +76,33 @@ const ServiceHealthPage = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Global operational status and incident management tracking</p>
                 </div>
 
-                {unhealthyServices.length > 0 ? (
-                    <div className="glass-card" style={{ padding: '12px 24px', background: 'hsla(0, 84%, 60%, 0.1)', borderColor: 'hsla(0, 84%, 60%, 0.3)', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                        <XCircle color="var(--accent-error)" size={24} />
-                        <div>
-                            <div style={{ fontWeight: 700, color: 'var(--accent-error)', fontSize: '14px' }}>{unhealthyServices.length} Active Issues</div>
-                            <div style={{ fontSize: '11px', opacity: 0.8 }}>Impact detected</div>
+                <div className="flex-center flex-gap-4">
+                    <button
+                        className={`sync-btn ${refreshing ? 'spinning' : ''}`}
+                        onClick={() => fetchData(true)}
+                        title="Sync & Refresh"
+                    >
+                        <RefreshCw size={16} />
+                    </button>
+
+                    {unhealthyServices.length > 0 ? (
+                        <div className="glass-card" style={{ padding: '12px 24px', background: 'hsla(0, 84%, 60%, 0.1)', borderColor: 'hsla(0, 84%, 60%, 0.3)', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                            <XCircle color="var(--accent-error)" size={24} />
+                            <div>
+                                <div style={{ fontWeight: 700, color: 'var(--accent-error)', fontSize: '14px' }}>{unhealthyServices.length} Active Issues</div>
+                                <div style={{ fontSize: '11px', opacity: 0.8 }}>Impact detected</div>
+                            </div>
                         </div>
-                    </div>
-                ) : (
-                    <div className="glass-card" style={{ padding: '12px 24px', background: 'hsla(142, 70%, 50%, 0.1)', borderColor: 'hsla(142, 70%, 50%, 0.3)', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                        <CheckCircle2 color="var(--accent-success)" size={24} />
-                        <div>
-                            <div style={{ fontWeight: 700, color: 'var(--accent-success)', fontSize: '14px' }}>All Systems Nominal</div>
-                            <div style={{ fontSize: '11px', opacity: 0.8 }}>No reported incidents</div>
+                    ) : (
+                        <div className="glass-card" style={{ padding: '12px 24px', background: 'hsla(142, 70%, 50%, 0.1)', borderColor: 'hsla(142, 70%, 50%, 0.3)', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                            <CheckCircle2 color="var(--accent-success)" size={24} />
+                            <div>
+                                <div style={{ fontWeight: 700, color: 'var(--accent-success)', fontSize: '14px' }}>All Systems Nominal</div>
+                                <div style={{ fontSize: '11px', opacity: 0.8 }}>No reported incidents</div>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </header>
 
             <div className="flex-center justify-start flex-gap-4 spacing-v-8" style={{ overflowX: 'auto', paddingBottom: '12px', maskImage: 'linear-gradient(to right, black 80%, transparent)' }}>

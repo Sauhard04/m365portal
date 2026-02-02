@@ -21,6 +21,7 @@ const UsageReports = () => {
     const { instance, accounts } = useMsal();
     const [searchParams] = useSearchParams();
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [period, setPeriod] = useState('D7');
     const [isPeriodDropdownOpen, setIsPeriodDropdownOpen] = useState(false);
     const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'teams');
@@ -31,8 +32,11 @@ const UsageReports = () => {
         onedrive: { detail: [], counts: [] }
     });
 
-    const fetchData = async () => {
-        setLoading(true);
+    const fetchData = async (isManual = false) => {
+        if (isManual) setRefreshing(true);
+        else setLoading(true);
+
+        const startTime = Date.now();
         try {
             let tokenResponse;
             try {
@@ -111,7 +115,14 @@ const UsageReports = () => {
                 onedrive: { detail: [], counts: [] }
             });
         } finally {
-            setLoading(false);
+            if (isManual) {
+                const elapsedTime = Date.now() - startTime;
+                const remainingTime = Math.max(0, 1500 - elapsedTime);
+                setTimeout(() => setRefreshing(false), remainingTime);
+            } else {
+                setLoading(false);
+                setRefreshing(false);
+            }
         }
     };
 
@@ -501,6 +512,12 @@ const UsageReports = () => {
         );
     };
 
+    if (loading) {
+        return (
+            <Loader3D showOverlay={true} />
+        );
+    }
+
     return (
         <div className="usage-reports-page">
             <header className="flex-between spacing-v-12">
@@ -595,7 +612,7 @@ const UsageReports = () => {
                             )}
                         </AnimatePresence>
                     </div>
-                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={fetchData} style={{ marginTop: '2px' }}>
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchData(true)} style={{ marginTop: '2px' }}>
                         <RefreshCw size={14} />
                     </button>
                 </div>
@@ -685,26 +702,20 @@ const UsageReports = () => {
             </div>
 
             <main>
-                {loading ? (
-                    <div style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <Loader3D />
-                    </div>
-                ) : (
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={activeTab}
-                            initial={{ opacity: 0, y: 15 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -15 }}
-                            transition={{ duration: 0.4, ease: "easeOut" }}
-                        >
-                            {activeTab === 'teams' && renderTeamsDashboard()}
-                            {activeTab === 'exchange' && renderExchangeDashboard()}
-                            {activeTab === 'sharepoint' && renderSharePointDashboard()}
-                            {activeTab === 'onedrive' && renderOneDriveDashboard()}
-                        </motion.div>
-                    </AnimatePresence>
-                )}
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={activeTab}
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -15 }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                    >
+                        {activeTab === 'teams' && renderTeamsDashboard()}
+                        {activeTab === 'exchange' && renderExchangeDashboard()}
+                        {activeTab === 'sharepoint' && renderSharePointDashboard()}
+                        {activeTab === 'onedrive' && renderOneDriveDashboard()}
+                    </motion.div>
+                </AnimatePresence>
             </main>
         </div>
     );

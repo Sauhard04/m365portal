@@ -30,11 +30,13 @@ const IntuneMonitoring = () => {
         adminRoles: 0
     });
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState(null);
 
     const fetchDashboardData = async (isManual = false) => {
         if (accounts.length === 0) return;
-        setLoading(true);
+        if (isManual) setRefreshing(true);
+        else setLoading(true);
         setError(null);
 
         const startTime = Date.now();
@@ -99,10 +101,11 @@ const IntuneMonitoring = () => {
                 const elapsedTime = Date.now() - startTime;
                 const remainingTime = Math.max(0, 2000 - elapsedTime);
                 setTimeout(() => {
-                    setLoading(false);
+                    setRefreshing(false);
                 }, remainingTime);
             } else {
                 setLoading(false);
+                setRefreshing(false);
             }
         }
     };
@@ -229,7 +232,7 @@ const IntuneMonitoring = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Device management and mobile application management</p>
                 </div>
                 <div className="flex-gap-2">
-                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={() => fetchDashboardData(true)} title="Sync & Refresh">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchDashboardData(true)} title="Sync & Refresh">
                         <RefreshCw size={16} />
                     </button>
                 </div>
@@ -302,7 +305,7 @@ const IntuneMonitoring = () => {
             )}
 
 
-            {loading && <Loader3D showOverlay={true} />}
+            {loading && !refreshing && <Loader3D showOverlay={true} />}
 
             <div className="stat-grid">
                 {tiles.map((tile, i) => {

@@ -4,7 +4,8 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { RolesService } from '../services/entra';
-import { ArrowLeft, ShieldCheck, ChevronDown, ChevronRight, User, Loader2, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, ChevronDown, ChevronRight, User, Loader2, ShieldAlert, RefreshCw } from 'lucide-react';
+import Loader3D from './Loader3D';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const EntraAdmins = () => {
@@ -12,36 +13,47 @@ const EntraAdmins = () => {
     const { instance, accounts } = useMsal();
     const [roles, setRoles] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [expandedRole, setExpandedRole] = useState(null);
 
-    useEffect(() => {
-        const fetchRoles = async () => {
-            if (accounts.length > 0) {
-                try {
-                    const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                    const client = new GraphService(response.accessToken).client;
-                    const data = await RolesService.getRoles(client);
-                    const activeRoles = data.filter(r => r.members && r.members.length > 0);
-                    setRoles(activeRoles);
+    const fetchRoles = async (isManual = false) => {
+        if (accounts.length > 0) {
+            if (isManual) setRefreshing(true);
+            else setLoading(true);
 
-                    // Background store for AI context
-                    const SiteDataStore = (await import('../services/siteDataStore')).default;
-                    SiteDataStore.store('privilegedRoles', activeRoles);
-                } catch (error) {
-                    console.error("Role fetch error", error);
-                } finally {
+            const startTime = Date.now();
+            try {
+                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+                const client = new GraphService(response.accessToken).client;
+                const data = await RolesService.getRoles(client);
+                const activeRoles = data.filter(r => r.members && r.members.length > 0);
+                setRoles(activeRoles);
+
+                // Background store for AI context
+                const SiteDataStore = (await import('../services/siteDataStore')).default;
+                SiteDataStore.store('privilegedRoles', activeRoles);
+            } catch (error) {
+                console.error("Role fetch error", error);
+            } finally {
+                if (isManual) {
+                    const elapsedTime = Date.now() - startTime;
+                    const remainingTime = Math.max(0, 1000 - elapsedTime);
+                    setTimeout(() => setRefreshing(false), remainingTime);
+                } else {
                     setLoading(false);
+                    setRefreshing(false);
                 }
             }
-        };
+        }
+    };
+
+    useEffect(() => {
         fetchRoles();
     }, [accounts, instance]);
 
     if (loading) {
         return (
-            <div className="flex-center" style={{ height: '60vh' }}>
-                <Loader2 className="animate-spin" size={40} color="var(--accent-error)" />
-            </div>
+            <Loader3D showOverlay={true} />
         );
     }
 
@@ -56,6 +68,11 @@ const EntraAdmins = () => {
                 <div>
                     <h1 className="title-gradient" style={{ fontSize: '32px' }}>Privileged Roles</h1>
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Administrative authority and security group attribution</p>
+                </div>
+                <div className="flex-gap-2">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchRoles(true)} title="Sync & Refresh">
+                        <RefreshCw size={16} />
+                    </button>
                 </div>
             </header>
 

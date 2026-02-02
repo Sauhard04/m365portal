@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
-import { ArrowLeft, Search, Download, CheckCircle2, XCircle, Loader2, LogIn, MapPin, Globe, Monitor, Calendar, AlertTriangle, Shield } from 'lucide-react';
+import { ArrowLeft, Search, Download, CheckCircle2, XCircle, LogIn, MapPin, Globe, Monitor, Calendar, AlertTriangle, Shield } from 'lucide-react';
+import Loader3D from './Loader3D';
 
 const EntraSignInLogs = () => {
     const navigate = useNavigate();
@@ -144,9 +145,7 @@ const EntraSignInLogs = () => {
 
     if (loading) {
         return (
-            <div className="flex-center" style={{ height: '60vh' }}>
-                <Loader2 className="animate-spin" size={40} color="var(--accent-blue)" />
-            </div>
+            <Loader3D showOverlay={true} />
         );
     }
 

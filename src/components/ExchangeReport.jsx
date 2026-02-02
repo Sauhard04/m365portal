@@ -4,7 +4,8 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RefreshCw, Download, AlertCircle, Loader2, Shield, ArrowLeft, Mail, Search, Terminal } from 'lucide-react';
+import { RefreshCw, Download, AlertCircle, Shield, ArrowLeft, Mail, Search, Terminal } from 'lucide-react';
+import Loader3D from './Loader3D';
 import SiteDataStore from '../services/siteDataStore';
 
 const ExchangeReport = () => {
@@ -14,6 +15,7 @@ const ExchangeReport = () => {
     const [reportData, setReportData] = useState([]);
     const [filterText, setFilterText] = useState('');
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState(null);
 
     const [isConcealed, setIsConcealed] = useState(false);
@@ -93,9 +95,11 @@ const ExchangeReport = () => {
         URL.revokeObjectURL(url);
     };
 
-    const fetchData = async () => {
-        setLoading(true);
+    const fetchData = async (isManual = false) => {
+        if (isManual) setRefreshing(true);
+        else setLoading(true);
         setError(null);
+        const startTime = Date.now();
         try {
             if (accounts.length === 0) return;
             const res = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
@@ -111,11 +115,22 @@ const ExchangeReport = () => {
         } catch (err) {
             setError("Failed to fetch operational data.");
         } finally {
-            setLoading(false);
+            if (isManual) {
+                const elapsedTime = Date.now() - startTime;
+                const remainingTime = Math.max(0, 1500 - elapsedTime);
+                setTimeout(() => setRefreshing(false), remainingTime);
+            } else {
+                setLoading(false);
+                setRefreshing(false);
+            }
         }
     };
 
     useEffect(() => { fetchData(); }, []);
+
+    if (loading && reportData.length === 0) {
+        return <Loader3D showOverlay={true} />;
+    }
 
     return (
         <div className="animate-in">
@@ -130,7 +145,7 @@ const ExchangeReport = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Real-time mailbox configuration and activity telemetry</p>
                 </div>
                 <div className="flex-gap-4">
-                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={fetchData} title="Sync & Refresh">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchData(true)} title="Sync & Refresh">
                         <RefreshCw size={16} />
                     </button>
                     <button className="btn btn-secondary" onClick={() => navigate('/service/admin/build-commands')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -202,13 +217,7 @@ const ExchangeReport = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {loading ? (
-                                <tr>
-                                    <td colSpan="6" style={{ textAlign: 'center', padding: '100px' }}>
-                                        <Loader2 className="animate-spin" size={32} color="var(--accent-blue)" />
-                                    </td>
-                                </tr>
-                            ) : filteredData.length > 0 ? filteredData.map((mb, i) => (
+                            {filteredData.length > 0 ? filteredData.map((mb, i) => (
                                 <tr key={i}>
 
                                     <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{mb.displayName}</td>

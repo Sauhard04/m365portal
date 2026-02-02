@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
-import { Shield, Loader2, ArrowLeft, TrendingUp, Target, CheckCircle2, AlertCircle, RefreshCw, ExternalLink } from 'lucide-react';
+import { Shield, ArrowLeft, TrendingUp, Target, CheckCircle2, AlertCircle, RefreshCw, ExternalLink } from 'lucide-react';
+import Loader3D from './Loader3D';
 
 const SecureScorePage = () => {
     const { instance, accounts } = useMsal();
@@ -11,11 +12,13 @@ const SecureScorePage = () => {
     const [score, setScore] = useState(null);
     const [controlProfiles, setControlProfiles] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState(null);
 
     const fetchData = async (isManual = false) => {
         if (accounts.length > 0) {
-            if (isManual) setLoading(true);
+            if (isManual) setRefreshing(true);
+            else setLoading(true);
             setError(null);
             try {
                 let response;
@@ -87,7 +90,12 @@ const SecureScorePage = () => {
                 console.error('Secure Score fetch error:', err);
                 setError(err.name === "InteractionRequiredAuthError" ? "InteractionRequired" : "Secure Score telemetry could not be fetched.");
             } finally {
-                setLoading(false);
+                if (isManual) {
+                    setTimeout(() => setRefreshing(false), 1000);
+                } else {
+                    setLoading(false);
+                    setRefreshing(false);
+                }
             }
         }
     };
@@ -106,9 +114,7 @@ const SecureScorePage = () => {
 
     if (loading && !score) {
         return (
-            <div className="flex-center" style={{ height: '60vh' }}>
-                <Loader2 className="animate-spin" size={40} color="var(--accent-blue)" />
-            </div>
+            <Loader3D showOverlay={true} />
         );
     }
 
@@ -127,7 +133,7 @@ const SecureScorePage = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Cybersecurity health assessment and posture tracking</p>
                 </div>
                 <div className="flex-gap-2">
-                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={() => fetchData(true)} title="Sync & Refresh">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchData(true)} title="Sync & Refresh">
                         <RefreshCw size={16} />
                     </button>
                 </div>

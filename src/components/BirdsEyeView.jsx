@@ -21,6 +21,7 @@ const BirdsEyeView = ({ embedded = false }) => {
     const { instance, accounts } = useMsal();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState(null);
     const [stats, setStats] = useState({
         admin: { mailboxes: 0, activeMail: 0, domains: 0, healthIssues: 0 },
@@ -61,9 +62,11 @@ const BirdsEyeView = ({ embedded = false }) => {
         }
 
         if (isManual) {
-            setLoading(true);
+            setRefreshing(true);
             // Clear broken cache
             await DataPersistenceService.clear('BirdsEyeView');
+        } else {
+            setLoading(true);
         }
         console.log("BirdsEyeView: fetchData started", { isManual });
         const startTime = Date.now();
@@ -255,10 +258,11 @@ const BirdsEyeView = ({ embedded = false }) => {
                 const elapsedTime = Date.now() - startTime;
                 const remainingTime = Math.max(0, 2000 - elapsedTime);
                 setTimeout(() => {
-                    setLoading(false);
+                    setRefreshing(false);
                 }, remainingTime);
             } else {
                 setLoading(false);
+                setRefreshing(false);
             }
         }
     };
@@ -283,9 +287,9 @@ const BirdsEyeView = ({ embedded = false }) => {
                             <p>Real-time environment telemetry and resource mapping.</p>
                         </div>
                         <button
-                            className={`sync-btn ${loading ? 'spinning' : ''}`}
+                            className={`sync-btn ${refreshing ? 'spinning' : ''}`}
                             onClick={() => fetchData(true)}
-                            disabled={loading}
+                            disabled={refreshing}
                         >
                             <RefreshCw size={14} />
                             <span>Refresh</span>

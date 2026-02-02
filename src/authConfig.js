@@ -11,6 +11,7 @@ export const msalConfig = {
 };
 
 // Scopes for the Graph API calls we need
+// Scopes for the Graph API calls we need
 export const loginRequest = {
     scopes: [
         "User.Read",
@@ -19,7 +20,35 @@ export const loginRequest = {
         "MailboxSettings.Read",
         "ServiceHealth.Read.All",
         "AuditLog.Read.All",
-        "Sites.Read.All"
+        "Sites.Read.All",
+        // Security
+        "SecurityAlert.Read.All",
+        "SecurityIncident.Read.All",
+        "IdentityRiskyUser.Read.All",
+        "IdentityRiskEvent.Read.All",
+        // Governance
+        "Policy.Read.All",
+        "Agreement.Read.All",
+        "AppRoleAssignment.ReadWrite.All",
+        // SharePoint
+        "Files.Read.All",
+        // Intune
+        "DeviceManagementManagedDevices.Read.All",
+        "DeviceManagementServiceConfig.Read.All",
+        "DeviceManagementApps.Read.All",
+        "DeviceManagementConfiguration.Read.All",
+        "ThreatHunting.Read.All",
+        // Teams
+        "Team.ReadBasic.All",
+        "TeamSettings.Read.All",
+        "Group.Read.All",
+        "Chat.Read",
+        // Admin
+        "Organization.Read.All",
+        // Purview
+        "InformationProtectionPolicy.Read",
+        "RecordsManagement.Read.All",
+        "eDiscovery.Read.All"
     ]
 };
 

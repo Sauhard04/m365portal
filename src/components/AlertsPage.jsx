@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import {
     Bell, AlertTriangle, Info, AlertCircle, Filter,
     CheckCircle2, Search, Calendar,
-    ShieldAlert, Zap, ArrowLeft, ChevronDown, ChevronRight
+    ShieldAlert, Zap, ArrowLeft, ChevronDown, ChevronRight, RefreshCw
 } from 'lucide-react';
 import { useMsal } from '@azure/msal-react';
 import { Client } from '@microsoft/microsoft-graph-client';
 import AlertsService from '../services/alerts/alerts.service';
+import Loader3D from './Loader3D';
 
 const AlertsPage = () => {
     const navigate = useNavigate();
@@ -22,14 +23,18 @@ const AlertsPage = () => {
         unresolved: 0,
         resolved: 0
     });
+    const [refreshing, setRefreshing] = useState(false);
     const [expandedAlert, setExpandedAlert] = useState(null);
 
     useEffect(() => {
         fetchAlerts();
     }, []);
 
-    const fetchAlerts = async () => {
-        setLoading(true);
+    const fetchAlerts = async (isManual = false) => {
+        if (isManual) setRefreshing(true);
+        else setLoading(true);
+
+        const startTime = Date.now();
         try {
             const accessToken = await instance.acquireTokenSilent({
                 scopes: ['https://graph.microsoft.com/.default'],
@@ -56,7 +61,14 @@ const AlertsPage = () => {
             console.error('Error fetching alerts:', error);
             // Keep empty array if fetch fails
         } finally {
-            setLoading(false);
+            if (isManual) {
+                const elapsedTime = Date.now() - startTime;
+                const remainingTime = Math.max(0, 1000 - elapsedTime);
+                setTimeout(() => setRefreshing(false), remainingTime);
+            } else {
+                setLoading(false);
+                setRefreshing(false);
+            }
         }
     };
 
@@ -84,6 +96,12 @@ const AlertsPage = () => {
         return matchesFilter && matchesSearch;
     });
 
+    if (loading) {
+        return (
+            <Loader3D showOverlay={true} text="Loading Alerts..." />
+        );
+    }
+
     return (
         <div className="animate-in">
             <header className="flex-between spacing-v-4">
@@ -92,6 +110,13 @@ const AlertsPage = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '11px' }}>Monitor and manage critical system notifications</p>
                 </div>
                 <div className="flex-gap-2">
+                    <button
+                        className={`sync-btn ${refreshing ? 'spinning' : ''}`}
+                        onClick={() => fetchAlerts(true)}
+                        title="Sync & Refresh"
+                    >
+                        <RefreshCw size={14} />
+                    </button>
                     <button
                         onClick={() => navigate(-1)}
                         className="btn btn-secondary"
@@ -109,28 +134,28 @@ const AlertsPage = () => {
                         <span className="stat-label">Critical Alerts</span>
                         <AlertCircle size={14} color="#ef4444" />
                     </div>
-                    <div className="stat-value">{loading ? '-' : stats.critical}</div>
+                    <div className="stat-value">{stats.critical}</div>
                 </div>
                 <div className="glass-card stat-card" style={{ borderLeft: '4px solid #f97316' }}>
                     <div className="flex-between spacing-v-2">
                         <span className="stat-label">High Severity</span>
                         <ShieldAlert size={14} color="#f97316" />
                     </div>
-                    <div className="stat-value">{loading ? '-' : stats.high}</div>
+                    <div className="stat-value">{stats.high}</div>
                 </div>
                 <div className="glass-card stat-card" style={{ borderLeft: '4px solid #eab308' }}>
                     <div className="flex-between spacing-v-2">
                         <span className="stat-label">Unresolved</span>
                         <Zap size={14} color="#eab308" />
                     </div>
-                    <div className="stat-value">{loading ? '-' : stats.unresolved}</div>
+                    <div className="stat-value">{stats.unresolved}</div>
                 </div>
                 <div className="glass-card stat-card" style={{ borderLeft: '4px solid #10b981' }}>
                     <div className="flex-between spacing-v-2">
                         <span className="stat-label">Resolved (24h)</span>
                         <CheckCircle2 size={14} color="#10b981" />
                     </div>
-                    <div className="stat-value">{loading ? '-' : stats.resolved}</div>
+                    <div className="stat-value">{stats.resolved}</div>
                 </div>
             </div>
 
@@ -184,13 +209,7 @@ const AlertsPage = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {loading ? (
-                                <tr>
-                                    <td colSpan="6" style={{ textAlign: 'center', padding: '40px', color: 'var(--text-dim)' }}>
-                                        Loading alerts...
-                                    </td>
-                                </tr>
-                            ) : filteredAlerts.length === 0 ? (
+                            {filteredAlerts.length === 0 ? (
                                 <tr>
                                     <td colSpan="6" style={{ textAlign: 'center', padding: '40px', color: 'var(--text-dim)' }}>
                                         No alerts found

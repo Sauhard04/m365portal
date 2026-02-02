@@ -3,15 +3,18 @@
 
 export const PurviewService = {
     // Configuration
+    isConfigured() {
+        return !!(import.meta.env.VITE_PURVIEW_ACCOUNT_NAME || import.meta.env.VITE_PURVIEW_ENDPOINT);
+    },
+
     getPurviewEndpoint() {
         const accountName = import.meta.env.VITE_PURVIEW_ACCOUNT_NAME;
         const endpoint = import.meta.env.VITE_PURVIEW_ENDPOINT;
 
         if (endpoint) return endpoint;
-        if (accountName) return `https://${accountName}.purview.azure.com`;
+        if (accountName && accountName !== 'your-purview-account') return `https://${accountName}.purview.azure.com`;
 
         // Fallback - return placeholder that will fail gracefully
-        console.warn('Purview endpoint not configured. Please set VITE_PURVIEW_ACCOUNT_NAME or VITE_PURVIEW_ENDPOINT in .env');
         return 'https://your-purview-account.purview.azure.com';
     },
 
@@ -398,7 +401,47 @@ export const PurviewService = {
     // ========================================
 
     // Get comprehensive dashboard data
+    // Get comprehensive dashboard data
     async getDashboardData(accessToken) {
+        if (!this.isConfigured()) {
+            console.warn('Purview not configured - returning mock data');
+            return {
+                totalAssets: 1240,
+                assetDistribution: [
+                    { name: 'Azure SQL Database', value: 450 },
+                    { name: 'Blob Storage', value: 320 },
+                    { name: 'Power BI', value: 180 },
+                    { name: 'AWS S3', value: 120 },
+                    { name: 'On-prem SQL', value: 95 },
+                    { name: 'Other', value: 75 }
+                ],
+                assetTypes: 12,
+                classifications: 42,
+                classificationDistribution: [
+                    { name: 'Confidential', count: 120 },
+                    { name: 'Highly Confidential', count: 45 },
+                    { name: 'Public', count: 800 },
+                    { name: 'Credit Card Number', count: 15 },
+                    { name: 'Passport Number', count: 8 }
+                ],
+                glossaryTermsCount: 85,
+                glossaryCategoriesCount: 14,
+                dataSources: 18,
+                scanStats: {
+                    totalSources: 18,
+                    activeSources: 15,
+                    inactiveSources: 3,
+                    pendingSources: 0
+                },
+                collections: 8,
+                policies: 5,
+                assetsWithLineage: 412,
+                sensitiveAssets: 68,
+                lastUpdated: new Date().toISOString(),
+                isMock: true
+            };
+        }
+
         try {
             // Fetch all dashboard metrics in parallel
             const [
@@ -422,17 +465,24 @@ export const PurviewService = {
             ]);
 
             // Calculate asset distribution by type
-            const assetDistribution = {};
+            const assetDistObj = {};
             searchResults.forEach(asset => {
                 const type = asset.entityType || asset['@type'] || 'Unknown';
-                assetDistribution[type] = (assetDistribution[type] || 0) + 1;
+                assetDistObj[type] = (assetDistObj[type] || 0) + 1;
             });
+            const assetDistribution = Object.entries(assetDistObj).map(([name, value]) => ({ name, value }));
 
             // Calculate classification distribution
-            const classificationDistribution = {};
-            classifications.forEach(cls => {
-                classificationDistribution[cls.name || 'Unknown'] = 0;
+            const classDistObj = {};
+            searchResults.forEach(asset => {
+                if (asset.classifications) {
+                    asset.classifications.forEach(cls => {
+                        const name = cls.typeName || cls.displayName || 'Unknown';
+                        classDistObj[name] = (classDistObj[name] || 0) + 1;
+                    });
+                }
             });
+            const classificationDistribution = Object.entries(classDistObj).map(([name, count]) => ({ name, count }));
 
             // Calculate scan statistics
             const scanStats = {
@@ -453,6 +503,8 @@ export const PurviewService = {
                 scanStats,
                 collections: collections.length,
                 policies: policies.length,
+                assetsWithLineage: searchResults.filter(a => a.hasLineage).length || 0,
+                sensitiveAssets: searchResults.filter(a => a.classifications && a.classifications.length > 0).length || 0,
                 lastUpdated: new Date().toISOString()
             };
         } catch (error) {

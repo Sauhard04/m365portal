@@ -43,8 +43,12 @@ const PIMRolesPage = () => {
         } catch (err) {
             console.error('Failed to fetch PIM roles:', err);
         } finally {
-            setLoading(false);
-            setRefreshing(false);
+            if (isManual) {
+                setTimeout(() => setRefreshing(false), 1000);
+            } else {
+                setLoading(false);
+                setRefreshing(false);
+            }
         }
     };
 

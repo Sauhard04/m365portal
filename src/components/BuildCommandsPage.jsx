@@ -13,7 +13,6 @@ import {
     HardDrive,
     CheckSquare,
     Square,
-    Loader2,
     Terminal,
     FileCode,
     Search,
@@ -29,6 +28,7 @@ import {
     Zap,
     Fingerprint
 } from 'lucide-react';
+import Loader3D from './Loader3D';
 
 const BuildCommandsPage = () => {
     const navigate = useNavigate();
@@ -461,6 +461,10 @@ Disconnect-ExchangeOnline -Confirm:$false
 
     useEffect(() => { fetchUsers(); }, []);
 
+    if (loading && users.length === 0) {
+        return <Loader3D showOverlay={true} />;
+    }
+
     return (
         <div className="animate-in">
             <button onClick={() => navigate('/service/admin/report')} className="btn-back">
@@ -629,14 +633,7 @@ Disconnect-ExchangeOnline -Confirm:$false
                             </tr>
                         </thead>
                         <tbody>
-                            {loading ? (
-                                <tr>
-                                    <td colSpan="6" style={{ textAlign: 'center', padding: '100px' }}>
-                                        <Loader2 className="animate-spin" size={32} color="var(--accent-blue)" />
-                                        <p style={{ marginTop: '16px', color: 'var(--text-dim)' }}>Loading users...</p>
-                                    </td>
-                                </tr>
-                            ) : error ? (
+                            {error ? (
                                 <tr>
                                     <td colSpan="6" style={{ textAlign: 'center', padding: '100px', color: 'var(--accent-error)' }}>
                                         {error}

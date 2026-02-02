@@ -41,7 +41,7 @@ export const GovernanceService = {
     async getRoleAssignments(client) {
         try {
             const response = await client.api('/roleManagement/directory/roleAssignments')
-                .expand('principal,roleDefinition')
+                .expand('roleDefinition')
                 .top(200)
                 .get();
             return response.value || [];
@@ -58,7 +58,7 @@ export const GovernanceService = {
     async getEligibleRoleAssignments(client) {
         try {
             const response = await client.api('/roleManagement/directory/roleEligibilitySchedules')
-                .expand('principal,roleDefinition')
+                .expand('roleDefinition')
                 .top(200)
                 .get();
             return response.value || [];
@@ -75,7 +75,7 @@ export const GovernanceService = {
     async getActiveRoleAssignments(client) {
         try {
             const response = await client.api('/roleManagement/directory/roleAssignmentSchedules')
-                .expand('principal,roleDefinition')
+                .expand('roleDefinition')
                 .top(200)
                 .get();
             return response.value || [];

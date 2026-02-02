@@ -27,6 +27,7 @@ const OverviewDashboard = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
     const [overviewOpen, setOverviewOpen] = useState(true);
@@ -34,7 +35,9 @@ const OverviewDashboard = () => {
 
     const fetchOverviewData = async (isManual = false) => {
         if (accounts.length === 0) return;
-        setLoading(true);
+
+        if (isManual) setRefreshing(true);
+        else setLoading(true);
 
         const startTime = Date.now();
 
@@ -73,10 +76,11 @@ const OverviewDashboard = () => {
                 const elapsedTime = Date.now() - startTime;
                 const remainingTime = Math.max(0, 2000 - elapsedTime);
                 setTimeout(() => {
-                    setLoading(false);
+                    setRefreshing(false);
                 }, remainingTime);
             } else {
                 setLoading(false);
+                setRefreshing(false);
             }
         }
     };
@@ -254,7 +258,7 @@ const OverviewDashboard = () => {
                     <h1 className="title-gradient" style={{ fontSize: '32px' }}>Overview Dashboard</h1>
                 </div>
                 <div className="flex-gap-2">
-                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={() => fetchOverviewData(true)} title="Sync & Refresh">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchOverviewData(true)} title="Sync & Refresh">
                         <RefreshCw size={16} />
                     </button>
                 </div>

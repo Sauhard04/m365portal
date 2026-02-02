@@ -307,7 +307,7 @@ const GovernanceDashboard = () => {
                             View All <ChevronRight size={14} />
                         </button>
                     </div>
-                    <div className="chart-body" style={{ height: '220px' }}>
+                    <div className="chart-body" style={{ height: '220px', width: '100%' }}>
                         {caPolicyData.length > 0 ? (
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
@@ -360,7 +360,7 @@ const GovernanceDashboard = () => {
                             View All <ChevronRight size={14} />
                         </button>
                     </div>
-                    <div className="chart-body" style={{ height: '220px' }}>
+                    <div className="chart-body" style={{ height: '220px', width: '100%' }}>
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={roleData} layout="vertical">
                                 <XAxis type="number" hide />

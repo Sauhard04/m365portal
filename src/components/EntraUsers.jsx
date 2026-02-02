@@ -4,40 +4,54 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { UsersService } from '../services/entra';
-import { ArrowLeft, Search, Download, CheckCircle2, XCircle, Loader2, Users } from 'lucide-react';
+import { ArrowLeft, Search, Download, CheckCircle2, XCircle, Loader2, Users, RefreshCw } from 'lucide-react';
 import SiteDataStore from '../services/siteDataStore';
+import Loader3D from './Loader3D';
 
 const EntraUsers = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [filterText, setFilterText] = useState('');
     const [filterType, setFilterType] = useState('all');
     const [filterStatus, setFilterStatus] = useState('all');
     const [filterLicense, setFilterLicense] = useState('all');
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            if (accounts.length > 0) {
-                try {
-                    const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                    const client = new GraphService(response.accessToken).client;
-                    const data = await UsersService.getAllUsers(client, 100);
-                    setUsers(data);
-                    SiteDataStore.store('entraUsers', {
-                        users: data,
-                        total: data.length,
-                        guests: data.filter(u => u.userType === 'Guest').length,
-                        disabled: data.filter(u => !u.accountEnabled).length
-                    }, { source: 'EntraUsers' });
-                } catch (error) {
-                    console.error("User fetch error:", error);
-                } finally {
+    const fetchUsers = async (isManual = false) => {
+        if (accounts.length > 0) {
+            if (isManual) setRefreshing(true);
+            else setLoading(true);
+
+            const startTime = Date.now();
+            try {
+                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+                const client = new GraphService(response.accessToken).client;
+                const data = await UsersService.getAllUsers(client, 100);
+                setUsers(data);
+                SiteDataStore.store('entraUsers', {
+                    users: data,
+                    total: data.length,
+                    guests: data.filter(u => u.userType === 'Guest').length,
+                    disabled: data.filter(u => !u.accountEnabled).length
+                }, { source: 'EntraUsers' });
+            } catch (error) {
+                console.error("User fetch error:", error);
+            } finally {
+                if (isManual) {
+                    const elapsedTime = Date.now() - startTime;
+                    const remainingTime = Math.max(0, 1000 - elapsedTime);
+                    setTimeout(() => setRefreshing(false), remainingTime);
+                } else {
                     setLoading(false);
+                    setRefreshing(false);
                 }
             }
-        };
+        }
+    };
+
+    useEffect(() => {
         fetchUsers();
     }, [accounts, instance]);
 
@@ -67,9 +81,7 @@ const EntraUsers = () => {
 
     if (loading) {
         return (
-            <div className="flex-center" style={{ height: '60vh' }}>
-                <Loader2 className="animate-spin" size={40} color="var(--accent-blue)" />
-            </div>
+            <Loader3D showOverlay={true} />
         );
     }
 
@@ -85,10 +97,15 @@ const EntraUsers = () => {
                     <h1 className="title-gradient" style={{ fontSize: '32px' }}>Microsoft Entra Users</h1>
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Identity management and access control directory</p>
                 </div>
-                <button className="btn btn-primary" onClick={handleDownloadCSV}>
-                    <Download size={16} />
-                    Export Users
-                </button>
+                <div className="flex-gap-2">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchUsers(true)} title="Sync & Refresh">
+                        <RefreshCw size={16} />
+                    </button>
+                    <button className="btn btn-primary" onClick={handleDownloadCSV}>
+                        <Download size={16} />
+                        Export Users
+                    </button>
+                </div>
             </header>
 
             <div className="glass-card" style={{ marginBottom: '32px', padding: '24px' }}>

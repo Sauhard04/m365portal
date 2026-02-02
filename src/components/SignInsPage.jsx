@@ -3,17 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
-import { AlertTriangle, Loader2, MapPin, User, Clock, ArrowLeft, XCircle, ShieldAlert, RefreshCw } from 'lucide-react';
+import { AlertTriangle, MapPin, User, Clock, ArrowLeft, XCircle, ShieldAlert, RefreshCw } from 'lucide-react';
+import Loader3D from './Loader3D';
 
 const SignInsPage = () => {
     const { instance, accounts } = useMsal();
     const navigate = useNavigate();
     const [signIns, setSignIns] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
     const fetchData = async (isManual = false) => {
         if (accounts.length > 0) {
-            if (isManual) setLoading(true);
+            if (isManual) setRefreshing(true);
+            else setLoading(true);
             try {
                 const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
                 const graphService = new GraphService(response.accessToken);
@@ -23,9 +26,10 @@ const SignInsPage = () => {
                 console.error(err);
             } finally {
                 if (isManual) {
-                    setTimeout(() => setLoading(false), 500);
+                    setTimeout(() => setRefreshing(false), 1000);
                 } else {
                     setLoading(false);
+                    setRefreshing(false);
                 }
             }
         }
@@ -37,9 +41,7 @@ const SignInsPage = () => {
 
     if (loading && signIns.length === 0) {
         return (
-            <div className="flex-center" style={{ height: '60vh' }}>
-                <Loader2 className="animate-spin" size={40} color="var(--accent-warning)" />
-            </div>
+            <Loader3D showOverlay={true} />
         );
     }
 
@@ -56,7 +58,7 @@ const SignInsPage = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Real-time monitoring of failed identity verification attempts</p>
                 </div>
                 <div className="flex-gap-2">
-                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={() => fetchData(true)} title="Sync & Refresh">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchData(true)} title="Sync & Refresh">
                         <RefreshCw size={16} />
                     </button>
                 </div>

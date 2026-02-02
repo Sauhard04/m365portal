@@ -32,6 +32,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
     const [failedSignIns, setFailedSignIns] = useState([]);
     const [deletedUsersCount, setDeletedUsersCount] = useState(0);
     const [licensingSummary, setLicensingSummary] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
 
     const serviceNames = {
         admin: 'Admin Center'
@@ -41,7 +42,8 @@ const ServicePage = ({ serviceId: propServiceId }) => {
 
     const fetchData = async (isManual = false) => {
         if (accounts.length === 0) return;
-        setLoading(true);
+        if (isManual) setRefreshing(true);
+        else setLoading(true);
 
         const startTime = Date.now();
 
@@ -123,12 +125,13 @@ const ServicePage = ({ serviceId: propServiceId }) => {
         } finally {
             if (isManual) {
                 const elapsedTime = Date.now() - startTime;
-                const remainingTime = Math.max(0, 2000 - elapsedTime);
+                const remainingTime = Math.max(0, 1500 - elapsedTime);
                 setTimeout(() => {
-                    setLoading(false);
+                    setRefreshing(false);
                 }, remainingTime);
             } else {
                 setLoading(false);
+                setRefreshing(false);
             }
         }
     };
@@ -182,7 +185,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '10px' }}>Real-time operational telemetry and management</p>
                 </div>
                 <div className="flex-gap-2">
-                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={() => fetchData(true)} title="Sync & Refresh">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchData(true)} title="Sync & Refresh">
                         <RefreshCw size={14} />
                     </button>
                     <button className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '11px' }}>

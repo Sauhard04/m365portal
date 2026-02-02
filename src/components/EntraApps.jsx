@@ -3,34 +3,48 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
-import { ArrowLeft, Search, Download, Box, Loader2 } from 'lucide-react';
+import { ArrowLeft, Search, Download, Box, Loader2, RefreshCw } from 'lucide-react';
+import Loader3D from './Loader3D';
 
 const EntraApps = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
     const [apps, setApps] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [filterText, setFilterText] = useState('');
 
-    useEffect(() => {
-        const fetchApps = async () => {
-            try {
-                if (accounts.length > 0) {
-                    const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                    const graphService = new GraphService(response.accessToken);
-                    const data = await graphService.getApplications();
-                    setApps(data || []);
+    const fetchApps = async (isManual = false) => {
+        if (accounts.length > 0) {
+            if (isManual) setRefreshing(true);
+            else setLoading(true);
 
-                    // Background store for AI context
-                    const SiteDataStore = (await import('../services/siteDataStore')).default;
-                    SiteDataStore.store('applications', data || []);
-                }
+            const startTime = Date.now();
+            try {
+                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+                const graphService = new GraphService(response.accessToken);
+                const data = await graphService.getApplications();
+                setApps(data || []);
+
+                // Background store for AI context
+                const SiteDataStore = (await import('../services/siteDataStore')).default;
+                SiteDataStore.store('applications', data || []);
             } catch (error) {
                 console.error("Failed to fetch apps", error);
             } finally {
-                setLoading(false);
+                if (isManual) {
+                    const elapsedTime = Date.now() - startTime;
+                    const remainingTime = Math.max(0, 1000 - elapsedTime);
+                    setTimeout(() => setRefreshing(false), remainingTime);
+                } else {
+                    setLoading(false);
+                    setRefreshing(false);
+                }
             }
-        };
+        }
+    };
+
+    useEffect(() => {
         fetchApps();
     }, [accounts, instance]);
 
@@ -53,9 +67,7 @@ const EntraApps = () => {
 
     if (loading) {
         return (
-            <div className="flex-center" style={{ height: '60vh' }}>
-                <Loader2 className="animate-spin" size={40} color="var(--accent-cyan)" />
-            </div>
+            <Loader3D showOverlay={true} />
         );
     }
 
@@ -71,10 +83,15 @@ const EntraApps = () => {
                     <h1 className="title-gradient" style={{ fontSize: '32px' }}>App Registrations</h1>
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Enterprise applications and service principal directory</p>
                 </div>
-                <button className="btn btn-primary" onClick={handleDownloadCSV} style={{ background: 'linear-gradient(135deg, var(--accent-cyan), var(--accent-blue))' }}>
-                    <Download size={16} />
-                    Export App List
-                </button>
+                <div className="flex-gap-2">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchApps(true)} title="Sync & Refresh">
+                        <RefreshCw size={16} />
+                    </button>
+                    <button className="btn btn-primary" onClick={handleDownloadCSV} style={{ background: 'linear-gradient(135deg, var(--accent-cyan), var(--accent-blue))' }}>
+                        <Download size={16} />
+                        Export App List
+                    </button>
+                </div>
             </header>
 
             <div className="glass-card" style={{ marginBottom: '32px', padding: '24px' }}>

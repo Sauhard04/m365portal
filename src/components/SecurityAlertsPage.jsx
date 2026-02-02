@@ -62,8 +62,12 @@ const SecurityAlertsPage = () => {
             console.error('Failed to fetch security alerts:', err);
             setError(err.name === "InteractionRequiredAuthError" ? "InteractionRequired" : "Failed to load alerts. Please check your permissions.");
         } finally {
-            setLoading(false);
-            setRefreshing(false);
+            if (isManual) {
+                setTimeout(() => setRefreshing(false), 1000);
+            } else {
+                setLoading(false);
+                setRefreshing(false);
+            }
         }
     };
 

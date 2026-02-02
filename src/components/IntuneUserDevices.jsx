@@ -5,6 +5,7 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { IntuneService } from '../services/intune';
 import { ArrowLeft, Search, Users, Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import Loader3D from './Loader3D';
 import styles from './DetailPage.module.css';
 
 const IntuneUserDevices = () => {
@@ -178,7 +179,7 @@ const IntuneUserDevices = () => {
 
                         {loadingDevices ? (
                             <div style={{ padding: '3rem', display: 'flex', justifyContent: 'center' }}>
-                                <Loader2 className="animate-spin" style={{ width: '2rem', height: '2rem', color: '#14b8a6' }} />
+                                <Loader3D scale={0.6} />
                             </div>
                         ) : userDevices.length > 0 ? (
                             <div className={styles.tableContainer}>

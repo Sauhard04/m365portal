@@ -28,11 +28,14 @@ const EntraDashboard = () => {
     const [mfaStats, setMfaStats] = useState(null);
     const [signInTrends, setSignInTrends] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState(null);
 
     const fetchDashboardData = async (isManual = false) => {
         if (accounts.length === 0) return;
-        setLoading(true);
+
+        if (isManual) setRefreshing(true);
+        else setLoading(true);
 
         const startTime = Date.now();
 
@@ -122,11 +125,10 @@ const EntraDashboard = () => {
             if (isManual) {
                 const elapsedTime = Date.now() - startTime;
                 const remainingTime = Math.max(0, 2000 - elapsedTime);
-                setTimeout(() => {
-                    setLoading(false);
-                }, remainingTime);
+                setTimeout(() => setRefreshing(false), remainingTime);
             } else {
                 setLoading(false);
+                setRefreshing(false);
             }
         }
     };
@@ -215,7 +217,7 @@ const EntraDashboard = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Unified identity protection and cloud authentication hub</p>
                 </div>
                 <div className="flex-gap-2">
-                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={() => fetchDashboardData(true)} title="Sync & Refresh">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchDashboardData(true)} title="Sync & Refresh">
                         <RefreshCw size={16} />
                     </button>
                 </div>

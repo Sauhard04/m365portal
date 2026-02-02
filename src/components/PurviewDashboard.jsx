@@ -47,29 +47,34 @@ const PurviewDashboard = () => {
         const startTime = Date.now();
 
         try {
-            const response = await instance.acquireTokenSilent({
-                scopes: ['https://purview.azure.net/.default'],
-                account: accounts[0]
-            }).catch(async (authErr) => {
-                if (authErr.name === "InteractionRequiredAuthError" || authErr.errorCode === "invalid_grant") {
-                    if (isManual) {
-                        return await instance.acquireTokenPopup({
-                            scopes: ['https://purview.azure.net/.default']
-                        });
-                    } else {
-                        throw authErr;
-                    }
-                }
-                throw authErr;
-            });
+            let accessToken = null;
 
-            const dashboardData = await PurviewService.getDashboardData(response.accessToken);
+            // Only attempt token acquisition if Purview is configured
+            if (PurviewService.isConfigured()) {
+                const response = await instance.acquireTokenSilent({
+                    scopes: ['https://purview.azure.com/.default'],
+                    account: accounts[0]
+                }).catch(async (authErr) => {
+                    if (authErr.name === "InteractionRequiredAuthError" || authErr.errorCode === "invalid_grant") {
+                        if (isManual) {
+                            return await instance.acquireTokenPopup({
+                                scopes: ['https://purview.azure.com/.default']
+                            });
+                        } else {
+                            throw authErr;
+                        }
+                    }
+                    throw authErr;
+                });
+                accessToken = response.accessToken;
+            }
+
+            const dashboardData = await PurviewService.getDashboardData(accessToken);
 
             // Transform asset distribution for charts
-            const topAssets = Object.entries(dashboardData.assetDistribution || {})
-                .map(([name, value]) => ({ name, value }))
-                .sort((a, b) => b.value - a.value)
-                .slice(0, 6);
+            const topAssets = Array.isArray(dashboardData.assetDistribution)
+                ? [...dashboardData.assetDistribution].sort((a, b) => b.value - a.value).slice(0, 6)
+                : [];
 
             // Persist data
             const persistenceData = {
@@ -96,13 +101,13 @@ const PurviewDashboard = () => {
                 setError(error.message || "Failed to load Purview data");
             }
         } finally {
-            setRefreshing(false);
             if (isManual) {
                 const elapsedTime = Date.now() - startTime;
                 const remainingTime = Math.max(0, 2000 - elapsedTime);
-                setTimeout(() => setLoading(false), remainingTime);
+                setTimeout(() => setRefreshing(false), remainingTime);
             } else {
                 setLoading(false);
+                setRefreshing(false);
             }
         }
     };
@@ -297,6 +302,60 @@ const PurviewDashboard = () => {
                 <Loader3D showOverlay={true} />
             ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px', alignItems: 'start' }}>
+                    <div style={{ gridColumn: '1 / -1' }}>
+                        {stats.isMock && (
+                            <div style={{
+                                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05))',
+                                border: '1px solid rgba(245, 158, 11, 0.2)',
+                                borderRadius: '16px',
+                                padding: '20px 24px',
+                                marginBottom: '24px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '20px',
+                                position: 'relative',
+                                overflow: 'hidden'
+                            }}>
+                                <div style={{
+                                    width: '48px',
+                                    height: '48px',
+                                    background: 'rgba(245, 158, 11, 0.1)',
+                                    borderRadius: '12px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: 'var(--accent-warning)',
+                                    flexShrink: 0
+                                }}>
+                                    <Shield size={24} />
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    <h3 style={{ margin: 0, fontSize: '15px', color: 'var(--text-primary)', fontWeight: 700 }}>Demo Mode: Purview Connection Required</h3>
+                                    <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--text-dim)', lineHeight: 1.5 }}>
+                                        The dashboard is currently showing <strong>mock governance data</strong>. To view your real asset catalog, configure <code>VITE_PURVIEW_ACCOUNT_NAME</code> and <code>VITE_PURVIEW_ENDPOINT</code> in your <code>.env</code> file.
+                                    </p>
+                                </div>
+                                <div style={{ display: 'flex', gap: '12px' }}>
+                                    <button
+                                        onClick={() => window.open('https://learn.microsoft.com/en-us/azure/purview/manage-data-sources', '_blank')}
+                                        style={{
+                                            background: 'rgba(255, 255, 255, 0.05)',
+                                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                                            color: 'var(--text-primary)',
+                                            padding: '8px 16px',
+                                            borderRadius: '8px',
+                                            fontSize: '12px',
+                                            fontWeight: 600,
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s'
+                                        }}
+                                    >
+                                        Setup Guide
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                     {/* Left Grid with Dashboard Tiles */}
                     <div className="stat-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', width: '100%' }}>
                         {tiles.map((tile, i) => {
@@ -496,7 +555,7 @@ const PurviewDashboard = () => {
                             Classification Coverage
                         </h3>
                         <ResponsiveContainer width="100%" height={250}>
-                            <BarChart data={stats.classificationDistribution || [
+                            <BarChart data={(Array.isArray(stats.classificationDistribution) && stats.classificationDistribution.length > 0) ? stats.classificationDistribution : [
                                 { name: 'Public', count: 0 },
                                 { name: 'Internal', count: 0 },
                                 { name: 'Confidential', count: 0 },

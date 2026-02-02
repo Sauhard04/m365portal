@@ -5,6 +5,7 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { IntuneService } from '../services/intune';
 import { ArrowLeft, Search, Download, AlertTriangle, XCircle, Loader2 } from 'lucide-react';
+import Loader3D from './Loader3D';
 import styles from './DetailPage.module.css';
 
 const IntuneNonCompliant = () => {
@@ -64,9 +65,7 @@ const IntuneNonCompliant = () => {
 
     if (loading) {
         return (
-            <div className={styles.loadingContainer}>
-                <Loader2 className="animate-spin" style={{ width: '2.5rem', height: '2.5rem', color: '#ef4444' }} />
-            </div>
+            <Loader3D showOverlay={true} />
         );
     }
 

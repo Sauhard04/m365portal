@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { UsageService } from '../services/usage.service';
-import { ArrowLeft, Mail, Activity, Send, Inbox, TrendingUp, Loader2, AlertCircle, Download } from 'lucide-react';
+import { ArrowLeft, Mail, Activity, Send, Inbox, TrendingUp, AlertCircle, Download } from 'lucide-react';
+import Loader3D from './Loader3D';
 import SiteDataStore from '../services/siteDataStore';
 
 const EmailActivityPage = () => {
@@ -75,9 +76,7 @@ const EmailActivityPage = () => {
 
     if (loading) {
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-                <Loader2 className="animate-spin" size={32} />
-            </div>
+            <Loader3D showOverlay={true} />
         );
     }
 

@@ -3,22 +3,25 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
-import { ArrowLeft, Search, Download, Box, Loader2, RefreshCw, Shield, Globe, Calendar } from 'lucide-react';
+import { ArrowLeft, Search, Download, Box, RefreshCw, Shield, Globe, Calendar } from 'lucide-react';
+import Loader3D from './Loader3D';
 
 const EntraEnterpriseApps = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
     const [apps, setApps] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [filterText, setFilterText] = useState('');
 
     useEffect(() => {
         fetchApps();
     }, [accounts, instance]);
 
-    const fetchApps = async () => {
+    const fetchApps = async (isManual = false) => {
         if (accounts.length > 0) {
-            setLoading(true);
+            if (isManual) setRefreshing(true);
+            else setLoading(true);
             try {
                 const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
                 const graphService = new GraphService(response.accessToken);
@@ -34,7 +37,12 @@ const EntraEnterpriseApps = () => {
                 console.error("Failed to fetch enterprise apps", error);
                 setApps([]);
             } finally {
-                setLoading(false);
+                if (isManual) {
+                    setTimeout(() => setRefreshing(false), 1000);
+                } else {
+                    setLoading(false);
+                    setRefreshing(false);
+                }
             }
         }
     };
@@ -111,9 +119,7 @@ const EntraEnterpriseApps = () => {
 
     if (loading) {
         return (
-            <div className="flex-center" style={{ height: '60vh' }}>
-                <Loader2 className="animate-spin" size={40} color="var(--accent-blue)" />
-            </div>
+            <Loader3D showOverlay={true} />
         );
     }
 
@@ -130,7 +136,7 @@ const EntraEnterpriseApps = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Manage service principals and application integrations</p>
                 </div>
                 <div className="flex-gap-4">
-                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={fetchApps} title="Sync & Refresh">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchApps(true)} title="Sync & Refresh">
                         <RefreshCw size={16} />
                     </button>
                     <button className="btn btn-primary" onClick={handleDownloadCSV}>

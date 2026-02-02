@@ -11,6 +11,7 @@ const IntuneReports = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [stats, setStats] = useState({
         complianceRate: 0,
         totalDevices: 0,
@@ -24,8 +25,11 @@ const IntuneReports = () => {
         }
     }, [accounts, instance]);
 
-    const loadData = async () => {
-        setLoading(true);
+    const loadData = async (isManual = false) => {
+        if (isManual) setRefreshing(true);
+        else setLoading(true);
+
+        const startTime = Date.now();
         try {
             // Fix: Correct Graph Client initialization
             const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
@@ -70,7 +74,14 @@ const IntuneReports = () => {
                 complianceRate: 92.4
             }));
         } finally {
-            setLoading(false);
+            if (isManual) {
+                const elapsedTime = Date.now() - startTime;
+                const remainingTime = Math.max(0, 1500 - elapsedTime);
+                setTimeout(() => setRefreshing(false), remainingTime);
+            } else {
+                setLoading(false);
+                setRefreshing(false);
+            }
         }
     };
 
@@ -102,7 +113,7 @@ const IntuneReports = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Deep dive into device compliance and inventory analytics</p>
                 </div>
                 <div className="flex-gap-2">
-                    <button className="sync-btn" onClick={loadData} title="Refresh Data">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => loadData(true)} title="Refresh Data">
                         <RefreshCw size={16} />
                     </button>
                 </div>

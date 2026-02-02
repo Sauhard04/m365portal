@@ -81,8 +81,13 @@ const TeamsDashboard = () => {
                 setError(err.message || "Failed to load Teams data");
             }
         } finally {
-            setLoading(false);
-            setRefreshing(false);
+            if (isManual) {
+                // Ensure the spinner shows for at least 1 second for better UX
+                setTimeout(() => setRefreshing(false), 1000);
+            } else {
+                setLoading(false);
+                setRefreshing(false);
+            }
         }
     };
 
@@ -300,7 +305,7 @@ const TeamsDashboard = () => {
                             View All <ChevronRight size={14} />
                         </button>
                     </div>
-                    <div className="chart-body" style={{ height: '220px' }}>
+                    <div className="chart-body" style={{ height: '220px', width: '100%' }}>
                         {visibilityData.length > 0 ? (
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>

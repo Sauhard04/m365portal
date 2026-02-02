@@ -4,13 +4,15 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { DevicesService } from '../services/entra';
-import { ArrowLeft, Search, Laptop, Monitor, Smartphone, Loader2, RefreshCw, Download } from 'lucide-react';
+import { ArrowLeft, Search, Laptop, Monitor, Smartphone, RefreshCw, Download } from 'lucide-react';
+import Loader3D from './Loader3D';
 
 const EntraDevices = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
     const [devices, setDevices] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [filterText, setFilterText] = useState('');
     const [osFilter, setOsFilter] = useState('all');
     const [joinTypeFilter, setJoinTypeFilter] = useState('all');
@@ -20,9 +22,10 @@ const EntraDevices = () => {
         fetchDevices();
     }, [accounts, instance]);
 
-    const fetchDevices = async () => {
+    const fetchDevices = async (isManual = false) => {
         if (accounts.length > 0) {
-            setLoading(true);
+            if (isManual) setRefreshing(true);
+            else setLoading(true);
             try {
                 const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
                 const client = new GraphService(response.accessToken).client;
@@ -31,7 +34,12 @@ const EntraDevices = () => {
             } catch (error) {
                 console.error("Device fetch error", error);
             } finally {
-                setLoading(false);
+                if (isManual) {
+                    setTimeout(() => setRefreshing(false), 1000);
+                } else {
+                    setLoading(false);
+                    setRefreshing(false);
+                }
             }
         }
     };
@@ -119,9 +127,7 @@ const EntraDevices = () => {
 
     if (loading) {
         return (
-            <div className="flex-center" style={{ height: '60vh' }}>
-                <Loader2 className="animate-spin" size={40} color="var(--accent-blue)" />
-            </div>
+            <Loader3D showOverlay={true} />
         );
     }
 
@@ -138,7 +144,7 @@ const EntraDevices = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Manage and monitor your organization's device inventory</p>
                 </div>
                 <div className="flex-gap-4">
-                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={fetchDevices} title="Sync & Refresh">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchDevices(true)} title="Sync & Refresh">
                         <RefreshCw size={16} />
                     </button>
                     <button className="btn btn-primary" onClick={handleDownloadCSV}>

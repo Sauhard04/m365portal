@@ -81,8 +81,12 @@ const SharePointDashboard = () => {
                 setError(err.message || "Failed to load SharePoint data");
             }
         } finally {
-            setLoading(false);
-            setRefreshing(false);
+            if (isManual) {
+                setTimeout(() => setRefreshing(false), 1500);
+            } else {
+                setLoading(false);
+                setRefreshing(false);
+            }
         }
     };
 
@@ -305,7 +309,7 @@ const SharePointDashboard = () => {
                             View All <ChevronRight size={14} />
                         </button>
                     </div>
-                    <div className="chart-body" style={{ height: '220px' }}>
+                    <div className="chart-body" style={{ height: '220px', width: '100%' }}>
                         {siteTypeData.length > 0 ? (
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>

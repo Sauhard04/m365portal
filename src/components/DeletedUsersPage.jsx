@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { GraphService } from '../services/graphService';
 import { loginRequest } from '../authConfig';
-import { Trash2, RefreshCw, AlertCircle, Loader2, Search, ArrowLeft, UserX } from 'lucide-react';
+import { Trash2, RefreshCw, AlertCircle, Search, ArrowLeft, UserX } from 'lucide-react';
+import Loader3D from './Loader3D';
 import { useNavigate } from 'react-router-dom';
 
 const DeletedUsersPage = () => {
@@ -10,11 +11,13 @@ const DeletedUsersPage = () => {
     const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState(null);
     const [filterText, setFilterText] = useState('');
 
-    const fetchData = async () => {
-        setLoading(true);
+    const fetchData = async (isManual = false) => {
+        if (isManual) setRefreshing(true);
+        else setLoading(true);
         setError(null);
         try {
             if (accounts.length > 0) {
@@ -26,7 +29,12 @@ const DeletedUsersPage = () => {
         } catch (err) {
             setError("Failed to synchronize organization recycle bin.");
         } finally {
-            setLoading(false);
+            if (isManual) {
+                setTimeout(() => setRefreshing(false), 1000);
+            } else {
+                setLoading(false);
+                setRefreshing(false);
+            }
         }
     };
 
@@ -41,9 +49,7 @@ const DeletedUsersPage = () => {
 
     if (loading) {
         return (
-            <div className="flex-center" style={{ height: '60vh' }}>
-                <Loader2 className="animate-spin" size={40} color="var(--accent-error)" />
-            </div>
+            <Loader3D showOverlay={true} />
         );
     }
 
@@ -60,7 +66,7 @@ const DeletedUsersPage = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Restore soft-deleted identities or permanently purge accounts</p>
                 </div>
                 <div className="flex-gap-2">
-                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={fetchData} title="Sync & Refresh">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchData(true)} title="Sync & Refresh">
                         <RefreshCw size={16} />
                     </button>
                 </div>

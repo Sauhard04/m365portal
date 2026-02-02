@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
-import { Loader2, ArrowLeft, Download, AlertCircle, CreditCard, TrendingUp, Search, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Download, AlertCircle, CreditCard, TrendingUp, Search, RefreshCw } from 'lucide-react';
+import Loader3D from './Loader3D';
 import SiteDataStore from '../services/siteDataStore';
 
 const LicensesPage = () => {
@@ -12,12 +13,14 @@ const LicensesPage = () => {
     const [licensingSummary, setLicensingSummary] = useState([]);
     const [reportData, setReportData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState(null);
     const [filterText, setFilterText] = useState('');
 
     const fetchData = async (isManual = false) => {
         if (accounts.length === 0) return;
-        setLoading(true);
+        if (isManual) setRefreshing(true);
+        else setLoading(true);
         try {
             const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
             const graphService = new GraphService(response.accessToken);
@@ -44,9 +47,10 @@ const LicensesPage = () => {
         } finally {
             if (isManual) {
                 // Add a small delay for manual refresh to show the animation
-                setTimeout(() => setLoading(false), 500);
+                setTimeout(() => setRefreshing(false), 1000);
             } else {
                 setLoading(false);
+                setRefreshing(false);
             }
         }
     };
@@ -78,9 +82,7 @@ const LicensesPage = () => {
 
     if (loading && reportData.length === 0) {
         return (
-            <div className="flex-center" style={{ height: '60vh' }}>
-                <Loader2 className="animate-spin" size={40} color="var(--accent-blue)" />
-            </div>
+            <Loader3D showOverlay={true} />
         );
     }
 
@@ -97,7 +99,7 @@ const LicensesPage = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Tenant subscription management and individual license attribution</p>
                 </div>
                 <div className="flex-gap-2">
-                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={() => fetchData(true)} title="Sync & Refresh">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchData(true)} title="Sync & Refresh">
                         <RefreshCw size={16} />
                     </button>
                     <button className="btn btn-primary" onClick={handleDownloadCSV}>

@@ -4,43 +4,55 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { SubscriptionsService } from '../services/entra';
-import { ArrowLeft, CreditCard, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, CreditCard, CheckCircle, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
+import Loader3D from './Loader3D';
 
 const EntraSubscriptions = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
     const [subs, setSubs] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
-    useEffect(() => {
-        const fetchSubs = async () => {
-            if (accounts.length > 0) {
-                try {
-                    const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                    const client = new GraphService(response.accessToken).client;
-                    const data = await SubscriptionsService.getSubscriptions(client);
-                    setSubs(data || []);
+    const fetchSubs = async (isManual = false) => {
+        if (accounts.length > 0) {
+            if (isManual) setRefreshing(true);
+            else setLoading(true);
 
-                    // Background store for AI context
-                    const SiteDataStore = (await import('../services/siteDataStore')).default;
-                    SiteDataStore.store('entraSubscriptions', data || []);
-                } catch (error) {
-                    console.error("Subs fetch error", error);
-                } finally {
+            const startTime = Date.now();
+            try {
+                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+                const client = new GraphService(response.accessToken).client;
+                const data = await SubscriptionsService.getSubscriptions(client);
+                setSubs(data || []);
+
+                // Background store for AI context
+                const SiteDataStore = (await import('../services/siteDataStore')).default;
+                SiteDataStore.store('entraSubscriptions', data || []);
+            } catch (error) {
+                console.error("Subs fetch error", error);
+            } finally {
+                if (isManual) {
+                    const elapsedTime = Date.now() - startTime;
+                    const remainingTime = Math.max(0, 1000 - elapsedTime);
+                    setTimeout(() => setRefreshing(false), remainingTime);
+                } else {
                     setLoading(false);
+                    setRefreshing(false);
                 }
             }
-        };
+        }
+    };
+
+    useEffect(() => {
         fetchSubs();
     }, [accounts, instance]);
 
     if (loading) {
         return (
-            <div className="flex-center" style={{ height: '60vh' }}>
-                <Loader2 className="animate-spin" size={40} color="var(--accent-success)" />
-            </div>
+            <Loader3D showOverlay={true} />
         );
-    }//
+    }
 
     return (
         <div className="animate-in">
@@ -53,6 +65,11 @@ const EntraSubscriptions = () => {
                 <div>
                     <h1 className="title-gradient" style={{ fontSize: '32px' }}>Entra Subscriptions</h1>
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Tenant licensing portfolio and service entitlement tracking</p>
+                </div>
+                <div className="flex-gap-2">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchSubs(true)} title="Sync & Refresh">
+                        <RefreshCw size={16} />
+                    </button>
                 </div>
             </header>
 
