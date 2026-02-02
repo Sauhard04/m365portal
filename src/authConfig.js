@@ -25,7 +25,8 @@ export const loginRequest = {
         "DeviceManagementConfiguration.Read.All",
         "IdentityRiskyUser.Read.All",
         "IdentityRiskEvent.Read.All",
-        "SecurityAlert.Read.All"
+        "SecurityAlert.Read.All",
+        "ThreatHunting.Read.All"
     ]
 };
 

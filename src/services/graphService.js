@@ -278,6 +278,22 @@ export class GraphService {
     }
 
     /**
+     * Run a KQL hunting query
+     * @param {string} query - The KQL query string
+     */
+    async runHuntingQuery(query) {
+        try {
+            const response = await this.client
+                .api('/security/runHuntingQuery')
+                .post({ query });
+            return response.value || [];
+        } catch (error) {
+            console.error('Hunting query failed:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Get mailbox activity trends
      * @param {string} period - D7, D30
      */

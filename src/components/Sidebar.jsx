@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     ShieldCheck, Smartphone, Lock,
-    LayoutDashboard
+    LayoutDashboard, Radar
 } from 'lucide-react';
 
 const Sidebar = ({ isSidebarOpen }) => {
@@ -58,6 +58,22 @@ const Sidebar = ({ isSidebarOpen }) => {
                         active={isActive('/service/purview')}
                         isOpen={isSidebarOpen}
                         onClick={() => navigate('/service/purview')}
+                    />
+                </div>
+
+                {/* Section: Security */}
+                <div className="space-y-1">
+                    {isSidebarOpen && (
+                        <h3 className="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-[0.15em] mb-4">
+                            Security
+                        </h3>
+                    )}
+                    <SidebarItem
+                        icon={Radar}
+                        label="Explorer"
+                        active={isActive('/service/security/explorer')}
+                        isOpen={isSidebarOpen}
+                        onClick={() => navigate('/service/security/explorer')}
                     />
                 </div>
 
