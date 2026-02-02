@@ -424,16 +424,15 @@ export class GraphService {
 
     async getSharePointSiteCount() {
         try {
-            // Fetching root site collections with count
-            const countResponse = await this.client.api("/sites")
-                .filter("siteCollection/root ne null")
+            // Fetching site collections. $count is not supported on /sites in many environments.
+            // We fetch a batch and return the count. For a more accurate total on large tenants,
+            // one would need to iterate through all pages or use Search API.
+            const response = await this.client.api("/sites")
                 .select("id")
-                .top(1)
-                .count(true)
-                .header('ConsistencyLevel', 'eventual')
+                .top(999)
                 .get();
 
-            return countResponse['@odata.count'] || 0;
+            return response.value?.length || 0;
         } catch (error) {
             console.warn("SharePoint site count fetch failed:", error);
             return 0;

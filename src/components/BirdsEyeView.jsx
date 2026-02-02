@@ -38,6 +38,7 @@ const BirdsEyeView = ({ embedded = false }) => {
     });
 
     const fetchData = async (isManual = false) => {
+        if (accounts.length === 0) return;
         setError(null);
         if (!isManual) {
             const cached = await DataPersistenceService.load('BirdsEyeView');
@@ -69,14 +70,25 @@ const BirdsEyeView = ({ embedded = false }) => {
 
         try {
             const request = {
-                scopes: ["User.Read.All", "Directory.Read.All", "DeviceManagementManagedDevices.Read.All", "Reports.Read.All", "Policy.Read.All", "ServiceHealth.Read.All", "Sites.Read.All"],
+                scopes: [
+                    "User.Read.All",
+                    "Directory.Read.All",
+                    "DeviceManagementManagedDevices.Read.All",
+                    "Reports.Read.All",
+                    "Policy.Read.All",
+                    "ServiceHealth.Read.All",
+                    "Sites.Read.All",
+                    "InformationProtectionPolicy.Read",
+                    "RecordsManagement.Read.All",
+                    "eDiscovery.Read.All"
+                ],
                 account: accounts[0],
             };
             let response;
             try {
                 response = await instance.acquireTokenSilent(request);
             } catch (error) {
-                if (error.name === "InteractionRequiredAuthError") {
+                if (error.name === "InteractionRequiredAuthError" || error.errorCode === "invalid_grant") {
                     if (isManual) {
                         // Only trigger popup if user explicitly asked for it (Refresh button)
                         const interactiveRequest = { ...request, prompt: 'select_account' };
@@ -231,8 +243,13 @@ const BirdsEyeView = ({ embedded = false }) => {
             SiteDataStore.store('birdsEye', newStats, { source: 'BirdsEyeView' });
 
         } catch (error) {
-            console.error("Failed to fetch Bird's Eye data", error);
-            setError(error.message || "Failed to load data");
+            if (error.name === "InteractionRequiredAuthError" || error.errorCode === "invalid_grant") {
+                console.warn("Interaction required for BirdsEyeView");
+                setError("InteractionRequired");
+            } else {
+                console.error("Failed to fetch Bird's Eye data", error);
+                setError(error.message || "Failed to load data");
+            }
         } finally {
             if (isManual) {
                 const elapsedTime = Date.now() - startTime;
@@ -260,63 +277,65 @@ const BirdsEyeView = ({ embedded = false }) => {
 
             {!embedded && (
                 <header className={styles.header}>
-                    <div>
-                        <h1 className={styles.title}>M365 Bird's Eye</h1>
-                        <p className={styles.subtitle}>Real-time environment telemetry and resource mapping.</p>
-                        {error && error !== "InteractionRequired" && (
-                            <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '5px', padding: '8px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '4px' }}>
-                                ⚠️ Error: {error}
-                            </div>
-                        )}
-                        {error === "InteractionRequired" && (
-                            <div style={{ marginTop: '8px' }}>
+                    <div className={styles.headerContent}>
+                        <div className={styles.titleSection}>
+                            <h1 className="title-gradient">M365 Bird's Eye</h1>
+                            <p>Real-time environment telemetry and resource mapping.</p>
+                        </div>
+                        <button
+                            className={`sync-btn ${loading ? 'spinning' : ''}`}
+                            onClick={() => fetchData(true)}
+                            disabled={loading}
+                        >
+                            <RefreshCw size={14} />
+                            <span>Refresh</span>
+                        </button>
+                    </div>
+
+                    {error && (
+                        <div className="error-banner" style={{
+                            background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                            border: `1px solid ${error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                            borderRadius: '12px',
+                            padding: '16px',
+                            marginTop: '16px',
+                            color: error === 'InteractionRequired' ? 'var(--accent-blue)' : '#ef4444',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}>
+                            <span>{error === 'InteractionRequired' ? '🔐 Session expired or additional permissions required to load telemetry.' : error}</span>
+                            {error === 'InteractionRequired' && (
                                 <button
                                     onClick={() => fetchData(true)}
                                     style={{
-                                        background: '#3b82f6', color: 'white', border: 'none', padding: '6px 12px',
-                                        borderRadius: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer',
-                                        display: 'flex', alignItems: 'center', gap: '6px'
+                                        background: 'var(--accent-blue)',
+                                        color: 'white', border: 'none', padding: '6px 12px',
+                                        borderRadius: '6px', fontSize: '12px', fontWeight: 700, cursor: 'pointer'
                                     }}
                                 >
-                                    <ShieldCheck size={14} />
-                                    Connect M365 Data
+                                    Reconnect
                                 </button>
-                            </div>
-                        )}
-                    </div>
-                    <button onClick={() => fetchData(true)} className={styles.refreshBtn}>
-                        <RefreshCw size={14} className={loading ? styles.spinning : ""} />
-                        <span>Refresh</span>
-                    </button>
+                            )}
+                        </div>
+                    )}
                 </header>
             )}
 
             {embedded && error === "InteractionRequired" && (
                 <div style={{
-                    padding: '20px',
-                    textAlign: 'center',
-                    background: 'var(--glass-bg)',
-                    border: '1px solid var(--glass-border)',
-                    borderRadius: '12px',
-                    marginBottom: '16px'
+                    padding: '20px', textAlign: 'center', background: 'var(--glass-bg)',
+                    border: '1px solid var(--glass-border)', borderRadius: '12px', marginBottom: '16px'
                 }}>
                     <p style={{ color: 'var(--text-secondary)', marginBottom: '12px', fontSize: '13px' }}>
-                        🔐 Additional permissions required to display M365 data
+                        🔐 Additional permissions required to display data
                     </p>
                     <button
                         onClick={() => fetchData(true)}
                         style={{
-                            background: '#3b82f6',
-                            color: 'white',
-                            border: 'none',
-                            padding: '10px 20px',
-                            borderRadius: '8px',
-                            fontSize: '13px',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '8px'
+                            background: '#3b82f6', color: 'white', border: 'none', padding: '10px 20px',
+                            borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer',
+                            display: 'inline-flex', alignItems: 'center', gap: '8px'
                         }}
                     >
                         <ShieldCheck size={16} />
@@ -363,7 +382,7 @@ const BirdsEyeView = ({ embedded = false }) => {
                     </div>
                 ))}
             </div>
-        </div>
+        </div >
     );
 };
 

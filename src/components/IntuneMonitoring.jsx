@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
-import { loginRequest } from '../authConfig';
+import { intuneScopes } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { IntuneService } from '../services/intune';
 import { motion } from 'framer-motion';
@@ -30,15 +30,30 @@ const IntuneMonitoring = () => {
         adminRoles: 0
     });
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const fetchDashboardData = async (isManual = false) => {
         if (accounts.length === 0) return;
         setLoading(true);
+        setError(null);
 
         const startTime = Date.now();
 
         try {
-            const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+            const response = await instance.acquireTokenSilent({
+                ...intuneScopes,
+                account: accounts[0]
+            }).catch(async (authErr) => {
+                if (authErr.name === "InteractionRequiredAuthError" || authErr.errorCode === "invalid_grant") {
+                    if (isManual) {
+                        return await instance.acquireTokenPopup(intuneScopes);
+                    } else {
+                        throw authErr;
+                    }
+                }
+                throw authErr;
+            });
+
             const client = new GraphService(response.accessToken).client;
             const dashboardStats = await IntuneService.getDashboardStats(client);
 
@@ -72,7 +87,13 @@ const IntuneMonitoring = () => {
             const SiteDataStore = (await import('../services/siteDataStore')).default;
             SiteDataStore.store('intuneStats', dashboardStats);
         } catch (error) {
-            console.error("Intune dashboard fetch error:", error);
+            if (error.name === "InteractionRequiredAuthError" || error.errorCode === "invalid_grant") {
+                console.warn("Interaction required for Intune Dashboard");
+                setError("InteractionRequired");
+            } else {
+                console.error("Intune dashboard fetch error:", error);
+                setError(error.message || "Failed to load Intune data");
+            }
         } finally {
             if (isManual) {
                 const elapsedTime = Date.now() - startTime;
@@ -214,6 +235,71 @@ const IntuneMonitoring = () => {
                 </div>
             </header>
 
+            {error && (
+                <div className="error-banner" style={{
+                    background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                    border: `1px solid ${error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                    borderRadius: '12px',
+                    padding: '16px',
+                    marginBottom: '24px',
+                    color: error === 'InteractionRequired' ? 'var(--accent-blue)' : '#ef4444',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <span>{error === 'InteractionRequired' ? '🔐 Intune session expired. Additional permissions required to load telemetry.' : error}</span>
+                    {error === 'InteractionRequired' && (
+                        <button
+                            onClick={() => fetchDashboardData(true)}
+                            style={{
+                                background: 'var(--accent-blue)',
+                                color: 'white',
+                                border: 'none',
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                fontSize: '12px',
+                                fontWeight: 700,
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Reconnect
+                        </button>
+                    )}
+                </div>
+            )}
+
+            {error && (
+                <div className="error-banner" style={{
+                    background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                    border: `1px solid ${error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                    borderRadius: '12px',
+                    padding: '16px',
+                    marginBottom: '24px',
+                    color: error === 'InteractionRequired' ? 'var(--accent-blue)' : '#ef4444',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <span>{error === 'InteractionRequired' ? '🔐 Intune session expired. Additional permissions required to load telemetry.' : error}</span>
+                    {error === 'InteractionRequired' && (
+                        <button
+                            onClick={() => fetchDashboardData(true)}
+                            style={{
+                                background: 'var(--accent-blue)',
+                                color: 'white',
+                                border: 'none',
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                fontSize: '12px',
+                                fontWeight: 700,
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Reconnect
+                        </button>
+                    )}
+                </div>
+            )}
 
 
             {loading && <Loader3D showOverlay={true} />}

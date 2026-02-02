@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { motion } from 'framer-motion';
-import { loginRequest } from '../authConfig';
+import { securityScopes } from '../authConfig';
 import { SecurityService } from '../services/security/security.service';
 import { DataPersistenceService } from '../services/dataPersistence';
 import AnimatedTile from './AnimatedTile';
@@ -36,6 +36,8 @@ const SecurityDashboard = () => {
     const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
     const fetchDashboardData = async (isManual = false) => {
+        if (accounts.length === 0) return;
+
         if (isManual) setRefreshing(true);
         else setLoading(true);
         setError(null);
@@ -59,14 +61,14 @@ const SecurityDashboard = () => {
             let tokenResponse;
             try {
                 tokenResponse = await instance.acquireTokenSilent({
-                    ...loginRequest,
+                    ...securityScopes,
                     account
                 });
             } catch (authErr) {
-                if (authErr.name === "InteractionRequiredAuthError") {
+                if (authErr.name === "InteractionRequiredAuthError" || authErr.errorCode === "invalid_grant") {
                     if (isManual) {
                         // Trigger popup if user clicked refresh
-                        tokenResponse = await instance.acquireTokenPopup(loginRequest);
+                        tokenResponse = await instance.acquireTokenPopup(securityScopes);
                     } else {
                         console.warn("Silent auth failed for Security Dashboard");
                         setError("InteractionRequired");
@@ -86,8 +88,13 @@ const SecurityDashboard = () => {
             setDashboardData(data);
             DataPersistenceService.save(CACHE_KEY, data);
         } catch (err) {
-            console.error('Failed to fetch security dashboard data:', err);
-            setError(err.name === "InteractionRequiredAuthError" ? "InteractionRequired" : "Failed to load security data. Please try again.");
+            if (err.name === "InteractionRequiredAuthError" || err.errorCode === "invalid_grant") {
+                console.warn("Interaction required for Security Dashboard");
+                setError("InteractionRequired");
+            } else {
+                console.error('Failed to fetch security dashboard data:', err);
+                setError("Failed to load security data. Please try again.");
+            }
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -516,7 +523,7 @@ const SecurityDashboard = () => {
                 </div>
             </motion.div>
 
-            <style jsx="true">{`
+            <style>{`
                 .stat-card {
                     display: flex;
                     align-items: center;

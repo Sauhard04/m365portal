@@ -19,6 +19,38 @@ export const loginRequest = {
         "MailboxSettings.Read",
         "ServiceHealth.Read.All",
         "AuditLog.Read.All",
+        "Sites.Read.All"
+    ]
+};
+
+// Granular scopes for specific modules
+export const securityScopes = {
+    scopes: [
+        "SecurityAlert.Read.All",
+        "SecurityIncident.Read.All",
+        "IdentityRiskyUser.Read.All",
+        "IdentityRiskEvent.Read.All"
+    ]
+};
+
+export const governanceScopes = {
+    scopes: [
+        "Policy.Read.All",
+        "Agreement.Read.All",
+        "Directory.Read.All",
+        "AppRoleAssignment.ReadWrite.All"
+    ]
+};
+
+export const sharepointScopes = {
+    scopes: [
+        "Sites.Read.All",
+        "Files.Read.All"
+    ]
+};
+
+export const intuneScopes = {
+    scopes: [
         "DeviceManagementManagedDevices.Read.All",
         "DeviceManagementServiceConfig.Read.All",
         "DeviceManagementApps.Read.All",
@@ -27,6 +59,31 @@ export const loginRequest = {
         "IdentityRiskEvent.Read.All",
         "SecurityAlert.Read.All",
         "ThreatHunting.Read.All"
+    ]
+};
+
+export const teamsScopes = {
+    scopes: [
+        "Team.ReadBasic.All",
+        "TeamSettings.Read.All",
+        "Group.Read.All",
+        "Chat.Read"
+    ]
+};
+
+export const adminScopes = {
+    scopes: [
+        "Directory.Read.All",
+        "ServiceHealth.Read.All",
+        "Organization.Read.All"
+    ]
+};
+
+export const purviewScopes = {
+    scopes: [
+        "InformationProtectionPolicy.Read",
+        "RecordsManagement.Read.All",
+        "eDiscovery.Read.All"
     ]
 };
 

@@ -34,10 +34,15 @@ const PurviewDashboard = () => {
     });
     const [assetDistribution, setAssetDistribution] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [refreshing, setRefreshing] = useState(false);
 
     const fetchDashboardData = async (isManual = false) => {
         if (accounts.length === 0) return;
-        setLoading(true);
+
+        if (isManual) setRefreshing(true);
+        else setLoading(true);
+        setError(null);
 
         const startTime = Date.now();
 
@@ -45,6 +50,17 @@ const PurviewDashboard = () => {
             const response = await instance.acquireTokenSilent({
                 scopes: ['https://purview.azure.net/.default'],
                 account: accounts[0]
+            }).catch(async (authErr) => {
+                if (authErr.name === "InteractionRequiredAuthError" || authErr.errorCode === "invalid_grant") {
+                    if (isManual) {
+                        return await instance.acquireTokenPopup({
+                            scopes: ['https://purview.azure.net/.default']
+                        });
+                    } else {
+                        throw authErr;
+                    }
+                }
+                throw authErr;
             });
 
             const dashboardData = await PurviewService.getDashboardData(response.accessToken);
@@ -72,10 +88,15 @@ const PurviewDashboard = () => {
             setStats(dashboardData);
             setAssetDistribution(topAssets);
         } catch (error) {
-            console.error('Purview dashboard fetch error:', error);
-            // No fallback - show empty state
-            console.warn('Purview endpoint not configured or API call failed. Please configure VITE_PURVIEW_ENDPOINT in .env');
+            if (error.name === "InteractionRequiredAuthError" || error.errorCode === "invalid_grant") {
+                console.warn("Interaction required for Purview Dashboard");
+                setError("InteractionRequired");
+            } else {
+                console.error('Purview dashboard fetch error:', error);
+                setError(error.message || "Failed to load Purview data");
+            }
         } finally {
+            setRefreshing(false);
             if (isManual) {
                 const elapsedTime = Date.now() - startTime;
                 const remainingTime = Math.max(0, 2000 - elapsedTime);
@@ -220,17 +241,57 @@ const PurviewDashboard = () => {
 
     return (
         <div className="animate-in">
-            <header className="flex-between spacing-v-4">
+            <header className="flex-between spacing-v-8">
                 <div>
-                    <h1 className="title-gradient" style={{ fontSize: '22px' }}>Purview Governance</h1>
-                    <p style={{ color: 'var(--text-dim)', fontSize: '11px' }}>Unified data governance and compliance platform</p>
+                    <h1 className="title-gradient" style={{ fontSize: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <Database size={28} style={{ color: 'var(--accent-blue)' }} />
+                        Microsoft Purview
+                    </h1>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Unified data governance and asset management</p>
                 </div>
                 <div className="flex-gap-2">
-                    <button className={`sync-btn ${loading ? 'spinning' : ''}`} onClick={() => fetchDashboardData(true)} title="Sync & Refresh">
+                    <button
+                        className={`sync-btn ${refreshing ? 'spinning' : ''}`}
+                        onClick={() => fetchDashboardData(true)}
+                        title="Sync & Refresh"
+                    >
                         <RefreshCw size={16} />
                     </button>
                 </div>
             </header>
+
+            {error && (
+                <div className="error-banner" style={{
+                    background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                    border: `1px solid ${error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                    borderRadius: '12px',
+                    padding: '16px',
+                    marginBottom: '24px',
+                    color: error === 'InteractionRequired' ? 'var(--accent-blue)' : '#ef4444',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <span>{error === 'InteractionRequired' ? '🔐 Purview session expired. Additional permissions required to access the catalog.' : error}</span>
+                    {error === 'InteractionRequired' && (
+                        <button
+                            onClick={() => fetchDashboardData(true)}
+                            style={{
+                                background: 'var(--accent-blue)',
+                                color: 'white',
+                                border: 'none',
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                fontSize: '12px',
+                                fontWeight: 700,
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Reconnect
+                        </button>
+                    )}
+                </div>
+            )}
 
             {loading ? (
                 <Loader3D showOverlay={true} />

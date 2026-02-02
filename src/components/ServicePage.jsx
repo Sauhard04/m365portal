@@ -47,7 +47,19 @@ const ServicePage = ({ serviceId: propServiceId }) => {
 
         setError(null);
         try {
-            const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+            const response = await instance.acquireTokenSilent({
+                ...loginRequest,
+                account: accounts[0]
+            }).catch(async (authErr) => {
+                if (authErr.name === "InteractionRequiredAuthError" || authErr.errorCode === "invalid_grant") {
+                    if (isManual) {
+                        return await instance.acquireTokenPopup(loginRequest);
+                    } else {
+                        throw authErr;
+                    }
+                }
+                throw authErr;
+            });
             const graphService = new GraphService(response.accessToken);
 
             if (isAdmin) {
@@ -101,8 +113,13 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 if (signIns) setFailedSignIns(signIns);
             }
         } catch (err) {
-            console.error("Fetch error:", err);
-            setError("Connectivity issue with Microsoft Graph.");
+            if (err.name === "InteractionRequiredAuthError" || err.errorCode === "invalid_grant") {
+                console.warn("Interaction required for Admin Center");
+                setError("InteractionRequired");
+            } else {
+                console.error("Fetch error:", err);
+                setError(err.message || "Connectivity issue with Microsoft Graph.");
+            }
         } finally {
             if (isManual) {
                 const elapsedTime = Date.now() - startTime;
@@ -176,11 +193,38 @@ const ServicePage = ({ serviceId: propServiceId }) => {
             </header>
 
             {error && (
-                <div className="glass-card" style={{ background: 'hsla(0, 84%, 60%, 0.05)', borderColor: 'hsla(0, 84%, 60%, 0.2)', marginBottom: '32px', padding: '20px' }}>
-                    <div className="flex-center flex-gap-4" style={{ color: 'var(--accent-error)' }}>
-                        <AlertCircle size={24} />
-                        <span>{error}</span>
+                <div className="error-banner" style={{
+                    background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                    border: `1px solid ${error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                    borderRadius: '12px',
+                    padding: '16px',
+                    marginBottom: '24px',
+                    color: error === 'InteractionRequired' ? 'var(--accent-blue)' : '#ef4444',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <div className="flex-center flex-gap-3">
+                        {error === 'InteractionRequired' ? <Lock size={18} /> : <AlertCircle size={18} />}
+                        <span>{error === 'InteractionRequired' ? '🔐 Session expired. Additional permissions required to load Admin Center telemetry.' : error}</span>
                     </div>
+                    {error === 'InteractionRequired' && (
+                        <button
+                            onClick={() => fetchData(true)}
+                            style={{
+                                background: 'var(--accent-blue)',
+                                color: 'white',
+                                border: 'none',
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                fontSize: '12px',
+                                fontWeight: 700,
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Reconnect
+                        </button>
+                    )}
                 </div>
             )}
 

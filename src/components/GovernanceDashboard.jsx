@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { motion } from 'framer-motion';
-import { loginRequest } from '../authConfig';
+import { governanceScopes } from '../authConfig';
 import { GovernanceService } from '../services/governance/governance.service';
 import { DataPersistenceService } from '../services/dataPersistence';
 import AnimatedTile from './AnimatedTile';
@@ -27,13 +27,17 @@ const GovernanceDashboard = () => {
         accessReviews: { total: 0, active: 0, reviews: [] },
         entitlementManagement: { catalogs: 0 }
     });
+    const [error, setError] = useState(null);
 
     const CACHE_KEY = 'governance_dashboard';
     const CACHE_DURATION = 5 * 60 * 1000;
 
     const fetchDashboardData = async (isManual = false) => {
+        if (accounts.length === 0) return;
+
         if (isManual) setRefreshing(true);
         else setLoading(true);
+        setError(null);
 
         try {
             if (!isManual) {
@@ -49,8 +53,17 @@ const GovernanceDashboard = () => {
             if (!account) throw new Error('No account found');
 
             const tokenResponse = await instance.acquireTokenSilent({
-                ...loginRequest,
+                ...governanceScopes,
                 account
+            }).catch(async (authErr) => {
+                if (authErr.name === "InteractionRequiredAuthError" || authErr.errorCode === "invalid_grant") {
+                    if (isManual) {
+                        return await instance.acquireTokenPopup(governanceScopes);
+                    } else {
+                        throw authErr;
+                    }
+                }
+                throw authErr;
             });
 
             const client = Client.init({
@@ -61,7 +74,13 @@ const GovernanceDashboard = () => {
             setDashboardData(data);
             DataPersistenceService.save(CACHE_KEY, data);
         } catch (err) {
-            console.error('Failed to fetch governance dashboard data:', err);
+            if (err.name === "InteractionRequiredAuthError" || err.errorCode === "invalid_grant") {
+                console.warn("Interaction required for Governance Dashboard");
+                setError("InteractionRequired");
+            } else {
+                console.error('Failed to fetch governance dashboard data:', err);
+                setError(err.message || "Failed to load governance data");
+            }
         } finally {
             setLoading(false);
             setRefreshing(false);
@@ -130,6 +149,39 @@ const GovernanceDashboard = () => {
                     </button>
                 </div>
             </header>
+
+            {error && (
+                <div className="error-banner" style={{
+                    background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                    border: `1px solid ${error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                    borderRadius: '12px',
+                    padding: '16px',
+                    marginBottom: '24px',
+                    color: error === 'InteractionRequired' ? 'var(--accent-blue)' : '#ef4444',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <span>{error === 'InteractionRequired' ? '🔐 Governance session expired. Additional permissions required to load telemetry.' : error}</span>
+                    {error === 'InteractionRequired' && (
+                        <button
+                            onClick={() => fetchDashboardData(true)}
+                            style={{
+                                background: 'var(--accent-blue)',
+                                color: 'white',
+                                border: 'none',
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                fontSize: '12px',
+                                fontWeight: 700,
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Reconnect
+                        </button>
+                    )}
+                </div>
+            )}
 
             {/* Stats Row */}
             <div className="stats-grid" style={{
@@ -370,7 +422,7 @@ const GovernanceDashboard = () => {
                 </div>
             </motion.div>
 
-            <style jsx="true">{`
+            <style>{`
                 .stat-card {
                     display: flex;
                     align-items: center;
