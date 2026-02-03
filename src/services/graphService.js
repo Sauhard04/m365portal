@@ -399,15 +399,8 @@ export class GraphService {
             // Sensitivity labels might fail with 403 on organization-wide endpoint for some users
             // Try organizational first, then fallback to user-specific
             const fetchLabels = async () => {
-                try {
-                    return await this.client.api("/security/informationProtection/sensitivityLabels").version("beta").get();
-                } catch (err) {
-                    if (err.statusCode === 403) {
-                        console.warn("Organizational labels forbidden, trying user-specific labels...");
-                        return await this.client.api("/me/security/informationProtection/sensitivityLabels").version("beta").get().catch(() => ({ value: [] }));
-                    }
-                    throw err;
-                }
+                // Remove the /me/ fallback as it often causes 404s and is rarely supported in a consistent way for admin views
+                return await this.client.api("/security/informationProtection/sensitivityLabels").version("beta").get();
             };
 
             const [labels, retention, cases] = await Promise.all([
@@ -424,7 +417,8 @@ export class GraphService {
                     const searches = await this.client.api(`/compliance/ediscovery/cases/${caseId}/searches`).version("beta").get();
                     searchCount = searches.value?.length || 0;
                 } catch (e) {
-                    console.debug("Could not fetch eDiscovery searches", e);
+                    // Log as debug but don't fail, eDiscovery often has granular access requirements
+                    console.debug("Could not fetch eDiscovery searches - likely needs eDiscovery Manager role", e.message);
                 }
             }
 
