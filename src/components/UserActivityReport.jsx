@@ -7,7 +7,7 @@ import {
     Users, Search, Download, Filter, ArrowLeft, RefreshCw,
     Mail, MessageSquare, Globe, Cloud, Calendar, ChevronDown,
     ChevronUp, ExternalLink, Activity, CheckCircle2, Clock, AlertTriangle,
-    Zap, TrendingUp, Info
+    Zap, TrendingUp, Info, Lock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -27,6 +27,9 @@ const UserActivityReport = () => {
     const [dataFreshness, setDataFreshness] = useState(null);
     const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, highlyEngaged: 0 });
     const [trendData, setTrendData] = useState([]);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [userSignIns, setUserSignIns] = useState([]);
+    const [loadingSignIns, setLoadingSignIns] = useState(false);
 
     const fetchActivityData = async (isManual = false) => {
         if (isManual) setRefreshing(true);
@@ -50,14 +53,14 @@ const UserActivityReport = () => {
 
             if (data) {
                 const mappedUsers = data.map(item => {
-                    const teams = item.teamsLastActivityDate || item.userLastActivityDate;
-                    const exchange = item.exchangeLastActivityDate || item.userLastActivityDate;
-                    const sharePoint = item.sharePointLastActivityDate || item.userLastActivityDate;
-                    const oneDrive = item.oneDriveLastActivityDate || item.userLastActivityDate;
+                    const teams = item.teamsLastActivityDate;
+                    const exchange = item.exchangeLastActivityDate;
+                    const sharePoint = item.sharePointLastActivityDate;
+                    const oneDrive = item.oneDriveLastActivityDate;
 
-                    // Calculate overall last active by taking the most recent of all
-                    const dates = [teams, exchange, sharePoint, oneDrive, item.lastActivityDate]
-                        .filter(d => d && d !== '' && d !== 'null')
+                    // Calculate overall last active by taking the most recent of all reported services
+                    const dates = [teams, exchange, sharePoint, oneDrive, item.userLastActivityDate]
+                        .filter(d => d && d !== '' && d !== 'null' && d !== '1901-01-01') // Graph often uses 1901 as 'never'
                         .map(d => new Date(d).getTime());
 
                     const maxDate = dates.length > 0 ? new Date(Math.max(...dates)).toISOString() : null;
@@ -65,16 +68,16 @@ const UserActivityReport = () => {
                     return {
                         upn: item.userPrincipalName,
                         displayName: item.displayName || item.userPrincipalName?.split('@')[0],
-                        teamsDate: teams,
-                        exchangeDate: exchange,
-                        sharePointDate: sharePoint,
-                        oneDriveDate: oneDrive,
+                        teamsDate: teams && teams !== '1901-01-01' ? teams : null,
+                        exchangeDate: exchange && exchange !== '1901-01-01' ? exchange : null,
+                        sharePointDate: sharePoint && sharePoint !== '1901-01-01' ? sharePoint : null,
+                        oneDriveDate: oneDrive && oneDrive !== '1901-01-01' ? oneDrive : null,
                         lastActivityDate: maxDate,
                         licenses: {
-                            teams: item.hasTeamsLicense ?? true,
-                            exchange: item.hasExchangeLicense ?? true,
-                            sharePoint: item.hasSharePointLicense ?? true,
-                            oneDrive: item.hasOneDriveLicense ?? true
+                            teams: true, // Licenses require a more complex lookup, showing true for active records
+                            exchange: true,
+                            sharePoint: true,
+                            oneDrive: true
                         }
                     };
                 });
@@ -89,7 +92,8 @@ const UserActivityReport = () => {
                 setTrendData(trend || []);
                 setLastRefreshed(new Date());
                 if (trend && trend.length > 0) {
-                    setDataFreshness(trend[trend.length - 1].reportRefreshDate);
+                    // UsageService maps reportDate which we can treat as the freshness point
+                    setDataFreshness(trend[trend.length - 1].reportDate);
                 }
 
                 // Calculate summary stats
@@ -165,6 +169,35 @@ const UserActivityReport = () => {
         return <AlertTriangle size={14} className="status-inactive" />;
     };
 
+    const handleUserClick = async (user) => {
+        if (selectedUser?.upn === user.upn) {
+            setSelectedUser(null);
+            return;
+        }
+
+        setSelectedUser(user);
+        setLoadingSignIns(true);
+        setUserSignIns([]);
+
+        try {
+            const account = accounts[0];
+            if (!account) return;
+
+            const tokenResponse = await instance.acquireTokenSilent({
+                scopes: ["AuditLog.Read.All"],
+                account
+            });
+
+            const usageService = new UsageService(tokenResponse.accessToken);
+            const signIns = await usageService.getUserSignIns(user.upn);
+            setUserSignIns(signIns);
+        } catch (err) {
+            console.error('Failed to fetch user sign-ins:', err);
+        } finally {
+            setLoadingSignIns(false);
+        }
+    };
+
     const formatDate = (date) => {
         if (!date) return 'Never';
         return new Date(date).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
@@ -238,7 +271,7 @@ const UserActivityReport = () => {
                         <div className="legend-dot-item"><div className="dot" style={{ background: '#f43f5e' }} /> OneDrive</div>
                     </div>
                 </div>
-                <div style={{ width: '100%', height: '240px' }}>
+                <div style={{ width: '100%', height: '240px', minHeight: '240px' }}>
                     <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                             <defs>
@@ -374,56 +407,109 @@ const UserActivityReport = () => {
                         <tbody>
                             {filteredUsers.length > 0 ? (
                                 filteredUsers.map((user, idx) => (
-                                    <motion.tr
-                                        key={user.upn}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: idx * 0.02 }}
-                                    >
-                                        <td>
-                                            <div className="user-info-cell">
-                                                <div className="user-avatar-glow">{user.displayName.charAt(0)}</div>
-                                                <div className="user-text">
-                                                    <span className="user-name">{user.displayName}</span>
-                                                    <span className="user-upn">{user.upn}</span>
+                                    <React.Fragment key={user.upn}>
+                                        <motion.tr
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: idx * 0.02 }}
+                                            onClick={() => handleUserClick(user)}
+                                            className={`clickable-row ${selectedUser?.upn === user.upn ? 'row-active' : ''}`}
+                                        >
+                                            <td>
+                                                <div className="user-info-cell">
+                                                    <div className="user-avatar-glow">{user.displayName.charAt(0)}</div>
+                                                    <div className="user-text">
+                                                        <span className="user-name">{user.displayName}</span>
+                                                        <span className="user-upn">{user.upn}</span>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td className="activity-cell">
-                                            <div className="status-wrap" title={user.exchangeDate ? `Last Active: ${new Date(user.exchangeDate).toLocaleString()}` : 'Never Active'}>
-                                                {getStatusIcon(user.exchangeDate)}
-                                                <span>{formatDate(user.exchangeDate)}</span>
-                                            </div>
-                                            {!user.licenses.exchange && <div className="no-license-indicator" title="No Exchange License"><Mail size={12} /></div>}
-                                        </td>
-                                        <td className="activity-cell">
-                                            <div className="status-wrap" title={user.teamsDate ? `Last Active: ${new Date(user.teamsDate).toLocaleString()}` : 'Never Active'}>
-                                                {getStatusIcon(user.teamsDate)}
-                                                <span>{formatDate(user.teamsDate)}</span>
-                                            </div>
-                                            {!user.licenses.teams && <div className="no-license-indicator" title="No Teams License"><MessageSquare size={12} /></div>}
-                                        </td>
-                                        <td className="activity-cell">
-                                            <div className="status-wrap" title={user.sharePointDate ? `Last Active: ${new Date(user.sharePointDate).toLocaleString()}` : 'Never Active'}>
-                                                {getStatusIcon(user.sharePointDate)}
-                                                <span>{formatDate(user.sharePointDate)}</span>
-                                            </div>
-                                            {!user.licenses.sharePoint && <div className="no-license-indicator" title="No SharePoint License"><Globe size={12} /></div>}
-                                        </td>
-                                        <td className="activity-cell">
-                                            <div className="status-wrap" title={user.oneDriveDate ? `Last Active: ${new Date(user.oneDriveDate).toLocaleString()}` : 'Never Active'}>
-                                                {getStatusIcon(user.oneDriveDate)}
-                                                <span>{formatDate(user.oneDriveDate)}</span>
-                                            </div>
-                                            {!user.licenses.oneDrive && <div className="no-license-indicator" title="No OneDrive License"><Cloud size={12} /></div>}
-                                        </td>
-                                        <td>
-                                            <div className="overall-activity">
-                                                <Calendar size={14} style={{ opacity: 0.5 }} />
-                                                <span>{formatDate(user.lastActivityDate)}</span>
-                                            </div>
-                                        </td>
-                                    </motion.tr>
+                                            </td>
+                                            <td className="activity-cell">
+                                                <div className="status-wrap" title={user.exchangeDate ? `Last Active: ${new Date(user.exchangeDate).toLocaleString()}` : 'Never Active'}>
+                                                    {getStatusIcon(user.exchangeDate)}
+                                                    <span>{formatDate(user.exchangeDate)}</span>
+                                                </div>
+                                                {!user.licenses.exchange && <div className="no-license-indicator" title="No Exchange License"><Mail size={12} /></div>}
+                                            </td>
+                                            <td className="activity-cell">
+                                                <div className="status-wrap" title={user.teamsDate ? `Last Active: ${new Date(user.teamsDate).toLocaleString()}` : 'Never Active'}>
+                                                    {getStatusIcon(user.teamsDate)}
+                                                    <span>{formatDate(user.teamsDate)}</span>
+                                                </div>
+                                                {!user.licenses.teams && <div className="no-license-indicator" title="No Teams License"><MessageSquare size={12} /></div>}
+                                            </td>
+                                            <td className="activity-cell">
+                                                <div className="status-wrap" title={user.sharePointDate ? `Last Active: ${new Date(user.sharePointDate).toLocaleString()}` : 'Never Active'}>
+                                                    {getStatusIcon(user.sharePointDate)}
+                                                    <span>{formatDate(user.sharePointDate)}</span>
+                                                </div>
+                                                {!user.licenses.sharePoint && <div className="no-license-indicator" title="No SharePoint License"><Globe size={12} /></div>}
+                                            </td>
+                                            <td className="activity-cell">
+                                                <div className="status-wrap" title={user.oneDriveDate ? `Last Active: ${new Date(user.oneDriveDate).toLocaleString()}` : 'Never Active'}>
+                                                    {getStatusIcon(user.oneDriveDate)}
+                                                    <span>{formatDate(user.oneDriveDate)}</span>
+                                                </div>
+                                                {!user.licenses.oneDrive && <div className="no-license-indicator" title="No OneDrive License"><Cloud size={12} /></div>}
+                                            </td>
+                                            <td>
+                                                <div className="overall-activity">
+                                                    <Calendar size={14} style={{ opacity: 0.5 }} />
+                                                    <span>{formatDate(user.lastActivityDate)}</span>
+                                                </div>
+                                            </td>
+                                        </motion.tr>
+
+                                        {/* Inline Expansion Detail */}
+                                        <AnimatePresence>
+                                            {selectedUser?.upn === user.upn && (
+                                                <motion.tr
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: 'auto', opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    transition={{ duration: 0.3, ease: 'circOut' }}
+                                                >
+                                                    <td colSpan="6" className="inline-detail-cell">
+                                                        <div className="audit-expansion-container">
+                                                            <div className="audit-header-inline">
+                                                                <h3 className="section-title"><Lock size={16} /> Audit Deep-Dive: {user.displayName}</h3>
+                                                            </div>
+
+                                                            {loadingSignIns ? (
+                                                                <div className="inline-loader">
+                                                                    <RefreshCw size={24} className="spinning" />
+                                                                    <p>Consulting Graph Audit Logs...</p>
+                                                                </div>
+                                                            ) : userSignIns.length > 0 ? (
+                                                                <div className="audit-grid-inline">
+                                                                    {userSignIns.map((log, lIdx) => (
+                                                                        <div key={lIdx} className="audit-pill">
+                                                                            <div className="pill-side-accent" style={{ background: log.status?.errorCode === 0 ? '#10b981' : '#f43f5e' }} />
+                                                                            <div className="pill-content">
+                                                                                <div className="pill-top">
+                                                                                    <span className="pill-app">{log.appDisplayName}</span>
+                                                                                    <span className="pill-status">{log.status?.errorCode === 0 ? 'Success' : 'Fail'}</span>
+                                                                                </div>
+                                                                                <div className="pill-bottom">
+                                                                                    <span className="pill-time">{new Date(log.createdDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {log.location?.city || 'Unknown'}</span>
+                                                                                    <span className="pill-os">{log.deviceDetail?.operatingSystem}</span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            ) : (
+                                                                <div className="no-inline-data">
+                                                                    <Info size={24} />
+                                                                    <span>No sign-in events found in the last 30 days. This user may be inactive or infrequent.</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                </motion.tr>
+                                            )}
+                                        </AnimatePresence>
+                                    </React.Fragment>
                                 ))
                             ) : (
                                 <tr>
@@ -514,6 +600,34 @@ const UserActivityReport = () => {
                 .chart-section { border: 1px solid var(--glass-border); position: relative; overflow: hidden; }
                 .chart-section::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% -20%, var(--accent-blue-glow), transparent); opacity: 0.3; pointer-events: none; }
 
+                .clickable-row { cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+                .clickable-row:hover { background: var(--glass-bg-hover) !important; }
+                .row-active { background: var(--accent-blue-alpha) !important; border-left: 4px solid var(--accent-blue) !important; }
+
+                .inline-detail-cell { padding: 0 !important; background: var(--bg-dark); }
+                .audit-expansion-container { padding: 24px; background: linear-gradient(to bottom, rgba(0,0,0,0.2), transparent); animation: expandIn 0.4s ease-out; }
+                
+                .audit-header-inline { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+                .section-title { font-size: 13px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+                
+                .audit-grid-inline { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+                .audit-pill { 
+                    display: flex; background: var(--glass-bg); border: 1px solid var(--glass-border); 
+                    border-radius: 12px; overflow: hidden; transition: transform 0.2s ease;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                }
+                .audit-pill:hover { transform: translateY(-2px); border-color: var(--accent-blue); }
+                .pill-side-accent { width: 4px; flex-shrink: 0; }
+                .pill-content { padding: 12px 16px; flex: 1; }
+                .pill-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+                .pill-app { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+                .pill-status { font-size: 10px; font-weight: 800; text-transform: uppercase; opacity: 0.7; }
+                .pill-bottom { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-tertiary); }
+                
+                .inline-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; color: var(--text-tertiary); gap: 12px; }
+                .no-inline-data { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 40px; color: var(--text-tertiary); font-size: 14px; }
+                
+                @keyframes expandIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
                 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
             `}</style>
         </div>

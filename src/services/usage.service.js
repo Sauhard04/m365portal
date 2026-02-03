@@ -259,7 +259,44 @@ export class UsageService {
         }
     }
 
+    /**
+     * Fetch recent sign-in events for a specific user
+     * @param {string} userPrincipalName - The user's UPN
+     */
+    async getUserSignIns(userPrincipalName) {
+        try {
+            // Escape single quotes for OData and encode # for URL safety (especially for Guest/EXT users)
+            const safeUpn = userPrincipalName.replace(/'/g, "''").replace(/#/g, '%23');
 
+            const response = await this.client.api('/auditLogs/signIns')
+                .filter(`userPrincipalName eq '${safeUpn}'`)
+                .orderby('createdDateTime desc')
+                .top(10)
+                .get();
+
+            return response.value || [];
+        } catch (error) {
+            console.error(`Failed to fetch sign-ins for ${userPrincipalName}:`, error.message);
+            return [];
+        }
+    }
+
+    /**
+     * Fetch recent tenant-wide audit logs
+     */
+    async getRecentAuditLogs(top = 20) {
+        try {
+            const response = await this.client.api('/auditLogs/directoryAudits')
+                .orderby('activityDateTime desc')
+                .top(top)
+                .get();
+
+            return response.value || [];
+        } catch (error) {
+            console.error('Failed to fetch audit logs:', error.message);
+            return [];
+        }
+    }
 }
 
 export default UsageService;

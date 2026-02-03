@@ -71,6 +71,8 @@ import UserActivityReport from './components/UserActivityReport';
 // Teams & Collaboration Module
 import TeamsDashboard from './components/TeamsDashboard';
 import TeamsListPage from './components/TeamsListPage';
+import TeamDetailsPage from './components/TeamDetailsPage';
+import TeamsChatPage from './components/TeamsChatPage';
 
 import { ThemeProvider } from './contexts/ThemeContext';
 
@@ -172,6 +174,8 @@ function App() {
                     {/* Teams & Collaboration Routes */}
                     <Route path="teams" element={<TeamsDashboard />} />
                     <Route path="teams/list" element={<TeamsListPage />} />
+                    <Route path="teams/chats" element={<TeamsChatPage />} />
+                    <Route path="teams/:teamId" element={<TeamDetailsPage />} />
 
                     <Route path="documentation" element={<DocumentationPage />} />
                     <Route path="documentation/view/:id" element={<PDFViewerPage />} />

@@ -4,7 +4,7 @@ import { useMsal } from '@azure/msal-react';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { loginRequest } from '../authConfig';
 import { TeamsService } from '../services/teams/teams.service';
-import { Users, ArrowLeft, RefreshCw, Search, Globe, Lock, Calendar, Mail } from 'lucide-react';
+import { Users, ArrowLeft, RefreshCw, Search, Globe, Lock, Calendar, Mail, Info } from 'lucide-react';
 
 const TeamsListPage = () => {
     const navigate = useNavigate();
@@ -15,7 +15,7 @@ const TeamsListPage = () => {
     const [myTeams, setMyTeams] = useState([]);
     const [filteredTeams, setFilteredTeams] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [filterMode, setFilterMode] = useState('all'); // 'all' or 'my'
+    const [filterMode, setFilterMode] = useState('all'); // 'all', 'my', or 'archived'
 
     const fetchTeams = async (isManual = false) => {
         if (isManual) setRefreshing(true);
@@ -47,6 +47,9 @@ const TeamsListPage = () => {
             if (params.get('filter') === 'my') {
                 setFilterMode('my');
                 setFilteredTeams(myJoinedTeams);
+            } else if (params.get('filter') === 'archived') {
+                setFilterMode('archived');
+                setFilteredTeams(allTeams.filter(t => t.isArchived));
             } else {
                 setFilterMode('all');
                 setFilteredTeams(allTeams);
@@ -69,6 +72,9 @@ const TeamsListPage = () => {
 
     useEffect(() => {
         let source = filterMode === 'my' ? myTeams : teams;
+        if (filterMode === 'archived') {
+            source = teams.filter(t => t.isArchived);
+        }
 
         if (!searchTerm) {
             setFilteredTeams(source);
@@ -149,6 +155,12 @@ const TeamsListPage = () => {
                         All Teams
                     </button>
                     <button
+                        className={`filter-tab ${filterMode === 'archived' ? 'active' : ''}`}
+                        onClick={() => setFilterMode('archived')}
+                    >
+                        Archived
+                    </button>
+                    <button
                         className={`filter-tab ${filterMode === 'my' ? 'active' : ''}`}
                         onClick={() => setFilterMode('my')}
                     >
@@ -178,6 +190,57 @@ const TeamsListPage = () => {
                                 </div>
                                 <h3 className="team-name">{team.displayName || 'Unnamed Team'}</h3>
                                 <p className="team-desc">{team.description?.substring(0, 80) || 'No description'}</p>
+
+                                <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+                                    <a
+                                        href={`https://admin.teams.microsoft.com/teams/manage/${team.id}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="glass-btn btn-manage"
+                                        style={{
+                                            flex: 1,
+                                            padding: '8px',
+                                            fontSize: '12px',
+                                            textAlign: 'center',
+                                            background: 'rgba(59, 130, 246, 0.1)',
+                                            color: '#3b82f6',
+                                            border: '1px solid rgba(59, 130, 246, 0.2)',
+                                            borderRadius: '8px',
+                                            textDecoration: 'none',
+                                            fontWeight: '600',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '6px'
+                                        }}
+                                    >
+                                        <Lock size={12} />
+                                        Manage Team
+                                    </a>
+                                    <button
+                                        onClick={() => navigate(`/service/teams/${team.id}`)}
+                                        className="glass-btn"
+                                        style={{
+                                            flex: 1,
+                                            padding: '8px',
+                                            fontSize: '12px',
+                                            textAlign: 'center',
+                                            background: 'rgba(168, 85, 247, 0.1)',
+                                            color: '#a855f7',
+                                            border: '1px solid rgba(168, 85, 247, 0.2)',
+                                            borderRadius: '8px',
+                                            fontWeight: '600',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '6px',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        <Info size={12} />
+                                        View Details
+                                    </button>
+                                </div>
                                 <div className="team-meta">
                                     {team.mail && (
                                         <div className="meta-item">
