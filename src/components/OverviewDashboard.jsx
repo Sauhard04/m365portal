@@ -438,17 +438,19 @@ const OverviewDashboard = () => {
                                             <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Active vs Inactive</p>
                                         </div>
                                     </div>
-                                    <ResponsiveContainer width="100%" height={240}>
-                                        <PieChart>
-                                            <Pie data={data.charts.userDistribution} cx="50%" cy="50%" outerRadius={80} innerRadius={60} paddingAngle={5} dataKey="value" stroke="var(--glass-bg)" strokeWidth={2}>
-                                                {data.charts.userDistribution.map((entry, index) => (
-                                                    <Cell key={`cell-${index}`} fill={entry.name === 'Active' ? 'var(--accent-success)' : 'var(--accent-warning)'} />
-                                                ))}
-                                            </Pie>
-                                            <Tooltip content={<CustomTooltip />} />
-                                            <Legend verticalAlign="bottom" height={36} />
-                                        </PieChart>
-                                    </ResponsiveContainer>
+                                    <div style={{ height: '240px', minWidth: '0' }}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <Pie data={data.charts.userDistribution} cx="50%" cy="50%" outerRadius={80} innerRadius={60} paddingAngle={5} dataKey="value" stroke="var(--glass-bg)" strokeWidth={2}>
+                                                    {data.charts.userDistribution.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={entry.name === 'Active' ? 'var(--accent-success)' : 'var(--accent-warning)'} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip content={<CustomTooltip />} />
+                                                <Legend verticalAlign="bottom" height={36} />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    </div>
                                 </div>
                             )}
 
@@ -470,21 +472,23 @@ const OverviewDashboard = () => {
                                             <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Security Posture</p>
                                         </div>
                                     </div>
-                                    <ResponsiveContainer width="100%" height={240}>
-                                        <BarChart data={data.charts.deviceCompliance} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                                            <defs>
-                                                <linearGradient id="compGrad" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="0%" stopColor="var(--accent-indigo)" />
-                                                    <stop offset="100%" stopColor="var(--accent-purple)" />
-                                                </linearGradient>
-                                            </defs>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} vertical={false} />
-                                            <XAxis dataKey="name" stroke="var(--text-dim)" fontSize={11} tickLine={false} axisLine={false} />
-                                            <YAxis stroke="var(--text-dim)" fontSize={11} tickLine={false} axisLine={false} />
-                                            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--glass-border)', opacity: 0.1 }} />
-                                            <Bar dataKey="value" fill="url(#compGrad)" radius={[6, 6, 0, 0]} />
-                                        </BarChart>
-                                    </ResponsiveContainer>
+                                    <div style={{ height: '240px', minWidth: '0' }}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart data={data.charts.deviceCompliance} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                                                <defs>
+                                                    <linearGradient id="compGrad" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="0%" stopColor="var(--accent-indigo)" />
+                                                        <stop offset="100%" stopColor="var(--accent-purple)" />
+                                                    </linearGradient>
+                                                </defs>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} vertical={false} />
+                                                <XAxis dataKey="name" stroke="var(--text-dim)" fontSize={11} tickLine={false} axisLine={false} />
+                                                <YAxis stroke="var(--text-dim)" fontSize={11} tickLine={false} axisLine={false} />
+                                                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--glass-border)', opacity: 0.1 }} />
+                                                <Bar dataKey="value" fill="url(#compGrad)" radius={[6, 6, 0, 0]} />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
                                 </div>
                             )}
 
@@ -540,20 +544,22 @@ const OverviewDashboard = () => {
                                             <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Last 7 Days</p>
                                         </div>
                                     </div>
-                                    <ResponsiveContainer width="100%" height={240}>
-                                        <AreaChart data={data.charts.emailTrend}>
-                                            <defs>
-                                                <linearGradient id="emailGrad" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="5%" stopColor="var(--accent-indigo)" stopOpacity={0.3} />
-                                                    <stop offset="95%" stopColor="var(--accent-indigo)" stopOpacity={0} />
-                                                </linearGradient>
-                                            </defs>
-                                            <XAxis dataKey="name" hide />
-                                            <Tooltip content={<CustomTooltip />} />
-                                            <Area type="monotone" dataKey="sent" name="Sent" stroke="var(--accent-indigo)" fillOpacity={1} fill="url(#emailGrad)" strokeWidth={2} />
-                                            <Area type="monotone" dataKey="received" name="Received" stroke="var(--accent-cyan)" fillOpacity={0} strokeWidth={2} />
-                                        </AreaChart>
-                                    </ResponsiveContainer>
+                                    <div style={{ height: '240px', minWidth: '0' }}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart data={data.charts.emailTrend}>
+                                                <defs>
+                                                    <linearGradient id="emailGrad" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="var(--accent-indigo)" stopOpacity={0.3} />
+                                                        <stop offset="95%" stopColor="var(--accent-indigo)" stopOpacity={0} />
+                                                    </linearGradient>
+                                                </defs>
+                                                <XAxis dataKey="name" hide />
+                                                <Tooltip content={<CustomTooltip />} />
+                                                <Area type="monotone" dataKey="sent" name="Sent" stroke="var(--accent-indigo)" fillOpacity={1} fill="url(#emailGrad)" strokeWidth={2} />
+                                                <Area type="monotone" dataKey="received" name="Received" stroke="var(--accent-cyan)" fillOpacity={0} strokeWidth={2} />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -577,14 +583,16 @@ const OverviewDashboard = () => {
                                             </div>
                                             <h3 style={{ fontSize: '12px', fontWeight: 700 }}>Security Posture</h3>
                                         </div>
-                                        <ResponsiveContainer width="100%" height={260}>
-                                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data.charts.securityRadar}>
-                                                <PolarGrid stroke="var(--glass-border)" />
-                                                <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-dim)', fontSize: 10 }} />
-                                                <Radar name="Score" dataKey="value" stroke="var(--accent-blue)" fill="var(--accent-blue)" fillOpacity={0.3} />
-                                                <Tooltip content={<CustomTooltip />} />
-                                            </RadarChart>
-                                        </ResponsiveContainer>
+                                        <div style={{ height: '260px', minWidth: '0' }}>
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data.charts.securityRadar}>
+                                                    <PolarGrid stroke="var(--glass-border)" />
+                                                    <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-dim)', fontSize: 10 }} />
+                                                    <Radar name="Score" dataKey="value" stroke="var(--accent-blue)" fill="var(--accent-blue)" fillOpacity={0.3} />
+                                                    <Tooltip content={<CustomTooltip />} />
+                                                </RadarChart>
+                                            </ResponsiveContainer>
+                                        </div>
                                     </div>
                                 )}
 
@@ -604,21 +612,23 @@ const OverviewDashboard = () => {
                                             </div>
                                             <h3 style={{ fontSize: '12px', fontWeight: 700 }}>Active User Trends</h3>
                                         </div>
-                                        <ResponsiveContainer width="100%" height={260}>
-                                            <AreaChart data={data.charts.userGrowthTrend}>
-                                                <defs>
-                                                    <linearGradient id="growthGrad" x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="5%" stopColor="var(--accent-blue)" stopOpacity={0.3} />
-                                                        <stop offset="95%" stopColor="var(--accent-blue)" stopOpacity={0} />
-                                                    </linearGradient>
-                                                </defs>
-                                                <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} vertical={false} />
-                                                <XAxis dataKey="week" hide />
-                                                <YAxis hide />
-                                                <Tooltip content={<CustomTooltip />} />
-                                                <Area type="monotone" dataKey="active" stroke="var(--accent-blue)" fillOpacity={1} fill="url(#growthGrad)" strokeWidth={3} />
-                                            </AreaChart>
-                                        </ResponsiveContainer>
+                                        <div style={{ height: '260px', minWidth: '0' }}>
+                                            <ResponsiveContainer width="100%" height="100%">
+                                                <AreaChart data={data.charts.userGrowthTrend}>
+                                                    <defs>
+                                                        <linearGradient id="growthGrad" x1="0" y1="0" x2="0" y2="1">
+                                                            <stop offset="5%" stopColor="var(--accent-blue)" stopOpacity={0.3} />
+                                                            <stop offset="95%" stopColor="var(--accent-blue)" stopOpacity={0} />
+                                                        </linearGradient>
+                                                    </defs>
+                                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} vertical={false} />
+                                                    <XAxis dataKey="week" hide />
+                                                    <YAxis hide />
+                                                    <Tooltip content={<CustomTooltip />} />
+                                                    <Area type="monotone" dataKey="active" stroke="var(--accent-blue)" fillOpacity={1} fill="url(#growthGrad)" strokeWidth={3} />
+                                                </AreaChart>
+                                            </ResponsiveContainer>
+                                        </div>
                                     </div>
                                 )}
                             </div>

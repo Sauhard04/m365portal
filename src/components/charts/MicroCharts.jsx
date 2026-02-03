@@ -15,34 +15,36 @@ export const MiniSparkline = ({ data, color = '#3b82f6', height = 35 }) => {
     const gradientId = `sparkline-gradient-${Math.random().toString(36).substr(2, 9)}`;
 
     return (
-        <ResponsiveContainer width="100%" height={height}>
-            <AreaChart data={data} margin={{ top: 2, right: 2, left: 2, bottom: 2 }}>
-                <defs>
-                    <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor={color} stopOpacity={0.4} />
-                        <stop offset="95%" stopColor={color} stopOpacity={0.05} />
-                    </linearGradient>
-                    <filter id={`glow-${gradientId}`}>
-                        <feGaussianBlur stdDeviation="2" result="coloredBlur" />
-                        <feMerge>
-                            <feMergeNode in="coloredBlur" />
-                            <feMergeNode in="SourceGraphic" />
-                        </feMerge>
-                    </filter>
-                </defs>
-                <Area
-                    type="monotone"
-                    dataKey="value"
-                    stroke={color}
-                    strokeWidth={3}
-                    dot={false}
-                    fill={`url(#${gradientId})`}
-                    animationDuration={1500}
-                    animationEasing="ease-in-out"
-                    filter={`url(#glow-${gradientId})`}
-                />
-            </AreaChart>
-        </ResponsiveContainer>
+        <div style={{ width: '100%', height: `${height}px`, minWidth: '0' }}>
+            <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={data} margin={{ top: 2, right: 2, left: 2, bottom: 2 }}>
+                    <defs>
+                        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor={color} stopOpacity={0.4} />
+                            <stop offset="95%" stopColor={color} stopOpacity={0.05} />
+                        </linearGradient>
+                        <filter id={`glow-${gradientId}`}>
+                            <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                            <feMerge>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <Area
+                        type="monotone"
+                        dataKey="value"
+                        stroke={color}
+                        strokeWidth={3}
+                        dot={false}
+                        fill={`url(#${gradientId})`}
+                        animationDuration={1500}
+                        animationEasing="ease-in-out"
+                        filter={`url(#glow-${gradientId})`}
+                    />
+                </AreaChart>
+            </ResponsiveContainer>
+        </div>
     );
 
 };
@@ -391,15 +393,17 @@ export const MiniBarChart = ({ data, height = 40 }) => {
     if (!data || data.length === 0) return null;
 
     return (
-        <ResponsiveContainer width="100%" height={height}>
-            <BarChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-                <Bar dataKey="value" radius={[2, 2, 2, 2]} animationDuration={800}>
-                    {data.map((entry, index) => (
-                        <rect key={`bar-${index}`} fill={entry.color || 'var(--accent-blue)'} />
-                    ))}
-                </Bar>
-            </BarChart>
-        </ResponsiveContainer>
+        <div style={{ width: '100%', height: `${height}px`, minWidth: '0' }}>
+            <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                    <Bar dataKey="value" radius={[2, 2, 2, 2]} animationDuration={800}>
+                        {data.map((entry, index) => (
+                            <rect key={`bar-${index}`} fill={entry.color || 'var(--accent-blue)'} />
+                        ))}
+                    </Bar>
+                </BarChart>
+            </ResponsiveContainer>
+        </div>
     );
 };
 

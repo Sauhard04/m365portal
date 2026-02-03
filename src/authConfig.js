@@ -7,7 +7,7 @@ export const msalConfig = {
     cache: {
         cacheLocation: "localStorage",
         storeAuthStateInCookie: false,
-    }
+    },
 };
 
 // Scopes for the Graph API calls we need
@@ -45,8 +45,7 @@ export const sharepointScopes = {
         "Sites.Read.All",
         "Files.Read.All",
         "Reports.Read.All",
-        "ServiceHealth.Read.All",
-        "ServiceAnnouncement.Read.All"
+        "ServiceHealth.Read.All"
     ]
 };
 

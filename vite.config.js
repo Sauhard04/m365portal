@@ -26,9 +26,10 @@ export default defineConfig({
                   res.setHeader('Content-Type', 'application/json');
                   res.end(content.trim() || '{}');
                 } else {
-                  res.statusCode = 404;
+                  // Return empty object instead of 404 to prevent console noise
+                  res.statusCode = 200;
                   res.setHeader('Content-Type', 'application/json');
-                  res.end(JSON.stringify({ error: 'File not found' }));
+                  res.end(JSON.stringify({ lastUpdated: Date.now(), sections: {} }));
                 }
               } catch (err) {
                 res.statusCode = 500;
@@ -103,7 +104,7 @@ export default defineConfig({
       },
     },
     headers: {
-      'Cross-Origin-Opener-Policy': 'unsafe-none',
+      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
       'Cross-Origin-Embedder-Policy': 'unsafe-none',
     },
   },

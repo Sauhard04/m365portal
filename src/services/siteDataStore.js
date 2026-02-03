@@ -46,6 +46,9 @@ function initStore() {
  */
 async function syncWithServer(tenantId = null) {
     try {
+        // Skip server sync in production as there is no dev server middleware
+        if (!import.meta.env.DEV) return;
+
         const headers = {};
         if (tenantId) headers['X-Tenant-Id'] = tenantId;
 
@@ -71,7 +74,10 @@ async function syncWithServer(tenantId = null) {
             }
         }
     } catch (error) {
-        console.warn('[SiteDataStore] Background server sync failed:', error);
+        // Only log if it's not a 404, which is expected if the file doesn't exist yet
+        if (error.status !== 404) {
+            console.debug('[SiteDataStore] Background server sync skipped or failed');
+        }
     }
 }
 
@@ -86,6 +92,9 @@ function saveLocally() {
 
 const persistToServer = async (sectionKey = null, sectionData = null, tenantId = null) => {
     try {
+        // Skip server persistence in production
+        if (!import.meta.env.DEV) return;
+
         let payload;
         if (sectionKey && sectionData) {
             // Partial update: only send the changed section
@@ -110,6 +119,11 @@ const persistToServer = async (sectionKey = null, sectionData = null, tenantId =
         });
 
         if (!response.ok) {
+            // Don't throw for 404 in case the dev server middleware is missing/disabled
+            if (response.status === 404) {
+                console.debug('[SiteDataStore] Persistence endpoint not found (Expected in production)');
+                return;
+            }
             const errorText = await response.text();
             throw new Error(`Server rejected storage: ${errorText}`);
         }
