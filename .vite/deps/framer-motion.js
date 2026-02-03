@@ -779,7 +779,7 @@ var getColorType = (v) => colorTypes.find((type) => type.test(v));
 function asRGBA(color2) {
   const type = getColorType(color2);
   warning(Boolean(type), `'${color2}' is not an animatable color. Use the equivalent color code instead.`, "color-not-animatable");
-  if (!Boolean(type))
+  if (!type)
     return false;
   let model = type.parse(color2);
   if (type === hsla) {
@@ -8457,7 +8457,7 @@ function createProjectionNode2({ attachResizeListener, defaultParent, measureScr
         this.forceRelativeParentToResolveTarget();
         calcRelativeBox(this.target, this.relativeTarget, this.relativeParent.target);
       } else if (this.targetDelta) {
-        if (Boolean(this.resumingFrom)) {
+        if (this.resumingFrom) {
           this.target = this.applyTransform(this.layout.layoutBox);
         } else {
           copyBoxInto(this.target, this.layout.layoutBox);
@@ -10569,7 +10569,7 @@ function useCycle(...items) {
     },
     // The array will change on each call, but by putting items.length at
     // the front of this array, we guarantee the dependency comparison will match up
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     [items.length, ...items]
   );
   return [item, runCycle];

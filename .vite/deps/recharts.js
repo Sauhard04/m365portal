@@ -5574,7 +5574,7 @@ function useElementOffset() {
         }
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     [lastBoundingBox.width, lastBoundingBox.height, lastBoundingBox.top, lastBoundingBox.left, ...extraDependencies]
   );
   return [lastBoundingBox, updateBoundingBox];

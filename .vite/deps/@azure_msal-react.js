@@ -325,11 +325,11 @@ function useMsalAuthentication(interactionType, authenticationRequest, accountId
   }, [inProgress]);
   const shouldAcquireToken = (0, import_react7.useRef)(true);
   (0, import_react7.useEffect)(() => {
-    if (!!error) {
+    if (error) {
       shouldAcquireToken.current = false;
       return;
     }
-    if (!!result) {
+    if (result) {
       shouldAcquireToken.current = false;
       return;
     }
@@ -475,7 +475,7 @@ function MsalAuthenticationTemplate({ interactionType, username, homeAccountId, 
   const msalAuthResult = useMsalAuthentication(interactionType, authenticationRequest, accountIdentifier);
   const isAuthenticated2 = useIsAuthenticated(accountIdentifier);
   if (msalAuthResult.error && context.inProgress === InteractionStatus.None) {
-    if (!!ErrorComponent) {
+    if (ErrorComponent) {
       return import_react8.default.createElement(ErrorComponent, { ...msalAuthResult });
     }
     throw msalAuthResult.error;

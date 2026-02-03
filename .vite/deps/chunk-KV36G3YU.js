@@ -2082,7 +2082,7 @@ var CacheManager = class {
       throw createClientAuthError(invalidCacheRecord);
     }
     try {
-      if (!!cacheRecord.account) {
+      if (cacheRecord.account) {
         await this.setAccount(cacheRecord.account, correlationId, kmsi);
       }
       if (!!cacheRecord.idToken && storeInCache?.idToken !== false) {
@@ -2094,7 +2094,7 @@ var CacheManager = class {
       if (!!cacheRecord.refreshToken && storeInCache?.refreshToken !== false) {
         await this.setRefreshTokenCredential(cacheRecord.refreshToken, correlationId, kmsi);
       }
-      if (!!cacheRecord.appMetadata) {
+      if (cacheRecord.appMetadata) {
         this.setAppMetadata(cacheRecord.appMetadata, correlationId);
       }
     } catch (e) {

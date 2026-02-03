@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 
 export const generateSections = (stats, styles) => [
+    // ROW 1
     {
         title: "Admin Center",
         portalUrl: "https://admin.microsoft.com",
@@ -164,6 +165,54 @@ export const generateSections = (stats, styles) => [
             }
         ]
     },
+
+    // ROW 2 (Paired with Row 1 for 3-Column Layout)
+    {
+        title: "Collaboration",
+        portalUrl: "https://admin.microsoft.com",
+        icon: Users,
+        color: "#6366f1",
+        blocks: [
+            {
+                label: "Teams Infrastructure",
+                value: stats.collaboration.teams,
+                path: '/service/teams',
+                subValues: [
+                    { label: "Private", value: stats.collaboration.privateTeams },
+                    { label: "Public", value: stats.collaboration.publicTeams }
+                ]
+            },
+            {
+                label: "Exchange Workloads",
+                value: stats.collaboration.mailboxes,
+                path: '/service/admin/report',
+                subValues: [
+                    { label: "Active (7D)", value: stats.collaboration.activeEmail },
+                    { label: "Mailboxes", value: stats.collaboration.mailboxes }
+                ]
+            },
+            {
+                label: "SharePoint Sites",
+                value: stats.collaboration.sharepoint || "N/A",
+                path: '/service/sharepoint',
+                custom: (
+                    <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
+                        Total Collections
+                    </div>
+                )
+            },
+            {
+                label: "OneDrive Accounts",
+                value: stats.collaboration.onedrive,
+                path: '/service/usage',
+                custom: (
+                    <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
+                        Active Storage
+                    </div>
+                )
+            }
+        ]
+    },
     {
         title: "Security & Compliance",
         portalUrl: "https://security.microsoft.com",
@@ -217,51 +266,35 @@ export const generateSections = (stats, styles) => [
         ]
     },
     {
-        title: "Collaboration",
-        portalUrl: "https://admin.microsoft.com",
-        icon: Users,
-        color: "#6366f1",
+        title: "Usage & Analytics",
+        portalUrl: "https://admin.microsoft.com/Adminportal/Home#/reportsUsage",
+        icon: TrendingUp,
+        color: "#f59e0b",
         blocks: [
             {
-                label: "Teams Infrastructure",
-                value: stats.collaboration.teams,
-                path: '/service/teams',
-                subValues: [
-                    { label: "Private", value: stats.collaboration.privateTeams },
-                    { label: "Public", value: stats.collaboration.publicTeams }
-                ]
-            },
-            {
-                label: "Exchange Workloads",
-                value: stats.collaboration.mailboxes,
-                path: '/service/admin/report',
-                subValues: [
-                    { label: "Active (7D)", value: stats.collaboration.activeEmail },
-                    { label: "Mailboxes", value: stats.collaboration.mailboxes }
-                ]
-            },
-            {
-                label: "SharePoint Sites",
-                value: stats.collaboration.sharepoint || "N/A",
-                path: '/service/sharepoint',
+                label: "Active Users (7D)",
+                value: stats.usage.activeUsers7d,
+                path: '/service/usage',
                 custom: (
                     <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
-                        Total Collections
+                        Last 7 Days
                     </div>
                 )
             },
             {
-                label: "OneDrive Accounts",
-                value: stats.collaboration.onedrive,
+                label: "Storage Consumption",
+                value: `${(stats.usage.storage / 1073741824).toFixed(2)} GB`,
                 path: '/service/usage',
                 custom: (
                     <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
-                        Active Storage
+                        OneDrive Total
                     </div>
                 )
             }
         ]
     },
+
+    // ROW 3
     {
         title: "Data Governance",
         portalUrl: "https://purview.microsoft.com",
@@ -294,34 +327,6 @@ export const generateSections = (stats, styles) => [
                 custom: (
                     <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
                         Active Investigations
-                    </div>
-                )
-            }
-        ]
-    },
-    {
-        title: "Usage & Analytics",
-        portalUrl: "https://admin.microsoft.com/Adminportal/Home#/reportsUsage",
-        icon: TrendingUp,
-        color: "#f59e0b",
-        blocks: [
-            {
-                label: "Active Users (7D)",
-                value: stats.usage.activeUsers7d,
-                path: '/service/usage',
-                custom: (
-                    <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
-                        Last 7 Days
-                    </div>
-                )
-            },
-            {
-                label: "Storage Consumption",
-                value: `${(stats.usage.storage / 1073741824).toFixed(2)} GB`,
-                path: '/service/usage',
-                custom: (
-                    <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
-                        OneDrive Total
                     </div>
                 )
             }
