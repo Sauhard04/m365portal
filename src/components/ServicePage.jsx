@@ -181,7 +181,16 @@ const ServicePage = ({ serviceId: propServiceId }) => {
         <div className="animate-in">
             <header className="flex-between spacing-v-4">
                 <div>
-                    <h1 className="title-gradient" style={{ fontSize: '18px' }}>{serviceNames[serviceId]} Overview</h1>
+                    <a
+                        href="https://admin.microsoft.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ textDecoration: 'none' }}
+                    >
+                        <h1 className="title-gradient" style={{ fontSize: '18px', cursor: 'pointer' }}>
+                            {serviceNames[serviceId]} Overview
+                        </h1>
+                    </a>
                     <p style={{ color: 'var(--text-dim)', fontSize: '10px' }}>Real-time operational telemetry and management</p>
                 </div>
                 <div className="flex-gap-2">

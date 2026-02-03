@@ -81,7 +81,7 @@ const BirdsEyeView = ({ embedded = false }) => {
                     "Policy.Read.All",
                     "ServiceHealth.Read.All",
                     "Sites.Read.All",
-                    "InformationProtectionPolicy.Read",
+                    "InformationProtectionPolicy.Read.All",
                     "RecordsManagement.Read.All",
                     "eDiscovery.Read.All"
                 ],
@@ -353,7 +353,27 @@ const BirdsEyeView = ({ embedded = false }) => {
                     <div key={idx} className={styles.card} style={{ borderTopColor: section.color }}>
                         <div className={styles.cardContent}>
                             <div className={styles.cardHeader}>
-                                <h3 className={styles.cardTitle}>{section.title}</h3>
+                                {section.portalUrl ? (
+                                    <a
+                                        href={section.portalUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={styles.cardTitle}
+                                        style={{
+                                            textDecoration: 'none',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px'
+                                        }}
+                                        title={`Open ${section.title}`}
+                                    >
+                                        {section.title}
+
+                                    </a>
+                                ) : (
+                                    <h3 className={styles.cardTitle}>{section.title}</h3>
+                                )}
                                 <section.icon size={18} style={{ color: section.color }} />
                             </div>
 

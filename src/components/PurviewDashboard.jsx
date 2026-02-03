@@ -248,11 +248,18 @@ const PurviewDashboard = () => {
         <div className="animate-in">
             <header className="flex-between spacing-v-8">
                 <div>
-                    <h1 className="title-gradient" style={{ fontSize: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <Database size={28} style={{ color: 'var(--accent-blue)' }} />
-                        Microsoft Purview
-                    </h1>
-                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Unified data governance and asset management</p>
+                    <a
+                        href="https://purview.microsoft.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ textDecoration: 'none' }}
+                    >
+                        <h1 className="title-gradient" style={{ fontSize: '32px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
+                            <Database size={28} style={{ color: 'var(--accent-blue)' }} />
+                            Microsoft Purview
+                        </h1>
+                    </a>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Data governance, compliance, and information protection</p>
                 </div>
                 <div className="flex-gap-2">
                     <button

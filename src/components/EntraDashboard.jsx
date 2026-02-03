@@ -213,7 +213,14 @@ const EntraDashboard = () => {
         <div className="animate-in">
             <header className="flex-between spacing-v-8">
                 <div>
-                    <h1 className="title-gradient" style={{ fontSize: '32px' }}>Entra ID Dashboard</h1>
+                    <a
+                        href="https://entra.microsoft.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ textDecoration: 'none' }}
+                    >
+                        <h1 className="title-gradient" style={{ fontSize: '32px', cursor: 'pointer' }}>Entra ID Dashboard</h1>
+                    </a>
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Unified identity protection and cloud authentication hub</p>
                 </div>
                 <div className="flex-gap-2">

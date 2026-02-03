@@ -231,11 +231,18 @@ const SharePointDashboard = () => {
             {/* Header */}
             <header className="flex-between spacing-v-8">
                 <div>
-                    <h1 className="title-gradient" style={{ fontSize: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <Globe size={28} style={{ color: 'var(--accent-blue)' }} />
-                        SharePoint & OneDrive
-                    </h1>
-                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Manage sites, document libraries, and storage</p>
+                    <a
+                        href="https://admin.microsoft.com/sharepoint"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ textDecoration: 'none' }}
+                    >
+                        <h1 className="title-gradient" style={{ fontSize: '32px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
+                            <Globe size={28} style={{ color: 'var(--accent-blue)' }} />
+                            SharePoint & OneDrive
+                        </h1>
+                    </a>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Analyze site usage, storage, and file activity</p>
                 </div>
                 <div className="flex-gap-2">
                     <button

@@ -10,6 +10,7 @@ import {
 export const generateSections = (stats, styles) => [
     {
         title: "Admin Center",
+        portalUrl: "https://admin.microsoft.com",
         icon: LayoutGrid,
         color: "#0078d4",
         blocks: [
@@ -46,6 +47,7 @@ export const generateSections = (stats, styles) => [
     },
     {
         title: "Entra ID",
+        portalUrl: "https://entra.microsoft.com",
         icon: ShieldCheck,
         color: "#3b82f6",
         blocks: [
@@ -117,6 +119,7 @@ export const generateSections = (stats, styles) => [
     },
     {
         title: "Endpoint Management",
+        portalUrl: "https://intune.microsoft.com",
         icon: Laptop,
         color: "#a855f7",
         blocks: [
@@ -163,6 +166,7 @@ export const generateSections = (stats, styles) => [
     },
     {
         title: "Security & Compliance",
+        portalUrl: "https://security.microsoft.com",
         icon: Shield,
         color: "#ef4444",
         blocks: [
@@ -214,6 +218,7 @@ export const generateSections = (stats, styles) => [
     },
     {
         title: "Collaboration",
+        portalUrl: "https://admin.microsoft.com",
         icon: Users,
         color: "#6366f1",
         blocks: [
@@ -259,6 +264,7 @@ export const generateSections = (stats, styles) => [
     },
     {
         title: "Data Governance",
+        portalUrl: "https://purview.microsoft.com",
         icon: FileText,
         color: "#059669",
         blocks: [
@@ -295,6 +301,7 @@ export const generateSections = (stats, styles) => [
     },
     {
         title: "Usage & Analytics",
+        portalUrl: "https://admin.microsoft.com/Adminportal/Home#/reportsUsage",
         icon: TrendingUp,
         color: "#f59e0b",
         blocks: [

@@ -133,11 +133,18 @@ const GovernanceDashboard = () => {
             {/* Header */}
             <header className="flex-between spacing-v-8">
                 <div>
-                    <h1 className="title-gradient" style={{ fontSize: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <Shield size={28} style={{ color: 'var(--accent-purple)' }} />
-                        Identity Governance
-                    </h1>
-                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Manage conditional access, privileged roles, and access reviews</p>
+                    <a
+                        href="https://entra.microsoft.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ textDecoration: 'none' }}
+                    >
+                        <h1 className="title-gradient" style={{ fontSize: '32px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
+                            <Shield size={28} style={{ color: 'var(--accent-blue)' }} />
+                            Identity Governance
+                        </h1>
+                    </a>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Privileged access, reviews, and entitlement management</p>
                 </div>
                 <div className="flex-gap-2">
                     <button

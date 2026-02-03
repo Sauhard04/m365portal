@@ -164,11 +164,18 @@ const SecurityDashboard = () => {
             {/* Header */}
             <header className="flex-between spacing-v-8">
                 <div>
-                    <h1 className="title-gradient" style={{ fontSize: '32px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <Shield size={28} style={{ color: 'var(--accent-error)' }} />
-                        Security Dashboard
-                    </h1>
-                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Monitor security alerts, incidents, and identity protection</p>
+                    <a
+                        href="https://security.microsoft.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ textDecoration: 'none' }}
+                    >
+                        <h1 className="title-gradient" style={{ fontSize: '32px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
+                            <Shield size={28} style={{ color: '#ef4444' }} />
+                            Security Dashboard
+                        </h1>
+                    </a>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Threat protection, detection, and response</p>
                 </div>
                 <div className="flex-gap-2">
                     <button

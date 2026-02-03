@@ -522,7 +522,14 @@ const UsageReports = () => {
         <div className="usage-reports-page">
             <header className="flex-between spacing-v-12">
                 <div>
-                    <h1 className="title-gradient" style={{ fontSize: '28px' }}>M365 Usage Analytics</h1>
+                    <a
+                        href="https://admin.microsoft.com/Adminportal/Home#/reportsUsage"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ textDecoration: 'none' }}
+                    >
+                        <h1 className="title-gradient" style={{ fontSize: '28px', cursor: 'pointer' }}>M365 Usage Analytics</h1>
+                    </a>
                     <p style={{ color: 'var(--text-dim)', fontSize: '13px' }}>Monitor resource consumption across Microsoft 365 services.</p>
                 </div>
                 <div className="flex-gap-3">
