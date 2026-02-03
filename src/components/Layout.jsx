@@ -32,6 +32,14 @@ const ServiceLayout = () => {
         }
     }, [accounts]);
 
+    // Log route changes for AI context
+    useEffect(() => {
+        const path = location.pathname;
+        let title = path.split('/').pop() || 'Dashboard';
+        title = title.charAt(0).toUpperCase() + title.slice(1);
+        SiteDataStore.logRoute(path, title);
+    }, [location]);
+
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
     // Keyboard shortcut for search (Cmd/Ctrl + K)

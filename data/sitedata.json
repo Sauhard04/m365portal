@@ -1,13 +1,468 @@
 {
-  "lastUpdated": 1770101560748,
+  "sectionKey": "birdsEye",
+  "sectionData": {
+    "data": {
+      "admin": {
+        "mailboxes": 12,
+        "activeMail": 10,
+        "domains": 5,
+        "healthIssues": 8
+      },
+      "entra": {
+        "users": 12,
+        "signin": 12,
+        "licensed": 12,
+        "guest": 2,
+        "groups": 58,
+        "securityGroups": 40,
+        "distGroups": 6,
+        "unifiedGroups": 12,
+        "admins": [
+          {
+            "name": "Global",
+            "count": 6
+          },
+          {
+            "name": "Exchange",
+            "count": 3
+          }
+        ],
+        "apps": 31,
+        "domains": 5,
+        "deletedUsers": 1,
+        "caPolicies": 1,
+        "riskyUsers": 0
+      },
+      "licenses": {
+        "purchased": 30026,
+        "assigned": 17,
+        "total": 5,
+        "topSkus": [
+          {
+            "name": "DEVELOPERPACK_E5",
+            "count": 10
+          },
+          {
+            "name": "FLOW_FREE",
+            "count": 3
+          },
+          {
+            "name": "CCIBOTS_PRIVPREV_VIRAL",
+            "count": 2
+          }
+        ]
+      },
+      "intune": {
+        "total": 0,
+        "compliant": 0,
+        "osSummary": {
+          "androidCount": 0,
+          "iosCount": 0,
+          "macOSCount": 1,
+          "windowsMobileCount": 0,
+          "windowsCount": 1,
+          "unknownCount": 0,
+          "androidDedicatedCount": 0,
+          "androidDeviceAdminCount": 0,
+          "androidFullyManagedCount": 0,
+          "androidWorkProfileCount": 0,
+          "androidCorporateWorkProfileCount": 0,
+          "configMgrDeviceCount": 0,
+          "aospUserlessCount": 0,
+          "aospUserAssociatedCount": 0,
+          "linuxCount": 0,
+          "chromeOSCount": 0
+        },
+        "entraTotal": "18",
+        "configProfiles": 8,
+        "applications": 7
+      },
+      "security": {
+        "score": 183.88,
+        "max": 283,
+        "alerts": 0,
+        "incidents": 0,
+        "failedSignins": 0
+      },
+      "collaboration": {
+        "teams": 5,
+        "privateTeams": 1,
+        "publicTeams": 4,
+        "sharepoint": 0,
+        "onedrive": 24,
+        "mailboxes": 12,
+        "activeEmail": 10
+      },
+      "purview": {
+        "labels": 0,
+        "retentionPolicies": 0,
+        "dlpPolicies": 0,
+        "dlpAlerts": 0
+      },
+      "usage": {
+        "activeUsers7d": 11,
+        "activeUsers30d": 0,
+        "storage": 57612224557
+      }
+    },
+    "timestamp": 1770102642626,
+    "source": "BirdsEyeView"
+  },
+  "tenantId": null,
   "sections": {
+    "entra_id": {
+      "data": {
+        "identities": {
+          "total": 12,
+          "trend": "Directory"
+        },
+        "groups": {
+          "count": 58,
+          "trend": "Teams"
+        },
+        "apps": {
+          "registered": 31,
+          "trend": "Registrations"
+        },
+        "enterpriseApps": {
+          "count": 41,
+          "trend": "Principals"
+        },
+        "admins": {
+          "global_count": 6,
+          "trend": "Privileged"
+        },
+        "subscriptions": {
+          "active": 5,
+          "trend": "Verified"
+        },
+        "devices": {
+          "managed": 18,
+          "trend": "Managed"
+        },
+        "compliance": {
+          "score_percentage": "65%",
+          "score_points": 183.88,
+          "max_points": 283,
+          "status": "Identity Guard"
+        }
+      },
+      "timestamp": 1770103559738,
+      "source": "EntraDashboard"
+    },
+    "entra_raw": {
+      "data": {
+        "stats": {
+          "users": {
+            "total": 12,
+            "growth": "Directory"
+          },
+          "groups": {
+            "total": 58,
+            "growth": "Teams"
+          },
+          "devices": {
+            "total": 18,
+            "managed": 7,
+            "growth": "By Intune"
+          },
+          "subs": {
+            "total": 5,
+            "growth": "Verified"
+          },
+          "admins": {
+            "total": 6,
+            "growth": "Privileged"
+          },
+          "apps": {
+            "total": 31,
+            "growth": "Registrations"
+          },
+          "enterpriseApps": {
+            "total": 41,
+            "growth": "Principals"
+          }
+        },
+        "secureScore": {
+          "current": 183.88,
+          "max": 283
+        },
+        "mfaStats": {
+          "mfaEnabled": 7,
+          "mfaDisabled": 5,
+          "risky": 1,
+          "total": 12
+        },
+        "signInTrends": [
+          {
+            "date": "20/1/2026",
+            "success": 9,
+            "failure": 2
+          },
+          {
+            "date": "21/1/2026",
+            "success": 21,
+            "failure": 9
+          },
+          {
+            "date": "22/1/2026",
+            "success": 28,
+            "failure": 0
+          },
+          {
+            "date": "23/1/2026",
+            "success": 24,
+            "failure": 5
+          },
+          {
+            "date": "24/1/2026",
+            "success": 3,
+            "failure": 0
+          },
+          {
+            "date": "25/1/2026",
+            "success": 4,
+            "failure": 0
+          },
+          {
+            "date": "27/1/2026",
+            "success": 46,
+            "failure": 6
+          },
+          {
+            "date": "28/1/2026",
+            "success": 65,
+            "failure": 2
+          },
+          {
+            "date": "29/1/2026",
+            "success": 32,
+            "failure": 14
+          },
+          {
+            "date": "30/1/2026",
+            "success": 46,
+            "failure": 15
+          },
+          {
+            "date": "31/1/2026",
+            "success": 18,
+            "failure": 1
+          },
+          {
+            "date": "2/2/2026",
+            "success": 52,
+            "failure": 13
+          },
+          {
+            "date": "3/2/2026",
+            "success": 27,
+            "failure": 26
+          }
+        ]
+      },
+      "timestamp": 1770103559741,
+      "source": "EntraDashboard_Raw"
+    },
+    "overview": {
+      "data": {
+        "quickStats": {
+          "totalUsers": 12,
+          "totalDevices": 2,
+          "totalLicenses": 17,
+          "secureScore": 183.88,
+          "maxSecureScore": 283,
+          "mfaRegistered": 0,
+          "mfaTotal": 24,
+          "activeRoles": 12
+        },
+        "charts": {
+          "serviceHealth": [
+            {
+              "name": "Operational",
+              "value": 21,
+              "color": "var(--accent-success)"
+            },
+            {
+              "name": "Issues",
+              "value": 8,
+              "color": "var(--accent-error)"
+            }
+          ],
+          "userDistribution": [
+            {
+              "name": "Active",
+              "value": 12,
+              "color": "var(--accent-success)"
+            },
+            {
+              "name": "Inactive",
+              "value": 0,
+              "color": "var(--accent-warning)"
+            }
+          ],
+          "deviceCompliance": [
+            {
+              "name": "Compliant",
+              "value": 1,
+              "color": "var(--accent-success)"
+            },
+            {
+              "name": "Non-Compliant",
+              "value": 1,
+              "color": "var(--accent-error)"
+            },
+            {
+              "name": "Not Evaluated",
+              "value": 0,
+              "color": "var(--accent-warning)"
+            }
+          ],
+          "deviceByPlatform": [
+            {
+              "name": "Windows",
+              "value": 1
+            },
+            {
+              "name": "macOS",
+              "value": 1
+            }
+          ],
+          "licenseUsage": [
+            {
+              "name": "FLOW FREE",
+              "assigned": 3,
+              "available": 9997
+            },
+            {
+              "name": "CCIBOTS PRIVPREV VIR",
+              "assigned": 2,
+              "available": 9998
+            },
+            {
+              "name": "DEVELOPERPACK E5",
+              "assigned": 10,
+              "available": 15
+            },
+            {
+              "name": "RMSBASIC",
+              "assigned": 0,
+              "available": 1
+            },
+            {
+              "name": "POWERAPPS DEV",
+              "assigned": 2,
+              "available": 9998
+            }
+          ],
+          "signIns": [
+            {
+              "name": "Last 24h",
+              "failed": 38,
+              "successful": 51
+            }
+          ],
+          "emailTrend": [
+            {
+              "name": "2026-01-26",
+              "sent": 0,
+              "received": 6
+            },
+            {
+              "name": "2026-01-27",
+              "sent": 0,
+              "received": 0
+            },
+            {
+              "name": "2026-01-28",
+              "sent": 0,
+              "received": 0
+            },
+            {
+              "name": "2026-01-29",
+              "sent": 0,
+              "received": 0
+            },
+            {
+              "name": "2026-01-30",
+              "sent": 0,
+              "received": 80
+            },
+            {
+              "name": "2026-01-31",
+              "sent": 0,
+              "received": 6
+            },
+            {
+              "name": "2026-02-01",
+              "sent": 0,
+              "received": 1
+            }
+          ],
+          "securityRadar": [
+            {
+              "subject": "Secure Score",
+              "value": 65,
+              "fullMark": 100
+            },
+            {
+              "subject": "Compliance",
+              "value": 50,
+              "fullMark": 100
+            },
+            {
+              "subject": "Active Users",
+              "value": 100,
+              "fullMark": 100
+            },
+            {
+              "subject": "License Usage",
+              "value": 38,
+              "fullMark": 100
+            },
+            {
+              "subject": "Sign-in Success",
+              "value": 57,
+              "fullMark": 100
+            }
+          ],
+          "licenseTreemap": [
+            {
+              "name": "FLOW FREE",
+              "size": 3,
+              "fill": "#3b82f6"
+            },
+            {
+              "name": "CCIBOTS PRIVPREV VIRAL",
+              "size": 2,
+              "fill": "#a855f7"
+            },
+            {
+              "name": "DEVELOPERPACK E5",
+              "size": 10,
+              "fill": "#06b6d4"
+            },
+            {
+              "name": "POWERAPPS DEV",
+              "size": 2,
+              "fill": "#f59e0b"
+            }
+          ],
+          "userGrowthTrend": [],
+          "enrollmentFunnel": [],
+          "licenseTrendComposed": []
+        }
+      },
+      "timestamp": 1770108106369,
+      "source": "OverviewDashboard"
+    },
     "birdsEye": {
       "data": {
         "admin": {
           "mailboxes": 12,
           "activeMail": 10,
           "domains": 5,
-          "healthIssues": 8
+          "healthIssues": 9
         },
         "entra": {
           "users": 12,
@@ -106,28 +561,235 @@
           "storage": 57612224557
         }
       },
-      "timestamp": 1770101560748,
+      "timestamp": 1770108097622,
       "source": "BirdsEyeView"
     },
-    "intuneStats": {
+    "mailboxes": {
       "data": {
-        "totalDevices": 2,
-        "osDistribution": {
-          "macOS": 1,
-          "Windows": 1
-        },
-        "nonCompliantDevices": 1,
-        "inactiveDevices": 1,
-        "compliantDevices": 1,
-        "inGracePeriodDevices": 0,
-        "unknownComplianceDevices": 0,
-        "compliancePolicies": 2,
-        "configProfiles": 8,
-        "mobileApps": 7,
-        "securityBaselines": 4,
-        "adminRoles": 9
+        "reports": [
+          {
+            "displayName": "anje",
+            "userPrincipalName": "anje@intunetraininglabs.onmicrosoft.com",
+            "emailAddress": "anje@intunetraininglabs.onmicrosoft.com",
+            "jobTitle": "",
+            "department": "",
+            "officeLocation": "",
+            "city": "",
+            "country": "",
+            "accountEnabled": "Yes",
+            "createdDateTime": "2026-01-28T05:33:06Z",
+            "lastActivityDate": "N/A",
+            "itemCount": 184,
+            "archivePolicy": false,
+            "mailboxSize": "0.00 GB",
+            "migrationStatus": "Cloud Native",
+            "dataMigrated": "0.00 GB"
+          },
+          {
+            "displayName": "Demo User",
+            "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+            "emailAddress": "demouser@intunetraininglabs.onmicrosoft.com",
+            "jobTitle": "Cloud engineer",
+            "department": "Tech",
+            "officeLocation": "gurugram",
+            "city": "North delhi",
+            "country": "India",
+            "accountEnabled": "Yes",
+            "createdDateTime": "2025-10-28T05:18:28Z",
+            "lastActivityDate": "2025-12-30",
+            "itemCount": 2932,
+            "archivePolicy": true,
+            "mailboxSize": "0.01 GB",
+            "migrationStatus": "Cloud Native",
+            "dataMigrated": "0.01 GB"
+          },
+          {
+            "displayName": "Dipanshu Sharma",
+            "userPrincipalName": "dipanshu.sharma_onmeridian.com#EXT#@sswari.onmicrosoft.com",
+            "emailAddress": "dipanshu.sharma@onmeridian.com",
+            "jobTitle": "",
+            "department": "",
+            "officeLocation": "",
+            "city": "",
+            "country": "",
+            "accountEnabled": "Yes",
+            "createdDateTime": "2025-12-02T09:31:49Z",
+            "lastActivityDate": "N/A",
+            "itemCount": 0,
+            "archivePolicy": false,
+            "mailboxSize": "0.00 GB",
+            "migrationStatus": "Cloud Native",
+            "dataMigrated": "N/A"
+          },
+          {
+            "displayName": "Jatin Kansal",
+            "userPrincipalName": "jatin.kansal_onmeridian.com#EXT#@sswari.onmicrosoft.com",
+            "emailAddress": "jatin.kansal@onmeridian.com",
+            "jobTitle": "",
+            "department": "",
+            "officeLocation": "",
+            "city": "",
+            "country": "",
+            "accountEnabled": "Yes",
+            "createdDateTime": "2025-11-20T05:58:34Z",
+            "lastActivityDate": "N/A",
+            "itemCount": 0,
+            "archivePolicy": false,
+            "mailboxSize": "0.00 GB",
+            "migrationStatus": "Cloud Native",
+            "dataMigrated": "N/A"
+          },
+          {
+            "displayName": "Jitesh Devnani",
+            "userPrincipalName": "jitesh@intunetraininglabs.onmicrosoft.com",
+            "emailAddress": "jitesh@intunetraininglabs.onmicrosoft.com",
+            "jobTitle": "",
+            "department": "",
+            "officeLocation": "",
+            "city": "",
+            "country": "",
+            "accountEnabled": "Yes",
+            "createdDateTime": "2025-12-03T05:52:13Z",
+            "lastActivityDate": "N/A",
+            "itemCount": 262,
+            "archivePolicy": true,
+            "mailboxSize": "0.00 GB",
+            "migrationStatus": "Cloud Native",
+            "dataMigrated": "0.00 GB"
+          },
+          {
+            "displayName": "Pilot User",
+            "userPrincipalName": "pilotuser@intunetraininglabs.onmicrosoft.com",
+            "emailAddress": "pilotuser@intunetraininglabs.onmicrosoft.com",
+            "jobTitle": "",
+            "department": "",
+            "officeLocation": "",
+            "city": "",
+            "country": "",
+            "accountEnabled": "Yes",
+            "createdDateTime": "2025-09-16T05:08:37Z",
+            "lastActivityDate": "2026-01-23",
+            "itemCount": 12147,
+            "archivePolicy": true,
+            "mailboxSize": "3.50 GB",
+            "migrationStatus": "Cloud Native",
+            "dataMigrated": "3.50 GB"
+          },
+          {
+            "displayName": "Parth Narang",
+            "userPrincipalName": "pn@intunetraininglabs.onmicrosoft.com",
+            "emailAddress": "pn@intunetraininglabs.onmicrosoft.com",
+            "jobTitle": "",
+            "department": "",
+            "officeLocation": "",
+            "city": "",
+            "country": "",
+            "accountEnabled": "Yes",
+            "createdDateTime": "2025-11-20T09:40:42Z",
+            "lastActivityDate": "N/A",
+            "itemCount": 2312,
+            "archivePolicy": false,
+            "mailboxSize": "0.01 GB",
+            "migrationStatus": "Cloud Native",
+            "dataMigrated": "0.01 GB"
+          },
+          {
+            "displayName": "PN",
+            "userPrincipalName": "PN510950@sswari.onmicrosoft.com",
+            "emailAddress": "PN510950@sswari.onmicrosoft.com",
+            "jobTitle": "",
+            "department": "",
+            "officeLocation": "",
+            "city": "",
+            "country": "",
+            "accountEnabled": "Yes",
+            "createdDateTime": "2024-04-24T06:33:25Z",
+            "lastActivityDate": "2025-11-25",
+            "itemCount": 3322,
+            "archivePolicy": true,
+            "mailboxSize": "0.01 GB",
+            "migrationStatus": "Cloud Native",
+            "dataMigrated": "0.01 GB"
+          },
+          {
+            "displayName": "sanskar dubey",
+            "userPrincipalName": "sanskar.dubey@intunetraininglabs.onmicrosoft.com",
+            "emailAddress": "sanskar.dubey@intunetraininglabs.onmicrosoft.com",
+            "jobTitle": "",
+            "department": "",
+            "officeLocation": "",
+            "city": "",
+            "country": "",
+            "accountEnabled": "Yes",
+            "createdDateTime": "2025-12-29T09:41:55Z",
+            "lastActivityDate": "N/A",
+            "itemCount": 0,
+            "archivePolicy": false,
+            "mailboxSize": "0.00 GB",
+            "migrationStatus": "Cloud Native",
+            "dataMigrated": "N/A"
+          },
+          {
+            "displayName": "User",
+            "userPrincipalName": "user@intunetraininglabs.onmicrosoft.com",
+            "emailAddress": "user@intunetraininglabs.onmicrosoft.com",
+            "jobTitle": "Senior Consultant",
+            "department": "Consulting",
+            "officeLocation": "gurugram",
+            "city": "DLF cybercity",
+            "country": "India",
+            "accountEnabled": "Yes",
+            "createdDateTime": "2025-09-08T10:33:29Z",
+            "lastActivityDate": "2025-12-13",
+            "itemCount": 5145,
+            "archivePolicy": false,
+            "mailboxSize": "0.00 GB",
+            "migrationStatus": "Cloud Native",
+            "dataMigrated": "0.00 GB"
+          },
+          {
+            "displayName": "Vishal",
+            "userPrincipalName": "Vishal@intunetraininglabs.onmicrosoft.com",
+            "emailAddress": "Vishal@intunetraininglabs.onmicrosoft.com",
+            "jobTitle": "",
+            "department": "",
+            "officeLocation": "",
+            "city": "",
+            "country": "",
+            "accountEnabled": "Yes",
+            "createdDateTime": "2026-01-09T12:05:35Z",
+            "lastActivityDate": "N/A",
+            "itemCount": 1654,
+            "archivePolicy": false,
+            "mailboxSize": "0.01 GB",
+            "migrationStatus": "Cloud Native",
+            "dataMigrated": "0.01 GB"
+          },
+          {
+            "displayName": "Vivek Kumar",
+            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+            "emailAddress": "vivek@intunetraininglabs.onmicrosoft.com",
+            "jobTitle": "",
+            "department": "",
+            "officeLocation": "",
+            "city": "",
+            "country": "India",
+            "accountEnabled": "Yes",
+            "createdDateTime": "2023-10-02T14:54:35Z",
+            "lastActivityDate": "2026-01-28",
+            "itemCount": 19534,
+            "archivePolicy": true,
+            "mailboxSize": "0.52 GB",
+            "migrationStatus": "Cloud Native",
+            "dataMigrated": "0.52 GB"
+          }
+        ],
+        "isConcealed": false,
+        "totalMailboxes": 12
       },
-      "timestamp": 1770100967617
+      "timestamp": 1770108212390,
+      "source": "ExchangeReport"
     }
-  }
+  },
+  "lastUpdated": 1770108212401
 }

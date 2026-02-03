@@ -13,6 +13,7 @@ import { CustomTooltip } from './charts/CustomTooltip';
 import Loader3D from './Loader3D';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { MiniSegmentedBar, MiniSeverityStrip, MiniSparkline, MiniProgressBar } from './charts/MicroCharts';
+import SiteDataStore from '../services/siteDataStore';
 
 const PurviewDashboard = () => {
     const navigate = useNavigate();
@@ -88,7 +89,8 @@ const PurviewDashboard = () => {
                 raw: { stats: dashboardData, assetDistribution: topAssets }
             };
 
-            await DataPersistenceService.save('Purview', persistenceData);
+            SiteDataStore.store('purview', persistenceData.purview, { source: 'PurviewDashboard' });
+            SiteDataStore.store('purview_raw', persistenceData.raw, { source: 'PurviewDashboard_Raw' });
 
             setStats(dashboardData);
             setAssetDistribution(topAssets);

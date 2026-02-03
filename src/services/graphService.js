@@ -396,8 +396,22 @@ export class GraphService {
 
     async getPurviewStats() {
         try {
+            // Sensitivity labels might fail with 403 on organization-wide endpoint for some users
+            // Try organizational first, then fallback to user-specific
+            const fetchLabels = async () => {
+                try {
+                    return await this.client.api("/security/informationProtection/sensitivityLabels").version("beta").get();
+                } catch (err) {
+                    if (err.statusCode === 403) {
+                        console.warn("Organizational labels forbidden, trying user-specific labels...");
+                        return await this.client.api("/me/security/informationProtection/sensitivityLabels").version("beta").get().catch(() => ({ value: [] }));
+                    }
+                    throw err;
+                }
+            };
+
             const [labels, retention, cases] = await Promise.all([
-                this.client.api("/security/informationProtection/sensitivityLabels").version("beta").get().catch(() => ({ value: [] })),
+                fetchLabels().catch(() => ({ value: [] })),
                 this.client.api("/security/labels/retentionLabels").version("beta").get().catch(() => ({ value: [] })),
                 this.client.api("/compliance/ediscovery/cases").version("beta").get().catch(() => ({ value: [] }))
             ]);
@@ -405,9 +419,13 @@ export class GraphService {
             // Attempt to fetch searches for the first case if any exist
             let searchCount = 0;
             if (cases.value && cases.value.length > 0) {
-                const caseId = cases.value[0].id;
-                const searches = await this.client.api(`/compliance/ediscovery/cases/${caseId}/searches`).version("beta").get().catch(() => ({ value: [] }));
-                searchCount = searches.value?.length || 0;
+                try {
+                    const caseId = cases.value[0].id;
+                    const searches = await this.client.api(`/compliance/ediscovery/cases/${caseId}/searches`).version("beta").get();
+                    searchCount = searches.value?.length || 0;
+                } catch (e) {
+                    console.debug("Could not fetch eDiscovery searches", e);
+                }
             }
 
             return {

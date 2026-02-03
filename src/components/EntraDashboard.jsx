@@ -10,6 +10,7 @@ import { Users, Shield, Smartphone, CreditCard, LayoutGrid, ArrowRight, ShieldCh
 import Loader3D from './Loader3D';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { MiniSegmentedBar, MiniSeverityStrip, MiniStatusGeneric, MiniSparkline, MiniProgressBar } from './charts/MicroCharts';
+import SiteDataStore from '../services/siteDataStore';
 
 const EntraDashboard = () => {
     const navigate = useNavigate();
@@ -111,7 +112,8 @@ const EntraDashboard = () => {
                 }
             };
 
-            await DataPersistenceService.save('EntraID_v4', persistenceData);
+            SiteDataStore.store('entra_id', persistenceData.entra_id, { source: 'EntraDashboard' });
+            SiteDataStore.store('entra_raw', persistenceData.raw, { source: 'EntraDashboard_Raw' });
 
             setStats(dashboardStats);
             setSecureScore(scoreInfo);

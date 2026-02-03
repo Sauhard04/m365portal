@@ -22,7 +22,6 @@ const ExchangeReport = () => {
 
     // Filter states
     const [archiveFilter, setArchiveFilter] = useState('all');
-    const [migrationFilter, setMigrationFilter] = useState('all');
 
 
 
@@ -35,8 +34,6 @@ const ExchangeReport = () => {
         }
         if (archiveFilter === 'enabled' && !item.archivePolicy) return false;
         if (archiveFilter === 'disabled' && item.archivePolicy) return false;
-        if (migrationFilter === 'migrated' && item.migrationStatus !== 'Migrated') return false;
-        if (migrationFilter === 'not-migrated' && item.migrationStatus === 'Migrated') return false;
         return true;
     });
 
@@ -192,11 +189,6 @@ const ExchangeReport = () => {
                             <option value="all">Archive Filter</option>
                             <option value="enabled">Enabled</option>
                             <option value="disabled">Disabled</option>
-                        </select>
-                        <select className="input" value={migrationFilter} onChange={(e) => setMigrationFilter(e.target.value)} style={{ width: '180px' }}>
-                            <option value="all">Migration Status</option>
-                            <option value="migrated">Migrated</option>
-                            <option value="not-migrated">On-Premises</option>
                         </select>
                     </div>
                 </div>

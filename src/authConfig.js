@@ -17,37 +17,7 @@ export const loginRequest = {
         "User.Read",
         "Directory.Read.All",
         "Reports.Read.All",
-        "ServiceHealth.Read.All",
-        "AuditLog.Read.All",
-        "Sites.Read.All",
-        // Security
-        "SecurityAlert.Read.All",
-        "SecurityIncident.Read.All",
-        "IdentityRiskyUser.Read.All",
-        "IdentityRiskEvent.Read.All",
-        // Governance
-        "Policy.Read.All",
-        "Agreement.Read.All",
-        "AppRoleAssignment.ReadWrite.All",
-        // SharePoint
-        "Files.Read.All",
-        // Intune
-        "DeviceManagementManagedDevices.Read.All",
-        "DeviceManagementServiceConfig.Read.All",
-        "DeviceManagementApps.Read.All",
-        "DeviceManagementConfiguration.Read.All",
-        "ThreatHunting.Read.All",
-        // Teams
-        "Team.ReadBasic.All",
-        "TeamSettings.Read.All",
-        "Group.Read.All",
-        "Chat.Read",
-        // Admin
-        "Organization.Read.All",
-        // Purview
-        "InformationProtectionPolicy.Read.All",
-        "RecordsManagement.Read.All",
-        "eDiscovery.Read.All"
+        "ServiceHealth.Read.All"
     ]
 };
 
@@ -113,7 +83,8 @@ export const adminScopes = {
 
 export const purviewScopes = {
     scopes: [
-        "InformationProtectionPolicy.Read.All",
+        "InformationProtectionPolicy.Read",
+        "SensitivityLabel.Read",
         "RecordsManagement.Read.All",
         "eDiscovery.Read.All"
     ]

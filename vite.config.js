@@ -43,11 +43,37 @@ export default defineConfig({
               req.on('data', chunk => { body += chunk.toString(); });
               req.on('end', () => {
                 try {
-                  const parsed = JSON.parse(body);
-                  const dataToSave = parsed.data || parsed;
+                  const payload = JSON.parse(body);
+                  const filename = urlParts[urlParts.length - 1].split('?')[0];
 
                   if (!fs.existsSync(path.dirname(filePath))) {
                     fs.mkdirSync(path.dirname(filePath), { recursive: true });
+                  }
+
+                  let dataToSave;
+
+                  // Special logic for sitedata.json to support partial updates
+                  if (filename === 'sitedata' && payload.sectionKey && payload.sectionData) {
+                    let currentData = { lastUpdated: Date.now(), sections: {} };
+                    if (fs.existsSync(filePath)) {
+                      try {
+                        const content = fs.readFileSync(filePath, 'utf-8');
+                        currentData = JSON.parse(content) || currentData;
+                      } catch (e) {
+                        console.error('Error reading existing sitedata', e);
+                      }
+                    }
+
+                    // Merge newest section
+                    if (!currentData.sections) currentData.sections = {};
+                    currentData.sections[payload.sectionKey] = payload.sectionData;
+                    currentData.lastUpdated = Date.now();
+                    if (payload.tenantId) currentData.tenantId = payload.tenantId;
+
+                    dataToSave = currentData;
+                  } else {
+                    // Standard overwrite for other files or full payloads
+                    dataToSave = payload.data || payload;
                   }
 
                   fs.writeFileSync(filePath, JSON.stringify(dataToSave, null, 2));
