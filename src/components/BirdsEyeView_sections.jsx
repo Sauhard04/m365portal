@@ -32,6 +32,16 @@ export const generateSections = (stats, styles) => [
                         Registered Domains
                     </div>
                 )
+            },
+            {
+                label: "User Engagement",
+                value: stats.usage.activeUsers7d,
+                path: '/service/admin/user-activity',
+                custom: (
+                    <div className={styles.statusText} style={{ color: 'var(--text-dim)', fontSize: '10px' }}>
+                        Cross-Service Activity
+                    </div>
+                )
             }
         ]
     },

@@ -63,6 +63,10 @@ import PIMRolesPage from './components/PIMRolesPage';
 // SharePoint & OneDrive Module
 import SharePointDashboard from './components/SharePointDashboard';
 import SharePointSitesPage from './components/SharePointSitesPage';
+import SiteDetailsPage from './components/SiteDetailsPage';
+import OneDrivePage from './components/OneDrivePage';
+import MessageCenterPage from './components/MessageCenterPage';
+import UserActivityReport from './components/UserActivityReport';
 
 // Teams & Collaboration Module
 import TeamsDashboard from './components/TeamsDashboard';
@@ -70,107 +74,119 @@ import TeamsListPage from './components/TeamsListPage';
 
 import { ThemeProvider } from './contexts/ThemeContext';
 
+import { SubscriptionProvider } from './contexts/SubscriptionContext';
+import SubscriptionGate from './components/SubscriptionGate';
 import PowerShellRunner from './components/PowerShellRunner';
 import BirdsEyeView from './components/BirdsEyeView';
 
 function App() {
+  console.log('[App] Rendering Root Component');
   return (
     <ThemeProvider>
-      <Router>
-        <div className="App">
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
+      <SubscriptionProvider>
+        <Router>
+          <div className="App">
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/powershell" element={<PowerShellRunner />} />
 
-            {/* Helper Route for PowerShell */}
-            <Route path="/powershell" element={<PowerShellRunner />} />
+              {/* Protected Routes Wrapper */}
+              <Route element={<ProtectedRoute />}>
+                <Route element={<SubscriptionGate />}>
+                  {/* Service Layout Wrapper */}
+                  <Route path="/service" element={<ServiceLayout />}>
+                    <Route index element={<Navigate to="overview" replace />} />
+                    <Route path="overview" element={<OverviewDashboard />} />
+                    <Route path="usage" element={<UsageReports />} />
+                    <Route path="birdseye" element={<BirdsEyeView />} />
 
-            {/* Protected Service Routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/service" element={<ServiceLayout />}>
-                {/* Overview Dashboard */}
-                <Route path="overview" element={<OverviewDashboard />} />
-                <Route path="usage" element={<UsageReports />} />
-                <Route path="birdseye" element={<BirdsEyeView />} />
+                    {/* Admin Center Routes */}
+                    <Route path="admin" element={<ServicePage serviceId="admin" />} />
+                    <Route path="admin/report" element={<ExchangeReport />} />
+                    <Route path="admin/build-commands" element={<BuildCommandsPage />} />
+                    <Route path="admin/domains" element={<DomainsPage />} />
+                    <Route path="admin/licenses" element={<LicensesPage />} />
+                    <Route path="admin/groups" element={<GroupsPage />} />
+                    <Route path="admin/deleted-users" element={<DeletedUsersPage />} />
+                    <Route path="admin/secure-score" element={<SecureScorePage />} />
+                    <Route path="admin/sign-ins" element={<SignInsPage />} />
+                    <Route path="admin/emails" element={<EmailActivityPage />} />
+                    <Route path="admin/alerts" element={<AlertsPage />} />
+                    <Route path="admin/profile" element={<UserDetailsPage />} />
+                    <Route path="admin/messages" element={<MessageCenterPage />} />
+                    <Route path="admin/user-activity" element={<UserActivityReport />} />
 
-                {/* Admin Center Routes */}
-                <Route path="admin" element={<ServicePage serviceId="admin" />} /> {/* /service/admin */}
-                <Route path="admin/report" element={<ExchangeReport />} />
-                <Route path="admin/build-commands" element={<BuildCommandsPage />} />
-                <Route path="admin/domains" element={<DomainsPage />} />
-                <Route path="admin/licenses" element={<LicensesPage />} />
-                <Route path="admin/groups" element={<GroupsPage />} />
-                <Route path="admin/deleted-users" element={<DeletedUsersPage />} />
-                <Route path="admin/secure-score" element={<SecureScorePage />} />
-                <Route path="admin/sign-ins" element={<SignInsPage />} />
-                <Route path="admin/emails" element={<EmailActivityPage />} />
-                <Route path="admin/alerts" element={<AlertsPage />} />
-                <Route path="admin/profile" element={<UserDetailsPage />} />
+                    {/* Entra ID Routes */}
+                    <Route path="entra" element={<EntraDashboard />} />
+                    <Route path="entra/users" element={<EntraUsers />} />
+                    <Route path="entra/groups" element={<EntraGroups />} />
+                    <Route path="entra/devices" element={<EntraDevices />} />
+                    <Route path="entra/subscriptions" element={<EntraSubscriptions />} />
+                    <Route path="entra/admins" element={<EntraAdmins />} />
+                    <Route path="entra/apps" element={<EntraApps />} />
+                    <Route path="entra/enterprise-apps" element={<EntraEnterpriseApps />} />
+                    <Route path="entra/sign-in-logs" element={<EntraSignInLogs />} />
 
-                {/* Entra ID Routes */}
-                <Route path="entra" element={<EntraDashboard />} />
-                <Route path="entra/users" element={<EntraUsers />} />
-                <Route path="entra/groups" element={<EntraGroups />} />
-                <Route path="entra/devices" element={<EntraDevices />} />
-                <Route path="entra/subscriptions" element={<EntraSubscriptions />} />
-                <Route path="entra/admins" element={<EntraAdmins />} />
-                <Route path="entra/apps" element={<EntraApps />} />
-                <Route path="entra/enterprise-apps" element={<EntraEnterpriseApps />} />
-                <Route path="entra/sign-in-logs" element={<EntraSignInLogs />} />
+                    {/* Intune Routes */}
+                    <Route path="intune" element={<IntuneMonitoring />} />
+                    <Route path="intune/devices" element={<IntuneManagedDevices />} />
+                    <Route path="intune/non-compliant" element={<IntuneNonCompliant />} />
+                    <Route path="intune/inactive" element={<IntuneInactiveDevices />} />
+                    <Route path="intune/compliance-policies" element={<IntuneCompliancePolicies />} />
+                    <Route path="intune/config-profiles" element={<IntuneConfigProfiles />} />
+                    <Route path="intune/applications" element={<IntuneApplications />} />
+                    <Route path="intune/security-baselines" element={<IntuneSecurityBaselines />} />
+                    <Route path="intune/user-devices" element={<IntuneUserDevices />} />
+                    <Route path="intune/rbac" element={<IntuneRBAC />} />
+                    <Route path="intune/audit-logs" element={<IntuneAuditLogs />} />
+                    <Route path="intune/reports" element={<IntuneReports />} />
 
-                {/* Intune Routes */}
-                <Route path="intune" element={<IntuneMonitoring />} />
-                <Route path="intune/devices" element={<IntuneManagedDevices />} />
-                <Route path="intune/non-compliant" element={<IntuneNonCompliant />} />
-                <Route path="intune/inactive" element={<IntuneInactiveDevices />} />
-                <Route path="intune/compliance-policies" element={<IntuneCompliancePolicies />} />
-                <Route path="intune/config-profiles" element={<IntuneConfigProfiles />} />
-                <Route path="intune/applications" element={<IntuneApplications />} />
-                <Route path="intune/security-baselines" element={<IntuneSecurityBaselines />} />
-                <Route path="intune/user-devices" element={<IntuneUserDevices />} />
-                <Route path="intune/rbac" element={<IntuneRBAC />} />
-                <Route path="intune/audit-logs" element={<IntuneAuditLogs />} />
-                <Route path="intune/reports" element={<IntuneReports />} />
+                    {/* Purview Routes */}
+                    <Route path="purview" element={<PurviewDashboard />} />
+                    <Route path="purview/catalog" element={<DataCatalogPage />} />
+                    <Route path="purview/lineage" element={<LineagePage />} />
+                    <Route path="purview/glossary" element={<GlossaryPage />} />
+                    <Route path="purview/scanning" element={<ScanningPage />} />
+                    <Route path="purview/collections" element={<CollectionsPage />} />
+                    <Route path="purview/policies" element={<PoliciesPage />} />
 
-                {/* Purview Routes */}
-                <Route path="purview" element={<PurviewDashboard />} />
-                <Route path="purview/catalog" element={<DataCatalogPage />} />
-                <Route path="purview/lineage" element={<LineagePage />} />
-                <Route path="purview/glossary" element={<GlossaryPage />} />
-                <Route path="purview/scanning" element={<ScanningPage />} />
-                <Route path="purview/collections" element={<CollectionsPage />} />
-                <Route path="purview/policies" element={<PoliciesPage />} />
+                    {/* Security Routes */}
+                    <Route path="security" element={<SecurityDashboard />} />
+                    <Route path="security/alerts" element={<SecurityAlertsPage />} />
+                    <Route path="security/incidents" element={<SecurityIncidentsPage />} />
+                    <Route path="security/risky-users" element={<RiskyUsersPage />} />
+                    <Route path="security/explorer" element={<SecurityExplorer />} />
 
-                {/* Security Routes */}
-                <Route path="security" element={<SecurityDashboard />} />
-                <Route path="security/alerts" element={<SecurityAlertsPage />} />
-                <Route path="security/incidents" element={<SecurityIncidentsPage />} />
-                <Route path="security/risky-users" element={<RiskyUsersPage />} />
-                <Route path="security/explorer" element={<SecurityExplorer />} />
+                    {/* Governance Routes */}
+                    <Route path="governance" element={<GovernanceDashboard />} />
+                    <Route path="governance/conditional-access" element={<ConditionalAccessPage />} />
+                    <Route path="governance/pim-roles" element={<PIMRolesPage />} />
 
-                {/* Governance Routes */}
-                <Route path="governance" element={<GovernanceDashboard />} />
-                <Route path="governance/conditional-access" element={<ConditionalAccessPage />} />
-                <Route path="governance/pim-roles" element={<PIMRolesPage />} />
+                    {/* SharePoint & OneDrive Routes */}
+                    <Route path="sharepoint" element={<SharePointDashboard />} />
+                    <Route path="sharepoint/sites" element={<SharePointSitesPage />} />
+                    <Route path="sharepoint/site/:siteId" element={<SiteDetailsPage />} />
+                    <Route path="sharepoint/onedrive" element={<OneDrivePage />} />
 
-                {/* SharePoint & OneDrive Routes */}
-                <Route path="sharepoint" element={<SharePointDashboard />} />
-                <Route path="sharepoint/sites" element={<SharePointSitesPage />} />
+                    {/* Teams & Collaboration Routes */}
+                    <Route path="teams" element={<TeamsDashboard />} />
+                    <Route path="teams/list" element={<TeamsListPage />} />
 
-                {/* Teams & Collaboration Routes */}
-                <Route path="teams" element={<TeamsDashboard />} />
-                <Route path="teams/list" element={<TeamsListPage />} />
+                    <Route path="documentation" element={<DocumentationPage />} />
+                    <Route path="documentation/view/:id" element={<PDFViewerPage />} />
 
-                <Route path="documentation" element={<DocumentationPage />} />
-                <Route path="documentation/view/:id" element={<PDFViewerPage />} />
-                <Route path=":serviceId" element={<ServicePage />} /> {/* generic service handler */}
-                <Route index element={<Navigate to="overview" replace />} /> {/* /service -> /service/overview */}
+                    {/* Generic Service Match */}
+                    <Route path=":serviceId" element={<ServicePage />} />
+                  </Route>
+                </Route>
               </Route>
-            </Route>
 
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
-      </Router>
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
+        </Router>
+      </SubscriptionProvider>
     </ThemeProvider>
   );
 }

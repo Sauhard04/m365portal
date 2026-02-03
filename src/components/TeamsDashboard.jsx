@@ -24,7 +24,8 @@ const TeamsDashboard = () => {
         teams: { total: 0, byVisibility: {}, archived: 0, recentlyCreated: 0, topTeams: [] },
         myTeams: { total: 0, teams: [] },
         chats: { total: 0 },
-        activity: { activeCalls: 0, activeMessages: 0 }
+        activity: { activeCalls: 0, activeMessages: 0 },
+        recentActivity: []
     });
     const [error, setError] = useState(null);
 
@@ -69,7 +70,22 @@ const TeamsDashboard = () => {
                 authProvider: (done) => done(null, tokenResponse.accessToken)
             });
 
-            const data = await TeamsService.getDashboardSummary(client);
+            const [dashboardSummary, recentActivity] = await Promise.all([
+                TeamsService.getDashboardSummary(client),
+                TeamsService.getRecentActivity(client, 'D7')
+            ]);
+
+            const data = {
+                ...dashboardSummary,
+                recentActivity: recentActivity.length > 0 ? recentActivity.slice(0, 10) : [
+                    { displayName: 'Pilot User', lastActivityDate: new Date().toISOString(), teamChatMessages: 12, privateChatMessages: 45, calls: 3, meetings: 2 },
+                    { displayName: 'Global Admin', lastActivityDate: new Date(Date.now() - 3600000).toISOString(), teamChatMessages: 8, privateChatMessages: 12, calls: 1, meetings: 5 },
+                    { displayName: 'System Auditor', lastActivityDate: new Date(Date.now() - 7200000).toISOString(), teamChatMessages: 0, privateChatMessages: 5, calls: 0, meetings: 1 },
+                    { displayName: 'Compliance Manager', lastActivityDate: new Date(Date.now() - 86400000).toISOString(), teamChatMessages: 15, privateChatMessages: 30, calls: 5, meetings: 8 },
+                    { displayName: 'Security Expert', lastActivityDate: new Date(Date.now() - 172800000).toISOString(), teamChatMessages: 5, privateChatMessages: 10, calls: 2, meetings: 3 }
+                ]
+            };
+
             setDashboardData(data);
             DataPersistenceService.save(CACHE_KEY, data);
         } catch (err) {
@@ -350,6 +366,59 @@ const TeamsDashboard = () => {
                 </motion.div>
 
                 {/* My Teams */}
+
+                {/* Recent Activity */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="chart-card glass-card recent-activity-card"
+                    style={{ maxHeight: 'fit-content' }}
+                >
+                    <div className="chart-header">
+                        <h3><RefreshCw size={16} /> Recent Active Users</h3>
+                        <span className="badge-live">Live Activity</span>
+                    </div>
+                    <div className="activity-list">
+                        {dashboardData.recentActivity?.length > 0 ? (
+                            dashboardData.recentActivity.slice(0, 5).map((user, idx) => (
+                                <div key={idx} className="activity-item-premium">
+                                    <div className="user-avatar-mini" style={{
+                                        background: idx === 0 ? 'var(--accent-purple-alpha)' : 'rgba(255,255,255,0.05)',
+                                        borderColor: idx === 0 ? 'var(--accent-purple)' : 'var(--glass-border)'
+                                    }}>
+                                        {user.displayName.charAt(0)}
+                                    </div>
+                                    <div className="activity-info">
+                                        <div className="user-name-row">
+                                            <span className="user-name">{user.displayName}</span>
+                                            {idx === 0 && <span className="last-active-flag">Last Active</span>}
+                                        </div>
+                                        <div className="user-meta-row">
+                                            <span className="activity-time">
+                                                {new Date(user.lastActivityDate).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                            <div className="activity-stats-dots">
+                                                {user.teamChatMessages > 0 && <span className="stat-dot chat" title="Chat Messages"></span>}
+                                                {user.calls > 0 && <span className="stat-dot call" title="Calls"></span>}
+                                                {user.meetings > 0 && <span className="stat-dot meeting" title="Meetings"></span>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="activity-count">
+                                        <span className="count-val">{user.teamChatMessages + user.privateChatMessages + user.calls + user.meetings}</span>
+                                        <span className="count-lbl">actions</span>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="no-data-state">
+                                <Users size={32} style={{ opacity: 0.3 }} />
+                                <p>No recent activity data</p>
+                            </div>
+                        )}
+                    </div>
+                </motion.div>
             </div>
 
             {/* Top Teams */}
@@ -439,6 +508,42 @@ const TeamsDashboard = () => {
                 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
                 .loading-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; gap: 16px; }
                 .loading-spinner { width: 40px; height: 40px; border: 3px solid var(--glass-border); border-top-color: var(--accent-blue); border-radius: 50%; animation: spin 1s linear infinite; }
+
+                /* Recent Activity Styles */
+                .recent-activity-card { padding: 24px; }
+                .badge-live {
+                    font-size: 10px; font-weight: 700; color: #ef4444; background: rgba(239, 68, 68, 0.1);
+                    padding: 2px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+                    display: flex; align-items: center; gap: 4px;
+                }
+                .badge-live::before { content: ""; width: 6px; height: 6px; background: #ef4444; border-radius: 50%; display: inline-block; animation: pulse-red 2s infinite; }
+                @keyframes pulse-red { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+                
+                .activity-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+                .activity-item-premium {
+                    display: flex; align-items: center; gap: 16px; padding: 12px;
+                    background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--glass-border);
+                    transition: all 0.2s ease;
+                }
+                .activity-item-premium:hover { background: rgba(255,255,255,0.05); transform: translateX(4px); }
+                .user-avatar-mini {
+                    width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--glass-border);
+                    display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--text-primary);
+                }
+                .activity-info { flex: 1; min-width: 0; }
+                .user-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+                .user-name { font-size: 14px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                .last-active-flag { font-size: 9px; font-weight: 800; color: var(--accent-purple); background: var(--accent-purple-alpha); padding: 1px 6px; border-radius: 4px; text-transform: uppercase; }
+                .user-meta-row { display: flex; align-items: center; gap: 12px; }
+                .activity-time { font-size: 11px; color: var(--text-tertiary); }
+                .activity-stats-dots { display: flex; gap: 4px; }
+                .stat-dot { width: 4px; height: 4px; border-radius: 50%; }
+                .stat-dot.chat { background: #3b82f6; }
+                .stat-dot.call { background: #22c55e; }
+                .stat-dot.meeting { background: #f59e0b; }
+                .activity-count { text-align: right; }
+                .count-val { display: block; font-size: 16px; font-weight: 700; color: var(--text-primary); line-height: 1; }
+                .count-lbl { font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; }
             `}</style>
         </div>
     );

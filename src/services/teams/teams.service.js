@@ -192,6 +192,39 @@ export const TeamsService = {
                 activity: { activeCalls: 0, activeMessages: 0 }
             };
         }
+    },
+
+    /**
+     * Get recent active users in Teams
+     * @param {Client} client - Microsoft Graph client
+     * @param {string} period - Report period (D7, D30)
+     */
+    async getRecentActivity(client, period = 'D7') {
+        try {
+            // Using beta endpoint via the client for JSON format
+            const response = await client.api(`/reports/getTeamsUserActivityUserDetail(period='${period}')`)
+                .version('beta')
+                .get();
+
+            if (response && response.value) {
+                return response.value.map(item => ({
+                    userPrincipalName: item.userPrincipalName,
+                    displayName: item.displayName || item.userPrincipalName?.split('@')[0] || 'Unknown User',
+                    lastActivityDate: item.lastActivityDate,
+                    teamChatMessages: parseInt(item.teamChatMessageCount) || 0,
+                    privateChatMessages: parseInt(item.privateChatMessageCount) || 0,
+                    calls: parseInt(item.callCount) || 0,
+                    meetings: parseInt(item.meetingCount) || 0,
+                    hasActivity: !!item.lastActivityDate
+                }))
+                    .filter(u => u.hasActivity)
+                    .sort((a, b) => new Date(b.lastActivityDate) - new Date(a.lastActivityDate));
+            }
+            return [];
+        } catch (error) {
+            console.error('Teams recent activity fetch failed:', error);
+            return [];
+        }
     }
 };
 

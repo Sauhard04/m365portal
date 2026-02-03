@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     ShieldCheck, Smartphone, Lock,
-    LayoutDashboard, Radar
+    LayoutDashboard, Radar, Activity
 } from 'lucide-react';
 
 const Sidebar = ({ isSidebarOpen }) => {
@@ -34,6 +34,13 @@ const Sidebar = ({ isSidebarOpen }) => {
                         active={isActive('/service/admin')}
                         isOpen={isSidebarOpen}
                         onClick={() => navigate('/service/admin')}
+                    />
+                    <SidebarItem
+                        icon={Activity}
+                        label="User Activity"
+                        active={isActive('/service/admin/user-activity')}
+                        isOpen={isSidebarOpen}
+                        onClick={() => navigate('/service/admin/user-activity')}
                     />
                 </div>
 

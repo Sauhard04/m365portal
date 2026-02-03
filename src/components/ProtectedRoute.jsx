@@ -6,6 +6,7 @@ import Loader3D from './Loader3D';
 
 const ProtectedRoute = () => {
     const { accounts, inProgress } = useMsal();
+    console.log('[ProtectedRoute] Auth Status:', { accountCount: accounts.length, inProgress });
 
     // Check if authentication interaction is in progress
     if (inProgress !== InteractionStatus.None && accounts.length === 0) {

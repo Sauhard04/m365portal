@@ -7,6 +7,7 @@ import { executeExchangeJobSync } from '../jobs/exchange.sync.ts';
 import { listAudits } from '../shared/logging/exchangeAudit.ts';
 import connectDB from './config/db.ts';
 import { PowerShellService } from '../services/powerShell.service.ts';
+import { subscriptionGuard } from './middleware/subscriptionGuard.ts';
 
 import { fileURLToPath } from 'url';
 
@@ -72,7 +73,7 @@ app.get('/health', (_req, res) => res.json({ status: 'ok' }));
  * Enqueue and execute Get-OrganizationConfig synchronously (no BullMQ needed)
  * Returns result immediately
  */
-app.post('/api/jobs/org-config', async (_req, res) => {
+app.post('/api/jobs/org-config', subscriptionGuard, async (_req, res) => {
     try {
         const result = await executeExchangeJobSync({ action: 'Get-OrganizationConfig' });
         res.json(result);
@@ -96,7 +97,7 @@ app.get('/api/audits', async (req, res) => {
  * POST /api/script/run
  * Body: { "command": "Get-Date" }
  */
-app.post('/api/script/run', async (req, res) => {
+app.post('/api/script/run', subscriptionGuard, async (req, res) => {
     try {
         const { command, token, tokenType, organization, userUpn } = req.body;
         if (!command) {
@@ -135,7 +136,7 @@ app.post('/api/script/reset', (_req, res) => {
  */
 
 // Save site data to sitedata.json (supports full overwrite or partial section update)
-app.post('/api/sitedata/save', async (req, res) => {
+app.post('/api/sitedata/save', subscriptionGuard, async (req, res) => {
     try {
         const body = req.body;
         if (!body) {

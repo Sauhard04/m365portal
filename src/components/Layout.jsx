@@ -24,10 +24,13 @@ const ServiceLayout = () => {
 
     // Initialize SiteDataStore from server/localStorage
     useEffect(() => {
-        SiteDataStore.ensureInitialized().then(() => {
-            console.log('SiteDataStore initialized in Layout');
-        });
-    }, []);
+        if (accounts && accounts.length > 0) {
+            const tenantId = accounts[0].tenantId || accounts[0].homeAccountId?.split('.')[1];
+            SiteDataStore.ensureInitialized(tenantId).then(() => {
+                console.log('SiteDataStore initialized in Layout for tenant:', tenantId);
+            });
+        }
+    }, [accounts]);
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
@@ -120,9 +123,16 @@ const ServiceLayout = () => {
                     <NavItem
                         icon={LayoutDashboard}
                         label="Admin Center"
-                        active={isActive('/service/admin')}
+                        active={location.pathname === '/service/admin' || (location.pathname.startsWith('/service/admin/') && location.pathname !== '/service/admin/user-activity')}
                         isOpen={isSidebarOpen}
                         onClick={() => navigate('/service/admin')}
+                    />
+                    <NavItem
+                        icon={Activity}
+                        label="User Activity"
+                        active={location.pathname === '/service/admin/user-activity'}
+                        isOpen={isSidebarOpen}
+                        onClick={() => navigate('/service/admin/user-activity')}
                     />
                     <NavItem
                         icon={ShieldCheck}

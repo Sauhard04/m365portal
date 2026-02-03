@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Terminal, Play, RotateCcw, AlertTriangle, ExternalLink, Loader2, Info, CheckCircle2, XCircle } from 'lucide-react';
+import { useSubscription } from '../contexts/SubscriptionContext';
 
 const PowerShellRunner = () => {
     const [command, setCommand] = useState('Get-Date');
@@ -9,6 +10,7 @@ const PowerShellRunner = () => {
     const [loading, setLoading] = useState(false);
     const [statusMessage, setStatusMessage] = useState('Idle');
     const [workflowUrl, setWorkflowUrl] = useState('');
+    const { tenantId, setIsExpired } = useSubscription();
 
     const runScript = async () => {
         setLoading(true);
@@ -20,18 +22,29 @@ const PowerShellRunner = () => {
         // Start polling for live status
         const pollInterval = setInterval(async () => {
             try {
-                const res = await fetch('http://localhost:4000/api/script/peek');
+                const res = await fetch('/api/script/peek', {
+                    headers: { 'X-Tenant-Id': tenantId }
+                });
                 const data = await res.json();
                 if (data.stdout) setStatusMessage(data.stdout);
             } catch (e) { /* ignore */ }
         }, 3000);
 
         try {
-            const response = await fetch('http://localhost:4000/api/script/run', {
+            const response = await fetch('/api/script/run', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ command }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Tenant-Id': tenantId
+                },
+                body: JSON.stringify({ command, tenantId }),
             });
+
+            if (response.status === 402) {
+                setIsExpired(true);
+                clearInterval(pollInterval);
+                return;
+            }
 
             const data = await response.json();
             clearInterval(pollInterval);
@@ -56,7 +69,10 @@ const PowerShellRunner = () => {
 
     const resetSession = async () => {
         try {
-            await fetch('http://localhost:4000/api/script/reset', { method: 'POST' });
+            await fetch('/api/script/reset', {
+                method: 'POST',
+                headers: { 'X-Tenant-Id': tenantId }
+            });
             setOutput('');
             setError('');
             setStatusMessage('Idle');
@@ -148,8 +164,8 @@ const PowerShellRunner = () => {
                                     onClick={runScript}
                                     disabled={loading}
                                     className={`flex items-center gap-2 px-8 py-3 rounded-xl font-bold transition-all ${loading
-                                            ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                                            : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/40 hover:scale-[1.02] active:scale-[0.98]'
+                                        ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                                        : 'bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/40 hover:scale-[1.02] active:scale-[0.98]'
                                         }`}
                                 >
                                     {loading ? 'Executing...' : (

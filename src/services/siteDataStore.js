@@ -5,14 +5,14 @@ let initPromise = null;
 /**
  * Initialize or load the data store
  */
-export async function ensureInitialized() {
+export async function ensureInitialized(tenantId = null) {
     if (initPromise) return initPromise;
 
     initPromise = (async () => {
         if (!memoryCache) {
             initStore();
         }
-        await syncWithServer();
+        await syncWithServer(tenantId);
         return memoryCache;
     })();
 
@@ -44,9 +44,12 @@ function initStore() {
 /**
  * Sync with server-side sitedata.json
  */
-async function syncWithServer() {
+async function syncWithServer(tenantId = null) {
     try {
-        const response = await fetch('/api/data/sitedata');
+        const headers = {};
+        if (tenantId) headers['X-Tenant-Id'] = tenantId;
+
+        const response = await fetch('/api/data/sitedata', { headers });
         if (response.ok) {
             const serverData = await response.json();
             if (serverData && serverData.sections) {
@@ -81,24 +84,28 @@ function saveLocally() {
     }
 }
 
-const persistToServer = async (sectionKey = null, sectionData = null) => {
+const persistToServer = async (sectionKey = null, sectionData = null, tenantId = null) => {
     try {
         let payload;
         if (sectionKey && sectionData) {
             // Partial update: only send the changed section
             payload = {
                 sectionKey,
-                sectionData
+                sectionData,
+                tenantId // Also send in body as fallback
             };
         } else {
             // Fallback: send everything if no specific section is provided
             if (!memoryCache) return;
-            payload = memoryCache;
+            payload = { ...memoryCache, tenantId };
         }
+
+        const headers = { 'Content-Type': 'application/json' };
+        if (tenantId) headers['X-Tenant-Id'] = tenantId;
 
         const response = await fetch('/api/data/sitedata', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify(payload)
         });
 
@@ -118,7 +125,7 @@ const persistToServer = async (sectionKey = null, sectionData = null) => {
  * @param {any} data - The data to store
  * @param {object} metadata - Optional metadata (source, period, etc.)
  */
-export function store(sectionKey, data, metadata = {}) {
+export function store(sectionKey, data, metadata = {}, tenantId = null) {
     const store = initStore();
 
     const section = {
@@ -132,7 +139,7 @@ export function store(sectionKey, data, metadata = {}) {
     saveLocally();
 
     // Asynchronously persist ONLY this section to server to avoid 413 (Payload Too Large)
-    persistToServer(sectionKey, section);
+    persistToServer(sectionKey, section, tenantId);
 }
 
 /**

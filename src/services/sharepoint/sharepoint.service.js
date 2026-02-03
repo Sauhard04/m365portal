@@ -5,16 +5,30 @@ export const SharePointService = {
      * Get all SharePoint sites
      * @param {Client} client - Microsoft Graph client
      */
-    async getSites(client, top = 100) {
+    async getSites(client, top = 999) {
         try {
+            // Try broad search first
             const response = await client.api('/sites')
                 .query({ search: '*' })
                 .select('id,displayName,name,webUrl,createdDateTime,lastModifiedDateTime')
                 .top(top)
                 .get();
-            return response.value || [];
+
+            let sites = response.value || [];
+
+            // If no sites found via search, try getting the root site as a last resort
+            if (sites.length === 0) {
+                try {
+                    const root = await client.api('/sites/root').get();
+                    if (root) sites = [root];
+                } catch (e) {
+                    console.warn('Root site fallback failed');
+                }
+            }
+
+            return sites;
         } catch (error) {
-            console.warn('Sites fetch failed:', error);
+            console.error('Sites fetch failed:', error);
             return [];
         }
     },
@@ -30,7 +44,7 @@ export const SharePointService = {
                 .get();
             return response;
         } catch (error) {
-            console.warn('Root site fetch failed:', error);
+            console.error('Root site fetch failed:', error);
             return null;
         }
     },
@@ -47,7 +61,7 @@ export const SharePointService = {
                 .get();
             return response;
         } catch (error) {
-            console.warn('Site fetch failed:', error);
+            console.error('Site fetch failed:', error);
             return null;
         }
     },
@@ -65,7 +79,7 @@ export const SharePointService = {
                 .get();
             return response.value || [];
         } catch (error) {
-            console.warn('Site lists fetch failed:', error);
+            console.error('Site lists fetch failed:', error);
             return [];
         }
     },
@@ -78,11 +92,11 @@ export const SharePointService = {
         try {
             const response = await client.api('/drives')
                 .select('id,name,driveType,owner,quota,webUrl,createdDateTime')
-                .top(100)
+                .top(999)
                 .get();
             return response.value || [];
         } catch (error) {
-            console.warn('Drives fetch failed:', error);
+            console.error('Drives fetch failed:', error);
             return [];
         }
     },
@@ -98,7 +112,7 @@ export const SharePointService = {
                 .get();
             return response;
         } catch (error) {
-            console.warn('My drive fetch failed:', error);
+            console.error('My drive fetch failed:', error);
             return null;
         }
     },
@@ -116,7 +130,7 @@ export const SharePointService = {
                 .get();
             return response.value || [];
         } catch (error) {
-            console.warn('Drive items fetch failed:', error);
+            console.error('Drive items fetch failed:', error);
             return [];
         }
     },
@@ -127,11 +141,28 @@ export const SharePointService = {
      */
     async getSharePointUsage(client) {
         try {
+            // Reports return CSV, ensure we get it as text
             const response = await client.api('/reports/getSharePointSiteUsageDetail(period=\'D7\')')
+                .responseType('text')
                 .get();
-            return response;
+
+            if (typeof response === 'string' && response.trim()) {
+                const data = this.parseCSV(response);
+                if (data.length === 0) return null;
+
+                return data.reduce((acc, site) => {
+                    acc.totalSites++;
+                    // Header names can sometimes vary slightly, check common variations
+                    const used = parseInt(site['Storage Used (Byte)'] || site['Storage Used (Bytes)']) || 0;
+                    const quota = parseInt(site['Storage Quota (Byte)'] || site['Storage Quota (Bytes)']) || 0;
+                    acc.used += used;
+                    acc.quota += quota;
+                    return acc;
+                }, { totalSites: 0, used: 0, quota: 0 });
+            }
+            return null;
         } catch (error) {
-            console.warn('SharePoint usage report failed:', error);
+            console.error('SharePoint usage report failed:', error);
             return null;
         }
     },
@@ -143,10 +174,29 @@ export const SharePointService = {
     async getOneDriveUsage(client) {
         try {
             const response = await client.api('/reports/getOneDriveUsageAccountDetail(period=\'D7\')')
+                .responseType('text')
                 .get();
-            return response;
+
+            if (typeof response === 'string' && response.trim()) {
+                const data = this.parseCSV(response);
+                if (data.length === 0) return null;
+
+                return data.reduce((acc, user) => {
+                    const hasOD = user['Has OneDrive'] || user['Has OneDrive Enabled'];
+                    if (hasOD === 'Yes' || hasOD === 'True' || hasOD === true) {
+                        acc.totalAccounts++;
+                        acc.totalFiles += parseInt(user['File Count']) || 0;
+                        const used = parseInt(user['Storage Used (Byte)'] || user['Storage Used (Bytes)']) || 0;
+                        const quota = parseInt(user['Storage Quota (Byte)'] || user['Storage Quota (Bytes)']) || 0;
+                        acc.used += used;
+                        acc.quota += quota;
+                    }
+                    return acc;
+                }, { totalAccounts: 0, totalFiles: 0, used: 0, quota: 0 });
+            }
+            return null;
         } catch (error) {
-            console.warn('OneDrive usage report failed:', error);
+            console.error('OneDrive usage report failed:', error);
             return null;
         }
     },
@@ -162,7 +212,7 @@ export const SharePointService = {
             const lists = await this.getSiteLists(client, siteId);
             return lists.filter(list => list.permissions?.some(p => p.link?.scope === 'anonymous'));
         } catch (error) {
-            console.warn('External sharing analysis failed:', error);
+            console.error('External sharing analysis failed:', error);
             return [];
         }
     },
@@ -174,7 +224,7 @@ export const SharePointService = {
     async getDashboardSummary(client) {
         try {
             const [sites, rootSite, drives, myDrive] = await Promise.all([
-                this.getSites(client, 200),
+                this.getSites(client, 999),
                 this.getRootSite(client),
                 this.getDrives(client),
                 this.getMyDrive(client)
@@ -230,6 +280,175 @@ export const SharePointService = {
                 storage: { totalGB: 0, usedGB: 0, percentUsed: 0 },
                 myDrive: null
             };
+        }
+    },
+
+    /**
+     * Get all OneDrive accounts in the organization
+     * @param {Client} client - Microsoft Graph client
+     */
+    async getOneDriveAccounts(client) {
+        try {
+            const drives = await this.getDrives(client);
+            const personalDrives = drives.filter(d => d.driveType === 'personal');
+
+            return personalDrives.map(drive => ({
+                id: drive.id,
+                owner: drive.owner?.user?.displayName || 'Unknown',
+                email: drive.owner?.user?.email || drive.owner?.user?.userPrincipalName || 'N/A',
+                usedGB: Math.round((drive.quota?.used || 0) / (1024 * 1024 * 1024)),
+                totalGB: Math.round((drive.quota?.total || 0) / (1024 * 1024 * 1024)),
+                percentUsed: drive.quota?.total ? Math.round((drive.quota.used / drive.quota.total) * 100) : 0,
+                webUrl: drive.webUrl,
+                createdDateTime: drive.createdDateTime
+            }));
+        } catch (error) {
+            console.error('OneDrive accounts fetch failed:', error);
+            return [];
+        }
+    },
+
+    /**
+     * Get detailed site information
+     * @param {Client} client - Microsoft Graph client
+     * @param {string} siteId - Site ID
+     */
+    async getSiteDetails(client, siteId) {
+        try {
+            const [site, drives, lists] = await Promise.all([
+                this.getSiteById(client, siteId),
+                client.api(`/sites/${siteId}/drives`)
+                    .select('id,name,driveType,quota,webUrl')
+                    .get()
+                    .then(res => res.value || [])
+                    .catch(() => []),
+                this.getSiteLists(client, siteId)
+            ]);
+
+            // Calculate total storage from drives
+            const totalStorage = drives.reduce((acc, drive) => {
+                if (drive.quota?.used) acc.used += drive.quota.used;
+                if (drive.quota?.total) acc.total += drive.quota.total;
+                return acc;
+            }, { used: 0, total: 0 });
+
+            return {
+                site,
+                drives: drives.map(d => ({
+                    ...d,
+                    usedGB: Math.round((d.quota?.used || 0) / (1024 * 1024 * 1024)),
+                    totalGB: Math.round((d.quota?.total || 0) / (1024 * 1024 * 1024))
+                })),
+                lists: lists.slice(0, 10), // Limit to 10 lists
+                storage: {
+                    usedGB: Math.round(totalStorage.used / (1024 * 1024 * 1024)),
+                    totalGB: Math.round(totalStorage.total / (1024 * 1024 * 1024)),
+                    percentUsed: totalStorage.total ? Math.round((totalStorage.used / totalStorage.total) * 100) : 0
+                }
+            };
+        } catch (error) {
+            console.error('Site details fetch failed:', error);
+            return {
+                site: null,
+                drives: [],
+                lists: [],
+                storage: { usedGB: 0, totalGB: 0, percentUsed: 0 }
+            };
+        }
+    },
+
+    /**
+     * Helper to parse CSV from Graph reports
+     */
+    parseCSV(csv) {
+        if (!csv || typeof csv !== 'string') return [];
+        // Handle BOM if present
+        const cleanCSV = csv.startsWith('\uFEFF') ? csv.substring(1) : csv;
+        const lines = cleanCSV.split(/\r?\n/).filter(line => line.trim() !== '');
+        if (lines.length < 2) return [];
+
+        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+        return lines.slice(1).map(line => {
+            // Improved split to handle values with commas inside quotes if needed
+            // But for these reports, simple split is usually okay.
+            const values = line.split(',').map(v => v.trim().replace(/"/g, ''));
+            const obj = {};
+            headers.forEach((header, i) => {
+                obj[header] = values[i] || null;
+            });
+            return obj;
+        });
+    },
+
+    /**
+     * Get OneDrive active accounts usage report
+     * @param {Client} client - Microsoft Graph client
+     * @param {string} period - Report period (D7, D30, D90, D180)
+     */
+    async getOneDriveActivity(client, period = 'D30') {
+        try {
+            const response = await client.api(`/reports/getOneDriveUsageAccountCounts(period='${period}')`)
+                .responseType('text')
+                .get();
+
+            if (typeof response === 'string' && response.trim()) {
+                const data = this.parseCSV(response);
+                return data.map(item => ({
+                    date: item['Report Refresh Date'] || item['Refresh Date'],
+                    active: parseInt(item['Active']) || 0,
+                    total: parseInt(item['Total']) || 0
+                })).filter(i => i.date).sort((a, b) => new Date(a.date) - new Date(b.date));
+            }
+            return Array.isArray(response) ? response : null;
+        } catch (error) {
+            console.error('OneDrive activity report failed:', error);
+            return null;
+        }
+    },
+
+    /**
+     * Get OneDrive file activity report
+     * @param {Client} client - Microsoft Graph client
+     * @param {string} period - Report period (D7, D30, D90, D180)
+     */
+    async getOneDriveFileActivity(client, period = 'D30') {
+        try {
+            const response = await client.api(`/reports/getOneDriveActivityFileCounts(period='${period}')`)
+                .responseType('text')
+                .get();
+
+            if (typeof response === 'string' && response.trim()) {
+                const data = this.parseCSV(response);
+                return data.map(item => ({
+                    date: item['Report Refresh Date'] || item['Refresh Date'],
+                    viewed: parseInt(item['Viewed Or Edited'] || item['Viewed or Edited']) || 0,
+                    synced: parseInt(item['Synced']) || 0,
+                    sharedInternally: parseInt(item['Shared Internally']) || 0,
+                    sharedExternally: parseInt(item['Shared Externally']) || 0
+                })).filter(i => i.date).sort((a, b) => new Date(a.date) - new Date(b.date));
+            }
+            return Array.isArray(response) ? response : null;
+        } catch (error) {
+            console.error('OneDrive file activity report failed:', error);
+            return null;
+        }
+    },
+
+    /**
+     * Get Service Health Messages (Message Center)
+     * @param {Client} client - Microsoft Graph client
+     */
+    async getServiceMessages(client) {
+        try {
+            const response = await client.api('/admin/serviceAnnouncement/messages')
+                .top(5)
+                .select('id,title,startDateTime,lastModifiedDateTime,category,details')
+                .orderby('lastModifiedDateTime desc')
+                .get();
+            return response.value || [];
+        } catch (error) {
+            console.error('Service messages fetch failed:', error);
+            return [];
         }
     }
 };
