@@ -188,20 +188,20 @@ const UserActivityReport = () => {
             {/* Header */}
             <div className="flex-between spacing-v-8">
                 <div className="header-left">
-                    <button className="glass-btn btn-back-nav" onClick={() => navigate('/service/admin')}>
-                        <ArrowLeft size={18} />
+                    <button className="btn-back" onClick={() => navigate('/service/admin')} style={{ marginBottom: 0 }}>
+                        <ArrowLeft size={16} />
                         Admin Center
                     </button>
-                    <div style={{ marginLeft: '12px' }}>
+                    <div style={{ marginLeft: '16px' }}>
                         <h1 className="title-gradient" style={{ fontSize: '32px', margin: 0 }}>Cross-Service Activity</h1>
                         <p style={{ color: 'var(--text-dim)', fontSize: '14px', margin: 0 }}>User engagement across Microsoft 365 workloads</p>
                     </div>
                 </div>
                 <div className="flex-gap-2">
-                    <button onClick={() => fetchActivityData(true)} disabled={refreshing} className="glass-btn" title="Refresh Data">
-                        <RefreshCw size={16} className={refreshing ? 'spin' : ''} />
+                    <button onClick={() => fetchActivityData(true)} disabled={refreshing} className={`sync-btn ${refreshing ? 'spinning' : ''}`} title="Refresh Data">
+                        <RefreshCw size={16} />
                     </button>
-                    <button onClick={downloadCSV} className="glass-btn btn-primary-glass">
+                    <button onClick={downloadCSV} className="btn btn-primary" style={{ padding: '8px 20px', fontSize: '13px' }}>
                         <Download size={16} /> Export CSV
                     </button>
                 </div>
@@ -368,7 +368,7 @@ const UserActivityReport = () => {
                 .filters-card { display: flex; gap: 24px; padding: 24px; border-radius: 16px; align-items: center; position: relative; }
                 .search-box-premium {
                     flex: 1; display: flex; align-items: center; gap: 12px; padding: 14px 20px;
-                    background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--glass-border);
+                    background: var(--glass-bg); border-radius: 12px; border: 1px solid var(--glass-border);
                 }
                 .search-box-premium input { background: none; border: none; color: var(--text-primary); outline: none; width: 100%; font-size: 14px; }
                 
@@ -384,17 +384,17 @@ const UserActivityReport = () => {
                 .matrix-container { padding: 0; border-radius: 20px; overflow: hidden; position: relative; border: 1px solid var(--glass-border); }
                 .matrix-container::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: linear-gradient(to top, rgba(0,0,0,0.2), transparent); pointer-events: none; }
                 .table-wrapper { overflow-x: auto; max-height: 600px; overflow-y: auto; }
-                .matrix-table { width: 100%; border-collapse: separate; border-spacing: 0; background: rgba(0,0,0,0.1); }
+                .matrix-table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--glass-bg); }
                 .matrix-table th {
-                    text-align: left; padding: 20px; background: #1a1f2e;
+                    text-align: left; padding: 20px; background: var(--bg-light);
                     color: var(--text-tertiary); font-size: 11px; font-weight: 700; text-transform: uppercase;
                     border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 10;
                 }
                 .matrix-table th.sortable { cursor: pointer; }
-                .matrix-table th.sortable:hover { background: #252b3d; color: var(--text-primary); }
+                .matrix-table th.sortable:hover { background: var(--glass-bg-hover); color: var(--text-primary); }
                 .header-icon-cell { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
                 .matrix-table td { padding: 16px 20px; border-bottom: 1px solid var(--glass-border); vertical-align: middle; background: rgba(255,255,255,0.01); }
-                .matrix-table tr:hover td { background: rgba(255,255,255,0.03); }
+                .matrix-table tr:hover td { background: var(--glass-bg-hover); }
                 
                 .user-info-cell { display: flex; align-items: center; gap: 12px; }
                 .user-avatar-glow {
@@ -416,7 +416,7 @@ const UserActivityReport = () => {
 
                 .overall-activity { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); background: rgba(255,255,255,0.02); padding: 6px 12px; border-radius: 8px; width: fit-content; }
                 
-                .matrix-legend { display: flex; gap: 24px; padding: 16px 20px; background: rgba(0,0,0,0.1); border-top: 1px solid var(--glass-border); }
+                .matrix-legend { display: flex; gap: 24px; padding: 16px 20px; background: var(--glass-bg); border-top: 1px solid var(--glass-border); }
                 .legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-tertiary); font-weight: 500; }
 
                 .no-data-matrix { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px; color: var(--text-tertiary); gap: 16px; }
