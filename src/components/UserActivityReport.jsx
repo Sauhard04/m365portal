@@ -391,7 +391,7 @@ const UserActivityReport = () => {
                     border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 10;
                 }
                 .matrix-table th.sortable { cursor: pointer; }
-                .matrix-table th.sortable:hover { background: var(--glass-bg-hover); color: var(--text-primary); }
+                .matrix-table th.sortable:hover { background: var(--bg-light); box-shadow: inset 0 0 0 1000px var(--glass-bg-hover); color: var(--text-primary); }
                 .header-icon-cell { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
                 .matrix-table td { padding: 16px 20px; border-bottom: 1px solid var(--glass-border); vertical-align: middle; background: rgba(255,255,255,0.01); }
                 .matrix-table tr:hover td { background: var(--glass-bg-hover); }
