@@ -1,24 +1,112 @@
 {
-  "sectionKey": "intuneStats",
+  "sectionKey": "birdsEye",
   "sectionData": {
     "data": {
-      "totalDevices": 2,
-      "osDistribution": {
-        "macOS": 1,
-        "Windows": 1
+      "admin": {
+        "mailboxes": 12,
+        "activeMail": 10,
+        "domains": 5,
+        "healthIssues": 8
       },
-      "nonCompliantDevices": 1,
-      "inactiveDevices": 1,
-      "compliantDevices": 1,
-      "inGracePeriodDevices": 0,
-      "unknownComplianceDevices": 0,
-      "compliancePolicies": 2,
-      "configProfiles": 8,
-      "mobileApps": 7,
-      "securityBaselines": 4,
-      "adminRoles": 9
+      "entra": {
+        "users": 12,
+        "signin": 12,
+        "licensed": 12,
+        "guest": 2,
+        "groups": 58,
+        "securityGroups": 40,
+        "distGroups": 6,
+        "unifiedGroups": 12,
+        "admins": [
+          {
+            "name": "Global",
+            "count": 6
+          },
+          {
+            "name": "Exchange",
+            "count": 3
+          }
+        ],
+        "apps": 31,
+        "domains": 5,
+        "deletedUsers": 1,
+        "caPolicies": 1,
+        "riskyUsers": 0
+      },
+      "licenses": {
+        "purchased": 30026,
+        "assigned": 17,
+        "total": 5,
+        "topSkus": [
+          {
+            "name": "DEVELOPERPACK_E5",
+            "count": 10
+          },
+          {
+            "name": "FLOW_FREE",
+            "count": 3
+          },
+          {
+            "name": "CCIBOTS_PRIVPREV_VIRAL",
+            "count": 2
+          }
+        ]
+      },
+      "intune": {
+        "total": 0,
+        "compliant": 0,
+        "osSummary": {
+          "androidCount": 0,
+          "iosCount": 0,
+          "macOSCount": 1,
+          "windowsMobileCount": 0,
+          "windowsCount": 1,
+          "unknownCount": 0,
+          "androidDedicatedCount": 0,
+          "androidDeviceAdminCount": 0,
+          "androidFullyManagedCount": 0,
+          "androidWorkProfileCount": 0,
+          "androidCorporateWorkProfileCount": 0,
+          "configMgrDeviceCount": 0,
+          "aospUserlessCount": 0,
+          "aospUserAssociatedCount": 0,
+          "linuxCount": 0,
+          "chromeOSCount": 0
+        },
+        "entraTotal": "18",
+        "configProfiles": 8,
+        "applications": 7
+      },
+      "security": {
+        "score": 183.88,
+        "max": 283,
+        "alerts": 0,
+        "incidents": 0,
+        "failedSignins": 0
+      },
+      "collaboration": {
+        "teams": 5,
+        "privateTeams": 1,
+        "publicTeams": 4,
+        "sharepoint": 0,
+        "onedrive": 24,
+        "mailboxes": 12,
+        "activeEmail": 10
+      },
+      "purview": {
+        "labels": 0,
+        "retentionPolicies": 0,
+        "dlpPolicies": 0,
+        "dlpAlerts": 4
+      },
+      "usage": {
+        "activeUsers7d": 11,
+        "activeUsers30d": 0,
+        "storage": 57612224557
+      }
     },
-    "timestamp": 1770100967617
+    "timestamp": 1770102569921,
+    "source": "BirdsEyeView"
   },
   "tenantId": null
 }

@@ -10,6 +10,9 @@ import {
     Zap, TrendingUp, Info
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from 'recharts';
 
 const UserActivityReport = () => {
     const navigate = useNavigate();
@@ -21,7 +24,9 @@ const UserActivityReport = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [sortConfig, setSortConfig] = useState({ key: 'displayName', direction: 'asc' });
     const [lastRefreshed, setLastRefreshed] = useState(null);
+    const [dataFreshness, setDataFreshness] = useState(null);
     const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, highlyEngaged: 0 });
+    const [trendData, setTrendData] = useState([]);
 
     const fetchActivityData = async (isManual = false) => {
         if (isManual) setRefreshing(true);
@@ -37,8 +42,11 @@ const UserActivityReport = () => {
             });
 
             const usageService = new UsageService(tokenResponse.accessToken);
-            // Using the unified report endpoint which covers multiple services
-            const data = await usageService.getOffice365ActiveUserDetail('D7');
+            // Fetch multiple data points in parallel
+            const [data, trend] = await Promise.all([
+                usageService.getOffice365ActiveUserDetail('D7'),
+                usageService.getOffice365ActiveUserCounts('D30')
+            ]);
 
             if (data) {
                 const mappedUsers = data.map(item => {
@@ -78,7 +86,11 @@ const UserActivityReport = () => {
                 });
                 setUsers(sorted);
                 setFilteredUsers(sorted);
+                setTrendData(trend || []);
                 setLastRefreshed(new Date());
+                if (trend && trend.length > 0) {
+                    setDataFreshness(trend[trend.length - 1].reportRefreshDate);
+                }
 
                 // Calculate summary stats
                 const now = new Date();
@@ -179,6 +191,77 @@ const UserActivityReport = () => {
         a.click();
     };
 
+    const WorkloadUtilizationChart = () => {
+        if (!trendData.length) return null;
+
+        const CustomChartTooltip = ({ active, payload, label }) => {
+            if (active && payload && payload.length) {
+                return (
+                    <div className="glass-card" style={{ padding: '12px', border: '1px solid var(--glass-border)', background: 'var(--tooltip-bg)', backdropFilter: 'blur(16px)' }}>
+                        <p style={{ margin: '0 0 8px 0', fontSize: '11px', fontWeight: 700, opacity: 0.7, color: 'var(--text-primary)' }}>
+                            {new Date(label).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                        </p>
+                        {payload.map((entry, index) => (
+                            <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: entry.color }} />
+                                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{entry.name}:</span>
+                                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', marginLeft: 'auto' }}>{entry.value}</span>
+                            </div>
+                        ))}
+                    </div>
+                );
+            }
+            return null;
+        };
+
+        return (
+            <div className="glass-card chart-section spacing-v-8 animate-in" style={{ padding: '24px', borderRadius: '24px' }}>
+                <div className="flex-between" style={{ marginBottom: '24px' }}>
+                    <div>
+                        <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700 }}>Tenant Resource Utilization</h3>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                            <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-dim)' }}>Relative activity load intensity across M365 workloads</p>
+                            {dataFreshness && (
+                                <>
+                                    <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'var(--text-tertiary)' }} />
+                                    <p style={{ margin: 0, fontSize: '11px', fontWeight: 600, color: 'var(--accent-blue)', opacity: 0.8 }}>
+                                        Data as of {new Date(dataFreshness).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
+                                    </p>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                    <div className="flex-gap-2">
+                        <div className="legend-dot-item"><div className="dot" style={{ background: '#3b82f6' }} /> Exchange</div>
+                        <div className="legend-dot-item"><div className="dot" style={{ background: '#8b5cf6' }} /> Teams</div>
+                        <div className="legend-dot-item"><div className="dot" style={{ background: '#10b981' }} /> SharePoint</div>
+                        <div className="legend-dot-item"><div className="dot" style={{ background: '#f43f5e' }} /> OneDrive</div>
+                    </div>
+                </div>
+                <div style={{ width: '100%', height: '240px' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                            <defs>
+                                <linearGradient id="colorEx" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} /><stop offset="95%" stopColor="#3b82f6" stopOpacity={0} /></linearGradient>
+                                <linearGradient id="colorTm" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4} /><stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} /></linearGradient>
+                                <linearGradient id="colorSp" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10b981" stopOpacity={0.4} /><stop offset="95%" stopColor="#10b981" stopOpacity={0} /></linearGradient>
+                                <linearGradient id="colorOd" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#f43f5e" stopOpacity={0.4} /><stop offset="95%" stopColor="#f43f5e" stopOpacity={0} /></linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--glass-border)" opacity={0.5} />
+                            <XAxis dataKey="reportDate" hide />
+                            <YAxis hide domain={[0, 'auto']} />
+                            <Tooltip content={<CustomChartTooltip />} cursor={{ stroke: 'var(--glass-border)', strokeWidth: 1 }} />
+                            <Area type="monotone" dataKey="exchange" name="Exchange" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorEx)" />
+                            <Area type="monotone" dataKey="teams" name="Teams" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorTm)" />
+                            <Area type="monotone" dataKey="sharePoint" name="SharePoint" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorSp)" />
+                            <Area type="monotone" dataKey="oneDrive" name="OneDrive" stroke="#f43f5e" strokeWidth={3} fillOpacity={1} fill="url(#colorOd)" />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
+        );
+    };
+
     if (loading) {
         return <Loader3D showOverlay={true} text="Aggregating user activity..." />;
     }
@@ -238,6 +321,9 @@ const UserActivityReport = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Utilization Chart */}
+            <WorkloadUtilizationChart />
 
             {/* Matrix Filters */}
             <div className="matrix-filters spacing-v-8">
@@ -421,6 +507,13 @@ const UserActivityReport = () => {
 
                 .no-data-matrix { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px; color: var(--text-tertiary); gap: 16px; }
                 .spin { animation: spin 1s linear infinite; }
+                
+                .legend-dot-item { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+                .legend-dot-item .dot { width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
+                
+                .chart-section { border: 1px solid var(--glass-border); position: relative; overflow: hidden; }
+                .chart-section::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% -20%, var(--accent-blue-glow), transparent); opacity: 0.3; pointer-events: none; }
+
                 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
             `}</style>
         </div>

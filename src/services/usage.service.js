@@ -228,6 +228,37 @@ export class UsageService {
         }
     }
 
+    /**
+     * Fetch Active Users counts across all services (Multi-service usage)
+     */
+    async getOffice365ActiveUserCounts(period = 'D30') {
+        try {
+            const data = await this.fetchReport('getOffice365ActiveUserCounts', period);
+            if (!data) return [];
+
+            return data.map((c, i) => {
+                let rDate = c.reportDate;
+                if (!rDate && c.reportRefreshDate) {
+                    const d = new Date(c.reportRefreshDate);
+                    d.setDate(d.getDate() - (data.length - 1 - i));
+                    rDate = d.toISOString().split('T')[0];
+                }
+
+                return {
+                    reportDate: rDate || c.reportRefreshDate,
+                    exchange: parseInt(c.exchange) || 0,
+                    oneDrive: parseInt(c.oneDrive) || 0,
+                    sharePoint: parseInt(c.sharePoint) || 0,
+                    teams: parseInt(c.teams) || 0,
+                    yammer: parseInt(c.yammer) || 0,
+                    skypeForBusiness: parseInt(c.skypeForBusiness) || 0
+                };
+            });
+        } catch {
+            return [];
+        }
+    }
+
 
 }
 
