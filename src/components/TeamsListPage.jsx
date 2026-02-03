@@ -201,7 +201,7 @@ const TeamsListPage = () => {
                 )}
             </div>
 
-            <style jsx>{`
+            <style>{`
                 .page-container { padding: 0; }
                 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
                 .header-left { display: flex; align-items: center; gap: 16px; }

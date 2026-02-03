@@ -9,163 +9,98 @@ import { Settings, RefreshCw, Filter, Download, AlertCircle, CheckCircle2, XCirc
 import Loader3D from './Loader3D';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, ResponsiveContainer } from 'recharts';
 import { MiniSparkline, MiniProgressBar, MiniSegmentedBar, MiniStatusGeneric } from './charts/MicroCharts';
+import { useDataCaching } from '../hooks/useDataCaching';
 
 const ServicePage = ({ serviceId: propServiceId }) => {
     const params = useParams();
     const serviceId = propServiceId || params.serviceId;
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const isAdmin = serviceId === 'admin';
 
-    const [reportData, setReportData] = useState([]);
-    const [exchangeData, setExchangeData] = useState([]);
-    const [domainsCount, setDomainsCount] = useState(0);
-    const [groupsCount, setGroupsCount] = useState(0);
-    const [emailActivity, setEmailActivity] = useState({ sent: 0, received: 0, date: null });
-    const [filterText, setFilterText] = useState('');
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const fetchFn = async () => {
+        if (!isAdmin) return null;
+        const response = await instance.acquireTokenSilent({
+            ...loginRequest,
+            account: accounts[0]
+        });
+        const graphService = new GraphService(response.accessToken);
 
+        const [exchangeResult, licensingResult, domainsCount, groupsCount, deletedUsersCount, score, health, signIns] = await Promise.all([
+            graphService.getExchangeMailboxReport().catch(() => ({ reports: [] })),
+            graphService.getLicensingData().catch(() => ({ skus: [], users: [] })),
+            graphService.getDomains().then(d => d.length),
+            graphService.getGroups().then(g => g.length),
+            graphService.getDeletedUsers().then(u => u?.length || 0),
+            graphService.getSecureScore(),
+            graphService.getServiceHealth(),
+            graphService.getFailedSignIns()
+        ]);
 
-    // Admin Center Specific State
-    const [secureScore, setSecureScore] = useState(null);
-    const [serviceHealth, setServiceHealth] = useState([]);
-    const [failedSignIns, setFailedSignIns] = useState([]);
-    const [deletedUsersCount, setDeletedUsersCount] = useState(0);
-    const [licensingSummary, setLicensingSummary] = useState([]);
-    const [refreshing, setRefreshing] = useState(false);
+        const persistenceData = {
+            mailboxes: { total: exchangeResult.reports?.length || 0, status: "Live" },
+            licenses: { used: licensingResult.skus?.reduce((acc, curr) => acc + (curr.consumedUnits || 0), 0) || 0, status: "Active" },
+            groups: { count: groupsCount, action: "Manage" },
+            domains: { count: domainsCount, action: "Manage" },
+            users: { deleted_count: deletedUsersCount, action: "Restore" },
+            security: {
+                secure_score_percentage: score ? `${Math.round((score.currentScore / score.maxScore) * 100)}%` : "0%",
+                secure_score_points: score?.currentScore || 0,
+                failed_logins_24h: signIns?.length || 0,
+                action: "Review"
+            },
+            service_health: { issues_count: health?.filter(s => s.status !== 'ServiceOperational').length || 0, status: "View Status" }
+        };
+
+        DataPersistenceService.save('AdminCenter_Legacy', persistenceData);
+
+        return {
+            exchangeData: exchangeResult.reports || [],
+            licensingSummary: licensingResult.skus || [],
+            domainsCount,
+            groupsCount,
+            deletedUsersCount,
+            secureScore: score,
+            serviceHealth: health,
+            failedSignIns: signIns
+        };
+    };
+
+    const {
+        data: dashboardData,
+        loading,
+        refreshing,
+        error: fetchError,
+        refetch
+    } = useDataCaching('AdminCenter_v2', fetchFn, {
+        maxAge: 30,
+        enabled: accounts.length > 0 && isAdmin,
+        storeSection: 'admincenter',
+        storeMetadata: { source: 'ServicePage' }
+    });
+
+    const exchangeData = dashboardData?.exchangeData || [];
+    const licensingSummary = dashboardData?.licensingSummary || [];
+    const domainsCount = dashboardData?.domainsCount || 0;
+    const groupsCount = dashboardData?.groupsCount || 0;
+    const deletedUsersCount = dashboardData?.deletedUsersCount || 0;
+    const secureScore = dashboardData?.secureScore || null;
+    const serviceHealth = dashboardData?.serviceHealth || [];
+    const failedSignIns = dashboardData?.failedSignIns || [];
+
+    const [interactionError, setInteractionError] = useState(false);
+
+    useEffect(() => {
+        if (fetchError && (fetchError.includes('InteractionRequiredAuthError') || fetchError.includes('interaction_required'))) {
+            setInteractionError(true);
+        }
+    }, [fetchError]);
 
     const serviceNames = {
         admin: 'Admin Center'
     };
 
-    const isAdmin = serviceId === 'admin';
 
-    const fetchData = async (isManual = false) => {
-        if (accounts.length === 0) return;
-        if (isManual) setRefreshing(true);
-        else setLoading(true);
-
-        const startTime = Date.now();
-
-        setError(null);
-        try {
-            const response = await instance.acquireTokenSilent({
-                ...loginRequest,
-                account: accounts[0]
-            }).catch(async (authErr) => {
-                if (authErr.name === "InteractionRequiredAuthError" || authErr.errorCode === "invalid_grant") {
-                    if (isManual) {
-                        return await instance.acquireTokenPopup(loginRequest);
-                    } else {
-                        throw authErr;
-                    }
-                }
-                throw authErr;
-            });
-            const graphService = new GraphService(response.accessToken);
-
-            if (isAdmin) {
-                const [exchangeResult, licensingResult, domainsCount, groupsCount, deletedUsersCount, score, health, signIns] = await Promise.all([
-                    graphService.getExchangeMailboxReport().catch(() => ({ reports: [] })),
-                    graphService.getLicensingData().catch(() => ({ skus: [], users: [] })),
-                    graphService.getDomains().then(d => d.length),
-                    graphService.getGroups().then(g => g.length),
-                    graphService.getDeletedUsers().then(u => u?.length || 0),
-                    graphService.getSecureScore(),
-                    graphService.getServiceHealth(),
-                    graphService.getFailedSignIns()
-                ]);
-
-                const persistenceData = {
-                    admincenter: {
-                        mailboxes: { total: exchangeResult.reports?.length || 0, status: "Live" },
-                        licenses: { used: licensingResult.skus?.reduce((acc, curr) => acc + (curr.consumedUnits || 0), 0) || 0, status: "Active" },
-                        groups: { count: groupsCount, action: "Manage" },
-                        domains: { count: domainsCount, action: "Manage" },
-                        users: { deleted_count: deletedUsersCount, action: "Restore" },
-                        security: {
-                            secure_score_percentage: score ? `${Math.round((score.currentScore / score.maxScore) * 100)}%` : "0%",
-                            secure_score_points: score?.currentScore || 0,
-                            failed_logins_24h: signIns?.length || 0,
-                            action: "Review"
-                        },
-                        service_health: { issues_count: health?.filter(s => s.status !== 'ServiceOperational').length || 0, status: "View Status" }
-                    },
-                    raw: {
-                        exchangeData: exchangeResult.reports || [],
-                        licensingSummary: licensingResult.skus || [],
-                        domainsCount,
-                        groupsCount,
-                        deletedUsersCount,
-                        secureScore: score,
-                        serviceHealth: health,
-                        failedSignIns: signIns
-                    }
-                };
-
-                await DataPersistenceService.save('AdminCenter', persistenceData);
-
-                setExchangeData(exchangeResult.reports || []);
-                setLicensingSummary(licensingResult.skus || []);
-                setDomainsCount(domainsCount);
-                setGroupsCount(groupsCount);
-                setDeletedUsersCount(deletedUsersCount);
-                if (score) setSecureScore(score);
-                if (health) setServiceHealth(health);
-                if (signIns) setFailedSignIns(signIns);
-            }
-        } catch (err) {
-            if (err.name === "InteractionRequiredAuthError" || err.errorCode === "invalid_grant") {
-                console.warn("Interaction required for Admin Center");
-                setError("InteractionRequired");
-            } else {
-                console.error("Fetch error:", err);
-                setError(err.message || "Connectivity issue with Microsoft Graph.");
-            }
-        } finally {
-            if (isManual) {
-                const elapsedTime = Date.now() - startTime;
-                const remainingTime = Math.max(0, 1500 - elapsedTime);
-                setTimeout(() => {
-                    setRefreshing(false);
-                }, remainingTime);
-            } else {
-                setLoading(false);
-                setRefreshing(false);
-            }
-        }
-    };
-
-    const loadData = async () => {
-        if (!isAdmin) {
-            // ServicePage only handles Admin Center now
-            fetchData(false);
-            return;
-        }
-
-        const cached = await DataPersistenceService.load('AdminCenter');
-        if (cached && cached.raw) {
-            setExchangeData(cached.raw.exchangeData);
-            setLicensingSummary(cached.raw.licensingSummary);
-            setDomainsCount(cached.raw.domainsCount);
-            setGroupsCount(cached.raw.groupsCount);
-            setDeletedUsersCount(cached.raw.deletedUsersCount);
-            setSecureScore(cached.raw.secureScore);
-            setServiceHealth(cached.raw.serviceHealth);
-            setFailedSignIns(cached.raw.failedSignIns);
-            setLoading(false);
-
-            if (DataPersistenceService.isExpired('AdminCenter', 30)) {
-                fetchData(false);
-            }
-        } else {
-            fetchData(false);
-        }
-    };
-
-    useEffect(() => {
-        loadData();
-    }, [serviceId]);
 
     const stats = [
         { label: 'Total Mailboxes', value: exchangeData.length, icon: Mail, color: 'var(--accent-blue)', path: '/service/admin/report', trend: 'Live' },
@@ -194,7 +129,7 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '10px' }}>Real-time operational telemetry and management</p>
                 </div>
                 <div className="flex-gap-2">
-                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchData(true)} title="Sync & Refresh">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => refetch(true)} title="Sync & Refresh">
                         <RefreshCw size={14} />
                     </button>
                     <button className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '11px' }}>
@@ -204,39 +139,18 @@ const ServicePage = ({ serviceId: propServiceId }) => {
                 </div>
             </header>
 
-            {error && (
-                <div className="error-banner" style={{
-                    background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                    border: `1px solid ${error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-                    borderRadius: '12px',
-                    padding: '16px',
-                    marginBottom: '24px',
-                    color: error === 'InteractionRequired' ? 'var(--accent-blue)' : '#ef4444',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                }}>
-                    <div className="flex-center flex-gap-3">
-                        {error === 'InteractionRequired' ? <Lock size={18} /> : <AlertCircle size={18} />}
-                        <span>{error === 'InteractionRequired' ? '🔐 Session expired. Additional permissions required to load Admin Center telemetry.' : error}</span>
-                    </div>
-                    {error === 'InteractionRequired' && (
-                        <button
-                            onClick={() => fetchData(true)}
-                            style={{
-                                background: 'var(--accent-blue)',
-                                color: 'white',
-                                border: 'none',
-                                padding: '6px 12px',
-                                borderRadius: '6px',
-                                fontSize: '12px',
-                                fontWeight: 700,
-                                cursor: 'pointer'
-                            }}
-                        >
-                            Reconnect
-                        </button>
-                    )}
+            {fetchError && !interactionError && (
+                <div className="error-banner" style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444' }}>
+                    <AlertCircle size={14} style={{ marginRight: '8px' }} />
+                    <span>{fetchError}</span>
+                </div>
+            )}
+
+            {interactionError && (
+                <div className="error-banner" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', color: 'var(--accent-blue)' }}>
+                    <Lock size={14} style={{ marginRight: '8px' }} />
+                    <span>🔐 Session expired or additional permissions required.</span>
+                    <button onClick={() => refetch(true)} className="reconnect-btn">Reconnect</button>
                 </div>
             )}
 

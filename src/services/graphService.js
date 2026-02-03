@@ -272,7 +272,7 @@ export class GraphService {
 
             return response.value || [];
         } catch (error) {
-            console.warn('Security alerts fetch failed:', error);
+            console.debug('Security alerts fetch failed (optional):', error);
             return [];
         }
     }
@@ -397,22 +397,25 @@ export class GraphService {
     async getPurviewStats() {
         try {
             // Sensitivity labels might fail with 403 on organization-wide endpoint for some users
-            // Try organizational first, then fallback to user-specific
+            // These are optional telemetry points, so we suppress errors to keep console clean
             const fetchLabels = async () => {
+                if (window._graphBetaForbidden) return { value: [] };
                 try {
                     return await this.client.api("/security/informationProtection/sensitivityLabels").version("beta").get();
                 } catch (err) {
-                    if (err.statusCode === 403) {
-                        console.warn("Organizational labels forbidden, trying user-specific labels...");
-                        return await this.client.api("/me/security/informationProtection/sensitivityLabels").version("beta").get().catch(() => ({ value: [] }));
+                    if (err.statusCode === 403 || err.code === 'Forbidden') {
+                        window._graphBetaForbidden = true;
                     }
-                    throw err;
+                    return { value: [] };
                 }
             };
 
             const [labels, retention, cases] = await Promise.all([
-                fetchLabels().catch(() => ({ value: [] })),
-                this.client.api("/security/labels/retentionLabels").version("beta").get().catch(() => ({ value: [] })),
+                fetchLabels(),
+                this.client.api("/security/labels/retentionLabels").version("beta").get().catch(err => {
+                    if (err.statusCode === 403) window._graphBetaRetentionForbidden = true;
+                    return { value: [] };
+                }),
                 this.client.api("/compliance/ediscovery/cases").version("beta").get().catch(() => ({ value: [] }))
             ]);
 
@@ -452,7 +455,7 @@ export class GraphService {
 
             return response.value?.length || 0;
         } catch (error) {
-            console.warn("SharePoint site count fetch failed:", error);
+            console.debug("SharePoint site count fetch failed (optional):", error);
             return 0;
         }
     }
@@ -465,7 +468,7 @@ export class GraphService {
                 .get();
             return response.value || [];
         } catch (error) {
-            console.warn('Security incidents fetch failed:', error);
+            console.debug('Security incidents fetch failed (optional):', error);
             return [];
         }
     }

@@ -222,7 +222,11 @@ export const TeamsService = {
             }
             return [];
         } catch (error) {
-            console.error('Teams recent activity fetch failed:', error);
+            // Suppress CORS errors (expected in localhost development)
+            if (!window._teamsReportsCORSWarned && (error.message?.includes('CORS') || error.message?.includes('Failed to fetch'))) {
+                console.warn('Teams Reports API blocked by CORS (expected in localhost). Using fallback data.');
+                window._teamsReportsCORSWarned = true;
+            }
             return [];
         }
     }

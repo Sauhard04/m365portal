@@ -162,7 +162,11 @@ export const SharePointService = {
             }
             return null;
         } catch (error) {
-            console.error('SharePoint usage report failed:', error);
+            // Suppress CORS errors (expected in localhost development)
+            if (!window._spReportsCORSWarned && (error.message?.includes('CORS') || error.message?.includes('Failed to fetch'))) {
+                console.warn('SharePoint Reports API blocked by CORS (expected in localhost). Using fallback data.');
+                window._spReportsCORSWarned = true;
+            }
             return null;
         }
     },
@@ -196,7 +200,10 @@ export const SharePointService = {
             }
             return null;
         } catch (error) {
-            console.error('OneDrive usage report failed:', error);
+            // Suppress CORS errors (expected in localhost development)
+            if (!window._odReportsCORSWarned && (error.message?.includes('CORS') || error.message?.includes('Failed to fetch'))) {
+                window._odReportsCORSWarned = true;
+            }
             return null;
         }
     },
@@ -401,7 +408,10 @@ export const SharePointService = {
             }
             return Array.isArray(response) ? response : null;
         } catch (error) {
-            console.error('OneDrive activity report failed:', error);
+            // Suppress CORS errors (expected in localhost development)
+            if (!window._odActivityCORSWarned && (error.message?.includes('CORS') || error.message?.includes('Failed to fetch'))) {
+                window._odActivityCORSWarned = true;
+            }
             return null;
         }
     },
@@ -429,7 +439,10 @@ export const SharePointService = {
             }
             return Array.isArray(response) ? response : null;
         } catch (error) {
-            console.error('OneDrive file activity report failed:', error);
+            // Suppress CORS errors (expected in localhost development)
+            if (!window._odFileActivityCORSWarned && (error.message?.includes('CORS') || error.message?.includes('Failed to fetch'))) {
+                window._odFileActivityCORSWarned = true;
+            }
             return null;
         }
     },
@@ -447,7 +460,11 @@ export const SharePointService = {
                 .get();
             return response.value || [];
         } catch (error) {
-            console.error('Service messages fetch failed:', error);
+            // Suppress 403 errors (requires ServiceMessage.Read.All permission)
+            if (!window._serviceMessages403Warned && error.statusCode === 403) {
+                console.warn('Service Announcement API requires additional admin permissions (ServiceMessage.Read.All). Using fallback.');
+                window._serviceMessages403Warned = true;
+            }
             return [];
         }
     }

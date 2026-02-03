@@ -14,7 +14,7 @@ export const SecurityService = {
                 .get();
             return response.value || [];
         } catch (error) {
-            console.warn('Security alerts fetch failed:', error);
+            console.debug('Security alerts v2 fetch failed (optional):', error);
             // Fall back to legacy alerts endpoint
             try {
                 const legacyResponse = await client.api('/security/alerts')
@@ -23,7 +23,7 @@ export const SecurityService = {
                     .get();
                 return legacyResponse.value || [];
             } catch (legacyError) {
-                console.warn('Legacy security alerts also failed:', legacyError);
+                console.debug('Legacy security alerts also failed (optional):', legacyError);
                 return [];
             }
         }
@@ -42,7 +42,7 @@ export const SecurityService = {
                 .get();
             return response.value || [];
         } catch (error) {
-            console.warn('Security incidents fetch failed:', error);
+            console.debug('Security incidents fetch failed (optional):', error);
             return [];
         }
     },
@@ -60,7 +60,7 @@ export const SecurityService = {
                 .get();
             return response.value || [];
         } catch (error) {
-            console.warn('Secure scores fetch failed:', error);
+            console.debug('Secure scores fetch failed (optional):', error);
             return [];
         }
     },
@@ -76,7 +76,7 @@ export const SecurityService = {
                 .get();
             return response.value || [];
         } catch (error) {
-            console.warn('Secure score control profiles fetch failed:', error);
+            console.debug('Secure score control profiles fetch failed (optional):', error);
             return [];
         }
     },
@@ -93,7 +93,7 @@ export const SecurityService = {
                 .get();
             return response.value || [];
         } catch (error) {
-            console.warn('Risky users fetch failed:', error);
+            console.debug('Risky users fetch failed (optional):', error);
             return [];
         }
     },
@@ -111,7 +111,7 @@ export const SecurityService = {
                 .get();
             return response.value || [];
         } catch (error) {
-            console.warn('Risk detections fetch failed:', error);
+            console.debug('Risk detections fetch failed (optional):', error);
             return [];
         }
     },
@@ -137,7 +137,7 @@ export const SecurityService = {
                     .get();
                 return signInsResponse.value || [];
             } catch (fallbackError) {
-                console.warn('Risky sign-ins fetch failed:', fallbackError);
+                console.debug('Risky sign-ins fetch failed (optional):', fallbackError);
                 return [];
             }
         }
@@ -154,7 +154,7 @@ export const SecurityService = {
                 .get();
             return response.value || [];
         } catch (error) {
-            console.warn('Threat indicators fetch failed:', error);
+            console.debug('Threat indicators fetch failed (optional):', error);
             return [];
         }
     },
@@ -171,7 +171,7 @@ export const SecurityService = {
                 .get();
             return response.value || [];
         } catch (error) {
-            console.warn('Auth methods registration fetch failed:', error);
+            console.debug('Auth methods registration fetch failed (optional):', error);
             return [];
         }
     },

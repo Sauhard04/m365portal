@@ -14,12 +14,70 @@ import Loader3D from './Loader3D';
 import { DataPersistenceService } from '../services/dataPersistence';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, ResponsiveContainer } from 'recharts';
 import { MiniSegmentedBar, MiniSeverityStrip, MiniStatusGeneric, MiniSparkline, MiniProgressBar } from './charts/MicroCharts';
+import { useDataCaching } from '../hooks/useDataCaching';
 
 const IntuneMonitoring = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
 
-    const [stats, setStats] = useState({
+    const fetchFn = async () => {
+        const response = await instance.acquireTokenSilent({
+            ...intuneScopes,
+            account: accounts[0]
+        });
+
+        const client = new GraphService(response.accessToken).client;
+        const dashboardStats = await IntuneService.getDashboardStats(client);
+
+        // Map to our persistence schema for legacy support if needed
+        const persistenceData = {
+            intune: {
+                devices: {
+                    total: dashboardStats.totalDevices,
+                    non_compliant: dashboardStats.nonCompliantDevices,
+                    inactive: dashboardStats.inactiveDevices
+                },
+                policies: {
+                    compliance: dashboardStats.compliancePolicies,
+                    configuration: dashboardStats.configProfiles
+                },
+                apps: {
+                    total_managed: dashboardStats.mobileApps
+                },
+                security: {
+                    baselines: dashboardStats.securityBaselines,
+                    admin_roles: dashboardStats.adminRoles
+                }
+            },
+            raw: dashboardStats
+        };
+        DataPersistenceService.save('Intune_Legacy', persistenceData);
+
+        return dashboardStats;
+    };
+
+    const {
+        data: statsData,
+        loading,
+        refreshing,
+        error: fetchError,
+        refetch
+    } = useDataCaching('Intune_Monitoring_v3', fetchFn, {
+        maxAge: 30,
+        storeSection: 'intune',
+        storeMetadata: { source: 'IntuneMonitoring' },
+        enabled: accounts.length > 0
+    });
+
+    const [interactionError, setInteractionError] = useState(false);
+
+    useEffect(() => {
+        if (fetchError && (fetchError.includes('InteractionRequiredAuthError') || fetchError.includes('interaction_required'))) {
+            setInteractionError(true);
+        }
+    }, [fetchError]);
+
+    const stats = statsData || {
         totalDevices: 0,
         nonCompliantDevices: 0,
         inactiveDevices: 0,
@@ -27,111 +85,10 @@ const IntuneMonitoring = () => {
         configProfiles: 0,
         mobileApps: 0,
         securityBaselines: 0,
-        adminRoles: 0
-    });
-    const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
-    const [error, setError] = useState(null);
-
-    const fetchDashboardData = async (isManual = false) => {
-        if (accounts.length === 0) return;
-        if (isManual) setRefreshing(true);
-        else setLoading(true);
-        setError(null);
-
-        const startTime = Date.now();
-
-        try {
-            const response = await instance.acquireTokenSilent({
-                ...intuneScopes,
-                account: accounts[0]
-            }).catch(async (authErr) => {
-                if (authErr.name === "InteractionRequiredAuthError" || authErr.errorCode === "invalid_grant") {
-                    if (isManual) {
-                        return await instance.acquireTokenPopup(intuneScopes);
-                    } else {
-                        throw authErr;
-                    }
-                }
-                throw authErr;
-            });
-
-            const client = new GraphService(response.accessToken).client;
-            const dashboardStats = await IntuneService.getDashboardStats(client);
-
-            // Map to our persistence schema
-            const persistenceData = {
-                intune: {
-                    devices: {
-                        total: dashboardStats.totalDevices,
-                        non_compliant: dashboardStats.nonCompliantDevices,
-                        inactive: dashboardStats.inactiveDevices
-                    },
-                    policies: {
-                        compliance: dashboardStats.compliancePolicies,
-                        configuration: dashboardStats.configProfiles
-                    },
-                    apps: {
-                        total_managed: dashboardStats.mobileApps
-                    },
-                    security: {
-                        baselines: dashboardStats.securityBaselines,
-                        admin_roles: dashboardStats.adminRoles
-                    }
-                },
-                raw: dashboardStats
-            };
-
-            await DataPersistenceService.save('Intune', persistenceData);
-            setStats(dashboardStats);
-
-            // Background store for AI context (makes it available to the chatbot)
-            const SiteDataStore = (await import('../services/siteDataStore')).default;
-            SiteDataStore.store('intuneStats', dashboardStats);
-        } catch (error) {
-            if (error.name === "InteractionRequiredAuthError" || error.errorCode === "invalid_grant") {
-                console.warn("Interaction required for Intune Dashboard");
-                setError("InteractionRequired");
-            } else {
-                console.error("Intune dashboard fetch error:", error);
-                setError(error.message || "Failed to load Intune data");
-            }
-        } finally {
-            if (isManual) {
-                const elapsedTime = Date.now() - startTime;
-                const remainingTime = Math.max(0, 2000 - elapsedTime);
-                setTimeout(() => {
-                    setRefreshing(false);
-                }, remainingTime);
-            } else {
-                setLoading(false);
-                setRefreshing(false);
-            }
-        }
+        adminRoles: 0,
+        osDistribution: {}
     };
 
-    const loadData = async () => {
-        const cached = await DataPersistenceService.load('Intune');
-        if (cached && cached.raw) {
-            setStats(cached.raw);
-            setLoading(false);
-
-            // Refetch if cache is expired OR missing new schema fields (osDistribution, securityBaselines, adminRoles)
-            const isSchemaOutdated = (cached.raw.totalDevices > 0 && !cached.raw.osDistribution) ||
-                (cached.raw.securityBaselines === 0) || // Force refetch if baselines is still placeholder
-                (cached.raw.adminRoles === 0); // Force refetch if adminRoles is still placeholder
-
-            if (DataPersistenceService.isExpired('Intune', 30) || isSchemaOutdated) {
-                fetchDashboardData(false);
-            }
-        } else {
-            fetchDashboardData(false);
-        }
-    };
-
-    useEffect(() => {
-        loadData();
-    }, [accounts, instance]);
 
     const tiles = [
         {
@@ -239,80 +196,29 @@ const IntuneMonitoring = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Device management and mobile application management</p>
                 </div>
                 <div className="flex-gap-2">
-                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchDashboardData(true)} title="Sync & Refresh">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => refetch(true)} title="Sync & Refresh">
                         <RefreshCw size={16} />
                     </button>
                 </div>
             </header>
 
-            {error && (
-                <div className="error-banner" style={{
-                    background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                    border: `1px solid ${error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-                    borderRadius: '12px',
-                    padding: '16px',
-                    marginBottom: '24px',
-                    color: error === 'InteractionRequired' ? 'var(--accent-blue)' : '#ef4444',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                }}>
-                    <span>{error === 'InteractionRequired' ? '🔐 Intune session expired. Additional permissions required to load telemetry.' : error}</span>
-                    {error === 'InteractionRequired' && (
-                        <button
-                            onClick={() => fetchDashboardData(true)}
-                            style={{
-                                background: 'var(--accent-blue)',
-                                color: 'white',
-                                border: 'none',
-                                padding: '6px 12px',
-                                borderRadius: '6px',
-                                fontSize: '12px',
-                                fontWeight: 700,
-                                cursor: 'pointer'
-                            }}
-                        >
-                            Reconnect
-                        </button>
-                    )}
+            {fetchError && !interactionError && (
+                <div className="error-banner" style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444' }}>
+                    <AlertTriangle size={14} style={{ marginRight: '8px' }} />
+                    <span>{fetchError}</span>
                 </div>
             )}
 
-            {error && (
-                <div className="error-banner" style={{
-                    background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                    border: `1px solid ${error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-                    borderRadius: '12px',
-                    padding: '16px',
-                    marginBottom: '24px',
-                    color: error === 'InteractionRequired' ? 'var(--accent-blue)' : '#ef4444',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                }}>
-                    <span>{error === 'InteractionRequired' ? '🔐 Intune session expired. Additional permissions required to load telemetry.' : error}</span>
-                    {error === 'InteractionRequired' && (
-                        <button
-                            onClick={() => fetchDashboardData(true)}
-                            style={{
-                                background: 'var(--accent-blue)',
-                                color: 'white',
-                                border: 'none',
-                                padding: '6px 12px',
-                                borderRadius: '6px',
-                                fontSize: '12px',
-                                fontWeight: 700,
-                                cursor: 'pointer'
-                            }}
-                        >
-                            Reconnect
-                        </button>
-                    )}
+            {interactionError && (
+                <div className="error-banner" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', color: 'var(--accent-blue)' }}>
+                    <Shield size={14} style={{ marginRight: '8px' }} />
+                    <span>🔐 Session expired or additional permissions required.</span>
+                    <button onClick={() => refetch(true)} className="reconnect-btn">Reconnect</button>
                 </div>
             )}
 
 
-            {loading && !refreshing && <Loader3D showOverlay={true} />}
+            {loading && !statsData && <Loader3D showOverlay={true} />}
 
             <div className="stat-grid">
                 {tiles.map((tile, i) => {

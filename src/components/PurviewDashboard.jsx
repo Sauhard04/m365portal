@@ -14,12 +14,59 @@ import Loader3D from './Loader3D';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { MiniSegmentedBar, MiniSeverityStrip, MiniSparkline, MiniProgressBar } from './charts/MicroCharts';
 import SiteDataStore from '../services/siteDataStore';
+import { useDataCaching } from '../hooks/useDataCaching';
 
 const PurviewDashboard = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
 
-    const [stats, setStats] = useState({
+    const fetchFn = async () => {
+        let accessToken = null;
+
+        // Only attempt token acquisition if Purview is configured
+        if (PurviewService.isConfigured()) {
+            const response = await instance.acquireTokenSilent({
+                scopes: ['https://purview.azure.com/.default'],
+                account: accounts[0]
+            });
+            accessToken = response.accessToken;
+        }
+
+        const dashboardData = await PurviewService.getDashboardData(accessToken);
+
+        // Transform asset distribution for charts
+        const topAssets = Array.isArray(dashboardData.assetDistribution)
+            ? [...dashboardData.assetDistribution].sort((a, b) => b.value - a.value).slice(0, 6)
+            : [];
+
+        return {
+            stats: dashboardData,
+            assetDistribution: topAssets
+        };
+    };
+
+    const {
+        data: cachedData,
+        loading,
+        refreshing,
+        error: fetchError,
+        refetch
+    } = useDataCaching('Purview_Dashboard_v3', fetchFn, {
+        maxAge: 30,
+        storeSection: 'purview',
+        storeMetadata: { source: 'PurviewDashboard' },
+        enabled: accounts.length > 0
+    });
+
+    const [interactionError, setInteractionError] = useState(false);
+
+    useEffect(() => {
+        if (fetchError && (fetchError.includes('InteractionRequiredAuthError') || fetchError.includes('interaction_required'))) {
+            setInteractionError(true);
+        }
+    }, [fetchError]);
+
+    const stats = cachedData?.stats || {
         totalAssets: 0,
         assetTypes: 0,
         classifications: 0,
@@ -32,106 +79,10 @@ const PurviewDashboard = () => {
         sensitiveAssets: 0,
         classificationDistribution: [],
         scanStats: { totalSources: 0, activeSources: 0, inactiveSources: 0, pendingSources: 0 }
-    });
-    const [assetDistribution, setAssetDistribution] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [refreshing, setRefreshing] = useState(false);
-
-    const fetchDashboardData = async (isManual = false) => {
-        if (accounts.length === 0) return;
-
-        if (isManual) setRefreshing(true);
-        else setLoading(true);
-        setError(null);
-
-        const startTime = Date.now();
-
-        try {
-            let accessToken = null;
-
-            // Only attempt token acquisition if Purview is configured
-            if (PurviewService.isConfigured()) {
-                const response = await instance.acquireTokenSilent({
-                    scopes: ['https://purview.azure.com/.default'],
-                    account: accounts[0]
-                }).catch(async (authErr) => {
-                    if (authErr.name === "InteractionRequiredAuthError" || authErr.errorCode === "invalid_grant") {
-                        if (isManual) {
-                            return await instance.acquireTokenPopup({
-                                scopes: ['https://purview.azure.com/.default']
-                            });
-                        } else {
-                            throw authErr;
-                        }
-                    }
-                    throw authErr;
-                });
-                accessToken = response.accessToken;
-            }
-
-            const dashboardData = await PurviewService.getDashboardData(accessToken);
-
-            // Transform asset distribution for charts
-            const topAssets = Array.isArray(dashboardData.assetDistribution)
-                ? [...dashboardData.assetDistribution].sort((a, b) => b.value - a.value).slice(0, 6)
-                : [];
-
-            // Persist data
-            const persistenceData = {
-                purview: {
-                    assets: { total: dashboardData.totalAssets, types: dashboardData.assetTypes },
-                    classifications: { count: dashboardData.classifications },
-                    glossary: { terms: dashboardData.glossaryTermsCount, categories: dashboardData.glossaryCategoriesCount },
-                    scanning: dashboardData.scanStats,
-                    governance: { collections: dashboardData.collections, policies: dashboardData.policies }
-                },
-                raw: { stats: dashboardData, assetDistribution: topAssets }
-            };
-
-            SiteDataStore.store('purview', persistenceData.purview, { source: 'PurviewDashboard' });
-            SiteDataStore.store('purview_raw', persistenceData.raw, { source: 'PurviewDashboard_Raw' });
-
-            setStats(dashboardData);
-            setAssetDistribution(topAssets);
-        } catch (error) {
-            if (error.name === "InteractionRequiredAuthError" || error.errorCode === "invalid_grant") {
-                console.warn("Interaction required for Purview Dashboard");
-                setError("InteractionRequired");
-            } else {
-                console.error('Purview dashboard fetch error:', error);
-                setError(error.message || "Failed to load Purview data");
-            }
-        } finally {
-            if (isManual) {
-                const elapsedTime = Date.now() - startTime;
-                const remainingTime = Math.max(0, 2000 - elapsedTime);
-                setTimeout(() => setRefreshing(false), remainingTime);
-            } else {
-                setLoading(false);
-                setRefreshing(false);
-            }
-        }
     };
 
-    const loadData = async () => {
-        const cached = await DataPersistenceService.load('Purview');
-        if (cached && cached.raw) {
-            setStats(cached.raw.stats);
-            setAssetDistribution(cached.raw.assetDistribution || []);
-            setLoading(false);
+    const assetDistribution = cachedData?.assetDistribution || [];
 
-            if (DataPersistenceService.isExpired('Purview', 30)) {
-                fetchDashboardData(false);
-            }
-        } else {
-            fetchDashboardData(false);
-        }
-    };
-
-    useEffect(() => {
-        loadData();
-    }, [accounts, instance]);
 
     const tiles = [
         {
@@ -266,7 +217,7 @@ const PurviewDashboard = () => {
                 <div className="flex-gap-2">
                     <button
                         className={`sync-btn ${refreshing ? 'spinning' : ''}`}
-                        onClick={() => fetchDashboardData(true)}
+                        onClick={() => refetch(true)}
                         title="Sync & Refresh"
                     >
                         <RefreshCw size={16} />
@@ -274,42 +225,25 @@ const PurviewDashboard = () => {
                 </div>
             </header>
 
-            {error && (
-                <div className="error-banner" style={{
-                    background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                    border: `1px solid ${error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-                    borderRadius: '12px',
-                    padding: '16px',
-                    marginBottom: '24px',
-                    color: error === 'InteractionRequired' ? 'var(--accent-blue)' : '#ef4444',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                }}>
-                    <span>{error === 'InteractionRequired' ? '🔐 Purview session expired. Additional permissions required to access the catalog.' : error}</span>
-                    {error === 'InteractionRequired' && (
-                        <button
-                            onClick={() => fetchDashboardData(true)}
-                            style={{
-                                background: 'var(--accent-blue)',
-                                color: 'white',
-                                border: 'none',
-                                padding: '6px 12px',
-                                borderRadius: '6px',
-                                fontSize: '12px',
-                                fontWeight: 700,
-                                cursor: 'pointer'
-                            }}
-                        >
-                            Reconnect
-                        </button>
-                    )}
+            {fetchError && !interactionError && (
+                <div className="error-banner" style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444' }}>
+                    <RefreshCw size={14} style={{ marginRight: '8px' }} />
+                    <span>{fetchError}</span>
                 </div>
             )}
 
-            {loading ? (
+            {interactionError && (
+                <div className="error-banner" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', color: 'var(--accent-blue)' }}>
+                    <RefreshCw size={14} style={{ marginRight: '8px' }} />
+                    <span>🔐 Session expired or additional permissions required.</span>
+                    <button onClick={() => refetch(true)} className="reconnect-btn">Reconnect</button>
+                </div>
+            )}
+
+            {!cachedData && loading && (
                 <Loader3D showOverlay={true} />
-            ) : (
+            )}
+            {cachedData && (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px', alignItems: 'start' }}>
                     <div style={{ gridColumn: '1 / -1' }}>
                         {stats.isMock && (
@@ -550,7 +484,7 @@ const PurviewDashboard = () => {
             )}
 
             {/* Analytics Section */}
-            {!loading && stats.totalAssets > 0 && (
+            {cachedData && stats.totalAssets > 0 && (
                 <div style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',

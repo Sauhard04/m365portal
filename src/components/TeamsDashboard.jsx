@@ -14,102 +14,70 @@ import {
 import {
     ResponsiveContainer, PieChart, Pie, Cell, Tooltip
 } from 'recharts';
+import { useDataCaching } from '../hooks/useDataCaching';
 
 const TeamsDashboard = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
-    const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
-    const [dashboardData, setDashboardData] = useState({
+    const fetchFn = async () => {
+        const account = accounts[0];
+        if (!account) throw new Error('No account found');
+
+        const tokenResponse = await instance.acquireTokenSilent({
+            ...teamsScopes,
+            account
+        });
+
+        const client = Client.init({
+            authProvider: (done) => done(null, tokenResponse.accessToken)
+        });
+
+        const [dashboardSummary, recentActivity] = await Promise.all([
+            TeamsService.getDashboardSummary(client),
+            TeamsService.getRecentActivity(client, 'D7')
+        ]);
+
+        return {
+            ...dashboardSummary,
+            recentActivity: recentActivity.length > 0 ? recentActivity.slice(0, 10) : [
+                { displayName: 'Pilot User', lastActivityDate: new Date().toISOString(), teamChatMessages: 12, privateChatMessages: 45, calls: 3, meetings: 2 },
+                { displayName: 'Global Admin', lastActivityDate: new Date(Date.now() - 3600000).toISOString(), teamChatMessages: 8, privateChatMessages: 12, calls: 1, meetings: 5 },
+                { displayName: 'System Auditor', lastActivityDate: new Date(Date.now() - 7200000).toISOString(), teamChatMessages: 0, privateChatMessages: 5, calls: 0, meetings: 1 },
+                { displayName: 'Compliance Manager', lastActivityDate: new Date(Date.now() - 86400000).toISOString(), teamChatMessages: 15, privateChatMessages: 30, calls: 5, meetings: 8 },
+                { displayName: 'Security Expert', lastActivityDate: new Date(Date.now() - 172800000).toISOString(), teamChatMessages: 5, privateChatMessages: 10, calls: 2, meetings: 3 }
+            ]
+        };
+    };
+
+    const {
+        data: dashboardData,
+        loading,
+        refreshing,
+        error: fetchError,
+        refetch
+    } = useDataCaching('Teams_Dashboard_v3', fetchFn, {
+        maxAge: 30,
+        storeSection: 'teams',
+        storeMetadata: { source: 'TeamsDashboard' },
+        enabled: accounts.length > 0
+    });
+
+    const [interactionError, setInteractionError] = useState(false);
+
+    useEffect(() => {
+        if (fetchError && (fetchError.includes('InteractionRequiredAuthError') || fetchError.includes('interaction_required'))) {
+            setInteractionError(true);
+        }
+    }, [fetchError]);
+
+    const safeData = dashboardData || {
         teams: { total: 0, byVisibility: {}, archived: 0, recentlyCreated: 0, topTeams: [] },
         myTeams: { total: 0, teams: [] },
         chats: { total: 0 },
         activity: { activeCalls: 0, activeMessages: 0 },
         recentActivity: []
-    });
-    const [error, setError] = useState(null);
-
-    const CACHE_KEY = 'teams_dashboard';
-    const CACHE_DURATION = 5 * 60 * 1000;
-
-    const fetchDashboardData = async (isManual = false) => {
-        if (accounts.length === 0) return;
-
-        if (isManual) setRefreshing(true);
-        else setLoading(true);
-        setError(null);
-
-        try {
-            if (!isManual) {
-                const cached = DataPersistenceService.load(CACHE_KEY, CACHE_DURATION);
-                if (cached) {
-                    setDashboardData(cached);
-                    setLoading(false);
-                    return;
-                }
-            }
-
-            const account = accounts[0];
-            if (!account) throw new Error('No account found');
-
-            const tokenResponse = await instance.acquireTokenSilent({
-                ...teamsScopes,
-                account
-            }).catch(async (authErr) => {
-                if (authErr.name === "InteractionRequiredAuthError" || authErr.errorCode === "invalid_grant") {
-                    if (isManual) {
-                        return await instance.acquireTokenPopup(teamsScopes);
-                    } else {
-                        throw authErr;
-                    }
-                }
-                throw authErr;
-            });
-
-            const client = Client.init({
-                authProvider: (done) => done(null, tokenResponse.accessToken)
-            });
-
-            const [dashboardSummary, recentActivity] = await Promise.all([
-                TeamsService.getDashboardSummary(client),
-                TeamsService.getRecentActivity(client, 'D7')
-            ]);
-
-            const data = {
-                ...dashboardSummary,
-                recentActivity: recentActivity.length > 0 ? recentActivity.slice(0, 10) : [
-                    { displayName: 'Pilot User', lastActivityDate: new Date().toISOString(), teamChatMessages: 12, privateChatMessages: 45, calls: 3, meetings: 2 },
-                    { displayName: 'Global Admin', lastActivityDate: new Date(Date.now() - 3600000).toISOString(), teamChatMessages: 8, privateChatMessages: 12, calls: 1, meetings: 5 },
-                    { displayName: 'System Auditor', lastActivityDate: new Date(Date.now() - 7200000).toISOString(), teamChatMessages: 0, privateChatMessages: 5, calls: 0, meetings: 1 },
-                    { displayName: 'Compliance Manager', lastActivityDate: new Date(Date.now() - 86400000).toISOString(), teamChatMessages: 15, privateChatMessages: 30, calls: 5, meetings: 8 },
-                    { displayName: 'Security Expert', lastActivityDate: new Date(Date.now() - 172800000).toISOString(), teamChatMessages: 5, privateChatMessages: 10, calls: 2, meetings: 3 }
-                ]
-            };
-
-            setDashboardData(data);
-            DataPersistenceService.save(CACHE_KEY, data);
-        } catch (err) {
-            if (err.name === "InteractionRequiredAuthError" || err.errorCode === "invalid_grant") {
-                console.warn("Interaction required for Teams Dashboard");
-                setError("InteractionRequired");
-            } else {
-                console.error('Failed to fetch Teams dashboard data:', err);
-                setError(err.message || "Failed to load Teams data");
-            }
-        } finally {
-            if (isManual) {
-                // Ensure the spinner shows for at least 1 second for better UX
-                setTimeout(() => setRefreshing(false), 1000);
-            } else {
-                setLoading(false);
-                setRefreshing(false);
-            }
-        }
     };
 
-    useEffect(() => {
-        fetchDashboardData();
-    }, [instance, accounts]);
 
     const CustomTooltip = ({ active, payload }) => {
         if (active && payload && payload.length) {
@@ -133,13 +101,13 @@ const TeamsDashboard = () => {
     };
 
     const visibilityData = [
-        { name: 'Public', value: dashboardData.teams.byVisibility?.Public || 0, color: '#22c55e', icon: Globe },
-        { name: 'Private', value: dashboardData.teams.byVisibility?.Private || 0, color: '#a855f7', icon: Lock },
-        { name: 'Hidden', value: dashboardData.teams.byVisibility?.HiddenMembership || 0, color: '#6b7280', icon: Archive }
+        { name: 'Public', value: safeData.teams.byVisibility?.Public || 0, color: '#22c55e', icon: Globe },
+        { name: 'Private', value: safeData.teams.byVisibility?.Private || 0, color: '#a855f7', icon: Lock },
+        { name: 'Hidden', value: safeData.teams.byVisibility?.HiddenMembership || 0, color: '#6b7280', icon: Archive }
     ].filter(d => d.value > 0);
 
-    if (loading) {
-        return <Loader3D showOverlay={true} text="Loading Teams Dashboard..." />;
+    if (loading && !dashboardData) {
+        return <Loader3D showOverlay={true} />;
     }
 
     return (
@@ -163,7 +131,7 @@ const TeamsDashboard = () => {
                 <div className="flex-gap-2">
                     <button
                         className={`sync-btn ${refreshing ? 'spinning' : ''}`}
-                        onClick={() => fetchDashboardData(true)}
+                        onClick={() => refetch(true)}
                         title="Sync & Refresh"
                     >
                         <RefreshCw size={16} />
@@ -171,36 +139,52 @@ const TeamsDashboard = () => {
                 </div>
             </header>
 
-            {error && (
+            {fetchError && !interactionError && (
                 <div className="error-banner" style={{
-                    background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                    border: `1px solid ${error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid rgba(239, 68, 68, 0.3)',
                     borderRadius: '12px',
                     padding: '16px',
                     marginBottom: '24px',
-                    color: error === 'InteractionRequired' ? 'var(--accent-blue)' : '#ef4444',
+                    color: '#ef4444',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center'
                 }}>
-                    <span>{error === 'InteractionRequired' ? '🔐 Teams session expired. Additional permissions required to load telemetry.' : error}</span>
-                    {error === 'InteractionRequired' && (
-                        <button
-                            onClick={() => fetchDashboardData(true)}
-                            style={{
-                                background: 'var(--accent-blue)',
-                                color: 'white',
-                                border: 'none',
-                                padding: '6px 12px',
-                                borderRadius: '6px',
-                                fontSize: '12px',
-                                fontWeight: 700,
-                                cursor: 'pointer'
-                            }}
-                        >
-                            Reconnect
-                        </button>
-                    )}
+                    <RefreshCw size={14} style={{ marginRight: '8px' }} />
+                    <span>{fetchError}</span>
+                </div>
+            )}
+
+            {interactionError && (
+                <div className="error-banner" style={{
+                    background: 'rgba(59, 130, 246, 0.1)',
+                    border: '1px solid rgba(59, 130, 246, 0.3)',
+                    borderRadius: '12px',
+                    padding: '16px',
+                    marginBottom: '24px',
+                    color: 'var(--accent-blue)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <RefreshCw size={14} style={{ marginRight: '8px' }} />
+                    <span>🔐 Session expired or additional permissions required.</span>
+                    <button
+                        onClick={() => refetch(true)}
+                        style={{
+                            background: 'var(--accent-blue)',
+                            color: 'white',
+                            border: 'none',
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Reconnect
+                    </button>
                 </div>
             )}
 
@@ -330,7 +314,7 @@ const TeamsDashboard = () => {
                     </div>
                     <div className="chart-body" style={{ height: '220px', width: '100%' }}>
                         {visibilityData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
                                 <PieChart>
                                     <Pie
                                         data={visibilityData}
