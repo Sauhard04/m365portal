@@ -3984,11 +3984,11 @@
           ],
           "deviceByPlatform": [
             {
-              "name": "macOS",
+              "name": "Windows",
               "value": 1
             },
             {
-              "name": "Windows",
+              "name": "macOS",
               "value": 1
             }
           ],
@@ -4022,8 +4022,8 @@
           "signIns": [
             {
               "name": "Last 24h",
-              "failed": 50,
-              "successful": 50
+              "failed": 19,
+              "successful": 40
             }
           ],
           "emailTrend": [
@@ -4086,7 +4086,7 @@
             },
             {
               "subject": "Sign-in Success",
-              "value": 50,
+              "value": 68,
               "fullMark": 100
             }
           ],
@@ -4117,7 +4117,7 @@
           "licenseTrendComposed": []
         }
       },
-      "timestamp": 1770182057426,
+      "timestamp": 1770195936184,
       "source": "OverviewDashboard"
     },
     "birdsEye": {
@@ -4225,7 +4225,7 @@
           "storage": 57612224557
         }
       },
-      "timestamp": 1770182507570,
+      "timestamp": 1770195947625,
       "source": "BirdsEyeView"
     },
     "entra_id": {
@@ -5189,7 +5189,7 @@
           "counts": []
         }
       },
-      "timestamp": 1770182946362,
+      "timestamp": 1770189449323,
       "source": "UsageReports",
       "period": "D7"
     },
@@ -9115,7 +9115,7 @@
         },
         "period": "D180"
       },
-      "timestamp": 1770182947403,
+      "timestamp": 1770189450418,
       "source": "UsageReports_Background",
       "period": "D180"
     },
@@ -11646,7 +11646,7 @@
           "coverage": 58
         }
       },
-      "timestamp": 1770182134384,
+      "timestamp": 1770189429940,
       "source": "SecurityDashboard"
     },
     "governance": {
@@ -12265,7 +12265,7 @@
         "recentActivity": [
           {
             "displayName": "Pilot User",
-            "lastActivityDate": "2026-02-04T05:28:14.757Z",
+            "lastActivityDate": "2026-02-04T07:17:32.642Z",
             "teamChatMessages": 12,
             "privateChatMessages": 45,
             "calls": 3,
@@ -12273,7 +12273,7 @@
           },
           {
             "displayName": "Global Admin",
-            "lastActivityDate": "2026-02-04T04:28:14.757Z",
+            "lastActivityDate": "2026-02-04T06:17:32.642Z",
             "teamChatMessages": 8,
             "privateChatMessages": 12,
             "calls": 1,
@@ -12281,7 +12281,7 @@
           },
           {
             "displayName": "System Auditor",
-            "lastActivityDate": "2026-02-04T03:28:14.757Z",
+            "lastActivityDate": "2026-02-04T05:17:32.642Z",
             "teamChatMessages": 0,
             "privateChatMessages": 5,
             "calls": 0,
@@ -12289,7 +12289,7 @@
           },
           {
             "displayName": "Compliance Manager",
-            "lastActivityDate": "2026-02-03T05:28:14.757Z",
+            "lastActivityDate": "2026-02-03T07:17:32.642Z",
             "teamChatMessages": 15,
             "privateChatMessages": 30,
             "calls": 5,
@@ -12297,7 +12297,7 @@
           },
           {
             "displayName": "Security Expert",
-            "lastActivityDate": "2026-02-02T05:28:14.757Z",
+            "lastActivityDate": "2026-02-02T07:17:32.642Z",
             "teamChatMessages": 5,
             "privateChatMessages": 10,
             "calls": 2,
@@ -12305,9 +12305,13 @@
           }
         ]
       },
-      "timestamp": 1770182894757,
+      "timestamp": 1770189452642,
       "source": "TeamsDashboard"
+    },
+    "securityAlerts": {
+      "data": [],
+      "timestamp": 1770189411757
     }
   },
-  "lastUpdated": 1770182947423
+  "lastUpdated": 1770195947634
 }
