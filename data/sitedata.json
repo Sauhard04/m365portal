@@ -3944,12 +3944,12 @@
           "serviceHealth": [
             {
               "name": "Operational",
-              "value": 21,
+              "value": 22,
               "color": "var(--accent-success)"
             },
             {
               "name": "Issues",
-              "value": 8,
+              "value": 7,
               "color": "var(--accent-error)"
             }
           ],
@@ -4022,25 +4022,20 @@
           "signIns": [
             {
               "name": "Last 24h",
-              "failed": 40,
-              "successful": 53
+              "failed": 38,
+              "successful": 56
             }
           ],
           "emailTrend": [
             {
-              "name": "2026-01-26",
-              "sent": 0,
-              "received": 6
-            },
-            {
               "name": "2026-01-27",
               "sent": 0,
-              "received": 0
+              "received": 2
             },
             {
               "name": "2026-01-28",
               "sent": 0,
-              "received": 0
+              "received": 6
             },
             {
               "name": "2026-01-29",
@@ -4050,17 +4045,22 @@
             {
               "name": "2026-01-30",
               "sent": 0,
-              "received": 80
+              "received": 0
             },
             {
               "name": "2026-01-31",
               "sent": 0,
-              "received": 6
+              "received": 0
             },
             {
               "name": "2026-02-01",
               "sent": 0,
-              "received": 1
+              "received": 80
+            },
+            {
+              "name": "2026-02-02",
+              "sent": 0,
+              "received": 6
             }
           ],
           "securityRadar": [
@@ -4086,7 +4086,7 @@
             },
             {
               "subject": "Sign-in Success",
-              "value": 57,
+              "value": 60,
               "fullMark": 100
             }
           ],
@@ -4117,7 +4117,7 @@
           "licenseTrendComposed": []
         }
       },
-      "timestamp": 1770109895846,
+      "timestamp": 1770187413235,
       "source": "OverviewDashboard"
     },
     "birdsEye": {
@@ -4389,11 +4389,11 @@
             {
               "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
               "displayName": "vivek",
-              "lastActivityDate": "2026-01-31",
+              "lastActivityDate": "2026-02-02",
               "teamChatMessages": 0,
               "privateChatMessages": 0,
               "calls": 0,
-              "meetings": 2
+              "meetings": 1
             },
             {
               "userPrincipalName": "Vishal@intunetraininglabs.onmicrosoft.com",
@@ -4479,6 +4479,13 @@
           ],
           "counts": [
             {
+              "reportDate": "2026-02-02",
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 1
+            },
+            {
               "reportDate": "2026-02-01",
               "teamChatMessages": 0,
               "privateChatMessages": 0,
@@ -4519,174 +4526,6 @@
               "privateChatMessages": 0,
               "calls": 0,
               "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-26",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-25",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-24",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-23",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-22",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-21",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-20",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-19",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-18",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-17",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-16",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-15",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-14",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-13",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-12",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-11",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-10",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-09",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-08",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-07",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 1
-            },
-            {
-              "reportDate": "2026-01-06",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-05",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 1
-            },
-            {
-              "reportDate": "2026-01-04",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
-            },
-            {
-              "reportDate": "2026-01-03",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
             }
           ]
         },
@@ -4697,7 +4536,7 @@
               "displayName": "Vivek Kumar",
               "lastActivityDate": "2026-01-28",
               "sendCount": 0,
-              "receiveCount": 35,
+              "receiveCount": 18,
               "readCount": 3
             },
             {
@@ -4705,7 +4544,7 @@
               "displayName": "Vishal",
               "lastActivityDate": null,
               "sendCount": 0,
-              "receiveCount": 30,
+              "receiveCount": 19,
               "readCount": 0
             },
             {
@@ -4713,7 +4552,7 @@
               "displayName": "anje",
               "lastActivityDate": null,
               "sendCount": 0,
-              "receiveCount": 17,
+              "receiveCount": 18,
               "readCount": 0
             },
             {
@@ -4721,7 +4560,7 @@
               "displayName": "PN",
               "lastActivityDate": "2025-11-25",
               "sendCount": 0,
-              "receiveCount": 30,
+              "receiveCount": 18,
               "readCount": 0
             },
             {
@@ -4744,16 +4583,16 @@
               "userPrincipalName": "pilotuser@intunetraininglabs.onmicrosoft.com",
               "displayName": "Pilot User",
               "lastActivityDate": "2026-01-27",
-              "sendCount": 3,
-              "receiveCount": 41,
-              "readCount": 14
+              "sendCount": 0,
+              "receiveCount": 18,
+              "readCount": 1
             },
             {
               "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
               "displayName": "Demo User",
               "lastActivityDate": "2025-12-30",
               "sendCount": 0,
-              "receiveCount": 33,
+              "receiveCount": 18,
               "readCount": 0
             },
             {
@@ -4761,7 +4600,7 @@
               "displayName": "Parth Narang",
               "lastActivityDate": null,
               "sendCount": 0,
-              "receiveCount": 13,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
@@ -4769,190 +4608,52 @@
               "displayName": "User",
               "lastActivityDate": "2025-12-13",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 0,
               "readCount": 0
             }
           ],
           "counts": [
             {
-              "reportDate": "2026-01-03",
-              "sendCount": 0,
-              "receiveCount": 6,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-04",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-05",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-06",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-07",
-              "sendCount": 0,
-              "receiveCount": 80,
-              "readCount": 3
-            },
-            {
-              "reportDate": "2026-01-08",
-              "sendCount": 0,
-              "receiveCount": 6,
-              "readCount": 1
-            },
-            {
-              "reportDate": "2026-01-09",
-              "sendCount": 0,
-              "receiveCount": 1,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-10",
-              "sendCount": 0,
-              "receiveCount": 6,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-11",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-12",
-              "sendCount": 1,
-              "receiveCount": 0,
-              "readCount": 1
-            },
-            {
-              "reportDate": "2026-01-13",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-14",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-15",
-              "sendCount": 0,
-              "receiveCount": 6,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-16",
-              "sendCount": 0,
-              "receiveCount": 1,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-17",
-              "sendCount": 0,
-              "receiveCount": 6,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-18",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-19",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-20",
-              "sendCount": 0,
-              "receiveCount": 7,
-              "readCount": 3
-            },
-            {
-              "reportDate": "2026-01-21",
-              "sendCount": 0,
-              "receiveCount": 9,
-              "readCount": 9
-            },
-            {
-              "reportDate": "2026-01-22",
-              "sendCount": 2,
-              "receiveCount": 9,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-23",
+              "reportDate": "2026-01-27",
               "sendCount": 0,
               "receiveCount": 2,
               "readCount": 0
             },
             {
-              "reportDate": "2026-01-24",
-              "sendCount": 0,
-              "receiveCount": 6,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-25",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-26",
-              "sendCount": 0,
-              "receiveCount": 21,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2026-01-27",
-              "sendCount": 0,
-              "receiveCount": 1,
-              "readCount": 0
-            },
-            {
               "reportDate": "2026-01-28",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 6,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-29",
               "sendCount": 0,
-              "receiveCount": 5,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-30",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-31",
               "sendCount": 0,
-              "receiveCount": 6,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2026-02-01",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "receiveCount": 80,
+              "readCount": 3
+            },
+            {
+              "reportDate": "2026-02-02",
+              "sendCount": 0,
+              "receiveCount": 6,
+              "readCount": 1
             }
           ]
         },
@@ -5146,7 +4847,7 @@
               "syncedFileCount": 0,
               "sharedInternalFileCount": 0,
               "sharedExternalFileCount": 0,
-              "storageUsedInBytes": 1155734
+              "storageUsedInBytes": 1156007
             },
             {
               "siteUrl": "",
@@ -5166,7 +4867,7 @@
               "syncedFileCount": 0,
               "sharedInternalFileCount": 0,
               "sharedExternalFileCount": 0,
-              "storageUsedInBytes": 4828562
+              "storageUsedInBytes": 4839253
             },
             {
               "siteUrl": "",
@@ -5291,6 +4992,11 @@
           ],
           "counts": [
             {
+              "reportDate": "2026-02-02",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0
+            },
+            {
               "reportDate": "2026-02-01",
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0
@@ -5319,293 +5025,282 @@
               "reportDate": "2026-01-27",
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-26",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-25",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-24",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-23",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-22",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-21",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-20",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-19",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-18",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-17",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-16",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-15",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-14",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-13",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-12",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-11",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-10",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-09",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-08",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-07",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-06",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-05",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-04",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2026-01-03",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
             }
           ]
         },
         "onedrive": {
           "detail": [
             {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": "2026-01-31",
-              "viewedOrEditedFileCount": 1,
-              "syncedFileCount": 5,
-              "sharedInternallyFileCount": 0,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)",
-                "MICROSOFT COPILOT STUDIO VIRAL TRIAL"
-              ],
-              "reportPeriod": "30"
-            },
-            {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "Vishal@intunetraininglabs.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": null,
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 57583785989,
+              "activeFileCount": 1,
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0,
-              "sharedInternallyFileCount": 0,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
-              ],
-              "reportPeriod": "30"
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2026-02-02"
             },
             {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "anje@intunetraininglabs.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": null,
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 12171355,
+              "activeFileCount": 0,
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0,
-              "sharedInternallyFileCount": 0,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT POWER APPS FOR DEVELOPER",
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)",
-                "MICROSOFT COPILOT STUDIO VIRAL TRIAL",
-                "MICROSOFT POWER AUTOMATE FREE"
-              ],
-              "reportPeriod": "30"
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-09-01"
             },
             {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "PN510950@sswari.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": "2024-05-07",
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 3391675,
+              "activeFileCount": 0,
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0,
-              "sharedInternallyFileCount": 0,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)",
-                "MICROSOFT POWER AUTOMATE FREE"
-              ],
-              "reportPeriod": "30"
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-12-30"
             },
             {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "jitesh@intunetraininglabs.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": null,
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 2772764,
+              "activeFileCount": 0,
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0,
-              "sharedInternallyFileCount": 0,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
-              ],
-              "reportPeriod": "30"
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-08-28"
             },
             {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "jatin.kansal_onmeridian.com#EXT#@sswari.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": null,
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 2327863,
+              "activeFileCount": 0,
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0,
-              "sharedInternallyFileCount": 0,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
-              ],
-              "reportPeriod": "30"
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2026-01-14"
             },
             {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "pilotuser@intunetraininglabs.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": "2026-01-14",
-              "viewedOrEditedFileCount": 2,
-              "syncedFileCount": 0,
-              "sharedInternallyFileCount": 0,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
-              ],
-              "reportPeriod": "30"
-            },
-            {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": "2025-12-30",
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 1315278,
+              "activeFileCount": 0,
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0,
-              "sharedInternallyFileCount": 0,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
-              ],
-              "reportPeriod": "30"
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-08-18"
             },
             {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "pn@intunetraininglabs.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": null,
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 1245099,
+              "activeFileCount": 0,
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0,
-              "sharedInternallyFileCount": 0,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
-              ],
-              "reportPeriod": "30"
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-07-21"
             },
             {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "user@intunetraininglabs.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": "2025-12-12",
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 734797,
+              "activeFileCount": 0,
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0,
-              "sharedInternallyFileCount": 0,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
-              ],
-              "reportPeriod": "30"
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-12-12"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 728794,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-08-26"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 728147,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-02-16"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 530293,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-08-25"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 308216,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-06-24"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 271572,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2024-05-07"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 239972,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2024-12-10"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 202522,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2026-01-03"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 197790,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "Never"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 182272,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2024-07-31"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 165766,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2024-10-05"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 159629,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "Never"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 159580,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "Never"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 159528,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "Never"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 159325,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "Never"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 159239,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "Never"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 127092,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "Never"
             }
           ],
           "counts": []
         }
       },
-      "timestamp": 1770111862991,
+      "timestamp": 1770187312133,
       "source": "UsageReports",
-      "period": "D30"
+      "period": "D7"
     },
     "usageReports_D180": {
       "data": {
@@ -5614,11 +5309,11 @@
             {
               "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
               "displayName": "vivek",
-              "lastActivityDate": "2026-01-31",
+              "lastActivityDate": "2026-02-02",
               "teamChatMessages": 0,
               "privateChatMessages": 1,
               "calls": 0,
-              "meetings": 12
+              "meetings": 13
             },
             {
               "userPrincipalName": "Vishal@intunetraininglabs.onmicrosoft.com",
@@ -5703,6 +5398,13 @@
             }
           ],
           "counts": [
+            {
+              "reportDate": "2026-02-02",
+              "teamChatMessages": 0,
+              "privateChatMessages": 0,
+              "calls": 0,
+              "meetings": 1
+            },
             {
               "reportDate": "2026-02-01",
               "teamChatMessages": 0,
@@ -6955,13 +6657,6 @@
               "privateChatMessages": 0,
               "calls": 0,
               "meetings": 0
-            },
-            {
-              "reportDate": "2025-08-06",
-              "teamChatMessages": 0,
-              "privateChatMessages": 0,
-              "calls": 0,
-              "meetings": 0
             }
           ]
         },
@@ -6980,7 +6675,7 @@
               "displayName": "Vishal",
               "lastActivityDate": null,
               "sendCount": 0,
-              "receiveCount": 30,
+              "receiveCount": 31,
               "readCount": 0
             },
             {
@@ -6988,7 +6683,7 @@
               "displayName": "anje",
               "lastActivityDate": null,
               "sendCount": 0,
-              "receiveCount": 17,
+              "receiveCount": 18,
               "readCount": 0
             },
             {
@@ -6996,7 +6691,7 @@
               "displayName": "PN",
               "lastActivityDate": "2025-11-25",
               "sendCount": 0,
-              "receiveCount": 92,
+              "receiveCount": 91,
               "readCount": 1
             },
             {
@@ -7050,21 +6745,15 @@
           ],
           "counts": [
             {
-              "reportDate": "2025-08-06",
-              "sendCount": 0,
-              "receiveCount": 6,
-              "readCount": 0
-            },
-            {
               "reportDate": "2025-08-07",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 2,
               "readCount": 0
             },
             {
               "reportDate": "2025-08-08",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 6,
               "readCount": 0
             },
             {
@@ -7076,38 +6765,38 @@
             {
               "reportDate": "2025-08-10",
               "sendCount": 0,
-              "receiveCount": 80,
-              "readCount": 3
+              "receiveCount": 0,
+              "readCount": 0
             },
             {
               "reportDate": "2025-08-11",
               "sendCount": 0,
-              "receiveCount": 6,
-              "readCount": 1
+              "receiveCount": 0,
+              "readCount": 0
             },
             {
               "reportDate": "2025-08-12",
               "sendCount": 0,
-              "receiveCount": 1,
-              "readCount": 0
+              "receiveCount": 80,
+              "readCount": 3
             },
             {
               "reportDate": "2025-08-13",
               "sendCount": 0,
               "receiveCount": 6,
-              "readCount": 0
+              "readCount": 1
             },
             {
               "reportDate": "2025-08-14",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
               "reportDate": "2025-08-15",
-              "sendCount": 1,
-              "receiveCount": 0,
-              "readCount": 1
+              "sendCount": 0,
+              "receiveCount": 6,
+              "readCount": 0
             },
             {
               "reportDate": "2025-08-16",
@@ -7117,20 +6806,20 @@
             },
             {
               "reportDate": "2025-08-17",
+              "sendCount": 1,
+              "receiveCount": 0,
+              "readCount": 1
+            },
+            {
+              "reportDate": "2025-08-18",
               "sendCount": 0,
               "receiveCount": 0,
               "readCount": 0
             },
             {
-              "reportDate": "2025-08-18",
-              "sendCount": 0,
-              "receiveCount": 6,
-              "readCount": 0
-            },
-            {
               "reportDate": "2025-08-19",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
@@ -7142,73 +6831,73 @@
             {
               "reportDate": "2025-08-21",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
               "reportDate": "2025-08-22",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 6,
               "readCount": 0
             },
             {
               "reportDate": "2025-08-23",
               "sendCount": 0,
-              "receiveCount": 7,
-              "readCount": 3
+              "receiveCount": 0,
+              "readCount": 0
             },
             {
               "reportDate": "2025-08-24",
-              "sendCount": 0,
-              "receiveCount": 9,
-              "readCount": 9
-            },
-            {
-              "reportDate": "2025-08-25",
-              "sendCount": 2,
-              "receiveCount": 9,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2025-08-26",
-              "sendCount": 0,
-              "receiveCount": 2,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2025-08-27",
-              "sendCount": 0,
-              "receiveCount": 6,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2025-08-28",
               "sendCount": 0,
               "receiveCount": 0,
               "readCount": 0
             },
             {
+              "reportDate": "2025-08-25",
+              "sendCount": 0,
+              "receiveCount": 7,
+              "readCount": 3
+            },
+            {
+              "reportDate": "2025-08-26",
+              "sendCount": 0,
+              "receiveCount": 9,
+              "readCount": 9
+            },
+            {
+              "reportDate": "2025-08-27",
+              "sendCount": 2,
+              "receiveCount": 9,
+              "readCount": 0
+            },
+            {
+              "reportDate": "2025-08-28",
+              "sendCount": 0,
+              "receiveCount": 2,
+              "readCount": 0
+            },
+            {
               "reportDate": "2025-08-29",
               "sendCount": 0,
-              "receiveCount": 21,
+              "receiveCount": 6,
               "readCount": 0
             },
             {
               "reportDate": "2025-08-30",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-08-31",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 21,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-01",
               "sendCount": 0,
-              "receiveCount": 5,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
@@ -7220,127 +6909,127 @@
             {
               "reportDate": "2025-09-03",
               "sendCount": 0,
-              "receiveCount": 6,
+              "receiveCount": 5,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-04",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-05",
               "sendCount": 0,
-              "receiveCount": 5,
+              "receiveCount": 6,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-06",
               "sendCount": 0,
-              "receiveCount": 5,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-07",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 5,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-08",
+              "sendCount": 0,
+              "receiveCount": 5,
+              "readCount": 0
+            },
+            {
+              "reportDate": "2025-09-09",
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
+            },
+            {
+              "reportDate": "2025-09-10",
               "sendCount": 4,
               "receiveCount": 10,
               "readCount": 2
             },
             {
-              "reportDate": "2025-09-09",
-              "sendCount": 0,
-              "receiveCount": 5,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2025-09-10",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
-            },
-            {
               "reportDate": "2025-09-11",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 5,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-12",
               "sendCount": 0,
-              "receiveCount": 2,
-              "readCount": 8
-            },
-            {
-              "reportDate": "2025-09-13",
-              "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
-              "reportDate": "2025-09-14",
+              "reportDate": "2025-09-13",
               "sendCount": 0,
               "receiveCount": 0,
               "readCount": 0
             },
             {
+              "reportDate": "2025-09-14",
+              "sendCount": 0,
+              "receiveCount": 2,
+              "readCount": 8
+            },
+            {
               "reportDate": "2025-09-15",
               "sendCount": 0,
-              "receiveCount": 7,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-16",
               "sendCount": 0,
-              "receiveCount": 5,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-17",
               "sendCount": 0,
-              "receiveCount": 5,
+              "receiveCount": 7,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-18",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 5,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-19",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 5,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-20",
               "sendCount": 0,
-              "receiveCount": 8,
-              "readCount": 14
+              "receiveCount": 1,
+              "readCount": 0
             },
             {
               "reportDate": "2025-09-21",
               "sendCount": 0,
-              "receiveCount": 2,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-22",
               "sendCount": 0,
-              "receiveCount": 4,
-              "readCount": 0
+              "receiveCount": 8,
+              "readCount": 14
             },
             {
               "reportDate": "2025-09-23",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 2,
               "readCount": 0
             },
             {
@@ -7351,63 +7040,63 @@
             },
             {
               "reportDate": "2025-09-25",
-              "sendCount": 3,
-              "receiveCount": 6,
+              "sendCount": 0,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-26",
-              "sendCount": 2,
+              "sendCount": 0,
               "receiveCount": 4,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-27",
-              "sendCount": 0,
-              "receiveCount": 1,
-              "readCount": 1
+              "sendCount": 3,
+              "receiveCount": 6,
+              "readCount": 0
             },
             {
               "reportDate": "2025-09-28",
-              "sendCount": 0,
-              "receiveCount": 0,
+              "sendCount": 2,
+              "receiveCount": 4,
               "readCount": 0
             },
             {
               "reportDate": "2025-09-29",
               "sendCount": 0,
+              "receiveCount": 1,
+              "readCount": 1
+            },
+            {
+              "reportDate": "2025-09-30",
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
+            },
+            {
+              "reportDate": "2025-10-01",
+              "sendCount": 0,
               "receiveCount": 6,
               "readCount": 2
             },
             {
-              "reportDate": "2025-09-30",
+              "reportDate": "2025-10-02",
               "sendCount": 1,
               "receiveCount": 3,
               "readCount": 3
             },
             {
-              "reportDate": "2025-10-01",
+              "reportDate": "2025-10-03",
               "sendCount": 0,
               "receiveCount": 4,
               "readCount": 0
             },
             {
-              "reportDate": "2025-10-02",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2025-10-03",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
-            },
-            {
               "reportDate": "2025-10-04",
-              "sendCount": 1,
-              "receiveCount": 3,
-              "readCount": 3
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
             },
             {
               "reportDate": "2025-10-05",
@@ -7417,27 +7106,27 @@
             },
             {
               "reportDate": "2025-10-06",
-              "sendCount": 2,
-              "receiveCount": 4,
+              "sendCount": 1,
+              "receiveCount": 3,
               "readCount": 3
             },
             {
               "reportDate": "2025-10-07",
               "sendCount": 0,
-              "receiveCount": 1,
-              "readCount": 1
+              "receiveCount": 0,
+              "readCount": 0
             },
             {
               "reportDate": "2025-10-08",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "sendCount": 2,
+              "receiveCount": 4,
+              "readCount": 3
             },
             {
               "reportDate": "2025-10-09",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "receiveCount": 1,
+              "readCount": 1
             },
             {
               "reportDate": "2025-10-10",
@@ -7460,49 +7149,49 @@
             {
               "reportDate": "2025-10-13",
               "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
+            },
+            {
+              "reportDate": "2025-10-14",
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
+            },
+            {
+              "reportDate": "2025-10-15",
+              "sendCount": 0,
               "receiveCount": 5,
               "readCount": 3
             },
             {
-              "reportDate": "2025-10-14",
+              "reportDate": "2025-10-16",
               "sendCount": 8,
               "receiveCount": 8,
               "readCount": 8
             },
             {
-              "reportDate": "2025-10-15",
-              "sendCount": 0,
-              "receiveCount": 4,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2025-10-16",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
-            },
-            {
               "reportDate": "2025-10-17",
               "sendCount": 0,
               "receiveCount": 4,
-              "readCount": 20
+              "readCount": 0
             },
             {
               "reportDate": "2025-10-18",
               "sendCount": 0,
-              "receiveCount": 6,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-10-19",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "receiveCount": 4,
+              "readCount": 20
             },
             {
               "reportDate": "2025-10-20",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 6,
               "readCount": 0
             },
             {
@@ -7526,50 +7215,50 @@
             {
               "reportDate": "2025-10-24",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 1
+              "receiveCount": 3,
+              "readCount": 0
             },
             {
               "reportDate": "2025-10-25",
-              "sendCount": 1,
-              "receiveCount": 1,
+              "sendCount": 0,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-10-26",
               "sendCount": 0,
               "receiveCount": 0,
-              "readCount": 0
+              "readCount": 1
             },
             {
               "reportDate": "2025-10-27",
-              "sendCount": 0,
-              "receiveCount": 4,
+              "sendCount": 1,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
               "reportDate": "2025-10-28",
               "sendCount": 0,
-              "receiveCount": 1,
-              "readCount": 9
+              "receiveCount": 0,
+              "readCount": 0
             },
             {
               "reportDate": "2025-10-29",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 4,
               "readCount": 0
             },
             {
               "reportDate": "2025-10-30",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "receiveCount": 1,
+              "readCount": 9
             },
             {
               "reportDate": "2025-10-31",
-              "sendCount": 1,
-              "receiveCount": 4,
-              "readCount": 5
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 0
             },
             {
               "reportDate": "2025-11-01",
@@ -7579,32 +7268,32 @@
             },
             {
               "reportDate": "2025-11-02",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "sendCount": 1,
+              "receiveCount": 4,
+              "readCount": 5
             },
             {
               "reportDate": "2025-11-03",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-11-04",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-11-05",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
               "reportDate": "2025-11-06",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
@@ -7616,7 +7305,7 @@
             {
               "reportDate": "2025-11-08",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
@@ -7628,8 +7317,8 @@
             {
               "reportDate": "2025-11-10",
               "sendCount": 0,
-              "receiveCount": 6,
-              "readCount": 1
+              "receiveCount": 0,
+              "readCount": 0
             },
             {
               "reportDate": "2025-11-11",
@@ -7640,8 +7329,8 @@
             {
               "reportDate": "2025-11-12",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "receiveCount": 6,
+              "readCount": 1
             },
             {
               "reportDate": "2025-11-13",
@@ -7658,7 +7347,7 @@
             {
               "reportDate": "2025-11-15",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
@@ -7670,7 +7359,7 @@
             {
               "reportDate": "2025-11-17",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
@@ -7694,7 +7383,7 @@
             {
               "reportDate": "2025-11-21",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
@@ -7706,19 +7395,19 @@
             {
               "reportDate": "2025-11-23",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-11-24",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-11-25",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
@@ -7730,19 +7419,19 @@
             {
               "reportDate": "2025-11-27",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
               "reportDate": "2025-11-28",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
               "reportDate": "2025-11-29",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
@@ -7754,44 +7443,44 @@
             {
               "reportDate": "2025-12-01",
               "sendCount": 0,
-              "receiveCount": 6,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-02",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-03",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 6,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-04",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-05",
               "sendCount": 0,
-              "receiveCount": 3,
-              "readCount": 3
+              "receiveCount": 0,
+              "readCount": 0
             },
             {
               "reportDate": "2025-12-06",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-07",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 2
+              "receiveCount": 3,
+              "readCount": 3
             },
             {
               "reportDate": "2025-12-08",
@@ -7802,19 +7491,19 @@
             {
               "reportDate": "2025-12-09",
               "sendCount": 0,
-              "receiveCount": 7,
-              "readCount": 0
+              "receiveCount": 0,
+              "readCount": 2
             },
             {
               "reportDate": "2025-12-10",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 3,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-11",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 7,
               "readCount": 0
             },
             {
@@ -7826,7 +7515,7 @@
             {
               "reportDate": "2025-12-13",
               "sendCount": 0,
-              "receiveCount": 3,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
@@ -7843,45 +7532,45 @@
             },
             {
               "reportDate": "2025-12-16",
-              "sendCount": 1,
-              "receiveCount": 2,
+              "sendCount": 0,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-17",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
-            },
-            {
-              "reportDate": "2025-12-18",
-              "sendCount": 0,
               "receiveCount": 3,
               "readCount": 0
             },
             {
-              "reportDate": "2025-12-19",
+              "reportDate": "2025-12-18",
               "sendCount": 1,
               "receiveCount": 2,
               "readCount": 0
             },
             {
-              "reportDate": "2025-12-20",
-              "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 1
-            },
-            {
-              "reportDate": "2025-12-21",
+              "reportDate": "2025-12-19",
               "sendCount": 0,
               "receiveCount": 0,
               "readCount": 0
             },
             {
-              "reportDate": "2025-12-22",
+              "reportDate": "2025-12-20",
               "sendCount": 0,
               "receiveCount": 3,
-              "readCount": 26
+              "readCount": 0
+            },
+            {
+              "reportDate": "2025-12-21",
+              "sendCount": 1,
+              "receiveCount": 2,
+              "readCount": 0
+            },
+            {
+              "reportDate": "2025-12-22",
+              "sendCount": 0,
+              "receiveCount": 0,
+              "readCount": 1
             },
             {
               "reportDate": "2025-12-23",
@@ -7892,8 +7581,8 @@
             {
               "reportDate": "2025-12-24",
               "sendCount": 0,
-              "receiveCount": 2,
-              "readCount": 0
+              "receiveCount": 3,
+              "readCount": 26
             },
             {
               "reportDate": "2025-12-25",
@@ -7904,7 +7593,7 @@
             {
               "reportDate": "2025-12-26",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 2,
               "readCount": 0
             },
             {
@@ -7916,19 +7605,19 @@
             {
               "reportDate": "2025-12-28",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-29",
               "sendCount": 0,
-              "receiveCount": 1,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2025-12-30",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
@@ -7946,7 +7635,7 @@
             {
               "reportDate": "2026-01-02",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 1,
               "readCount": 0
             },
             {
@@ -7964,14 +7653,14 @@
             {
               "reportDate": "2026-01-05",
               "sendCount": 0,
-              "receiveCount": 14,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-06",
               "sendCount": 0,
-              "receiveCount": 44,
-              "readCount": 3
+              "receiveCount": 0,
+              "readCount": 0
             },
             {
               "reportDate": "2026-01-07",
@@ -7982,13 +7671,13 @@
             {
               "reportDate": "2026-01-08",
               "sendCount": 0,
-              "receiveCount": 0,
-              "readCount": 0
+              "receiveCount": 44,
+              "readCount": 3
             },
             {
               "reportDate": "2026-01-09",
               "sendCount": 0,
-              "receiveCount": 45,
+              "receiveCount": 14,
               "readCount": 0
             },
             {
@@ -8000,13 +7689,13 @@
             {
               "reportDate": "2026-01-11",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 45,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-12",
               "sendCount": 0,
-              "receiveCount": 12,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
@@ -8030,7 +7719,7 @@
             {
               "reportDate": "2026-01-16",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 12,
               "readCount": 0
             },
             {
@@ -8048,7 +7737,7 @@
             {
               "reportDate": "2026-01-19",
               "sendCount": 0,
-              "receiveCount": 12,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
@@ -8072,13 +7761,13 @@
             {
               "reportDate": "2026-01-23",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 12,
               "readCount": 0
             },
             {
               "reportDate": "2026-01-24",
               "sendCount": 0,
-              "receiveCount": 12,
+              "receiveCount": 0,
               "readCount": 0
             },
             {
@@ -8090,7 +7779,7 @@
             {
               "reportDate": "2026-01-26",
               "sendCount": 0,
-              "receiveCount": 24,
+              "receiveCount": 12,
               "readCount": 0
             },
             {
@@ -8102,7 +7791,7 @@
             {
               "reportDate": "2026-01-28",
               "sendCount": 0,
-              "receiveCount": 0,
+              "receiveCount": 24,
               "readCount": 0
             },
             {
@@ -8126,7 +7815,13 @@
             {
               "reportDate": "2026-02-01",
               "sendCount": 0,
-              "receiveCount": 12,
+              "receiveCount": 0,
+              "readCount": 0
+            },
+            {
+              "reportDate": "2026-02-02",
+              "sendCount": 0,
+              "receiveCount": 0,
               "readCount": 0
             }
           ]
@@ -8321,7 +8016,7 @@
               "syncedFileCount": 0,
               "sharedInternalFileCount": 0,
               "sharedExternalFileCount": 0,
-              "storageUsedInBytes": 1155734
+              "storageUsedInBytes": 1156007
             },
             {
               "siteUrl": "",
@@ -8341,7 +8036,7 @@
               "syncedFileCount": 0,
               "sharedInternalFileCount": 0,
               "sharedExternalFileCount": 0,
-              "storageUsedInBytes": 4828562
+              "storageUsedInBytes": 4839253
             },
             {
               "siteUrl": "",
@@ -8465,6 +8160,11 @@
             }
           ],
           "counts": [
+            {
+              "reportDate": "2026-02-02",
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0
+            },
             {
               "reportDate": "2026-02-01",
               "viewedOrEditedFileCount": 0,
@@ -9359,180 +9059,284 @@
               "reportDate": "2025-08-07",
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0
-            },
-            {
-              "reportDate": "2025-08-06",
-              "viewedOrEditedFileCount": 0,
-              "syncedFileCount": 0
             }
           ]
         },
         "onedrive": {
           "detail": [
             {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": "2026-01-31",
-              "viewedOrEditedFileCount": 25,
-              "syncedFileCount": 172,
-              "sharedInternallyFileCount": 0,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)",
-                "MICROSOFT COPILOT STUDIO VIRAL TRIAL"
-              ],
-              "reportPeriod": "180"
-            },
-            {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "Vishal@intunetraininglabs.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": null,
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 57583785989,
+              "activeFileCount": 194,
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0,
-              "sharedInternallyFileCount": 0,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
-              ],
-              "reportPeriod": "180"
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2026-02-02"
             },
             {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "anje@intunetraininglabs.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": null,
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 12171355,
+              "activeFileCount": 1,
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0,
-              "sharedInternallyFileCount": 0,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT POWER APPS FOR DEVELOPER",
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)",
-                "MICROSOFT COPILOT STUDIO VIRAL TRIAL",
-                "MICROSOFT POWER AUTOMATE FREE"
-              ],
-              "reportPeriod": "180"
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-09-01"
             },
             {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "PN510950@sswari.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": "2024-05-07",
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 3391675,
+              "activeFileCount": 2,
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0,
-              "sharedInternallyFileCount": 0,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)",
-                "MICROSOFT POWER AUTOMATE FREE"
-              ],
-              "reportPeriod": "180"
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-12-30"
             },
             {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "jitesh@intunetraininglabs.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": null,
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 2772764,
+              "activeFileCount": 1,
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0,
-              "sharedInternallyFileCount": 0,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
-              ],
-              "reportPeriod": "180"
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-08-28"
             },
             {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "jatin.kansal_onmeridian.com#EXT#@sswari.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": null,
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 2327863,
+              "activeFileCount": 13,
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0,
-              "sharedInternallyFileCount": 0,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
-              ],
-              "reportPeriod": "180"
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2026-01-14"
             },
             {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "pilotuser@intunetraininglabs.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": "2026-01-14",
-              "viewedOrEditedFileCount": 11,
-              "syncedFileCount": 0,
-              "sharedInternallyFileCount": 2,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
-              ],
-              "reportPeriod": "180"
-            },
-            {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": "2025-12-30",
-              "viewedOrEditedFileCount": 2,
-              "syncedFileCount": 1,
-              "sharedInternallyFileCount": 1,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
-              ],
-              "reportPeriod": "180"
-            },
-            {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "pn@intunetraininglabs.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": null,
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 1315278,
+              "activeFileCount": 1,
               "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0,
-              "sharedInternallyFileCount": 0,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
-              ],
-              "reportPeriod": "180"
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-08-18"
             },
             {
-              "reportRefreshDate": "2026-02-01",
-              "userPrincipalName": "user@intunetraininglabs.onmicrosoft.com",
-              "isDeleted": false,
-              "deletedDate": null,
-              "lastActivityDate": "2025-12-12",
-              "viewedOrEditedFileCount": 5,
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 1245099,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
               "syncedFileCount": 0,
-              "sharedInternallyFileCount": 0,
-              "sharedExternallyFileCount": 0,
-              "assignedProducts": [
-                "MICROSOFT 365 E5 DEVELOPER (WITHOUT WINDOWS AND AUDIO CONFERENCING)"
-              ],
-              "reportPeriod": "180"
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-07-21"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 734797,
+              "activeFileCount": 5,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-12-12"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 728794,
+              "activeFileCount": 1,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-08-26"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 728147,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-02-16"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 530293,
+              "activeFileCount": 1,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-08-25"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 308216,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2025-06-24"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 271572,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2024-05-07"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 239972,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2024-12-10"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 202522,
+              "activeFileCount": 1,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2026-01-03"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 197790,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "Never"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 182272,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2024-07-31"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 165766,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "2024-10-05"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 159629,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "Never"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 159580,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "Never"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 159528,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "Never"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 159325,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "Never"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 159239,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "Never"
+            },
+            {
+              "userPrincipalName": "N/A",
+              "displayName": "Unknown User",
+              "storageUsedInBytes": 127092,
+              "activeFileCount": 0,
+              "viewedOrEditedFileCount": 0,
+              "syncedFileCount": 0,
+              "sharedInternalFileCount": 0,
+              "sharedExternalFileCount": 0,
+              "lastActivityDate": "Never"
             }
           ],
           "counts": []
         },
         "period": "D180"
       },
-      "timestamp": 1770111861250,
+      "timestamp": 1770187312991,
       "source": "UsageReports_Background",
       "period": "D180"
     }
   },
-  "lastUpdated": 1770111863000
+  "lastUpdated": 1770187413244
 }

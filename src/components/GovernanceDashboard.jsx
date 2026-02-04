@@ -25,7 +25,10 @@ const GovernanceDashboard = () => {
         conditionalAccess: { total: 0, enabled: 0, disabled: 0, policies: [] },
         roles: { definitions: 0, assignments: 0, eligibleAssignments: 0, privilegedAssignments: 0 },
         accessReviews: { total: 0, active: 0, reviews: [] },
-        entitlementManagement: { catalogs: 0 }
+        entitlementManagement: { catalogs: 0 },
+        mfa: { totalUsers: 0, capable: 0, mfaRegistered: 0, ssprRegistered: 0 },
+        compliance: { agreements: 0, agreementsList: [] },
+        audit: []
     });
     const [error, setError] = useState(null);
 
@@ -384,6 +387,98 @@ const GovernanceDashboard = () => {
                 </motion.div>
             </div>
 
+            {/* NEW: Compliance Posture and MFA Health */}
+            <div className="charts-grid" style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+                gap: '20px',
+                marginBottom: '24px'
+            }}>
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="glass-card"
+                    style={{ padding: '20px' }}
+                >
+                    <div className="chart-header">
+                        <h3><Shield size={16} /> Compliance & Posture</h3>
+                    </div>
+                    <div style={{ marginTop: '16px' }}>
+                        <div className="compliance-item">
+                            <div className="flex-between">
+                                <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>MFA Registration</span>
+                                <span style={{ fontSize: '13px', fontWeight: 700 }}>{dashboardData.mfa.totalUsers > 0 ? Math.round((dashboardData.mfa.mfaRegistered / dashboardData.mfa.totalUsers) * 100) : 0}%</span>
+                            </div>
+                            <div className="progress-bar-bg">
+                                <motion.div
+                                    className="progress-bar-fill"
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${dashboardData.mfa.totalUsers > 0 ? (dashboardData.mfa.mfaRegistered / dashboardData.mfa.totalUsers) * 100 : 0}%` }}
+                                    style={{ background: 'var(--accent-success)' }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="compliance-item" style={{ marginTop: '20px' }}>
+                            <div className="flex-between">
+                                <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>SSPR Capability</span>
+                                <span style={{ fontSize: '13px', fontWeight: 700 }}>{dashboardData.mfa.totalUsers > 0 ? Math.round((dashboardData.mfa.ssprRegistered / dashboardData.mfa.totalUsers) * 100) : 0}%</span>
+                            </div>
+                            <div className="progress-bar-bg">
+                                <motion.div
+                                    className="progress-bar-fill"
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${dashboardData.mfa.totalUsers > 0 ? (dashboardData.mfa.ssprRegistered / dashboardData.mfa.totalUsers) * 100 : 0}%` }}
+                                    style={{ background: 'var(--accent-blue)' }}
+                                />
+                            </div>
+                        </div>
+
+                        <div style={{ marginTop: '24px', padding: '12px', background: 'rgba(59, 130, 246, 0.05)', borderRadius: '12px', border: '1px solid rgba(59, 130, 246, 0.1)' }}>
+                            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                                <ClipboardList size={18} style={{ color: 'var(--accent-blue)' }} />
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <span style={{ fontSize: '13px', fontWeight: 700 }}>{dashboardData.compliance.agreements} Terms of Use</span>
+                                    <span style={{ fontSize: '11px', color: 'var(--text-dim)' }}>Active compliance agreements found</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
+
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.7 }}
+                    className="glass-card"
+                    style={{ padding: '20px' }}
+                >
+                    <div className="chart-header">
+                        <h3><RefreshCw size={16} /> Identity Activity Feed</h3>
+                    </div>
+                    <div className="activity-feed" style={{ maxHeight: '250px', overflowY: 'auto', marginTop: '12px' }}>
+                        {dashboardData.audit?.length > 0 ? dashboardData.audit.map((event, idx) => (
+                            <div key={event.id || idx} className="activity-event">
+                                <div className={`event-dot ${event.result === 'success' ? 'success' : 'error'}`} />
+                                <div className="event-details">
+                                    <div className="flex-between">
+                                        <span className="event-title">{event.activity}</span>
+                                        <span className="event-time">{event.timestamp ? new Date(event.timestamp).toLocaleTimeString() : 'Recent'}</span>
+                                    </div>
+                                    <span className="event-actor">{event.actor}</span>
+                                </div>
+                            </div>
+                        )) : (
+                            <div className="no-data-state">
+                                <UserCheck size={30} style={{ opacity: 0.2 }} />
+                                <p style={{ fontSize: '12px' }}>No recent activities</p>
+                            </div>
+                        )}
+                    </div>
+                </motion.div>
+            </div>
+
             {/* Recent CA Policies */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -610,6 +705,52 @@ const GovernanceDashboard = () => {
                     border-radius: 50%;
                     animation: spin 1s linear infinite;
                 }
+
+                .compliance-item {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                }
+                .progress-bar-bg {
+                    height: 6px;
+                    background: var(--glass-border);
+                    border-radius: 3px;
+                    overflow: hidden;
+                }
+                .progress-bar-fill {
+                    height: 100%;
+                    border-radius: 3px;
+                }
+
+                .activity-feed::-webkit-scrollbar {
+                    width: 4px;
+                }
+                .activity-feed::-webkit-scrollbar-thumb {
+                    background: var(--glass-border);
+                    border-radius: 4px;
+                }
+
+                .activity-event {
+                    display: flex;
+                    gap: 12px;
+                    padding: 12px 0;
+                    border-bottom: 1px solid var(--glass-border);
+                }
+                .activity-event:last-child { border-bottom: none; }
+                .event-dot {
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    margin-top: 6px;
+                    flex-shrink: 0;
+                }
+                .event-dot.success { background: #22c55e; box-shadow: 0 0 8px rgba(34, 197, 94, 0.4); }
+                .event-dot.error { background: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.4); }
+                
+                .event-details { flex: 1; }
+                .event-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+                .event-time { font-size: 11px; color: var(--text-dim); }
+                .event-actor { font-size: 11px; color: var(--text-secondary); display: block; margin-top: 2px; }
             `}</style>
         </div >
     );

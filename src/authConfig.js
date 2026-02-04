@@ -36,7 +36,9 @@ export const governanceScopes = {
         "Policy.Read.All",
         "Agreement.Read.All",
         "Directory.Read.All",
-        "AppRoleAssignment.ReadWrite.All"
+        "AppRoleAssignment.ReadWrite.All",
+        "AuditLog.Read.All",
+        "UserAuthenticationMethod.Read.All"
     ]
 };
 
