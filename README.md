@@ -17,6 +17,7 @@ A state-of-the-art **Microsoft 365 Analytics Dashboard** that provides deep insi
 *   **⚡ High Performance**: Implements smart caching (localStorage) and optimized API calls to minimize latency.
 *   **📱 Responsive Data**: Fully responsive design with glassmorphism UI for a premium look and feel.
 *   **🤖 AI Integration**: Built-in context for AI-driven insights (Gemini/Grok integration ready).
+*   **🆘 Get Support**: Integrated support form powered by Web3Forms for quick assistance requests(requests can be seen at https://app.web3forms.com/).
 
 ---
 
