@@ -205,13 +205,62 @@ export class UsageService {
     }
 
     /**
-     * Fetch OneDrive user activity data
+     * Fetch OneDrive user activity data merging activity counts and storage usage
      */
     async getOneDriveUsage(period = 'D7') {
         try {
-            const data = await this.fetchReport('getOneDriveActivityUserDetail', period);
-            return data || [];
-        } catch {
+            // Fetch both activity (detail) and usage (storage) reports
+            const [activityData, usageData] = await Promise.all([
+                this.fetchReport('getOneDriveActivityUserDetail', period),
+                this.fetchReport('getOneDriveUsageAccountDetail', period)
+            ]);
+
+            if (!activityData && !usageData) return [];
+
+            // Helper to get value regardless of key casing
+            const getValue = (obj, key) => {
+                if (!obj) return undefined;
+                const lowerKey = key.toLowerCase();
+                const foundKey = Object.keys(obj).find(k => k.toLowerCase() === lowerKey);
+                return foundKey ? obj[foundKey] : undefined;
+            };
+
+            const activityMap = (activityData || []).reduce((acc, curr) => {
+                const upn = getValue(curr, 'userPrincipalName');
+                if (upn) {
+                    acc[upn.toLowerCase()] = {
+                        viewedOrEdited: parseInt(getValue(curr, 'viewedOrEditedFileCount')) || 0,
+                        synced: parseInt(getValue(curr, 'syncedFileCount')) || 0,
+                        sharedInternal: parseInt(getValue(curr, 'sharedInternalFileCount')) || 0,
+                        sharedExternal: parseInt(getValue(curr, 'sharedExternalFileCount')) || 0,
+                        lastActivityDate: getValue(curr, 'lastActivityDate'),
+                        displayName: getValue(curr, 'displayName')
+                    };
+                }
+                return acc;
+            }, {});
+
+            const merged = (usageData || []).map(usageItem => {
+                const upn = getValue(usageItem, 'userPrincipalName');
+                const lowerUpn = upn ? upn.toLowerCase() : '';
+                const activityItem = activityMap[lowerUpn] || {};
+
+                return {
+                    userPrincipalName: upn || 'N/A',
+                    displayName: getValue(usageItem, 'displayName') || activityItem.displayName || (upn && !upn.includes('-') ? upn.split('@')[0] : 'Unknown User'),
+                    storageUsedInBytes: parseInt(getValue(usageItem, 'storageUsedInBytes')) || 0,
+                    activeFileCount: parseInt(getValue(usageItem, 'activeFileCount')) || 0,
+                    viewedOrEditedFileCount: activityItem.viewedOrEdited || 0,
+                    syncedFileCount: activityItem.synced || 0,
+                    sharedInternalFileCount: activityItem.sharedInternal || 0,
+                    sharedExternalFileCount: activityItem.sharedExternal || 0,
+                    lastActivityDate: getValue(usageItem, 'lastActivityDate') || activityItem.lastActivityDate || 'Never'
+                };
+            });
+
+            return merged.sort((a, b) => b.storageUsedInBytes - a.storageUsedInBytes);
+        } catch (error) {
+            console.error("[UsageService] Error in getOneDriveUsage:", error.message);
             return [];
         }
     }

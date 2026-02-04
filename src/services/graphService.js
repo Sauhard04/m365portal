@@ -445,17 +445,68 @@ export class GraphService {
 
     async getSharePointSiteCount() {
         try {
-            // Fetching site collections. $count is not supported on /sites in many environments.
-            // We fetch a batch and return the count. For a more accurate total on large tenants,
-            // one would need to iterate through all pages or use Search API.
-            const response = await this.client.api("/sites")
-                .select("id")
-                .top(999)
-                .get();
+            console.log("GraphService: Starting SharePoint site discovery cycle...");
+            const siteIds = new Set();
 
-            return response.value?.length || 0;
+            // Strategy 1: Search-based discovery (Standard for all sites)
+            try {
+                const searchRes = await this.client.api("/sites").query({ search: '*' }).select("id").get();
+                if (searchRes.value) searchRes.value.forEach(s => siteIds.add(s.id));
+                console.log(`GraphService: Strategy 1 (Search) found ${siteIds.size} sites.`);
+            } catch (e) {
+                console.debug("GraphService: Strategy 1 search failed");
+            }
+
+            // Strategy 2: Direct listing (Standard for accessible sites)
+            try {
+                const listRes = await this.client.api("/sites").select("id").top(999).get();
+                const startCount = siteIds.size;
+                if (listRes.value) listRes.value.forEach(s => siteIds.add(s.id));
+                console.log(`GraphService: Strategy 2 (Listing) added ${siteIds.size - startCount} unique sites.`);
+            } catch (e) {
+                console.debug("GraphService: Strategy 2 listing failed");
+            }
+
+            // Strategy 3: Usage Report (Deep Discovery - Best for missing sites)
+            if (siteIds.size < 2) { // Only try if we found very little, as reports are expensive
+                try {
+                    // Usage reports often contain sites that don't appear in basic listing
+                    // We use beta because it supports JSON format more reliably for this specific report
+                    const reportRes = await this.client.api("/beta/reports/getSharePointSiteUsageDetail(period='D7')")
+                        .query({ '$format': 'application/json' })
+                        .get();
+
+                    const startCount = siteIds.size;
+                    if (reportRes.value) {
+                        reportRes.value.forEach(s => {
+                            if (s.siteId) siteIds.add(s.siteId);
+                            else if (s.id) siteIds.add(s.id);
+                        });
+                    }
+                    console.log(`GraphService: Strategy 3 (Deep Report) added ${siteIds.size - startCount} unique sites.`);
+                } catch (e) {
+                    console.debug("GraphService: Strategy 3 report failed", e.message);
+                }
+            }
+
+            // Strategy 4: Root site fallback
+            if (siteIds.size === 0) {
+                try {
+                    const root = await this.client.api('/sites/root').select('id').get();
+                    if (root && root.id) {
+                        siteIds.add(root.id);
+                        console.log("GraphService: Strategy 4 (Root) added root site.");
+                    }
+                } catch (e) {
+                    console.debug("GraphService: Strategy 4 root failed");
+                }
+            }
+
+            const finalCount = siteIds.size;
+            console.log(`GraphService: DISCOVERY COMPLETED. Total Unique Sites: ${finalCount}`);
+            return finalCount;
         } catch (error) {
-            console.debug("SharePoint site count fetch failed (optional):", error);
+            console.error("GraphService: SharePoint site count discovery failed:", error);
             return 0;
         }
     }

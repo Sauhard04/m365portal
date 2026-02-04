@@ -89,11 +89,11 @@ export const searchableItems = [
     {
         id: 'sign-ins',
         title: 'Sign-in Logs',
-        description: 'User sign-in activity and failures',
-        path: '/service/admin/sign-ins',
+        description: 'User authentication activity and events',
+        path: '/service/entra/sign-in-logs',
         category: 'Admin Center',
         icon: AlertTriangle,
-        tags: ['sign-in', 'login', 'authentication', 'logs', 'failed', 'activity', 'audit']
+        tags: ['sign-in', 'login', 'authentication', 'logs', 'failed', 'activity', 'audit', 'security']
     },
     {
         id: 'email-activity',

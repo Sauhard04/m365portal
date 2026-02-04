@@ -18,7 +18,6 @@ import EntraApps from './components/EntraApps';
 import EntraEnterpriseApps from './components/EntraEnterpriseApps';
 import EntraSignInLogs from './components/EntraSignInLogs';
 import SecureScorePage from './components/SecureScorePage';
-import SignInsPage from './components/SignInsPage';
 import IntuneMonitoring from './components/IntuneMonitoring';
 import IntuneManagedDevices from './components/IntuneManagedDevices';
 import IntuneNonCompliant from './components/IntuneNonCompliant';
@@ -112,7 +111,6 @@ function App() {
                     <Route path="admin/groups" element={<GroupsPage />} />
                     <Route path="admin/deleted-users" element={<DeletedUsersPage />} />
                     <Route path="admin/secure-score" element={<SecureScorePage />} />
-                    <Route path="admin/sign-ins" element={<SignInsPage />} />
                     <Route path="admin/emails" element={<EmailActivityPage />} />
                     <Route path="admin/alerts" element={<AlertsPage />} />
                     <Route path="admin/profile" element={<UserDetailsPage />} />

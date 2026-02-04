@@ -136,6 +136,54 @@ export const GovernanceService = {
     },
 
     /**
+     * Get MFA registration status for the tenant
+     * @param {Client} client - Microsoft Graph client
+     */
+    async getMfaRegistrationStatus(client) {
+        try {
+            const response = await client.api('/reports/authenticationMethods/userRegistrationDetails')
+                .get();
+            return response.value || [];
+        } catch (error) {
+            console.warn('MFA registration fetch failed:', error);
+            return [];
+        }
+    },
+
+    /**
+     * Get Terms of Use agreements
+     * @param {Client} client - Microsoft Graph client
+     */
+    async getAgreements(client) {
+        try {
+            const response = await client.api('/agreements')
+                .select('id,displayName,isViewingBeforeAcceptanceRequired')
+                .get();
+            return response.value || [];
+        } catch (error) {
+            console.warn('Agreements fetch failed:', error);
+            return [];
+        }
+    },
+
+    /**
+     * Get Governance-related audit logs
+     * @param {Client} client - Microsoft Graph client
+     */
+    async getGovernanceAuditLogs(client) {
+        try {
+            const response = await client.api('/auditLogs/directoryAudits')
+                .filter("category eq 'IdentityGovernance' or category eq 'RoleManagement'")
+                .top(20)
+                .get();
+            return response.value || [];
+        } catch (error) {
+            console.warn('Governance audit logs fetch failed:', error);
+            return [];
+        }
+    },
+
+    /**
      * Get governance dashboard summary
      * @param {Client} client - Microsoft Graph client
      */
@@ -147,14 +195,20 @@ export const GovernanceService = {
                 roleAssignments,
                 eligibleRoles,
                 accessReviews,
-                catalogs
+                catalogs,
+                mfaStatus,
+                agreements,
+                auditLogs
             ] = await Promise.all([
                 this.getConditionalAccessPolicies(client),
                 this.getRoleDefinitions(client),
                 this.getRoleAssignments(client),
                 this.getEligibleRoleAssignments(client),
                 this.getAccessReviews(client),
-                this.getEntitlementCatalogs(client)
+                this.getEntitlementCatalogs(client),
+                this.getMfaRegistrationStatus(client),
+                this.getAgreements(client),
+                this.getGovernanceAuditLogs(client)
             ]);
 
             // CA Policy breakdown by state
@@ -204,8 +258,26 @@ export const GovernanceService = {
                 },
                 entitlementManagement: {
                     catalogs: catalogs.length,
-                    catalogs: catalogs.slice(0, 5)
-                }
+                    catalogsList: catalogs.slice(0, 5)
+                },
+                mfa: {
+                    totalUsers: mfaStatus.length,
+                    capable: mfaStatus.filter(u => u.isMfaCapable).length,
+                    mfaRegistered: mfaStatus.filter(u => u.isMfaRegistered).length,
+                    ssprRegistered: mfaStatus.filter(u => u.isSsprRegistered).length
+                },
+                compliance: {
+                    agreements: agreements.length,
+                    agreementsList: agreements.slice(0, 5)
+                },
+                audit: auditLogs.map(log => ({
+                    id: log.id,
+                    activity: log.activityDisplayName,
+                    category: log.category,
+                    actor: log.initiatedBy?.user?.userPrincipalName || log.initiatedBy?.app?.displayName || 'System',
+                    timestamp: log.activityDateTime,
+                    result: log.result
+                }))
             };
         } catch (error) {
             console.error('Governance dashboard summary fetch failed:', error);

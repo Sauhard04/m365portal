@@ -488,19 +488,17 @@ const UsageReports = () => {
                             <thead>
                                 <tr>
                                     <th>User</th>
-                                    <th>Active Files</th>
                                     <th>Storage Used</th>
-                                    <th>Shared (Int/Ext)</th>
                                     <th>Last Activity</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {latestDetail.slice(0, 10).map((u, i) => (
+                                {latestDetail.slice(0, 50).map((u, i) => (
                                     <tr key={i}>
                                         <td style={{ fontWeight: 600 }}>{u.displayName || u.userPrincipalName}</td>
-                                        <td>{u.activeFileCount}</td>
-                                        <td>{formatGB(u.storageUsedInBytes)} GB</td>
-                                        <td>{u.sharedInternalFileCount} / {u.sharedExternalFileCount}</td>
+                                        <td style={{ fontWeight: 700, color: 'var(--accent-green)' }}>
+                                            {formatGB(u.storageUsedInBytes)} GB
+                                        </td>
                                         <td>{u.lastActivityDate}</td>
                                     </tr>
                                 ))}

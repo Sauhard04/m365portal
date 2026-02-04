@@ -44,18 +44,7 @@ const BirdsEyeView = ({ embedded = false }) => {
         if (!isManual) {
             const cached = await DataPersistenceService.load('BirdsEyeView');
             if (cached && !DataPersistenceService.isExpired('BirdsEyeView', 15)) {
-                // Merge cached data with current structure to ensure all new comprehensive fields exist
-                const mergedStats = {
-                    admin: cached.admin || stats.admin,
-                    entra: { ...stats.entra, ...cached.entra },
-                    licenses: cached.licenses || stats.licenses,
-                    intune: cached.intune || stats.intune,
-                    security: cached.security || stats.security,
-                    collaboration: cached.collaboration || stats.collaboration,
-                    purview: cached.purview || stats.purview,
-                    usage: cached.usage || stats.usage
-                };
-                setStats(mergedStats);
+                setStats(cached);
                 setLoading(false);
                 return;
             }
@@ -63,47 +52,33 @@ const BirdsEyeView = ({ embedded = false }) => {
 
         if (isManual) {
             setRefreshing(true);
-            // Clear broken cache
             await DataPersistenceService.clear('BirdsEyeView');
         } else {
             setLoading(true);
         }
-        console.log("BirdsEyeView: fetchData started", { isManual });
+
         const startTime = Date.now();
 
         try {
             const request = {
                 scopes: [
-                    "User.Read.All",
-                    "Directory.Read.All",
-                    "DeviceManagementManagedDevices.Read.All",
-                    "Reports.Read.All",
-                    "Policy.Read.All",
-                    "ServiceHealth.Read.All",
-                    "Sites.Read.All",
-                    "InformationProtectionPolicy.Read",
-                    "SensitivityLabel.Read",
-                    "RecordsManagement.Read.All",
-                    "eDiscovery.Read.All",
-                    "SecurityAlert.Read.All",
-                    "SecurityIncident.Read.All",
-                    "IdentityRiskyUser.Read.All",
-                    "IdentityRiskEvent.Read.All"
+                    "User.Read.All", "Directory.Read.All", "DeviceManagementManagedDevices.Read.All",
+                    "Reports.Read.All", "Policy.Read.All", "ServiceHealth.Read.All",
+                    "Sites.Read.All", "InformationProtectionPolicy.Read", "SensitivityLabel.Read",
+                    "RecordsManagement.Read.All", "eDiscovery.Read.All", "SecurityAlert.Read.All",
+                    "SecurityIncident.Read.All", "IdentityRiskyUser.Read.All", "IdentityRiskEvent.Read.All"
                 ],
                 account: accounts[0],
             };
+
             let response;
             try {
                 response = await instance.acquireTokenSilent(request);
             } catch (error) {
                 if (error.name === "InteractionRequiredAuthError" || error.errorCode === "invalid_grant") {
                     if (isManual) {
-                        // Only trigger popup if user explicitly asked for it (Refresh button)
-                        const interactiveRequest = { ...request, prompt: 'select_account' };
-                        response = await instance.acquireTokenPopup(interactiveRequest);
+                        response = await instance.acquireTokenPopup({ ...request, prompt: 'select_account' });
                     } else {
-                        // On auto-load, don't popup. Show error asking user to click refresh.
-                        console.warn("Silent auth failed, user interaction required.");
                         setError("InteractionRequired");
                         setLoading(false);
                         return;
@@ -112,31 +87,32 @@ const BirdsEyeView = ({ embedded = false }) => {
                     throw error;
                 }
             }
+
             const graphService = new GraphService(response.accessToken);
 
             const [
                 users, groups, devices, secureScore, skus,
                 directoryRoles, apps, domains, deletedUsers,
                 caPolicies, serviceIssues, entraDevicesCount,
-                sharePointSites, purviewStats, emailActivity,
-                securityAlerts, securityIncidents, riskyUsers,
+                sharePointSites, purviewStats, emailActivityByDay,
+                securityAlerts, securityIncidents, riskyUsersCount,
                 configProfiles, intuneApps, activeUsers7d, oneDriveUsage
             ] = await Promise.all([
-                graphService.client.api('/users').select('id,accountEnabled,userType,assignedLicenses').top(999).get().catch(e => ({ value: [] })),
-                graphService.client.api('/groups').select('id,groupTypes,mailEnabled,securityEnabled,resourceProvisioningOptions,visibility').top(999).get().catch(e => ({ value: [] })),
+                graphService.client.api('/users').select('id,accountEnabled,userType,assignedLicenses').top(999).get().catch(() => ({ value: [] })),
+                graphService.client.api('/groups').select('id,groupTypes,mailEnabled,securityEnabled,resourceProvisioningOptions,visibility').top(999).get().catch(() => ({ value: [] })),
                 graphService.getDeviceComplianceStats().catch(() => ({ total: 0, compliant: 0, osSummary: null })),
                 graphService.getSecureScore().catch(() => ({ currentScore: 0, maxScore: 0 })),
-                graphService.client.api('/subscribedSkus').get().catch(e => ({ value: [] })),
-                graphService.getDirectoryRoles(),
-                graphService.getApplications(),
-                graphService.getDomains(),
-                graphService.getDeletedUsers(),
-                graphService.getConditionalAccessPolicies(),
-                graphService.getServiceIssues(),
-                graphService.getTotalDevicesCount(),
-                graphService.getSharePointSiteCount(),
-                graphService.getPurviewStats(),
-                graphService.getEmailActivityUserDetail('D7'),
+                graphService.client.api('/subscribedSkus').get().catch(() => ({ value: [] })),
+                graphService.getDirectoryRoles().catch(() => []),
+                graphService.getApplications().catch(() => []),
+                graphService.getDomains().catch(() => []),
+                graphService.getDeletedUsers().catch(() => []),
+                graphService.getConditionalAccessPolicies().catch(() => []),
+                graphService.getServiceIssues().catch(() => []),
+                graphService.getTotalDevicesCount().catch(() => 0),
+                graphService.getSharePointSiteCount().catch(() => 0),
+                graphService.getPurviewStats().catch(() => ({ labels: 0, retentionPolicies: 0, dlpPolicies: 0, dlpAlerts: 0 })),
+                graphService.getEmailActivityUserDetail('D7').catch(() => []),
                 graphService.getSecurityAlerts().catch(() => []),
                 graphService.getSecurityIncidents().catch(() => []),
                 graphService.getRiskyUsersCount().catch(() => 0),
@@ -145,16 +121,6 @@ const BirdsEyeView = ({ embedded = false }) => {
                 graphService.getActiveUsersCount('D7').catch(() => []),
                 graphService.getOneDriveUsage().catch(() => [])
             ]);
-
-            console.log("BirdsEyeView: Data fetched", {
-                usersLen: users?.value?.length,
-                groupsLen: groups?.value?.length,
-                devices,
-                secureScore,
-                sharePointSites,
-                purviewStats,
-                securityAlertsLen: securityAlerts?.length
-            });
 
             const userList = users.value || [];
             const groupList = groups.value || [];
@@ -206,14 +172,14 @@ const BirdsEyeView = ({ embedded = false }) => {
             const newStats = {
                 admin: {
                     mailboxes: userStats.licensed,
-                    activeMail: emailActivity.length,
+                    activeMail: emailActivityByDay.length,
                     domains: domains.length,
                     healthIssues: activeIssues
                 },
                 entra: {
                     ...userStats,
                     caPolicies: enabledCaPolicies,
-                    riskyUsers: riskyUsers
+                    riskyUsers: riskyUsersCount
                 },
                 licenses: licenseStats,
                 intune: {
@@ -227,22 +193,22 @@ const BirdsEyeView = ({ embedded = false }) => {
                     max: secureScore?.maxScore || 0,
                     alerts: securityAlerts.length,
                     incidents: securityIncidents.length,
-                    failedSignins: 0 // Will be calculated from sign-ins if available
+                    failedSignins: 0
                 },
                 collaboration: {
                     teams: teamsCount,
                     privateTeams: privateTeams,
                     publicTeams: publicTeams,
-                    sharepoint: sharePointSites,
+                    sharepoint: Math.max(0, parseInt(sharePointSites) || 0),
                     onedrive: oneDriveUsage.length,
                     mailboxes: userStats.licensed,
-                    activeEmail: emailActivity.length
+                    activeEmail: emailActivityByDay.length
                 },
                 purview: purviewStats,
                 usage: {
                     activeUsers7d: activeUsers7d.length,
-                    activeUsers30d: 0, // Can be fetched separately if needed
-                    storage: oneDriveUsage.reduce((acc, u) => acc + (u.storageUsedInBytes || 0), 0)
+                    activeUsers30d: 0,
+                    storage: oneDriveUsage.reduce((acc, u) => acc + (parseInt(u.storageUsedInBytes) || 0), 0)
                 }
             };
 
@@ -250,39 +216,26 @@ const BirdsEyeView = ({ embedded = false }) => {
             await DataPersistenceService.save('BirdsEyeView', newStats);
             SiteDataStore.store('birdsEye', newStats, { source: 'BirdsEyeView' });
 
+            console.log(`BirdsEyeView: Fetch finished in ${Date.now() - startTime}ms. SharePoint Sites: ${newStats.collaboration.sharepoint}`);
+
         } catch (error) {
-            if (error.name === "InteractionRequiredAuthError" || error.errorCode === "invalid_grant") {
-                console.warn("Interaction required for BirdsEyeView");
-                setError("InteractionRequired");
-            } else {
-                console.error("Failed to fetch Bird's Eye data", error);
-                setError(error.message || "Failed to load data");
-            }
+            console.error("BirdsEyeView Error:", error);
+            setError(error.message || "Failed to load snapshot");
         } finally {
-            if (isManual) {
-                const elapsedTime = Date.now() - startTime;
-                const remainingTime = Math.max(0, 2000 - elapsedTime);
-                setTimeout(() => {
-                    setRefreshing(false);
-                }, remainingTime);
-            } else {
-                setLoading(false);
-                setRefreshing(false);
-            }
+            setLoading(false);
+            setRefreshing(false);
         }
     };
 
     useEffect(() => {
-        if (accounts.length > 0) {
-            fetchData();
-        }
-    }, [instance, accounts]);
+        if (accounts.length > 0) fetchData();
+    }, [accounts]);
 
     const sections = generateSections(stats, styles);
 
     return (
         <div className={embedded ? styles.embeddedContainer : styles.container}>
-            {loading && <Loader3D showOverlay={true} />}
+            {loading && <Loader3D showOverlay={true} text="Assembling Bird's Eye Snapshot..." />}
 
             {!embedded && (
                 <header className={styles.header}>
@@ -297,7 +250,7 @@ const BirdsEyeView = ({ embedded = false }) => {
                             disabled={refreshing}
                         >
                             <RefreshCw size={14} />
-                            <span>Refresh</span>
+                            <span>{refreshing ? 'Syncing...' : 'Refresh'}</span>
                         </button>
                     </div>
 
@@ -305,24 +258,13 @@ const BirdsEyeView = ({ embedded = false }) => {
                         <div className="error-banner" style={{
                             background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
                             border: `1px solid ${error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-                            borderRadius: '12px',
-                            padding: '16px',
-                            marginTop: '16px',
+                            borderRadius: '12px', padding: '16px', marginTop: '16px',
                             color: error === 'InteractionRequired' ? 'var(--accent-blue)' : '#ef4444',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center'
+                            display: 'flex', justifyContent: 'space-between', alignItems: 'center'
                         }}>
-                            <span>{error === 'InteractionRequired' ? '🔐 Session expired or additional permissions required to load telemetry.' : error}</span>
+                            <span>{error === 'InteractionRequired' ? '🔐 Session expired or additional permissions required.' : error}</span>
                             {error === 'InteractionRequired' && (
-                                <button
-                                    onClick={() => fetchData(true)}
-                                    style={{
-                                        background: 'var(--accent-blue)',
-                                        color: 'white', border: 'none', padding: '6px 12px',
-                                        borderRadius: '6px', fontSize: '12px', fontWeight: 700, cursor: 'pointer'
-                                    }}
-                                >
+                                <button onClick={() => fetchData(true)} className="btn-primary" style={{ padding: '6px 12px', fontSize: '11px' }}>
                                     Reconnect
                                 </button>
                             )}
@@ -332,49 +274,22 @@ const BirdsEyeView = ({ embedded = false }) => {
             )}
 
             {embedded && error === "InteractionRequired" && (
-                <div style={{
-                    padding: '20px', textAlign: 'center', background: 'var(--glass-bg)',
-                    border: '1px solid var(--glass-border)', borderRadius: '12px', marginBottom: '16px'
-                }}>
-                    <p style={{ color: 'var(--text-secondary)', marginBottom: '12px', fontSize: '13px' }}>
-                        🔐 Additional permissions required to display data
-                    </p>
-                    <button
-                        onClick={() => fetchData(true)}
-                        style={{
-                            background: '#3b82f6', color: 'white', border: 'none', padding: '10px 20px',
-                            borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer',
-                            display: 'inline-flex', alignItems: 'center', gap: '8px'
-                        }}
-                    >
-                        <ShieldCheck size={16} />
-                        Connect M365 Data
+                <div style={{ padding: '20px', textAlign: 'center', background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '12px', marginBottom: '16px' }}>
+                    <p style={{ color: 'var(--text-secondary)', marginBottom: '12px', fontSize: '13px' }}>🔐 Additional permissions required</p>
+                    <button onClick={() => fetchData(true)} className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                        <ShieldCheck size={16} /> Connect M365 Data
                     </button>
                 </div>
             )}
 
             <div className={styles.cardGrid}>
-                {sections.map((section, idx) => (
-                    <div key={idx} className={styles.card} style={{ borderTopColor: section.color }}>
+                {sections.map((section, sIdx) => (
+                    <div key={sIdx} className={styles.card} style={{ borderTopColor: section.color }}>
                         <div className={styles.cardContent}>
                             <div className={styles.cardHeader}>
                                 {section.portalUrl ? (
-                                    <a
-                                        href={section.portalUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className={styles.cardTitle}
-                                        style={{
-                                            textDecoration: 'none',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '8px'
-                                        }}
-                                        title={`Open ${section.title}`}
-                                    >
+                                    <a href={section.portalUrl} target="_blank" rel="noopener noreferrer" className={styles.cardTitle} style={{ textDecoration: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }} title={`Open ${section.title}`}>
                                         {section.title}
-
                                     </a>
                                 ) : (
                                     <h3 className={styles.cardTitle}>{section.title}</h3>
@@ -384,18 +299,14 @@ const BirdsEyeView = ({ embedded = false }) => {
 
                             <div className={styles.statSection}>
                                 {section.blocks.map((block, bIdx) => (
-                                    <div
-                                        key={bIdx}
-                                        className={`${styles.statBlock} ${block.path ? styles.interactive : ""}`}
-                                        onClick={() => block.path && navigate(block.path)}
-                                    >
+                                    <div key={bIdx} className={`${styles.statBlock} ${block.path ? styles.interactive : ''}`} onClick={() => block.path && navigate(block.path)}>
                                         <div className={styles.statLabel}>{block.label}</div>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                                             <div className={styles.statValue}>{block.value}</div>
                                             {block.subValues && (
                                                 <div className={styles.subValueGroup}>
-                                                    {block.subValues.map((sv, svi) => (
-                                                        <div key={svi} className={styles.subValueLine}>
+                                                    {block.subValues.map((sv, svIdx) => (
+                                                        <div key={svIdx} className={styles.subValueLine}>
                                                             <span className={styles.subValueLabel}>{sv.label}</span>
                                                             <span className={styles.subValueNumber}>{sv.value}</span>
                                                         </div>
@@ -411,7 +322,7 @@ const BirdsEyeView = ({ embedded = false }) => {
                     </div>
                 ))}
             </div>
-        </div >
+        </div>
     );
 };
 
