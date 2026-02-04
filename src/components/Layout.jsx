@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../contexts/ThemeContext';
 import { useMsal } from '@azure/msal-react';
 import {
-    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, BarChart3, Activity, Command, BookOpen, Sun, Moon, User, Shield, Key, FolderOpen, MessageCircle
+    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, BarChart3, Activity, Command, BookOpen, Sun, Moon, User, Shield, Key, FolderOpen, MessageCircle, LifeBuoy
 } from 'lucide-react';
 import SearchModal from './SearchModal';
 import Logo from './Logo';
@@ -206,6 +206,22 @@ const ServiceLayout = () => {
                         onClick={() => navigate('/service/documentation')}
                     />
                 </nav>
+
+                {/* Support Section - Fixed at Bottom */}
+                <div style={{
+                    marginTop: 'auto',
+                    padding: '12px',
+                    borderTop: '1px solid rgba(255,255,255,0.08)',
+                    background: 'rgba(255,255,255,0.02)'
+                }}>
+                    <NavItem
+                        icon={LifeBuoy}
+                        label="Get Support"
+                        active={isActive('/service/support')}
+                        isOpen={isSidebarOpen}
+                        onClick={() => navigate('/service/support')}
+                    />
+                </div>
             </aside>
 
             {/* Main Wrapper */}

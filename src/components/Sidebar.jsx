@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     ShieldCheck, Smartphone, Lock,
-    LayoutDashboard, Radar, Activity
+    LayoutDashboard, Radar, Activity, LifeBuoy
 } from 'lucide-react';
 
 const Sidebar = ({ isSidebarOpen }) => {
@@ -99,6 +99,17 @@ const Sidebar = ({ isSidebarOpen }) => {
                         onClick={() => navigate('/service/intune')}
                     />
                 </div>
+            </div>
+
+            {/* Support Section - Separator and Button */}
+            <div className="mt-auto p-4 border-t border-white/10">
+                <SidebarItem
+                    icon={LifeBuoy}
+                    label="Get Support"
+                    active={isActive('/service/support')}
+                    isOpen={isSidebarOpen}
+                    onClick={() => navigate('/service/support')}
+                />
             </div>
 
             {/* Bottom Accent */}

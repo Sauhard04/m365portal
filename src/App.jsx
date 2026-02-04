@@ -79,6 +79,7 @@ import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import SubscriptionGate from './components/SubscriptionGate';
 import PowerShellRunner from './components/PowerShellRunner';
 import BirdsEyeView from './components/BirdsEyeView';
+import SupportPage from './components/SupportPage';
 
 function App() {
   console.log('[App] Rendering Root Component');
@@ -177,6 +178,8 @@ function App() {
 
                     <Route path="documentation" element={<DocumentationPage />} />
                     <Route path="documentation/view/:id" element={<PDFViewerPage />} />
+
+                    <Route path="support" element={<SupportPage />} />
 
                     {/* Generic Service Match */}
                     <Route path=":serviceId" element={<ServicePage />} />
