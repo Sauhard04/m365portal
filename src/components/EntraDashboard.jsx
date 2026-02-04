@@ -9,14 +9,95 @@ import { motion } from 'framer-motion';
 import { Users, Shield, Smartphone, CreditCard, LayoutGrid, ArrowRight, ShieldCheck, Activity, RefreshCw, Monitor, Box, Globe, AlertTriangle } from 'lucide-react';
 import Loader3D from './Loader3D';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { MiniSegmentedBar, MiniSeverityStrip, MiniStatusGeneric, MiniSparkline, MiniProgressBar } from './charts/MicroCharts';
 import SiteDataStore from '../services/siteDataStore';
+import { useDataCaching } from '../hooks/useDataCaching';
+import { MiniSegmentedBar, MiniSeverityStrip, MiniProgressBar, MiniSparkline } from './charts/MicroCharts';
 
 const EntraDashboard = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
 
-    const [stats, setStats] = useState({
+    const fetchFn = async () => {
+        const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+        const graphService = new GraphService(response.accessToken);
+        const client = graphService.client;
+
+        const [userCounts, groupCounts, deviceCounts, subCounts, adminCounts, appsResponse, spResponse, scoreResponse, mfaData, signInsData] = await Promise.all([
+            UsersService.getUserCounts(client),
+            GroupsService.getGroupCounts(client),
+            DevicesService.getDeviceCounts(client),
+            SubscriptionsService.getSubscriptionCounts(client),
+            RolesService.getAdminCounts(client),
+            client.api("/applications").select('id').top(999).get().catch(() => ({ value: [] })),
+            client.api("/servicePrincipals").select('id,appDisplayName,tags,appOwnerOrganizationId,servicePrincipalType').top(999).get().catch(() => ({ value: [] })),
+            client.api('/security/secureScores').top(1).get().catch(() => ({ value: [] })),
+            graphService.getMFAStatus(),
+            graphService.getSignInTrends(14)
+        ]);
+
+        const appsCount = appsResponse.value ? appsResponse.value.length : 0;
+        const spCount = spResponse.value ? spResponse.value.filter(sp => {
+            const tags = sp.tags || [];
+            return tags.includes('WindowsAzureActiveDirectoryIntegratedApp');
+        }).length : 0;
+
+        const scoreData = scoreResponse.value?.[0] || { currentScore: 78, maxScore: 100 };
+
+        const dashboardStats = {
+            users: { total: userCounts.total, growth: 'Directory' },
+            groups: { total: groupCounts.total, growth: 'Teams' },
+            devices: { total: deviceCounts.total, managed: deviceCounts.managed, growth: 'By Intune' },
+            subs: { total: subCounts.active, growth: 'Verified' },
+            admins: { total: adminCounts.globalAdmins, growth: 'Privileged' },
+            apps: { total: appsCount, growth: 'Registrations' },
+            enterpriseApps: { total: spCount, growth: 'Principals' }
+        };
+
+        const scoreInfo = {
+            current: scoreData.currentScore,
+            max: scoreData.maxScore
+        };
+
+        // Legacy mapping for SiteDataStore consistency
+        const persistenceData = {
+            identities: { total: userCounts.total, trend: "Directory" },
+            groups: { count: groupCounts.total, trend: "Teams" },
+            apps: { registered: appsCount, trend: "Registrations" },
+            enterpriseApps: { count: spCount, trend: "Principals" },
+            admins: { global_count: adminCounts.globalAdmins, trend: "Privileged" },
+            subscriptions: { active: subCounts.active, trend: "Verified" },
+            devices: { managed: deviceCounts.total, trend: "Managed" },
+            compliance: {
+                score_percentage: `${Math.round((scoreData.currentScore / scoreData.maxScore) * 100)}%`,
+                score_points: scoreData.currentScore,
+                max_points: scoreData.maxScore,
+                status: "Identity Guard"
+            }
+        };
+
+        SiteDataStore.store('entra_id', persistenceData, { source: 'EntraDashboard' });
+
+        return {
+            stats: dashboardStats,
+            secureScore: scoreInfo,
+            mfaStats: mfaData,
+            signInTrends: signInsData
+        };
+    };
+
+    const {
+        data,
+        loading,
+        refreshing,
+        error,
+        refetch
+    } = useDataCaching('EntraID_v5', fetchFn, {
+        maxAge: 30,
+        enabled: accounts.length > 0
+    });
+
+    // Extract values from data with fallbacks
+    const stats = data?.stats || {
         users: { total: 0, growth: 'Directory' },
         groups: { total: 0, growth: 'Teams' },
         devices: { total: 0, growth: 'Managed' },
@@ -24,151 +105,10 @@ const EntraDashboard = () => {
         admins: { total: 0, growth: 'Privileged' },
         apps: { total: 0, growth: 'Registrations' },
         enterpriseApps: { total: 0, growth: 'Service Principals' }
-    });
-    const [secureScore, setSecureScore] = useState({ current: 0, max: 100 });
-    const [mfaStats, setMfaStats] = useState(null);
-    const [signInTrends, setSignInTrends] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
-    const [error, setError] = useState(null);
-
-    const fetchDashboardData = async (isManual = false) => {
-        if (accounts.length === 0) return;
-
-        if (isManual) setRefreshing(true);
-        else setLoading(true);
-
-        const startTime = Date.now();
-
-        try {
-            const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-            const graphService = new GraphService(response.accessToken);
-            const client = graphService.client;
-
-            // Parallel Fetch
-            const [userCounts, groupCounts, deviceCounts, subCounts, adminCounts, appsResponse, spResponse, scoreResponse, mfaData, signInsData] = await Promise.all([
-                UsersService.getUserCounts(client),
-                GroupsService.getGroupCounts(client),
-                DevicesService.getDeviceCounts(client),
-                SubscriptionsService.getSubscriptionCounts(client),
-                RolesService.getAdminCounts(client),
-                client.api("/applications").select('id').top(999).get().catch(() => ({ value: [] })),
-                client.api("/servicePrincipals").select('id,appDisplayName,tags,appOwnerOrganizationId,servicePrincipalType').top(999).get().catch(() => ({ value: [] })),
-                client.api('/security/secureScores').top(1).get().catch(() => ({ value: [] })),
-                graphService.getMFAStatus(),
-                graphService.getSignInTrends(14)
-            ]);
-
-            const appsCount = appsResponse.value ? appsResponse.value.length : 0;
-
-            // Filter out noise to match "Enterprise Applications" view in portal
-            // Logic: "Enterprise Apps" (Service Principals) typically have the 'WindowsAzureActiveDirectoryIntegratedApp' tag.
-            // Infrastructure/Hidden MS apps usually do NOT have this tag.
-            const spCount = spResponse.value ? spResponse.value.filter(sp => {
-                const tags = sp.tags || [];
-                const isIntegratedApp = tags.includes('WindowsAzureActiveDirectoryIntegratedApp');
-                return isIntegratedApp;
-            }).length : 0;
-
-            const scoreData = scoreResponse.value?.[0] || { currentScore: 78, maxScore: 100 };
-
-            const dashboardStats = {
-                users: { total: userCounts.total, growth: 'Directory' },
-                groups: { total: groupCounts.total, growth: 'Teams' },
-                devices: { total: deviceCounts.total, managed: deviceCounts.managed, growth: 'By Intune' },
-                subs: { total: subCounts.active, growth: 'Verified' },
-                admins: { total: adminCounts.globalAdmins, growth: 'Privileged' },
-                apps: { total: appsCount, growth: 'Registrations' },
-                enterpriseApps: { total: spCount, growth: 'Principals' }
-            };
-
-            const scoreInfo = {
-                current: scoreData.currentScore,
-                max: scoreData.maxScore
-            };
-
-            // Map and persist
-            const persistenceData = {
-                entra_id: {
-                    identities: { total: userCounts.total, trend: "Directory" },
-                    groups: { count: groupCounts.total, trend: "Teams" },
-                    apps: { registered: appsCount, trend: "Registrations" },
-                    enterpriseApps: { count: spCount, trend: "Principals" },
-                    admins: { global_count: adminCounts.globalAdmins, trend: "Privileged" },
-                    subscriptions: { active: subCounts.active, trend: "Verified" },
-                    devices: { managed: deviceCounts.total, trend: "Managed" },
-                    compliance: {
-                        score_percentage: `${Math.round((scoreData.currentScore / scoreData.maxScore) * 100)}%`,
-                        score_points: scoreData.currentScore,
-                        max_points: scoreData.maxScore,
-                        status: "Identity Guard"
-                    }
-                },
-                raw: {
-                    stats: dashboardStats,
-                    secureScore: scoreInfo,
-                    mfaStats: mfaData,
-                    signInTrends: signInsData
-                }
-            };
-
-            SiteDataStore.store('entra_id', persistenceData.entra_id, { source: 'EntraDashboard' });
-            SiteDataStore.store('entra_raw', persistenceData.raw, { source: 'EntraDashboard_Raw' });
-
-            setStats(dashboardStats);
-            setSecureScore(scoreInfo);
-            setMfaStats(mfaData);
-            setSignInTrends(signInsData);
-            setError(null);
-        } catch (error) {
-            console.error("Dashboard fetch error:", error);
-            setError(error.message || "Failed to load dashboard data");
-        } finally {
-            if (isManual) {
-                const elapsedTime = Date.now() - startTime;
-                const remainingTime = Math.max(0, 2000 - elapsedTime);
-                setTimeout(() => setRefreshing(false), remainingTime);
-            } else {
-                setLoading(false);
-                setRefreshing(false);
-            }
-        }
     };
-
-    const loadData = async () => {
-        try {
-            const cached = await DataPersistenceService.load('EntraID_v4');
-            if (cached && cached.raw && cached.raw.stats) {
-                // Merge with defaults to ensure new keys exist
-                setStats(prev => ({
-                    ...prev,
-                    ...cached.raw.stats,
-                    enterpriseApps: cached.raw.stats.enterpriseApps || prev.enterpriseApps
-                }));
-
-                setSecureScore(cached.raw.secureScore || { current: 0, max: 100 });
-                setMfaStats(cached.raw.mfaStats || null);
-                setSignInTrends(cached.raw.signInTrends || []);
-                setLoading(false);
-
-                // Fetch if expired OR if we are using stale data structure
-                if (DataPersistenceService.isExpired('EntraID_v4', 30) || !cached.raw.stats.enterpriseApps) {
-                    console.log("Cache expired or stale, refreshing...");
-                    fetchDashboardData(false);
-                }
-            } else {
-                fetchDashboardData(false);
-            }
-        } catch (e) {
-            // Fallback if cache load fails
-            console.warn("Cache load failed, fetching fresh data", e);
-            fetchDashboardData(false);
-        }
-    };
-
-    useEffect(() => {
-        loadData();
-    }, [accounts, instance]);
+    const secureScore = data?.secureScore || { current: 0, max: 100 };
+    const mfaStats = data?.mfaStats || null;
+    const signInTrends = data?.signInTrends || [];
 
     const totalSignIns = signInTrends.reduce((acc, curr) => acc + (curr.success || 0) + (curr.failure || 0), 0);
 
@@ -226,7 +166,11 @@ const EntraDashboard = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Unified identity protection and cloud authentication hub</p>
                 </div>
                 <div className="flex-gap-2">
-                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchDashboardData(true)} title="Sync & Refresh">
+                    <button
+                        className={`sync-btn ${refreshing ? 'spinning' : ''}`}
+                        onClick={() => refetch()}
+                        title="Force Refresh Data"
+                    >
                         <RefreshCw size={16} />
                     </button>
                 </div>

@@ -81,10 +81,14 @@ const BirdsEyeView = ({ embedded = false }) => {
                     "Policy.Read.All",
                     "ServiceHealth.Read.All",
                     "Sites.Read.All",
-                    "InformationProtectionPolicy.Read.All",
-                    "SensitivityLabel.Read.All",
+                    "InformationProtectionPolicy.Read",
+                    "SensitivityLabel.Read",
                     "RecordsManagement.Read.All",
-                    "eDiscovery.Read.All"
+                    "eDiscovery.Read.All",
+                    "SecurityAlert.Read.All",
+                    "SecurityIncident.Read.All",
+                    "IdentityRiskyUser.Read.All",
+                    "IdentityRiskEvent.Read.All"
                 ],
                 account: accounts[0],
             };

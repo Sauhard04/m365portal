@@ -14,176 +14,128 @@ import {
 import {
     ResponsiveContainer, PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis, LineChart, Line, AreaChart, Area, CartesianGrid
 } from 'recharts';
+import { useDataCaching } from '../hooks/useDataCaching';
 
 const SharePointDashboard = () => {
-    const navigate = useNavigate();
     const { instance, accounts } = useMsal();
-    const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
-    const [dashboardData, setDashboardData] = useState({
-        sites: { total: 0, byType: {}, recentSites: [] },
-        drives: { total: 0, documentLibraries: 0, personal: 0 },
-        storage: { totalGB: 0, usedGB: 0, percentUsed: 0 },
-        myDrive: null,
-        activity: { oneDrive: [], files: [] },
-        messages: []
-    });
-    const [error, setError] = useState(null);
+    const fetchFn = async () => {
+        const account = accounts[0];
+        if (!account) throw new Error('No account found');
 
-    const CACHE_KEY = 'sharepoint_dashboard';
-    const CACHE_DURATION = 5 * 60 * 1000;
+        const tokenResponse = await instance.acquireTokenSilent({
+            ...sharepointScopes,
+            account
+        });
 
-    const fetchDashboardData = async (isManual = false) => {
-        if (accounts.length === 0) return;
+        const client = Client.init({
+            authProvider: (done) => done(null, tokenResponse.accessToken)
+        });
 
-        if (isManual) setRefreshing(true);
-        else setLoading(true);
-        setError(null);
+        const [
+            sites, rootSite, drives, myDrive,
+            oneDriveActivity, fileActivity, messages,
+            spUsage, odUsage
+        ] = await Promise.all([
+            SharePointService.getSites(client, 999),
+            SharePointService.getRootSite(client),
+            SharePointService.getDrives(client),
+            SharePointService.getMyDrive(client),
+            SharePointService.getOneDriveActivity(client),
+            SharePointService.getOneDriveFileActivity(client),
+            SharePointService.getServiceMessages(client),
+            SharePointService.getSharePointUsage(client),
+            SharePointService.getOneDriveUsage(client)
+        ]);
 
-        try {
-            if (!isManual) {
-                const cached = DataPersistenceService.load(CACHE_KEY, CACHE_DURATION);
-                if (cached) {
-                    setDashboardData(cached);
-                    setLoading(false);
-                    return;
-                }
-            }
+        // Calculate local storage as fallback
+        const localDrivesStorage = drives.reduce((acc, drive) => {
+            if (drive.quota?.used) acc.used += drive.quota.used;
+            if (drive.quota?.total) acc.total += drive.quota.total;
+            return acc;
+        }, { used: 0, total: 0 });
 
-            const account = accounts[0];
-            if (!account) throw new Error('No account found');
+        const totalUsedRaw = (spUsage?.used || odUsage?.used) ? (spUsage?.used || 0) + (odUsage?.used || 0) : localDrivesStorage.used;
+        const totalQuotaRaw = (spUsage?.quota || odUsage?.quota) ? (spUsage?.quota || 0) + (odUsage?.quota || 0) : localDrivesStorage.total;
 
-            const tokenResponse = await instance.acquireTokenSilent({
-                ...sharepointScopes,
-                account
-            }).catch(async (authErr) => {
-                if (authErr.name === "InteractionRequiredAuthError" || authErr.errorCode === "invalid_grant") {
-                    if (isManual) {
-                        return await instance.acquireTokenPopup(sharepointScopes);
-                    } else {
-                        throw authErr;
-                    }
-                }
-                throw authErr;
-            });
+        const personalDrivesCount = drives.filter(d => d.driveType === 'personal').length;
+        const docLibsCount = drives.filter(d => d.driveType === 'documentLibrary').length;
 
-            const client = Client.init({
-                authProvider: (done) => done(null, tokenResponse.accessToken)
-            });
+        const sitesByType = (sites || []).reduce((acc, site) => {
+            const type = site.webUrl?.includes('/teams/') ? 'Team Sites' :
+                site.webUrl?.includes('/sites/') ? 'Communication Sites' : 'Other';
+            acc[type] = (acc[type] || 0) + 1;
+            return acc;
+        }, {});
 
-            const [
-                sites, rootSite, drives, myDrive,
-                oneDriveActivity, fileActivity, messages,
-                spUsage, odUsage
-            ] = await Promise.all([
-                SharePointService.getSites(client, 999),
-                SharePointService.getRootSite(client),
-                SharePointService.getDrives(client),
-                SharePointService.getMyDrive(client),
-                SharePointService.getOneDriveActivity(client),
-                SharePointService.getOneDriveFileActivity(client),
-                SharePointService.getServiceMessages(client),
-                SharePointService.getSharePointUsage(client),
-                SharePointService.getOneDriveUsage(client)
-            ]);
-
-            // Calculate local storage as fallback
-            const localDrivesStorage = drives.reduce((acc, drive) => {
-                if (drive.quota?.used) acc.used += drive.quota.used;
-                if (drive.quota?.total) acc.total += drive.quota.total;
-                return acc;
-            }, { used: 0, total: 0 });
-
-            // Prefer usage reports for tenant view, but fallback to local if report is empty/null
-            const totalUsedRaw = (spUsage?.used || odUsage?.used) ? (spUsage?.used || 0) + (odUsage?.used || 0) : localDrivesStorage.used;
-            const totalQuotaRaw = (spUsage?.quota || odUsage?.quota) ? (spUsage?.quota || 0) + (odUsage?.quota || 0) : localDrivesStorage.total;
-
-            // Count document libraries vs personal
-            const personalDrivesCount = drives.filter(d => d.driveType === 'personal').length;
-            const docLibsCount = drives.filter(d => d.driveType === 'documentLibrary').length;
-
-            // Group sites by type
-            const sitesByType = (sites || []).reduce((acc, site) => {
-                const type = site.webUrl?.includes('/teams/') ? 'Team Sites' :
-                    site.webUrl?.includes('/sites/') ? 'Communication Sites' : 'Other';
-                acc[type] = (acc[type] || 0) + 1;
-                return acc;
-            }, {});
-
-            const dashboardData = {
-                sites: {
-                    total: spUsage?.totalSites || sites.length,
-                    byType: sitesByType,
-                    recentSites: (sites || [])
-                        .sort((a, b) => new Date(b.lastModifiedDateTime) - new Date(a.lastModifiedDateTime))
-                        .slice(0, 5)
-                },
-                drives: {
-                    total: odUsage?.totalAccounts ? (odUsage.totalAccounts + docLibsCount) : (personalDrivesCount + docLibsCount),
-                    documentLibraries: docLibsCount,
-                    personal: odUsage?.totalAccounts || personalDrivesCount
-                },
-                storage: {
-                    usedGB: Math.round(totalUsedRaw / (1024 * 1024 * 1024)),
-                    totalGB: Math.round(totalQuotaRaw / (1024 * 1024 * 1024)),
-                    percentUsed: totalQuotaRaw ? Math.round((totalUsedRaw / totalQuotaRaw) * 100) : 0
-                },
-                myDrive: myDrive ? {
-                    usedGB: Math.round((myDrive.quota?.used || 0) / (1024 * 1024 * 1024)),
-                    totalGB: Math.round((myDrive.quota?.total || 0) / (1024 * 1024 * 1024))
-                } : null,
-                activity: {
-                    totalFiles: odUsage?.totalFiles || 0,
-                    oneDrive: Array.isArray(oneDriveActivity) && oneDriveActivity.length > 0 ? oneDriveActivity : [
-                        { date: 'Jan 2', active: 1, total: 8 },
-                        { date: 'Jan 7', active: 1.2, total: 8 },
-                        { date: 'Jan 12', active: 2.1, total: 8 },
-                        { date: 'Jan 17', active: 0.8, total: 8 },
-                        { date: 'Jan 22', active: 1.1, total: 8 },
-                        { date: 'Jan 27', active: 1, total: 8 },
-                        { date: 'Jan 31', active: 1.1, total: 8 },
-                    ],
-                    files: Array.isArray(fileActivity) && fileActivity.length > 0 ? fileActivity : [
-                        { date: 'Jan 2', viewed: 1, synced: 0.1, sharedInternally: 0.2, sharedExternally: 0.05 },
-                        { date: 'Jan 7', viewed: 1.2, synced: 0.2, sharedInternally: 0.3, sharedExternally: 0.1 },
-                        { date: 'Jan 12', viewed: 2.0, synced: 0.4, sharedInternally: 0.5, sharedExternally: 0.15 },
-                        { date: 'Jan 17', viewed: 1.1, synced: 0.3, sharedInternally: 0.4, sharedExternally: 0.08 },
-                        { date: 'Jan 22', viewed: 1.8, synced: 0.6, sharedInternally: 0.8, sharedExternally: 0.2 },
-                        { date: 'Jan 27', viewed: 0.4, synced: 4.0, sharedInternally: 0.1, sharedExternally: 0.05 },
-                        { date: 'Jan 31', viewed: 1.1, synced: 0.2, sharedInternally: 0.3, sharedExternally: 0.1 },
-                    ]
-                },
-                messages: messages?.length > 0 ? messages : [
-                    { id: 1, title: 'Drawn electronic signatures with eSignature for Microsoft 365', lastModifiedDateTime: '2026-01-25T10:00:00Z', category: 'announcement' },
-                    { id: 2, title: '(Updated) Microsoft 365: Modern Access Request and Access Denied web page', lastModifiedDateTime: '2026-01-22T10:00:00Z', category: 'announcement' },
-                    { id: 3, title: '(Updated) Updates to custom scripting in sites and Classic Publishing site creation', lastModifiedDateTime: '2026-01-20T10:00:00Z', category: 'announcement' },
-                    { id: 4, title: 'SharePoint: Migrate the Maps web part to Azure Maps', lastModifiedDateTime: '2026-01-18T10:00:00Z', category: 'announcement' },
+        const processedData = {
+            sites: {
+                total: spUsage?.totalSites || sites.length,
+                byType: sitesByType,
+                recentSites: (sites || [])
+                    .sort((a, b) => new Date(b.lastModifiedDateTime) - new Date(a.lastModifiedDateTime))
+                    .slice(0, 5)
+            },
+            drives: {
+                total: odUsage?.totalAccounts ? (odUsage.totalAccounts + docLibsCount) : (personalDrivesCount + docLibsCount),
+                documentLibraries: docLibsCount,
+                personal: odUsage?.totalAccounts || personalDrivesCount
+            },
+            storage: {
+                usedGB: Math.round(totalUsedRaw / (1024 * 1024 * 1024)),
+                totalGB: Math.round(totalQuotaRaw / (1024 * 1024 * 1024)),
+                percentUsed: totalQuotaRaw ? Math.round((totalUsedRaw / totalQuotaRaw) * 100) : 0
+            },
+            myDrive: myDrive ? {
+                usedGB: Math.round((myDrive.quota?.used || 0) / (1024 * 1024 * 1024)),
+                totalGB: Math.round((myDrive.quota?.total || 0) / (1024 * 1024 * 1024))
+            } : null,
+            activity: {
+                totalFiles: odUsage?.totalFiles || 0,
+                oneDrive: Array.isArray(oneDriveActivity) && oneDriveActivity.length > 0 ? oneDriveActivity : [
+                    { date: 'Jan 2', active: 1, total: 8 },
+                    { date: 'Jan 7', active: 1.2, total: 8 },
+                    { date: 'Jan 12', active: 2.1, total: 8 },
+                    { date: 'Jan 17', active: 0.8, total: 8 },
+                    { date: 'Jan 22', active: 1.1, total: 8 },
+                    { date: 'Jan 27', active: 1, total: 8 },
+                    { date: 'Jan 31', active: 1.1, total: 8 },
+                ],
+                files: Array.isArray(fileActivity) && fileActivity.length > 0 ? fileActivity : [
+                    { date: 'Jan 2', viewed: 1, synced: 0.1, sharedInternally: 0.2, sharedExternally: 0.05 },
+                    { date: 'Jan 7', viewed: 1.2, synced: 0.2, sharedInternally: 0.3, sharedExternally: 0.1 },
+                    { date: 'Jan 12', viewed: 2.0, synced: 0.4, sharedInternally: 0.5, sharedExternally: 0.15 },
+                    { date: 'Jan 17', viewed: 1.1, synced: 0.3, sharedInternally: 0.4, sharedExternally: 0.08 },
+                    { date: 'Jan 22', viewed: 1.5, synced: 0.5, sharedInternally: 0.7, sharedExternally: 0.12 },
+                    { date: 'Jan 27', viewed: 1.8, synced: 0.3, sharedInternally: 0.6, sharedExternally: 0.1 },
+                    { date: 'Jan 31', viewed: 1.9, synced: 0.4, sharedInternally: 0.6, sharedExternally: 0.15 },
                 ]
-            };
+            },
+            messages: messages || []
+        };
 
-            setDashboardData(dashboardData);
-            DataPersistenceService.save(CACHE_KEY, dashboardData);
-        } catch (err) {
-            if (err.name === "InteractionRequiredAuthError" || err.errorCode === "invalid_grant") {
-                console.warn("Interaction required for SharePoint Dashboard");
-                setError("InteractionRequired");
-            } else {
-                console.error('Failed to fetch SharePoint dashboard data:', err);
-                setError(err.message || "Failed to load SharePoint data");
-            }
-        } finally {
-            if (isManual) {
-                setTimeout(() => setRefreshing(false), 1500);
-            } else {
-                setLoading(false);
-                setRefreshing(false);
-            }
-        }
+        return processedData;
     };
 
+    const {
+        data: dashboardData,
+        loading,
+        refreshing,
+        error: fetchError,
+        refetch
+    } = useDataCaching('SharePoint_Dashboard_v3', fetchFn, {
+        maxAge: 30,
+        storeSection: 'sharepoint',
+        storeMetadata: { source: 'SharePointDashboard' },
+        enabled: accounts.length > 0
+    });
+
+    const [interactionError, setInteractionError] = useState(false);
+
     useEffect(() => {
-        fetchDashboardData();
-    }, [instance, accounts]);
+        if (fetchError && (fetchError.includes('InteractionRequiredAuthError') || fetchError.includes('interaction_required'))) {
+            setInteractionError(true);
+        }
+    }, [fetchError]);
 
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
@@ -209,20 +161,21 @@ const SharePointDashboard = () => {
         return null;
     };
 
-    const siteTypeData = Object.entries(dashboardData.sites.byType || {}).map(([name, value]) => ({
+    // Safe data extraction even if dashboardData is null
+    const siteTypeData = dashboardData?.sites ? Object.entries(dashboardData.sites.byType || {}).map(([name, value]) => ({
         name,
         value,
         color: name === 'Team Sites' ? '#3b82f6' : name === 'Communication Sites' ? '#22c55e' : '#6b7280'
-    }));
+    })) : [];
 
-    const driveTypeData = [
+    const driveTypeData = dashboardData?.drives ? [
         { name: 'Document Libraries', value: dashboardData.drives.documentLibraries, color: '#3b82f6' },
         { name: 'Personal Drives', value: dashboardData.drives.personal, color: '#a855f7' }
-    ].filter(d => d.value > 0);
+    ].filter(d => d.value > 0) : [];
 
-    const storageUsedPercent = dashboardData.storage.percentUsed || 0;
+    const storageUsedPercent = dashboardData?.storage?.percentUsed || 0;
 
-    if (loading) {
+    if (loading && (!dashboardData || !dashboardData.sites)) {
         return <Loader3D showOverlay={true} text="Loading SharePoint Dashboard..." />;
     }
 
@@ -247,7 +200,7 @@ const SharePointDashboard = () => {
                 <div className="flex-gap-2">
                     <button
                         className={`sync-btn ${refreshing ? 'spinning' : ''}`}
-                        onClick={() => fetchDashboardData(true)}
+                        onClick={() => refetch(true)}
                         title="Sync & Refresh"
                     >
                         <RefreshCw size={16} />
@@ -255,36 +208,54 @@ const SharePointDashboard = () => {
                 </div>
             </header>
 
-            {error && (
+            {fetchError && !interactionError && (
                 <div className="error-banner" style={{
-                    background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                    border: `1px solid ${error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid rgba(239, 68, 68, 0.3)',
                     borderRadius: '12px',
                     padding: '16px',
                     marginBottom: '24px',
-                    color: error === 'InteractionRequired' ? 'var(--accent-blue)' : '#ef4444',
+                    color: '#ef4444',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
+                }}>
+                    <AlertCircle size={14} />
+                    <span>{fetchError}</span>
+                </div>
+            )}
+
+            {interactionError && (
+                <div className="error-banner" style={{
+                    background: 'rgba(59, 130, 246, 0.1)',
+                    border: '1px solid rgba(59, 130, 246, 0.3)',
+                    borderRadius: '12px',
+                    padding: '16px',
+                    marginBottom: '24px',
+                    color: 'var(--accent-blue)',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center'
                 }}>
-                    <span>{error === 'InteractionRequired' ? '🔐 SharePoint session expired. Additional permissions required to load telemetry.' : error}</span>
-                    {error === 'InteractionRequired' && (
-                        <button
-                            onClick={() => fetchDashboardData(true)}
-                            style={{
-                                background: 'var(--accent-blue)',
-                                color: 'white',
-                                border: 'none',
-                                padding: '6px 12px',
-                                borderRadius: '6px',
-                                fontSize: '12px',
-                                fontWeight: 700,
-                                cursor: 'pointer'
-                            }}
-                        >
-                            Reconnect
-                        </button>
-                    )}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <AlertCircle size={14} />
+                        <span>🔐 Session expired or additional permissions required to load telemetry.</span>
+                    </div>
+                    <button
+                        onClick={() => refetch(true)}
+                        style={{
+                            background: 'var(--accent-blue)',
+                            color: 'white',
+                            border: 'none',
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Reconnect
+                    </button>
                 </div>
             )}
 
@@ -310,7 +281,7 @@ const SharePointDashboard = () => {
                     <div className="stat-content">
                         <span className="stat-label">SharePoint Sites</span>
                         <span className="stat-value" style={{ color: '#3b82f6' }}>
-                            {dashboardData.sites.total}
+                            {dashboardData?.sites?.total || 0}
                         </span>
                         <span className="stat-sublabel">
                             active sites
@@ -333,7 +304,7 @@ const SharePointDashboard = () => {
                     <div className="stat-content">
                         <span className="stat-label">Drives</span>
                         <span className="stat-value" style={{ color: '#a855f7' }}>
-                            {dashboardData.drives.total}
+                            {dashboardData?.drives?.total || 0}
                         </span>
                         <span className="stat-sublabel">
                             total drives
@@ -355,10 +326,10 @@ const SharePointDashboard = () => {
                     <div className="stat-content">
                         <span className="stat-label">Storage Used</span>
                         <span className="stat-value" style={{ color: '#22c55e' }}>
-                            {dashboardData.storage.usedGB} GB
+                            {dashboardData?.storage?.usedGB || 0} GB
                         </span>
                         <span className="stat-sublabel">
-                            of {dashboardData.storage.totalGB} GB
+                            of {dashboardData?.storage?.totalGB || 0} GB
                         </span>
                     </div>
                 </motion.div>
@@ -378,7 +349,7 @@ const SharePointDashboard = () => {
                     <div className="stat-content">
                         <span className="stat-label">OneDrive Accounts</span>
                         <span className="stat-value" style={{ color: '#f59e0b' }}>
-                            {dashboardData.drives.personal}
+                            {dashboardData?.drives?.personal || 0}
                         </span>
                         <span className="stat-sublabel">
                             user drives
@@ -414,7 +385,7 @@ const SharePointDashboard = () => {
                     </div>
                     <div className="chart-body" style={{ height: '220px', width: '100%' }}>
                         {siteTypeData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
                                 <PieChart>
                                     <defs>
                                         {siteTypeData.map((entry, index) => (
@@ -560,7 +531,7 @@ const SharePointDashboard = () => {
                     </div>
                     <div className="chart-body" style={{ height: '200px' }}>
                         {dashboardData.activity.oneDrive?.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
                                 <AreaChart data={dashboardData.activity.oneDrive}>
                                     <defs>
                                         <linearGradient id="colorActive" x1="0" y1="0" x2="0" y2="1">
@@ -619,7 +590,7 @@ const SharePointDashboard = () => {
                     </div>
                     <div className="chart-body" style={{ height: '200px' }}>
                         {dashboardData.activity.files?.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
                                 <AreaChart data={dashboardData.activity.files}>
                                     <defs>
                                         <linearGradient id="colorViewed" x1="0" y1="0" x2="0" y2="1">

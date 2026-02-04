@@ -1,83 +1,114 @@
-# M365 Portal
+# 🌐 M365 Portal - Advanced Data Visualization Dashboard
 
-A modern, unified operations portal for Microsoft 365. This application provides real-time telemetry, license tracking, and mailbox reporting directly from Microsoft Graph API.
+![M365 Portal Banner](https://img.shields.io/badge/M365%20Portal-Enterprise%20Ready-blue?style=for-the-badge&logo=microsoft)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)
+![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=for-the-badge&logo=vite)
+![MSAL](https://img.shields.io/badge/MSAL-Auth-orange?style=for-the-badge&logo=microsoft)
 
-## 🚀 Features
-
-- **Unified Dashboard**: Oversight of core M365 services (Exchange, Entra, Intune, Purview).
-- **Exchange Reports**: Real-time mailbox statistics, archive status, and migration tracking.
-- **Licensing Analysis**: Detailed breakdown of tenant SKUs, assigned seats, and usage metrics.
-- **Secure Authentication**: Integrated with Microsoft Identity Platform (MSAL).
+A state-of-the-art **Microsoft 365 Analytics Dashboard** that provides deep insights into your tenant's Security, Governance, SharePoint, Teams, and Intune usage. Built with a focus on aesthetics, performance, and granular security controls.
 
 ---
 
-## 🛠️ Prerequisites
+## ✨ Key Features
 
-Before you begin, ensure you have:
-- An **Azure AD (Entra ID) Tenant**.
-- **Global Administrator** or **Privileged Role Administrator** access (to grant API permissions).
-- [Node.js](https://nodejs.org/) installed (v18+ recommended).
-
----
-
-## 🔐 Azure Setup Instructions
-
-### 1. App Registration
-1. Sign in to the [Azure Portal](https://portal.azure.com/).
-2. Navigate to **Microsoft Entra ID** > **App registrations** > **New registration**.
-3. **Name**: `M365 Portal` (or any preferred name).
-4. **Supported account types**: `Accounts in this organizational directory only (Single tenant)`.
-5. **Redirect URI**:
-    - Select **SPA (Single-page application)** from the dropdown.
-    - Enter `http://localhost:5173` (for local development).
-6. Click **Register**.
-
-### 2. API Permissions
-1. In your registered app, go to **API permissions** > **Add a permission**.
-2. Select **Microsoft Graph** > **Delegated permissions**.
-3. Search and add the following permissions:
-    - `User.Read`
-    - `User.Read.All`
-    - `Directory.Read.All`
-    - `MailboxSettings.Read`
-    - `Organization.Read.All`
-    - `Reports.Read.All`
-4. Click **Add permissions**.
-5. **CRITICAL**: Click **Grant admin consent for [Your Tenant Name]** to enable these permissions for all users.
-
-### 3. Client ID & Tenant ID
-- Copy the **Application (client) ID** and **Directory (tenant) ID** from the **Overview** page. You'll need these for your environment variables.
+*   **🦅 BirdsEye View**: A holistic tenant overview aggregating data from 20+ Microsoft Graph endpoints in simpler terms.
+*   **📊 Interactive Charts**: Beautiful, responsive visualizations powered by Recharts (with robust error handling).
+*   **🔐 Granular Security**: Uses MSAL.js for secure authentication with specific scopes for each dashboard.
+*   **⚡ High Performance**: Implements smart caching (localStorage) and optimized API calls to minimize latency.
+*   **📱 Responsive Data**: Fully responsive design with glassmorphism UI for a premium look and feel.
+*   **🤖 AI Integration**: Built-in context for AI-driven insights (Gemini/Grok integration ready).
 
 ---
 
-## ⚙️ Environment Configuration
+## 🚀 Getting Started
 
-Create a `.env` file in the root directory and add the following:
+### Prerequisites
 
-```env
-VITE_CLIENT_ID=your_client_id_here
-VITE_TENANT_ID=your_tenant_id_here
-VITE_AZURE_MFA_FUNCTION_URL=optional_azure_function_url
-```
+*   **Node.js**: v18.0.0 or higher
+*   **Microsoft 365 Tenant**: Admin access required for most reports.
+*   **Azure AD App Registration**: You need a registered app in your tenant.
+
+### 🛠️ Installation
+
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/Sauhard04/m365portal.git
+    cd m365portal
+    ```
+
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
+
+3.  **Environment Setup**
+    Create a `.env` file in the root directory:
+    ```env
+    VITE_CLIENT_ID=your_azure_ad_client_id
+    VITE_TENANT_ID=your_tenant_id
+    ```
+
+4.  **Run the Application**
+    To run both the frontend (Vite) and backend server (for PDF/AI features):
+    ```bash
+    npm run dev:all
+    ```
+    *   Frontend: `http://localhost:5173`
+    *   Server: `http://localhost:3000`
 
 ---
 
-## 🏃 Local Development
+## 🔑 Required Permissions (Microsoft Graph)
 
-1. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
+To unlock the full potential of the dashboard, the following **Delegated Permissions** must be granted to your Azure AD App. 
 
-2. **Run the App**:
-   ```bash
-   npm run dev
-   ```
+Admin Consent is recommended for a seamless experience.
 
-3. **Access the Portal**: Open [http://localhost:5173](http://localhost:5173) in your browser.
+| Category | Permission Scope | Purpose |
+| :--- | :--- | :--- |
+| **Identity** | `User.Read` | Sign-in and read user profile |
+| | `User.Read.All` | Read full user list |
+| | `Directory.Read.All` | Read organizational directory data |
+| **Reports** | `Reports.Read.All` | Access M365 usage reports (SharePoint, OneDrive, etc.) |
+| **Security** | `SecurityAlert.Read.All` | View active security alerts |
+| | `SecurityIncident.Read.All` | View security incidents |
+| | `IdentityRiskyUser.Read.All` | Identify risky users |
+| | `IdentityRiskEvent.Read.All` | Analyze risk events |
+| **Devices** | `DeviceManagementManagedDevices.Read.All` | List Intune managed devices |
+| | `DeviceManagementApps.Read.All` | List Intune apps |
+| **SharePoint** | `Sites.Read.All` | Access SharePoint site details |
+| | `Files.Read.All` | Read file activity stats |
+| **Teams** | `Team.ReadBasic.All` | List Teams and members |
+| | `Chat.Read` | Read chat activity stats |
+| **Purview** | `InformationProtectionPolicy.Read` | Read MIP policies |
+| | `SensitivityLabel.Read` | Read sensitivity labels |
+| | `eDiscovery.Read.All` | Access eDiscovery case stats |
+
+> **Note:** If you see a "Session expired or additional permissions required" banner, click the **Connect/Reconnect** button to grant the specific scopes needed for that page.
 
 ---
 
-## 🧪 Azure Functions (Optional)
+## 🛠️ Tech Stack
 
-For features like "Bulk MFA Enforcement", you will need to host an Azure Function. See the setup guide in [azure_function_setup.md](./azure_function_setup.md) for details.
+*   **Frontend Framework**: React 18 + Vite
+*   **Styling**: Custom CSS (Glassmorphism), Framer Motion (Animations)
+*   **Authentication**: Azure MSAL Browser & React (`@azure/msal-react`)
+*   **Data Visualization**: Recharts
+*   **Backend (Optional)**: Node.js + Express (for AI/PDF processing)
+*   **State Management**: React Hooks + LocalStorage Caching
+
+---
+
+## 💡 Troubleshooting
+
+*   **CORS Errors on Localhost**: If you see CORS errors for SharePoint/OneDrive reports, this is normal. The app detects `localhost` and safely skips these specific report downloads to prevent crashes. They will work in production.
+*   **Charts Not Rendering**: We use a custom `SafeResponsiveContainer` to ensure charts only render when dimensions are valid. If a chart is missing, try resizing the window slightly.
+
+---
+
+## 📜 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+

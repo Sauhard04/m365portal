@@ -16,94 +16,62 @@ import {
     ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis,
     Tooltip, LineChart, Line, AreaChart, Area
 } from 'recharts';
+import { useDataCaching } from '../hooks/useDataCaching';
 
 const SecurityDashboard = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
-    const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
-    const [error, setError] = useState(null);
-    const [dashboardData, setDashboardData] = useState({
+    const fetchFn = async () => {
+        const account = accounts[0];
+        if (!account) throw new Error('No account found');
+
+        const tokenResponse = await instance.acquireTokenSilent({
+            ...securityScopes,
+            account
+        });
+
+        const client = Client.init({
+            authProvider: (done) => done(null, tokenResponse.accessToken)
+        });
+
+        return await SecurityService.getDashboardSummary(client);
+    };
+
+    const {
+        data: dashboardData,
+        loading,
+        refreshing,
+        error: fetchError,
+        refetch
+    } = useDataCaching('Security_Dashboard_v3', fetchFn, {
+        maxAge: 30,
+        storeSection: 'security',
+        storeMetadata: { source: 'SecurityDashboard' },
+        enabled: accounts.length > 0
+    });
+
+    const [interactionError, setInteractionError] = useState(false);
+
+    useEffect(() => {
+        if (fetchError && (fetchError.includes('InteractionRequiredAuthError') || fetchError.includes('interaction_required'))) {
+            setInteractionError(true);
+        }
+    }, [fetchError]);
+
+    // Ensure we have a valid initial state for render logic
+    const safeData = dashboardData || {
         alerts: { total: 0, highSeverity: 0, mediumSeverity: 0, lowSeverity: 0 },
         incidents: { total: 0, active: 0, resolved: 0 },
         secureScore: { current: 0, max: 100, percentage: 0 },
         riskyUsers: { total: 0, high: 0, medium: 0, low: 0 },
         riskDetections: { total: 0, recent: [] },
         mfa: { registered: 0, total: 0, coverage: 0 }
-    });
+    };
 
     const CACHE_KEY = 'security_dashboard';
     const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-    const fetchDashboardData = async (isManual = false) => {
-        if (accounts.length === 0) return;
 
-        if (isManual) setRefreshing(true);
-        else setLoading(true);
-        setError(null);
-
-        try {
-            // Check cache first
-            if (!isManual) {
-                const cached = DataPersistenceService.load(CACHE_KEY, CACHE_DURATION);
-                if (cached) {
-                    setDashboardData(cached);
-                    setLoading(false);
-                    return;
-                }
-            }
-
-            const account = accounts[0];
-            if (!account) {
-                throw new Error('No account found');
-            }
-
-            let tokenResponse;
-            try {
-                tokenResponse = await instance.acquireTokenSilent({
-                    ...securityScopes,
-                    account
-                });
-            } catch (authErr) {
-                if (authErr.name === "InteractionRequiredAuthError" || authErr.errorCode === "invalid_grant") {
-                    if (isManual) {
-                        // Trigger popup if user clicked refresh
-                        tokenResponse = await instance.acquireTokenPopup(securityScopes);
-                    } else {
-                        console.warn("Silent auth failed for Security Dashboard");
-                        setError("InteractionRequired");
-                        setLoading(false);
-                        return;
-                    }
-                } else {
-                    throw authErr;
-                }
-            }
-
-            const client = Client.init({
-                authProvider: (done) => done(null, tokenResponse.accessToken)
-            });
-
-            const data = await SecurityService.getDashboardSummary(client);
-            setDashboardData(data);
-            DataPersistenceService.save(CACHE_KEY, data);
-        } catch (err) {
-            if (err.name === "InteractionRequiredAuthError" || err.errorCode === "invalid_grant") {
-                console.warn("Interaction required for Security Dashboard");
-                setError("InteractionRequired");
-            } else {
-                console.error('Failed to fetch security dashboard data:', err);
-                setError("Failed to load security data. Please try again.");
-            }
-        } finally {
-            setLoading(false);
-            setRefreshing(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchDashboardData();
-    }, [instance, accounts]);
 
     // Custom Tooltip
     const CustomTooltip = ({ active, payload }) => {
@@ -139,23 +107,23 @@ const SecurityDashboard = () => {
 
     // Prepare chart data
     const alertSeverityData = [
-        { name: 'High', value: dashboardData.alerts.highSeverity, color: severityColors.high },
-        { name: 'Medium', value: dashboardData.alerts.mediumSeverity, color: severityColors.medium },
-        { name: 'Low', value: dashboardData.alerts.lowSeverity, color: severityColors.low }
+        { name: 'High', value: safeData.alerts.highSeverity, color: severityColors.high },
+        { name: 'Medium', value: safeData.alerts.mediumSeverity, color: severityColors.medium },
+        { name: 'Low', value: safeData.alerts.lowSeverity, color: severityColors.low }
     ].filter(d => d.value > 0);
 
     const riskyUsersData = [
-        { name: 'High Risk', value: dashboardData.riskyUsers.high, color: severityColors.high },
-        { name: 'Medium Risk', value: dashboardData.riskyUsers.medium, color: severityColors.medium },
-        { name: 'Low Risk', value: dashboardData.riskyUsers.low, color: severityColors.low }
+        { name: 'High Risk', value: safeData.riskyUsers.high, color: severityColors.high },
+        { name: 'Medium Risk', value: safeData.riskyUsers.medium, color: severityColors.medium },
+        { name: 'Low Risk', value: safeData.riskyUsers.low, color: severityColors.low }
     ].filter(d => d.value > 0);
 
     const mfaData = [
-        { name: 'MFA Enabled', value: dashboardData.mfa.registered, color: '#22c55e' },
-        { name: 'No MFA', value: dashboardData.mfa.total - dashboardData.mfa.registered, color: '#ef4444' }
+        { name: 'MFA Enabled', value: safeData.mfa.registered, color: '#22c55e' },
+        { name: 'No MFA', value: safeData.mfa.total - safeData.mfa.registered, color: '#ef4444' }
     ].filter(d => d.value > 0);
 
-    if (loading) {
+    if (loading && !dashboardData) {
         return <Loader3D showOverlay={true} text="Loading Security Dashboard..." />;
     }
 
@@ -180,7 +148,7 @@ const SecurityDashboard = () => {
                 <div className="flex-gap-2">
                     <button
                         className={`sync-btn ${refreshing ? 'spinning' : ''}`}
-                        onClick={() => fetchDashboardData(true)}
+                        onClick={() => refetch(true)}
                         title="Sync & Refresh"
                     >
                         <RefreshCw size={16} />
@@ -188,36 +156,53 @@ const SecurityDashboard = () => {
                 </div>
             </header>
 
-            {error && (
+            {fetchError && !interactionError && (
                 <div className="error-banner" style={{
-                    background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                    border: `1px solid ${error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid rgba(239, 68, 68, 0.3)',
                     borderRadius: '12px',
                     padding: '16px',
                     marginBottom: '24px',
-                    color: error === 'InteractionRequired' ? 'var(--accent-blue)' : '#ef4444',
+                    color: '#ef4444',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center'
                 }}>
-                    <span>{error === 'InteractionRequired' ? '🔐 Security session expired. Additional authentication required to load telemetry.' : error}</span>
-                    {error === 'InteractionRequired' && (
-                        <button
-                            onClick={() => fetchDashboardData(true)}
-                            style={{
-                                background: 'var(--accent-blue)',
-                                color: 'white',
-                                border: 'none',
-                                padding: '6px 12px',
-                                borderRadius: '6px',
-                                fontSize: '12px',
-                                fontWeight: 700,
-                                cursor: 'pointer'
-                            }}
-                        >
-                            Reconnect
-                        </button>
-                    )}
+                    <AlertTriangle size={14} />
+                    <span>{fetchError}</span>
+                </div>
+            )}
+
+            {interactionError && (
+                <div className="error-banner" style={{
+                    background: 'rgba(59, 130, 246, 0.1)',
+                    border: '1px solid rgba(59, 130, 246, 0.3)',
+                    borderRadius: '12px',
+                    padding: '16px',
+                    marginBottom: '24px',
+                    color: 'var(--accent-blue)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <Shield size={14} />
+                    <span>🔐 Session expired or additional permissions required to load security data.</span>
+                    <button
+                        onClick={() => refetch(true)}
+                        className="reconnect-btn"
+                        style={{
+                            background: 'var(--accent-blue)',
+                            color: 'white',
+                            border: 'none',
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Reconnect
+                    </button>
                 </div>
             )}
 
@@ -243,10 +228,10 @@ const SecurityDashboard = () => {
                     <div className="stat-content">
                         <span className="stat-label">Secure Score</span>
                         <span className="stat-value" style={{ color: '#22c55e' }}>
-                            {dashboardData.secureScore.percentage}%
+                            {safeData.secureScore.percentage}%
                         </span>
                         <span className="stat-sublabel">
-                            {dashboardData.secureScore.current}/{dashboardData.secureScore.max}
+                            {safeData.secureScore.current}/{safeData.secureScore.max}
                         </span>
                     </div>
                 </motion.div>
@@ -267,10 +252,10 @@ const SecurityDashboard = () => {
                     <div className="stat-content">
                         <span className="stat-label">Security Alerts</span>
                         <span className="stat-value" style={{ color: '#ef4444' }}>
-                            {dashboardData.alerts.total}
+                            {safeData.alerts.total}
                         </span>
                         <span className="stat-sublabel">
-                            {dashboardData.alerts.highSeverity} high severity
+                            {safeData.alerts.highSeverity} high severity
                         </span>
                     </div>
                     <ChevronRight size={16} style={{ color: 'var(--text-tertiary)' }} />
@@ -292,10 +277,10 @@ const SecurityDashboard = () => {
                     <div className="stat-content">
                         <span className="stat-label">Incidents</span>
                         <span className="stat-value" style={{ color: '#f59e0b' }}>
-                            {dashboardData.incidents.total}
+                            {safeData.incidents.active}
                         </span>
                         <span className="stat-sublabel">
-                            {dashboardData.incidents.active} active
+                            {safeData.incidents.total} total
                         </span>
                     </div>
                     <ChevronRight size={16} style={{ color: 'var(--text-tertiary)' }} />
@@ -317,10 +302,10 @@ const SecurityDashboard = () => {
                     <div className="stat-content">
                         <span className="stat-label">Risky Users</span>
                         <span className="stat-value" style={{ color: '#a855f7' }}>
-                            {dashboardData.riskyUsers.total}
+                            {safeData.riskyUsers.total}
                         </span>
                         <span className="stat-sublabel">
-                            {dashboardData.riskyUsers.high} high risk
+                            {safeData.riskyUsers.high} high risk
                         </span>
                     </div>
                     <ChevronRight size={16} style={{ color: 'var(--text-tertiary)' }} />
@@ -353,7 +338,7 @@ const SecurityDashboard = () => {
                     </div>
                     <div className="chart-body" style={{ height: '220px' }}>
                         {alertSeverityData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
                                 <PieChart>
                                     <Pie
                                         data={alertSeverityData}
@@ -406,7 +391,7 @@ const SecurityDashboard = () => {
                     </div>
                     <div className="chart-body" style={{ height: '220px' }}>
                         {riskyUsersData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
                                 <BarChart data={riskyUsersData} layout="vertical">
                                     <XAxis type="number" hide />
                                     <YAxis type="category" dataKey="name" width={90} tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} />

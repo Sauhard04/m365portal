@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line 
 import {
     PieChart, Pie, BarChart, Bar, LineChart, Line, AreaChart, Area, RadialBarChart, RadialBar,
     RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Treemap, ComposedChart,
-    XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, ResponsiveContainer, Label, LabelList
+    XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, Label, LabelList
 } from 'recharts';
 import {
     Users, Smartphone, CreditCard, Shield, Activity,
@@ -21,90 +21,65 @@ import Loader3D from './Loader3D';
 import { DataPersistenceService } from '../services/dataPersistence';
 import SiteDataStore from '../services/siteDataStore';
 import { MiniSparkline, MiniProgressBar, MiniSegmentedBar } from './charts/MicroCharts';
-import { CustomTooltip, ChartHeader } from './charts/CustomTooltip';
+import { useDataCaching } from '../hooks/useDataCaching';
+import SafeResponsiveContainer from './SafeResponsiveContainer';
 
 const OverviewDashboard = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
-    const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
-    const [data, setData] = useState(null);
-    const [error, setError] = useState(null);
+    const fetchFn = async () => {
+        const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
+        const graphService = new GraphService(response.accessToken);
+        const overviewData = await AggregationService.getOverviewData(graphService, response.accessToken);
+
+        // Map to our persistence schema (Legacy support)
+        const persistenceData = {
+            overview: {
+                statistics: {
+                    total_users: overviewData.quickStats.totalUsers,
+                    total_devices: overviewData.quickStats.totalDevices,
+                    total_licenses: overviewData.quickStats.totalLicenses,
+                    secure_score: overviewData.quickStats.secureScore
+                },
+                health_and_security: {
+                    failed_signins: overviewData.charts.signIns[0]?.failed || 0,
+                    compliance_rate: overviewData.charts.securityRadar.find(d => d.subject === 'Compliance')?.value || 0
+                }
+            },
+            raw: overviewData
+        };
+        // L2 cache is handled by the hook for fresh data
+        return overviewData;
+    };
+
+    const {
+        data,
+        loading,
+        refreshing,
+        error,
+        refetch
+    } = useDataCaching('Overview_v3', fetchFn, {
+        maxAge: 30, // 30 minutes
+        storeSection: 'overview',
+        storeMetadata: { source: 'OverviewDashboard' },
+        enabled: accounts.length > 0
+    });
+
     const [overviewOpen, setOverviewOpen] = useState(true);
     const [birdsEyeOpen, setBirdsEyeOpen] = useState(true);
 
-    const fetchOverviewData = async (isManual = false) => {
-        if (accounts.length === 0) return;
-
-        if (isManual) setRefreshing(true);
-        else setLoading(true);
-
-        const startTime = Date.now();
-
-        try {
-            const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-            const graphService = new GraphService(response.accessToken);
-            const overviewData = await AggregationService.getOverviewData(graphService, response.accessToken);
-
-            // Map to our persistence schema
-            const persistenceData = {
-                overview: {
-                    statistics: {
-                        total_users: overviewData.quickStats.totalUsers,
-                        total_devices: overviewData.quickStats.totalDevices,
-                        total_licenses: overviewData.quickStats.totalLicenses,
-                        secure_score: overviewData.quickStats.secureScore
-                    },
-                    health_and_security: {
-                        // Service Health removed
-                        failed_signins: overviewData.charts.signIns[0]?.failed || 0,
-                        compliance_rate: overviewData.charts.securityRadar.find(d => d.subject === 'Compliance')?.value || 0
-                    }
-                },
-                raw: overviewData
-            };
-
-            // Save to Cache & JSON
-            await DataPersistenceService.save('Overview_v2', persistenceData);
-            SiteDataStore.store('overview', overviewData, { source: 'OverviewDashboard' });
-            setData(overviewData);
-        } catch (err) {
-            console.error('Overview fetch error:', err);
-            setError('Failed to load overview data');
-        } finally {
-            if (isManual) {
-                const elapsedTime = Date.now() - startTime;
-                const remainingTime = Math.max(0, 2000 - elapsedTime);
-                setTimeout(() => {
-                    setRefreshing(false);
-                }, remainingTime);
-            } else {
-                setLoading(false);
-                setRefreshing(false);
-            }
-        }
-    };
-
-    const loadData = async () => {
-        const cached = await DataPersistenceService.load('Overview_v2');
-        if (cached && cached.raw) {
-            setData(cached.raw);
-            setLoading(false);
-
-            // Background revalidate if stale (30 mins)
-            if (DataPersistenceService.isExpired('Overview_v2', 30)) {
-                fetchOverviewData(false);
-            }
-        } else {
-            fetchOverviewData(false);
-        }
-    };
+    const [chartsVisible, setChartsVisible] = useState(false);
 
     useEffect(() => {
-        loadData();
-    }, [accounts, instance]);
+        if (!loading && data) {
+            const timer = setTimeout(() => {
+                setChartsVisible(true);
+            }, 800); // Increased delay to ensure container dimensions are stable
+            return () => clearTimeout(timer);
+        }
+    }, [loading, data]);
 
-    if (loading) {
+    if (loading && !data) {
         return (
             <Loader3D showOverlay={true} />
         );
@@ -123,7 +98,7 @@ const OverviewDashboard = () => {
     const quickStats = [
         {
             label: 'Total Users',
-            value: data?.quickStats.totalUsers || 0,
+            value: data?.quickStats?.totalUsers || 0,
             icon: Users,
             color: 'var(--accent-blue)',
             gradient: 'linear-gradient(135deg, #3b82f6, #2563eb)',
@@ -131,7 +106,7 @@ const OverviewDashboard = () => {
         },
         {
             label: 'Managed Devices',
-            value: data?.quickStats.totalDevices || 0,
+            value: data?.quickStats?.totalDevices || 0,
             icon: Smartphone,
             color: 'var(--accent-purple)',
             gradient: 'linear-gradient(135deg, #a855f7, #9333ea)',
@@ -139,7 +114,7 @@ const OverviewDashboard = () => {
         },
         {
             label: 'Active Licenses',
-            value: data?.quickStats.totalLicenses || 0,
+            value: data?.quickStats?.totalLicenses || 0,
             icon: CreditCard,
             color: 'var(--accent-cyan)',
             gradient: 'linear-gradient(135deg, #06b6d4, #0891b2)',
@@ -147,7 +122,7 @@ const OverviewDashboard = () => {
         },
         {
             label: 'Secure Score',
-            value: data?.quickStats.secureScore ? `${Math.round((data.quickStats.secureScore / data.quickStats.maxSecureScore) * 100)}%` : '0%',
+            value: data?.quickStats?.secureScore ? `${Math.round((data.quickStats.secureScore / (data.quickStats.maxSecureScore || 100)) * 100)}%` : '0%',
             icon: Shield,
             color: 'var(--accent-success)',
             gradient: 'linear-gradient(135deg, #10b981, #059669)',
@@ -155,7 +130,7 @@ const OverviewDashboard = () => {
         },
         {
             label: 'MFA Enrollment',
-            value: data?.quickStats.mfaRegistered && data?.quickStats.mfaTotal ? `${Math.round((data.quickStats.mfaRegistered / data.quickStats.mfaTotal) * 100)}%` : '0%',
+            value: data?.quickStats?.mfaRegistered && data?.quickStats?.mfaTotal ? `${Math.round((data.quickStats.mfaRegistered / data.quickStats.mfaTotal) * 100)}%` : '0%',
             icon: Lock,
             color: 'var(--accent-success)',
             gradient: 'linear-gradient(135deg, #059669, #047857)',
@@ -163,7 +138,7 @@ const OverviewDashboard = () => {
         },
         {
             label: 'Active Roles',
-            value: data?.quickStats.activeRoles || 0,
+            value: data?.quickStats?.activeRoles || 0,
             icon: Shield,
             color: 'var(--accent-warning)',
             gradient: 'linear-gradient(135deg, #f59e0b, #d97706)',
@@ -258,7 +233,11 @@ const OverviewDashboard = () => {
                     <h1 className="title-gradient" style={{ fontSize: '32px' }}>Overview Dashboard</h1>
                 </div>
                 <div className="flex-gap-2">
-                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchOverviewData(true)} title="Sync & Refresh">
+                    <button
+                        className={`sync-btn ${refreshing ? 'spinning' : ''}`}
+                        onClick={() => refetch()}
+                        title="Sync & Refresh"
+                    >
                         <RefreshCw size={16} />
                     </button>
                 </div>
@@ -438,18 +417,20 @@ const OverviewDashboard = () => {
                                             <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Active vs Inactive</p>
                                         </div>
                                     </div>
-                                    <div style={{ height: '240px', minWidth: '0' }}>
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <PieChart>
-                                                <Pie data={data.charts.userDistribution} cx="50%" cy="50%" outerRadius={80} innerRadius={60} paddingAngle={5} dataKey="value" stroke="var(--glass-bg)" strokeWidth={2}>
-                                                    {data.charts.userDistribution.map((entry, index) => (
-                                                        <Cell key={`cell-${index}`} fill={entry.name === 'Active' ? 'var(--accent-success)' : 'var(--accent-warning)'} />
-                                                    ))}
-                                                </Pie>
-                                                <Tooltip content={<CustomTooltip />} />
-                                                <Legend verticalAlign="bottom" height={36} />
-                                            </PieChart>
-                                        </ResponsiveContainer>
+                                    <div style={{ height: '240px', width: '100%', minWidth: '200px', overflow: 'hidden', position: 'relative' }}>
+                                        {chartsVisible ? (
+                                            <SafeResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={200}>
+                                                <PieChart>
+                                                    <Pie data={data.charts.userDistribution} cx="50%" cy="50%" outerRadius={80} innerRadius={60} paddingAngle={5} dataKey="value" stroke="var(--glass-bg)" strokeWidth={2}>
+                                                        {data.charts.userDistribution.map((entry, index) => (
+                                                            <Cell key={`cell-${index}`} fill={entry.name === 'Active' ? 'var(--accent-success)' : 'var(--accent-warning)'} />
+                                                        ))}
+                                                    </Pie>
+                                                    <Tooltip content={<CustomTooltip />} />
+                                                    <Legend verticalAlign="bottom" height={36} />
+                                                </PieChart>
+                                            </SafeResponsiveContainer>
+                                        ) : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>Loading chart...</div>}
                                     </div>
                                 </div>
                             )}
@@ -472,22 +453,24 @@ const OverviewDashboard = () => {
                                             <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Security Posture</p>
                                         </div>
                                     </div>
-                                    <div style={{ height: '240px', minWidth: '0' }}>
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <BarChart data={data.charts.deviceCompliance} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                                                <defs>
-                                                    <linearGradient id="compGrad" x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="0%" stopColor="var(--accent-indigo)" />
-                                                        <stop offset="100%" stopColor="var(--accent-purple)" />
-                                                    </linearGradient>
-                                                </defs>
-                                                <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} vertical={false} />
-                                                <XAxis dataKey="name" stroke="var(--text-dim)" fontSize={11} tickLine={false} axisLine={false} />
-                                                <YAxis stroke="var(--text-dim)" fontSize={11} tickLine={false} axisLine={false} />
-                                                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--glass-border)', opacity: 0.1 }} />
-                                                <Bar dataKey="value" fill="url(#compGrad)" radius={[6, 6, 0, 0]} />
-                                            </BarChart>
-                                        </ResponsiveContainer>
+                                    <div style={{ height: '240px', minWidth: '0', overflow: 'hidden' }}>
+                                        {chartsVisible && (
+                                            <SafeResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={200}>
+                                                <BarChart data={data.charts.deviceCompliance} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                                                    <defs>
+                                                        <linearGradient id="compGrad" x1="0" y1="0" x2="0" y2="1">
+                                                            <stop offset="0%" stopColor="var(--accent-indigo)" />
+                                                            <stop offset="100%" stopColor="var(--accent-purple)" />
+                                                        </linearGradient>
+                                                    </defs>
+                                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} vertical={false} />
+                                                    <XAxis dataKey="name" stroke="var(--text-dim)" fontSize={11} tickLine={false} axisLine={false} />
+                                                    <YAxis stroke="var(--text-dim)" fontSize={11} tickLine={false} axisLine={false} />
+                                                    <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--glass-border)', opacity: 0.1 }} />
+                                                    <Bar dataKey="value" fill="url(#compGrad)" radius={[6, 6, 0, 0]} />
+                                                </BarChart>
+                                            </SafeResponsiveContainer>
+                                        )}
                                     </div>
                                 </div>
                             )}
@@ -544,21 +527,23 @@ const OverviewDashboard = () => {
                                             <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Last 7 Days</p>
                                         </div>
                                     </div>
-                                    <div style={{ height: '240px', minWidth: '0' }}>
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <AreaChart data={data.charts.emailTrend}>
-                                                <defs>
-                                                    <linearGradient id="emailGrad" x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="5%" stopColor="var(--accent-indigo)" stopOpacity={0.3} />
-                                                        <stop offset="95%" stopColor="var(--accent-indigo)" stopOpacity={0} />
-                                                    </linearGradient>
-                                                </defs>
-                                                <XAxis dataKey="name" hide />
-                                                <Tooltip content={<CustomTooltip />} />
-                                                <Area type="monotone" dataKey="sent" name="Sent" stroke="var(--accent-indigo)" fillOpacity={1} fill="url(#emailGrad)" strokeWidth={2} />
-                                                <Area type="monotone" dataKey="received" name="Received" stroke="var(--accent-cyan)" fillOpacity={0} strokeWidth={2} />
-                                            </AreaChart>
-                                        </ResponsiveContainer>
+                                    <div style={{ height: '240px', width: '100%', minWidth: '200px', overflow: 'hidden', position: 'relative' }}>
+                                        {chartsVisible ? (
+                                            <SafeResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={200}>
+                                                <AreaChart data={data.charts.emailTrend}>
+                                                    <defs>
+                                                        <linearGradient id="emailGrad" x1="0" y1="0" x2="0" y2="1">
+                                                            <stop offset="5%" stopColor="var(--accent-indigo)" stopOpacity={0.3} />
+                                                            <stop offset="95%" stopColor="var(--accent-indigo)" stopOpacity={0} />
+                                                        </linearGradient>
+                                                    </defs>
+                                                    <XAxis dataKey="name" hide />
+                                                    <Tooltip content={<CustomTooltip />} />
+                                                    <Area type="monotone" dataKey="sent" name="Sent" stroke="var(--accent-indigo)" fillOpacity={1} fill="url(#emailGrad)" strokeWidth={2} />
+                                                    <Area type="monotone" dataKey="received" name="Received" stroke="var(--accent-cyan)" fillOpacity={0} strokeWidth={2} />
+                                                </AreaChart>
+                                            </SafeResponsiveContainer>
+                                        ) : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>Loading chart...</div>}
                                     </div>
                                 </div>
                             )}
@@ -583,15 +568,17 @@ const OverviewDashboard = () => {
                                             </div>
                                             <h3 style={{ fontSize: '12px', fontWeight: 700 }}>Security Posture</h3>
                                         </div>
-                                        <div style={{ height: '260px', minWidth: '0' }}>
-                                            <ResponsiveContainer width="100%" height="100%">
-                                                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data.charts.securityRadar}>
-                                                    <PolarGrid stroke="var(--glass-border)" />
-                                                    <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-dim)', fontSize: 10 }} />
-                                                    <Radar name="Score" dataKey="value" stroke="var(--accent-blue)" fill="var(--accent-blue)" fillOpacity={0.3} />
-                                                    <Tooltip content={<CustomTooltip />} />
-                                                </RadarChart>
-                                            </ResponsiveContainer>
+                                        <div style={{ height: '260px', width: '100%', minWidth: '200px', overflow: 'hidden', position: 'relative' }}>
+                                            {chartsVisible ? (
+                                                <SafeResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={200}>
+                                                    <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data.charts.securityRadar}>
+                                                        <PolarGrid stroke="var(--glass-border)" />
+                                                        <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-dim)', fontSize: 10 }} />
+                                                        <Radar name="Score" dataKey="value" stroke="var(--accent-blue)" fill="var(--accent-blue)" fillOpacity={0.3} />
+                                                        <Tooltip content={<CustomTooltip />} />
+                                                    </RadarChart>
+                                                </SafeResponsiveContainer>
+                                            ) : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>Loading chart...</div>}
                                         </div>
                                     </div>
                                 )}
@@ -612,31 +599,34 @@ const OverviewDashboard = () => {
                                             </div>
                                             <h3 style={{ fontSize: '12px', fontWeight: 700 }}>Active User Trends</h3>
                                         </div>
-                                        <div style={{ height: '260px', minWidth: '0' }}>
-                                            <ResponsiveContainer width="100%" height="100%">
-                                                <AreaChart data={data.charts.userGrowthTrend}>
-                                                    <defs>
-                                                        <linearGradient id="growthGrad" x1="0" y1="0" x2="0" y2="1">
-                                                            <stop offset="5%" stopColor="var(--accent-blue)" stopOpacity={0.3} />
-                                                            <stop offset="95%" stopColor="var(--accent-blue)" stopOpacity={0} />
-                                                        </linearGradient>
-                                                    </defs>
-                                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} vertical={false} />
-                                                    <XAxis dataKey="week" hide />
-                                                    <YAxis hide />
-                                                    <Tooltip content={<CustomTooltip />} />
-                                                    <Area type="monotone" dataKey="active" stroke="var(--accent-blue)" fillOpacity={1} fill="url(#growthGrad)" strokeWidth={3} />
-                                                </AreaChart>
-                                            </ResponsiveContainer>
+                                        <div style={{ height: '260px', width: '100%', minWidth: '200px', overflow: 'hidden', position: 'relative' }}>
+                                            {chartsVisible ? (
+                                                <SafeResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={200}>
+                                                    <AreaChart data={data.charts.userGrowthTrend}>
+                                                        <defs>
+                                                            <linearGradient id="growthGrad" x1="0" y1="0" x2="0" y2="1">
+                                                                <stop offset="5%" stopColor="var(--accent-blue)" stopOpacity={0.3} />
+                                                                <stop offset="95%" stopColor="var(--accent-blue)" stopOpacity={0} />
+                                                            </linearGradient>
+                                                        </defs>
+                                                        <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} vertical={false} />
+                                                        <XAxis dataKey="week" hide />
+                                                        <YAxis hide />
+                                                        <Tooltip content={<CustomTooltip />} />
+                                                        <Area type="monotone" dataKey="active" stroke="var(--accent-blue)" fillOpacity={1} fill="url(#growthGrad)" strokeWidth={3} />
+                                                    </AreaChart>
+                                                </SafeResponsiveContainer>
+                                            ) : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>Loading chart...</div>}
                                         </div>
                                     </div>
                                 )}
                             </div>
                         </div>
                     </motion.div>
-                )}
-            </div>
-        </div>
+                )
+                }
+            </div >
+        </div >
     );
 };
 

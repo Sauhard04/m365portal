@@ -15,13 +15,49 @@ import {
 import {
     ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip
 } from 'recharts';
+import { useDataCaching } from '../hooks/useDataCaching';
 
 const GovernanceDashboard = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
-    const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
-    const [dashboardData, setDashboardData] = useState({
+    const fetchFn = async () => {
+        const account = accounts[0];
+        if (!account) throw new Error('No account found');
+
+        const tokenResponse = await instance.acquireTokenSilent({
+            ...governanceScopes,
+            account
+        });
+
+        const client = Client.init({
+            authProvider: (done) => done(null, tokenResponse.accessToken)
+        });
+
+        return await GovernanceService.getDashboardSummary(client);
+    };
+
+    const {
+        data: dashboardData,
+        loading,
+        refreshing,
+        error: fetchError,
+        refetch
+    } = useDataCaching('Governance_Dashboard_v3', fetchFn, {
+        maxAge: 30,
+        storeSection: 'governance',
+        storeMetadata: { source: 'GovernanceDashboard' },
+        enabled: accounts.length > 0
+    });
+
+    const [interactionError, setInteractionError] = useState(false);
+
+    useEffect(() => {
+        if (fetchError && (fetchError.includes('InteractionRequiredAuthError') || fetchError.includes('interaction_required'))) {
+            setInteractionError(true);
+        }
+    }, [fetchError]);
+
+    const safeData = dashboardData || {
         conditionalAccess: { total: 0, enabled: 0, disabled: 0, policies: [] },
         roles: { definitions: 0, assignments: 0, eligibleAssignments: 0, privilegedAssignments: 0 },
         accessReviews: { total: 0, active: 0, reviews: [] },
@@ -29,70 +65,8 @@ const GovernanceDashboard = () => {
         mfa: { totalUsers: 0, capable: 0, mfaRegistered: 0, ssprRegistered: 0 },
         compliance: { agreements: 0, agreementsList: [] },
         audit: []
-    });
-    const [error, setError] = useState(null);
-
-    const CACHE_KEY = 'governance_dashboard';
-    const CACHE_DURATION = 5 * 60 * 1000;
-
-    const fetchDashboardData = async (isManual = false) => {
-        if (accounts.length === 0) return;
-
-        if (isManual) setRefreshing(true);
-        else setLoading(true);
-        setError(null);
-
-        try {
-            if (!isManual) {
-                const cached = DataPersistenceService.load(CACHE_KEY, CACHE_DURATION);
-                if (cached) {
-                    setDashboardData(cached);
-                    setLoading(false);
-                    return;
-                }
-            }
-
-            const account = accounts[0];
-            if (!account) throw new Error('No account found');
-
-            const tokenResponse = await instance.acquireTokenSilent({
-                ...governanceScopes,
-                account
-            }).catch(async (authErr) => {
-                if (authErr.name === "InteractionRequiredAuthError" || authErr.errorCode === "invalid_grant") {
-                    if (isManual) {
-                        return await instance.acquireTokenPopup(governanceScopes);
-                    } else {
-                        throw authErr;
-                    }
-                }
-                throw authErr;
-            });
-
-            const client = Client.init({
-                authProvider: (done) => done(null, tokenResponse.accessToken)
-            });
-
-            const data = await GovernanceService.getDashboardSummary(client);
-            setDashboardData(data);
-            DataPersistenceService.save(CACHE_KEY, data);
-        } catch (err) {
-            if (err.name === "InteractionRequiredAuthError" || err.errorCode === "invalid_grant") {
-                console.warn("Interaction required for Governance Dashboard");
-                setError("InteractionRequired");
-            } else {
-                console.error('Failed to fetch governance dashboard data:', err);
-                setError(err.message || "Failed to load governance data");
-            }
-        } finally {
-            setLoading(false);
-            setRefreshing(false);
-        }
     };
 
-    useEffect(() => {
-        fetchDashboardData();
-    }, [instance, accounts]);
 
     const CustomTooltip = ({ active, payload }) => {
         if (active && payload && payload.length) {
@@ -116,19 +90,19 @@ const GovernanceDashboard = () => {
     };
 
     const caPolicyData = [
-        { name: 'Enabled', value: dashboardData.conditionalAccess.enabled, color: '#22c55e' },
-        { name: 'Report-only', value: dashboardData.conditionalAccess.enabledForReportingButNotEnforced || 0, color: '#f59e0b' },
-        { name: 'Disabled', value: dashboardData.conditionalAccess.disabled, color: '#6b7280' }
+        { name: 'Enabled', value: safeData.conditionalAccess.enabled, color: '#22c55e' },
+        { name: 'Report-only', value: safeData.conditionalAccess.enabledForReportingButNotEnforced || 0, color: '#f59e0b' },
+        { name: 'Disabled', value: safeData.conditionalAccess.disabled, color: '#6b7280' }
     ].filter(d => d.value > 0);
 
     const roleData = [
-        { name: 'Active Assignments', value: dashboardData.roles.assignments, color: '#3b82f6' },
-        { name: 'Eligible (PIM)', value: dashboardData.roles.eligibleAssignments, color: '#a855f7' },
-        { name: 'Privileged Roles', value: dashboardData.roles.privilegedAssignments, color: '#ef4444' }
+        { name: 'Active Assignments', value: safeData.roles.assignments, color: '#3b82f6' },
+        { name: 'Eligible (PIM)', value: safeData.roles.eligibleAssignments, color: '#a855f7' },
+        { name: 'Privileged Roles', value: safeData.roles.privilegedAssignments, color: '#ef4444' }
     ];
 
-    if (loading) {
-        return <Loader3D showOverlay={true} text="Loading Governance Dashboard..." />;
+    if (loading && !dashboardData) {
+        return <Loader3D showOverlay={true} />;
     }
 
     return (
@@ -152,7 +126,7 @@ const GovernanceDashboard = () => {
                 <div className="flex-gap-2">
                     <button
                         className={`sync-btn ${refreshing ? 'spinning' : ''}`}
-                        onClick={() => fetchDashboardData(true)}
+                        onClick={() => refetch(true)}
                         title="Sync & Refresh"
                     >
                         <RefreshCw size={16} />
@@ -160,36 +134,18 @@ const GovernanceDashboard = () => {
                 </div>
             </header>
 
-            {error && (
-                <div className="error-banner" style={{
-                    background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                    border: `1px solid ${error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-                    borderRadius: '12px',
-                    padding: '16px',
-                    marginBottom: '24px',
-                    color: error === 'InteractionRequired' ? 'var(--accent-blue)' : '#ef4444',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                }}>
-                    <span>{error === 'InteractionRequired' ? '🔐 Governance session expired. Additional permissions required to load telemetry.' : error}</span>
-                    {error === 'InteractionRequired' && (
-                        <button
-                            onClick={() => fetchDashboardData(true)}
-                            style={{
-                                background: 'var(--accent-blue)',
-                                color: 'white',
-                                border: 'none',
-                                padding: '6px 12px',
-                                borderRadius: '6px',
-                                fontSize: '12px',
-                                fontWeight: 700,
-                                cursor: 'pointer'
-                            }}
-                        >
-                            Reconnect
-                        </button>
-                    )}
+            {fetchError && !interactionError && (
+                <div className="error-banner" style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#ef4444' }}>
+                    <RefreshCw size={14} style={{ marginRight: '8px' }} />
+                    <span>{fetchError}</span>
+                </div>
+            )}
+
+            {interactionError && (
+                <div className="error-banner" style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.3)', color: 'var(--accent-blue)' }}>
+                    <RefreshCw size={14} style={{ marginRight: '8px' }} />
+                    <span>🔐 Session expired or additional permissions required.</span>
+                    <button onClick={() => refetch(true)} className="reconnect-btn">Reconnect</button>
                 </div>
             )}
 
@@ -319,7 +275,7 @@ const GovernanceDashboard = () => {
                     </div>
                     <div className="chart-body" style={{ height: '220px', width: '100%' }}>
                         {caPolicyData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
                                 <PieChart>
                                     <Pie
                                         data={caPolicyData}
@@ -371,7 +327,7 @@ const GovernanceDashboard = () => {
                         </button>
                     </div>
                     <div className="chart-body" style={{ height: '220px', width: '100%' }}>
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
                             <BarChart data={roleData} layout="vertical">
                                 <XAxis type="number" hide />
                                 <YAxis type="category" dataKey="name" width={110} tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} />

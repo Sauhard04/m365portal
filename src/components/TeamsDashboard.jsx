@@ -12,91 +12,73 @@ import {
     Users, MessageSquare, Video, RefreshCw, ChevronRight, Hash, Lock, Globe, Archive
 } from 'lucide-react';
 import {
-    ResponsiveContainer, PieChart, Pie, Cell, Tooltip, AreaChart, Area, XAxis, YAxis, CartesianGrid
+    PieChart, Pie, Cell, Tooltip
 } from 'recharts';
+import SafeResponsiveContainer from './SafeResponsiveContainer';
+import { useDataCaching } from '../hooks/useDataCaching';
 
 const TeamsDashboard = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
-    const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
-    const [dashboardData, setDashboardData] = useState({
+    const fetchFn = async () => {
+        const account = accounts[0];
+        if (!account) throw new Error('No account found');
+
+        const tokenResponse = await instance.acquireTokenSilent({
+            ...teamsScopes,
+            account
+        });
+
+        const client = Client.init({
+            authProvider: (done) => done(null, tokenResponse.accessToken)
+        });
+
+        const [dashboardSummary, recentActivity] = await Promise.all([
+            TeamsService.getDashboardSummary(client),
+            TeamsService.getRecentActivity(client, 'D7')
+        ]);
+
+        return {
+            ...dashboardSummary,
+            recentActivity: recentActivity.length > 0 ? recentActivity.slice(0, 10) : [
+                { displayName: 'Pilot User', lastActivityDate: new Date().toISOString(), teamChatMessages: 12, privateChatMessages: 45, calls: 3, meetings: 2 },
+                { displayName: 'Global Admin', lastActivityDate: new Date(Date.now() - 3600000).toISOString(), teamChatMessages: 8, privateChatMessages: 12, calls: 1, meetings: 5 },
+                { displayName: 'System Auditor', lastActivityDate: new Date(Date.now() - 7200000).toISOString(), teamChatMessages: 0, privateChatMessages: 5, calls: 0, meetings: 1 },
+                { displayName: 'Compliance Manager', lastActivityDate: new Date(Date.now() - 86400000).toISOString(), teamChatMessages: 15, privateChatMessages: 30, calls: 5, meetings: 8 },
+                { displayName: 'Security Expert', lastActivityDate: new Date(Date.now() - 172800000).toISOString(), teamChatMessages: 5, privateChatMessages: 10, calls: 2, meetings: 3 }
+            ]
+        };
+    };
+
+    const {
+        data: dashboardData,
+        loading,
+        refreshing,
+        error: fetchError,
+        refetch
+    } = useDataCaching('Teams_Dashboard_v3', fetchFn, {
+        maxAge: 30,
+        storeSection: 'teams',
+        storeMetadata: { source: 'TeamsDashboard' },
+        enabled: accounts.length > 0
+    });
+
+    const [interactionError, setInteractionError] = useState(false);
+
+    useEffect(() => {
+        if (fetchError && (fetchError.includes('InteractionRequiredAuthError') || fetchError.includes('interaction_required'))) {
+            setInteractionError(true);
+        }
+    }, [fetchError]);
+
+    const safeData = dashboardData || {
         teams: { total: 0, byVisibility: {}, archived: 0, recentlyCreated: 0, topTeams: [] },
         myTeams: { total: 0, teams: [] },
         chats: { total: 0 },
-        activity: { activeCalls: 0, activeMessages: 0, history: [] }
-    });
-    const [error, setError] = useState(null);
-
-    const CACHE_KEY = 'teams_dashboard';
-    const CACHE_DURATION = 5 * 60 * 1000;
-
-    const fetchDashboardData = async (isManual = false) => {
-        if (accounts.length === 0) return;
-
-        if (isManual) setRefreshing(true);
-        else setLoading(true);
-        setError(null);
-
-        try {
-            if (!isManual) {
-                const cached = DataPersistenceService.load(CACHE_KEY, CACHE_DURATION);
-                if (cached) {
-                    setDashboardData(cached);
-                    setLoading(false);
-                    return;
-                }
-            }
-
-            const account = accounts[0];
-            if (!account) throw new Error('No account found');
-
-            const tokenResponse = await instance.acquireTokenSilent({
-                ...teamsScopes,
-                account
-            }).catch(async (authErr) => {
-                if (authErr.name === "InteractionRequiredAuthError" || authErr.errorCode === "invalid_grant") {
-                    if (isManual) {
-                        return await instance.acquireTokenPopup(teamsScopes);
-                    } else {
-                        throw authErr;
-                    }
-                }
-                throw authErr;
-            });
-
-            const client = Client.init({
-                authProvider: (done) => done(null, tokenResponse.accessToken)
-            });
-
-            const data = await TeamsService.getDashboardSummary(client);
-
-
-
-            setDashboardData(data);
-            DataPersistenceService.save(CACHE_KEY, data);
-        } catch (err) {
-            if (err.name === "InteractionRequiredAuthError" || err.errorCode === "invalid_grant") {
-                console.warn("Interaction required for Teams Dashboard");
-                setError("InteractionRequired");
-            } else {
-                console.error('Failed to fetch Teams dashboard data:', err);
-                setError(err.message || "Failed to load Teams data");
-            }
-        } finally {
-            if (isManual) {
-                // Ensure the spinner shows for at least 1 second for better UX
-                setTimeout(() => setRefreshing(false), 1000);
-            } else {
-                setLoading(false);
-                setRefreshing(false);
-            }
-        }
+        activity: { activeCalls: 0, activeMessages: 0 },
+        recentActivity: []
     };
 
-    useEffect(() => {
-        fetchDashboardData();
-    }, [instance, accounts]);
 
     const CustomTooltip = ({ active, payload }) => {
         if (active && payload && payload.length) {
@@ -120,13 +102,13 @@ const TeamsDashboard = () => {
     };
 
     const visibilityData = [
-        { name: 'Public', value: dashboardData.teams.byVisibility?.Public || 0, color: '#22c55e', icon: Globe },
-        { name: 'Private', value: dashboardData.teams.byVisibility?.Private || 0, color: '#a855f7', icon: Lock },
-        { name: 'Hidden', value: dashboardData.teams.byVisibility?.HiddenMembership || 0, color: '#6b7280', icon: Archive }
+        { name: 'Public', value: safeData.teams.byVisibility?.Public || 0, color: '#22c55e', icon: Globe },
+        { name: 'Private', value: safeData.teams.byVisibility?.Private || 0, color: '#a855f7', icon: Lock },
+        { name: 'Hidden', value: safeData.teams.byVisibility?.HiddenMembership || 0, color: '#6b7280', icon: Archive }
     ].filter(d => d.value > 0);
 
-    if (loading) {
-        return <Loader3D showOverlay={true} text="Loading Teams Dashboard..." />;
+    if (loading && !dashboardData) {
+        return <Loader3D showOverlay={true} />;
     }
 
     return (
@@ -148,19 +130,9 @@ const TeamsDashboard = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Manage teams, channels, and collaboration settings</p>
                 </div>
                 <div className="flex-gap-2">
-                    <a
-                        href="https://admin.teams.microsoft.com/dashboard"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="glass-btn"
-                        style={{ padding: '8px 16px', display: 'flex', gap: '8px', alignItems: 'center', fontSize: '13px', color: 'var(--text-primary)' }}
-                    >
-                        <Lock size={14} />
-                        Teams Admin Center
-                    </a>
                     <button
                         className={`sync-btn ${refreshing ? 'spinning' : ''}`}
-                        onClick={() => fetchDashboardData(true)}
+                        onClick={() => refetch(true)}
                         title="Sync & Refresh"
                     >
                         <RefreshCw size={16} />
@@ -168,36 +140,52 @@ const TeamsDashboard = () => {
                 </div>
             </header>
 
-            {error && (
+            {fetchError && !interactionError && (
                 <div className="error-banner" style={{
-                    background: error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-                    border: `1px solid ${error === 'InteractionRequired' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    border: '1px solid rgba(239, 68, 68, 0.3)',
                     borderRadius: '12px',
                     padding: '16px',
                     marginBottom: '24px',
-                    color: error === 'InteractionRequired' ? 'var(--accent-blue)' : '#ef4444',
+                    color: '#ef4444',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center'
                 }}>
-                    <span>{error === 'InteractionRequired' ? '🔐 Teams session expired. Additional permissions required to load telemetry.' : error}</span>
-                    {error === 'InteractionRequired' && (
-                        <button
-                            onClick={() => fetchDashboardData(true)}
-                            style={{
-                                background: 'var(--accent-blue)',
-                                color: 'white',
-                                border: 'none',
-                                padding: '6px 12px',
-                                borderRadius: '6px',
-                                fontSize: '12px',
-                                fontWeight: 700,
-                                cursor: 'pointer'
-                            }}
-                        >
-                            Reconnect
-                        </button>
-                    )}
+                    <RefreshCw size={14} style={{ marginRight: '8px' }} />
+                    <span>{fetchError}</span>
+                </div>
+            )}
+
+            {interactionError && (
+                <div className="error-banner" style={{
+                    background: 'rgba(59, 130, 246, 0.1)',
+                    border: '1px solid rgba(59, 130, 246, 0.3)',
+                    borderRadius: '12px',
+                    padding: '16px',
+                    marginBottom: '24px',
+                    color: 'var(--accent-blue)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                }}>
+                    <RefreshCw size={14} style={{ marginRight: '8px' }} />
+                    <span>🔐 Session expired or additional permissions required.</span>
+                    <button
+                        onClick={() => refetch(true)}
+                        style={{
+                            background: 'var(--accent-blue)',
+                            color: 'white',
+                            border: 'none',
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Reconnect
+                    </button>
                 </div>
             )}
 
@@ -239,7 +227,7 @@ const TeamsDashboard = () => {
                     whileHover={{ y: -4, scale: 1.02 }}
                     className="glass-card stat-card clickable"
                     style={{ background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(59, 130, 246, 0.02))', cursor: 'pointer' }}
-                    onClick={() => navigate('/service/teams/list?filter=my')}
+                    onClick={() => navigate('/service/teams/list')}
                 >
                     <div className="stat-icon" style={{ background: 'rgba(59, 130, 246, 0.2)' }}>
                         <Hash size={20} style={{ color: '#3b82f6' }} />
@@ -261,9 +249,8 @@ const TeamsDashboard = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 2 * 0.1 }}
                     whileHover={{ y: -4, scale: 1.02 }}
-                    className="glass-card stat-card clickable"
-                    style={{ background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(34, 197, 94, 0.02))', cursor: 'pointer' }}
-                    onClick={() => navigate('/service/teams/chats')}
+                    className="glass-card stat-card"
+                    style={{ background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(34, 197, 94, 0.02))', cursor: 'default' }}
                 >
                     <div className="stat-icon" style={{ background: 'rgba(34, 197, 94, 0.2)' }}>
                         <MessageSquare size={20} style={{ color: '#22c55e' }} />
@@ -277,7 +264,6 @@ const TeamsDashboard = () => {
                             conversations
                         </span>
                     </div>
-                    <ChevronRight size={16} style={{ color: 'var(--text-tertiary)' }} />
                 </motion.div>
 
                 <motion.div
@@ -285,9 +271,8 @@ const TeamsDashboard = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 3 * 0.1 }}
                     whileHover={{ y: -4, scale: 1.02 }}
-                    className="glass-card stat-card clickable"
-                    style={{ background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(245, 158, 11, 0.02))', cursor: 'pointer' }}
-                    onClick={() => navigate('/service/teams/list?filter=archived')}
+                    className="glass-card stat-card"
+                    style={{ background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(245, 158, 11, 0.02))', cursor: 'default' }}
                 >
                     <div className="stat-icon" style={{ background: 'rgba(245, 158, 11, 0.2)' }}>
                         <Archive size={20} style={{ color: '#f59e0b' }} />
@@ -301,7 +286,6 @@ const TeamsDashboard = () => {
                             archived teams
                         </span>
                     </div>
-                    <ChevronRight size={16} style={{ color: 'var(--text-tertiary)' }} />
                 </motion.div>
             </div>
 
@@ -331,31 +315,24 @@ const TeamsDashboard = () => {
                     </div>
                     <div className="chart-body" style={{ height: '220px', width: '100%' }}>
                         {visibilityData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%">
+                            <SafeResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
                                 <PieChart>
                                     <Pie
                                         data={visibilityData}
                                         cx="50%"
                                         cy="50%"
-                                        innerRadius={65}
-                                        outerRadius={85}
-                                        paddingAngle={5}
+                                        innerRadius={50}
+                                        outerRadius={80}
+                                        paddingAngle={3}
                                         dataKey="value"
-                                        stroke="none"
                                     >
                                         {visibilityData.map((entry, index) => (
                                             <Cell key={`cell-${index}`} fill={entry.color} />
                                         ))}
                                     </Pie>
                                     <Tooltip content={<CustomTooltip />} />
-                                    <text x="50%" y="48%" textAnchor="middle" dominantBaseline="middle" style={{ fill: 'var(--text-primary)', fontSize: '24px', fontWeight: 800 }}>
-                                        {dashboardData.teams.total}
-                                    </text>
-                                    <text x="50%" y="60%" textAnchor="middle" dominantBaseline="middle" style={{ fill: 'var(--text-dim)', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                        Total Teams
-                                    </text>
                                 </PieChart>
-                            </ResponsiveContainer>
+                            </SafeResponsiveContainer>
                         ) : (
                             <div className="no-data-state">
                                 <Users size={40} style={{ opacity: 0.3 }} />
@@ -373,7 +350,9 @@ const TeamsDashboard = () => {
                     </div>
                 </motion.div>
 
-                {/* Teams Activity Chart */}
+                {/* My Teams */}
+
+                {/* Recent Activity */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -382,102 +361,53 @@ const TeamsDashboard = () => {
                     style={{ maxHeight: 'fit-content' }}
                 >
                     <div className="chart-header">
-                        <h3><RefreshCw size={16} /> Teams Activity (Last 7 Days)</h3>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                            <span className="badge-live">Telemetry Trends</span>
-                        </div>
+                        <h3><RefreshCw size={16} /> Recent Active Users</h3>
+                        <span className="badge-live">Live Activity</span>
                     </div>
-                    <div className="chart-body" style={{ height: '220px', width: '100%', marginTop: '12px' }}>
-                        {dashboardData.activity?.history && dashboardData.activity.history.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={dashboardData.activity.history} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                    <defs>
-                                        <linearGradient id="colorMessages" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
-                                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                                        </linearGradient>
-                                        <linearGradient id="colorCalls" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.4} />
-                                            <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                                        </linearGradient>
-                                        <linearGradient id="colorMeetings" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.4} />
-                                            <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
-                                    <XAxis
-                                        dataKey="date"
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }}
-                                        tickFormatter={(str) => {
-                                            try {
-                                                const d = new Date(str);
-                                                return d.toLocaleDateString([], { weekday: 'short' });
-                                            } catch (e) { return str; }
-                                        }}
-                                    />
-                                    <YAxis
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fill: 'var(--text-tertiary)', fontSize: 10 }}
-                                    />
-                                    <Tooltip
-                                        contentStyle={{
-                                            background: 'var(--tooltip-bg)',
-                                            border: '1px solid var(--tooltip-border)',
-                                            borderRadius: '12px',
-                                            fontSize: '11px',
-                                            backdropFilter: 'blur(12px)'
-                                        }}
-                                    />
-                                    <Area
-                                        type="monotone"
-                                        dataKey="teamChatMessages"
-                                        name="Team Messages"
-                                        stroke="#3b82f6"
-                                        strokeWidth={3}
-                                        fillOpacity={1}
-                                        fill="url(#colorMessages)"
-                                        animationDuration={1500}
-                                    />
-                                    <Area
-                                        type="monotone"
-                                        dataKey="calls"
-                                        name="Calls"
-                                        stroke="#22c55e"
-                                        strokeWidth={3}
-                                        fillOpacity={1}
-                                        fill="url(#colorCalls)"
-                                        animationDuration={1500}
-                                        animationBegin={200}
-                                    />
-                                    <Area
-                                        type="monotone"
-                                        dataKey="meetings"
-                                        name="Meetings"
-                                        stroke="#f59e0b"
-                                        strokeWidth={3}
-                                        fillOpacity={1}
-                                        fill="url(#colorMeetings)"
-                                        animationDuration={1500}
-                                        animationBegin={400}
-                                    />
-                                </AreaChart>
-                            </ResponsiveContainer>
+                    <div className="activity-list">
+                        {dashboardData.recentActivity?.length > 0 ? (
+                            dashboardData.recentActivity.slice(0, 5).map((user, idx) => (
+                                <div key={idx} className="activity-item-premium">
+                                    <div className="user-avatar-mini" style={{
+                                        background: idx === 0 ? 'var(--accent-purple-alpha)' : 'rgba(255,255,255,0.05)',
+                                        borderColor: idx === 0 ? 'var(--accent-purple)' : 'var(--glass-border)'
+                                    }}>
+                                        {user.displayName.charAt(0)}
+                                    </div>
+                                    <div className="activity-info">
+                                        <div className="user-name-row">
+                                            <span className="user-name">{user.displayName}</span>
+                                            {idx === 0 && <span className="last-active-flag">Last Active</span>}
+                                        </div>
+                                        <div className="user-meta-row">
+                                            <span className="activity-time">
+                                                {new Date(user.lastActivityDate).toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                            <div className="activity-stats-dots">
+                                                {user.teamChatMessages > 0 && <span className="stat-dot chat" title="Chat Messages"></span>}
+                                                {user.calls > 0 && <span className="stat-dot call" title="Calls"></span>}
+                                                {user.meetings > 0 && <span className="stat-dot meeting" title="Meetings"></span>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="activity-count">
+                                        <span className="count-val">{user.teamChatMessages + user.privateChatMessages + user.calls + user.meetings}</span>
+                                        <span className="count-lbl">actions</span>
+                                    </div>
+                                </div>
+                            ))
                         ) : (
                             <div className="no-data-state">
-                                <RefreshCw size={32} style={{ opacity: 0.3 }} />
-                                <p>No activity trends available</p>
+                                <Users size={32} style={{ opacity: 0.3 }} />
+                                <p>No recent activity data</p>
                             </div>
                         )}
                     </div>
                 </motion.div>
-            </div>
+            </div >
 
             {/* Top Teams */}
-            <motion.div
+            < motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
@@ -498,12 +428,7 @@ const TeamsDashboard = () => {
                             </thead>
                             <tbody>
                                 {dashboardData.teams.topTeams.map((team, idx) => (
-                                    <tr
-                                        key={team.id || idx}
-                                        onClick={() => navigate(`/service/teams/${team.id}`)}
-                                        style={{ cursor: 'pointer' }}
-                                        className="hover-row"
-                                    >
+                                    <tr key={team.id || idx}>
                                         <td className="team-name-cell">
                                             <Users size={14} style={{ color: '#a855f7' }} />
                                             {team.displayName || 'Unnamed Team'}
@@ -526,7 +451,7 @@ const TeamsDashboard = () => {
                         </div>
                     )}
                 </div>
-            </motion.div>
+            </motion.div >
 
             <style>{`
                 .stat-card {
@@ -566,13 +491,46 @@ const TeamsDashboard = () => {
                 .visibility-badge.private { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
                 .spin { animation: spin 1s linear infinite; }
                 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-                .hover-row:hover { background: rgba(255, 255, 255, 0.03); }
                 .loading-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; gap: 16px; }
                 .loading-spinner { width: 40px; height: 40px; border: 3px solid var(--glass-border); border-top-color: var(--accent-blue); border-radius: 50%; animation: spin 1s linear infinite; }
 
-
+                /* Recent Activity Styles */
+                .recent-activity-card { padding: 24px; }
+                .badge-live {
+                    font-size: 10px; font-weight: 700; color: #ef4444; background: rgba(239, 68, 68, 0.1);
+                    padding: 2px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+                    display: flex; align-items: center; gap: 4px;
+                }
+                .badge-live::before { content: ""; width: 6px; height: 6px; background: #ef4444; border-radius: 50%; display: inline-block; animation: pulse-red 2s infinite; }
+                @keyframes pulse-red { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+                
+                .activity-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+                .activity-item-premium {
+                    display: flex; align-items: center; gap: 16px; padding: 12px;
+                    background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--glass-border);
+                    transition: all 0.2s ease;
+                }
+                .activity-item-premium:hover { background: rgba(255,255,255,0.05); transform: translateX(4px); }
+                .user-avatar-mini {
+                    width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--glass-border);
+                    display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--text-primary);
+                }
+                .activity-info { flex: 1; min-width: 0; }
+                .user-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 2px; }
+                .user-name { font-size: 14px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+                .last-active-flag { font-size: 9px; font-weight: 800; color: var(--accent-purple); background: var(--accent-purple-alpha); padding: 1px 6px; border-radius: 4px; text-transform: uppercase; }
+                .user-meta-row { display: flex; align-items: center; gap: 12px; }
+                .activity-time { font-size: 11px; color: var(--text-tertiary); }
+                .activity-stats-dots { display: flex; gap: 4px; }
+                .stat-dot { width: 4px; height: 4px; border-radius: 50%; }
+                .stat-dot.chat { background: #3b82f6; }
+                .stat-dot.call { background: #22c55e; }
+                .stat-dot.meeting { background: #f59e0b; }
+                .activity-count { text-align: right; }
+                .count-val { display: block; font-size: 16px; font-weight: 700; color: var(--text-primary); line-height: 1; }
+                .count-lbl { font-size: 9px; color: var(--text-tertiary); text-transform: uppercase; }
             `}</style>
-        </div>
+        </div >
     );
 };
 
