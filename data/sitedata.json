@@ -1,5 +1,5 @@
 {
-  "lastUpdated": 1770200451244,
+  "lastUpdated": 1770201025204,
   "sections": {
     "overview": {
       "data": {
@@ -57,11 +57,11 @@
           ],
           "deviceByPlatform": [
             {
-              "name": "macOS",
+              "name": "Windows",
               "value": 1
             },
             {
-              "name": "Windows",
+              "name": "macOS",
               "value": 1
             }
           ],
@@ -190,7 +190,7 @@
           "licenseTrendComposed": []
         }
       },
-      "timestamp": 1770200226759,
+      "timestamp": 1770201012351,
       "source": "OverviewDashboard"
     },
     "birdsEye": {
@@ -298,7 +298,7 @@
           "storage": 57612224557
         }
       },
-      "timestamp": 1770200439481,
+      "timestamp": 1770201025174,
       "source": "BirdsEyeView"
     },
     "emailActivity": {

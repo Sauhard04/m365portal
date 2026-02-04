@@ -134,7 +134,7 @@ const OverviewDashboard = () => {
             icon: Lock,
             color: 'var(--accent-success)',
             gradient: 'linear-gradient(135deg, #059669, #047857)',
-            path: '/service/admin/sign-ins'
+            path: '/service/entra/sign-in-logs'
         },
         {
             label: 'Active Roles',

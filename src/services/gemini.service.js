@@ -41,7 +41,7 @@ ROUTE DIRECTORY (Reference for [ACTION:NAVIGATE]):
    - Domains: /service/admin/domains
    - Licenses: /service/admin/licenses
    - Security Score: /service/admin/secure-score
-   - Sign-in Logs: /service/admin/sign-ins
+   - Sign-in Logs: /service/entra/sign-in-logs
    - Email Activity: /service/admin/emails
 
 3. IDENTITY & ENDPOINTS:
