@@ -8,7 +8,7 @@ import { SharePointService } from '../services/sharepoint/sharepoint.service';
 import { DataPersistenceService } from '../services/dataPersistence';
 import AnimatedTile from './AnimatedTile';
 import Loader3D from './Loader3D';
-import SafeResponsiveContainer from './SafeResponsiveContainer';
+
 import {
     Globe, HardDrive, Database, RefreshCw, ChevronRight, FolderOpen, Cloud, ExternalLink, Activity, FileText, Bell, AlertCircle, Maximize2
 } from 'lucide-react';

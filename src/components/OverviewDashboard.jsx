@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line 
 import {
     PieChart, Pie, BarChart, Bar, LineChart, Line, AreaChart, Area, RadialBarChart, RadialBar,
     RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Treemap, ComposedChart,
-    XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, Label, LabelList
+    XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, Label, LabelList, ResponsiveContainer
 } from 'recharts';
 import {
     Users, Smartphone, CreditCard, Shield, Activity,
@@ -22,8 +22,7 @@ import { DataPersistenceService } from '../services/dataPersistence';
 import SiteDataStore from '../services/siteDataStore';
 import { MiniSparkline, MiniProgressBar, MiniSegmentedBar } from './charts/MicroCharts';
 import { useDataCaching } from '../hooks/useDataCaching';
-// SafeResponsiveContainer was removed in favor of standard ResponsiveContainer with fixed height for better reliability
-// import SafeResponsiveContainer from './SafeResponsiveContainer';
+// Recharts components are standard for visualizations
 
 const CustomTreemapContent = (props) => {
     const { x, y, width, height, name, fill } = props;
