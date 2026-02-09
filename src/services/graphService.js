@@ -404,12 +404,14 @@ export class GraphService {
             // Group by date and success/failure
             const trendMap = new Map();
             signIns.forEach(signIn => {
-                const date = new Date(signIn.createdDateTime).toLocaleDateString();
+                const date = signIn.createdDateTime ? signIn.createdDateTime.split('T')[0] : new Date().toISOString().split('T')[0];
                 if (!trendMap.has(date)) {
                     trendMap.set(date, { date, success: 0, failure: 0 });
                 }
                 const entry = trendMap.get(date);
-                if (signIn.status.errorCode === 0) {
+                const status = signIn.status || {};
+
+                if (status.errorCode === 0 || status.errorCode === "0") {
                     entry.success++;
                 } else {
                     entry.failure++;
@@ -428,35 +430,45 @@ export class GraphService {
             // Sensitivity labels might fail with 403 on organization-wide endpoint for some users
             // These are optional telemetry points, so we suppress errors to keep console clean
             const fetchLabels = async () => {
-                if (window._graphBetaForbidden) return { value: [] };
+                if (window._graphBetaLabelsForbidden) return { value: [] };
                 try {
                     return await this.client.api("/security/informationProtection/sensitivityLabels").version("beta").get();
                 } catch (err) {
-                    if (err.statusCode === 403 || err.code === 'Forbidden') {
-                        window._graphBetaForbidden = true;
+                    if (err.statusCode === 403 || err.code === 'Forbidden' || err.statusCode === 401) {
+                        window._graphBetaLabelsForbidden = true;
                     }
+                    console.debug("Optional sensitivity labels fetch skipped or forbidden");
                     return { value: [] };
                 }
             };
 
             const [labels, retention, cases] = await Promise.all([
                 fetchLabels(),
-                this.client.api("/security/labels/retentionLabels").version("beta").get().catch(err => {
-                    if (err.statusCode === 403) window._graphBetaRetentionForbidden = true;
+                window._graphBetaRetentionForbidden ? Promise.resolve({ value: [] }) : this.client.api("/security/labels/retentionLabels").version("beta").get().catch(err => {
+                    if (err.statusCode === 403 || err.statusCode === 401) window._graphBetaRetentionForbidden = true;
                     return { value: [] };
                 }),
-                this.client.api("/compliance/ediscovery/cases").version("beta").get().catch(() => ({ value: [] }))
+                window._graphBetaEDiscoveryForbidden ? Promise.resolve({ value: [] }) : this.client.api("/compliance/ediscovery/cases").version("beta").get().catch((err) => {
+                    if (err.statusCode === 403 || err.statusCode === 401) window._graphBetaEDiscoveryForbidden = true;
+                    return { value: [] };
+                })
             ]);
 
             // Attempt to fetch searches for the first case if any exist
             let searchCount = 0;
-            if (cases.value && cases.value.length > 0) {
+            if (cases?.value?.length > 0 && !window._graphBetaEDiscoverySearchesForbidden) {
                 try {
                     const caseId = cases.value[0].id;
-                    const searches = await this.client.api(`/compliance/ediscovery/cases/${caseId}/searches`).version("beta").get();
-                    searchCount = searches.value?.length || 0;
+                    if (caseId) {
+                        const searches = await this.client.api(`/compliance/ediscovery/cases/${caseId}/searches`).version("beta").get();
+                        searchCount = searches.value?.length || 0;
+                    }
                 } catch (e) {
-                    console.debug("Could not fetch eDiscovery searches", e);
+                    // Suppress 400/403 errors for eDiscovery searches as they are optional telemetry
+                    if (e.statusCode === 400 || e.statusCode === 403 || e.statusCode === 401) {
+                        window._graphBetaEDiscoverySearchesForbidden = true;
+                    }
+                    console.debug("Could not fetch eDiscovery searches (optional):", e.message);
                 }
             }
 

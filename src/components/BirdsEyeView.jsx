@@ -20,6 +20,7 @@ import styles from './BirdsEyeView.module.css';
 const BirdsEyeView = ({ embedded = false }) => {
     const { instance, accounts } = useMsal();
     const navigate = useNavigate();
+    const fetchRef = React.useRef(0);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState(null);
@@ -40,10 +41,14 @@ const BirdsEyeView = ({ embedded = false }) => {
 
     const fetchData = async (isManual = false) => {
         if (accounts.length === 0) return;
+
+        const requestId = ++fetchRef.current;
         setError(null);
+
         if (!isManual) {
             const cached = await DataPersistenceService.load('BirdsEyeView');
             if (cached && !DataPersistenceService.isExpired('BirdsEyeView', 15)) {
+                if (requestId !== fetchRef.current) return;
                 setStats(cached);
                 setLoading(false);
                 return;
@@ -220,10 +225,14 @@ const BirdsEyeView = ({ embedded = false }) => {
 
         } catch (error) {
             console.error("BirdsEyeView Error:", error);
-            setError(error.message || "Failed to load snapshot");
+            if (requestId === fetchRef.current) {
+                setError(error.message || "Failed to load snapshot");
+            }
         } finally {
-            setLoading(false);
-            setRefreshing(false);
+            if (requestId === fetchRef.current) {
+                setLoading(false);
+                setRefreshing(false);
+            }
         }
     };
 

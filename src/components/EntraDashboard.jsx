@@ -130,7 +130,7 @@ const EntraDashboard = () => {
     ];
 
     // Reusable Tooltip
-    const CustomTooltip = ({ active, payload }) => {
+    const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
                 <div style={{
@@ -140,11 +140,15 @@ const EntraDashboard = () => {
                     padding: '12px 16px',
                     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
                     backdropFilter: 'blur(12px)',
-                    minWidth: '140px'
+                    minWidth: '150px'
                 }}>
-                    <p style={{ margin: 0, fontWeight: 700, color: 'var(--tooltip-text)', fontSize: '12px' }}>
-                        {payload[0].name}: <span style={{ color: 'var(--accent-blue)' }}>{payload[0].value}</span>
-                    </p>
+                    {label && <p style={{ margin: '0 0 8px 0', fontSize: '10px', color: 'var(--text-dim)', fontWeight: 600 }}>{label}</p>}
+                    {payload.map((item, index) => (
+                        <p key={index} style={{ margin: '4px 0', fontWeight: 700, color: 'var(--tooltip-text)', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: item.color }}></span>
+                            {item.name}: <span style={{ color: item.color, marginLeft: 'auto' }}>{item.value.toLocaleString()}</span>
+                        </p>
+                    ))}
                 </div>
             );
         }
@@ -364,33 +368,35 @@ const EntraDashboard = () => {
                         </div>
 
                         <div style={{ flex: 1, position: 'relative', width: '100%', minHeight: '340px', display: 'flex', justifyContent: 'center', alignItems: 'center', pointerEvents: 'none' }}>
-                            <PieChart width={320} height={320}>
-                                <defs>
-                                    <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="#60a5fa" />
-                                        <stop offset="100%" stopColor="#3b82f6" />
-                                    </linearGradient>
-                                </defs>
-                                <Pie
-                                    data={scoreData}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={95}
-                                    outerRadius={125}
-                                    paddingAngle={0}
-                                    dataKey="value"
-                                    startAngle={90}
-                                    endAngle={-270}
-                                    stroke="none"
-                                    cornerRadius={0}
-                                    isAnimationActive={true}
-                                >
-                                    {scoreData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                    ))}
-                                </Pie>
-                                <Tooltip content={<CustomTooltip />} cursor={false} />
-                            </PieChart>
+                            <ResponsiveContainer width="100%" height={320} minWidth={1} minHeight={1}>
+                                <PieChart>
+                                    <defs>
+                                        <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stopColor="#60a5fa" />
+                                            <stop offset="100%" stopColor="#3b82f6" />
+                                        </linearGradient>
+                                    </defs>
+                                    <Pie
+                                        data={scoreData}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={95}
+                                        outerRadius={125}
+                                        paddingAngle={0}
+                                        dataKey="value"
+                                        startAngle={90}
+                                        endAngle={-270}
+                                        stroke="none"
+                                        cornerRadius={0}
+                                        isAnimationActive={true}
+                                    >
+                                        {scoreData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.color} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip content={<CustomTooltip />} cursor={false} />
+                                </PieChart>
+                            </ResponsiveContainer>
                             <div style={{
                                 position: 'absolute',
                                 top: '50.5%',
@@ -436,7 +442,7 @@ const EntraDashboard = () => {
                                 <Shield size={14} color="var(--accent-success)" />
                                 MFA Enrollment Status
                             </h3>
-                            <ResponsiveContainer width="100%" height={250}>
+                            <ResponsiveContainer width="100%" height={250} minWidth={1} minHeight={1} debounce={50}>
                                 <BarChart data={[
                                     {
                                         name: 'Users',
@@ -480,7 +486,7 @@ const EntraDashboard = () => {
                                 Sign-in Activity (14 Days)
                                 <ArrowRight size={12} style={{ marginLeft: 'auto', color: 'var(--text-dim)' }} />
                             </h3>
-                            <ResponsiveContainer width="100%" height={250}>
+                            <ResponsiveContainer width="100%" height={250} minWidth={1} minHeight={1} debounce={50}>
                                 <AreaChart data={signInTrends} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
                                     <defs>
                                         <linearGradient id="colorSuccess" x1="0" y1="0" x2="0" y2="1">
@@ -493,12 +499,29 @@ const EntraDashboard = () => {
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" opacity={0.3} vertical={false} />
-                                    <XAxis dataKey="date" stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
-                                    <YAxis stroke="var(--text-dim)" fontSize={10} tickLine={false} axisLine={false} />
+                                    <XAxis
+                                        dataKey="date"
+                                        stroke="var(--text-dim)"
+                                        fontSize={10}
+                                        tickLine={false}
+                                        axisLine={false}
+                                        tickFormatter={(str) => {
+                                            const d = new Date(str);
+                                            return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                                        }}
+                                    />
+                                    <YAxis
+                                        stroke="var(--text-dim)"
+                                        fontSize={10}
+                                        tickLine={false}
+                                        axisLine={false}
+                                        allowDecimals={false}
+                                        domain={[0, 'auto']}
+                                    />
                                     <Tooltip content={<CustomTooltip />} />
                                     <Legend iconType="circle" />
-                                    <Area type="monotone" dataKey="success" stroke="#10b981" fillOpacity={1} fill="url(#colorSuccess)" strokeWidth={2} name="Success" />
-                                    <Area type="monotone" dataKey="failure" stroke="#ef4444" fillOpacity={1} fill="url(#colorFailure)" strokeWidth={2} name="Failure" />
+                                    <Area type="monotone" dataKey="success" stroke="#10b981" fillOpacity={0.4} fill="url(#colorSuccess)" strokeWidth={2} name="Success" />
+                                    <Area type="monotone" dataKey="failure" stroke="#ef4444" fillOpacity={0.6} fill="url(#colorFailure)" strokeWidth={2} name="Failure" />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>

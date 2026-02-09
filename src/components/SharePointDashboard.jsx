@@ -380,7 +380,7 @@ const SharePointDashboard = () => {
                     <div className="chart-body" style={{ height: '220px', width: '100%' }}>
                         {siteTypeData.length > 0 ? (
                             chartsVisible ? (
-                                <ResponsiveContainer width="100%" height={220} minWidth={0} minHeight={0} debounce={50}>
+                                <ResponsiveContainer width="100%" height={220} minWidth={1} minHeight={1}>
                                     <PieChart>
                                         <defs>
                                             {siteTypeData.map((entry, index) => (
@@ -524,7 +524,7 @@ const SharePointDashboard = () => {
                     <div className="chart-body" style={{ height: '200px' }}>
                         {dashboardData.activity.oneDrive?.length > 0 ? (
                             chartsVisible ? (
-                                <ResponsiveContainer width="100%" height={200} minWidth={0} minHeight={0} debounce={50}>
+                                <ResponsiveContainer width="100%" height={200} minWidth={1} minHeight={1} debounce={50}>
                                     <AreaChart data={dashboardData.activity.oneDrive}>
                                         <defs>
                                             <linearGradient id="colorActive" x1="0" y1="0" x2="0" y2="1">
@@ -537,8 +537,24 @@ const SharePointDashboard = () => {
                                             </linearGradient>
                                         </defs>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--glass-border)" />
-                                        <XAxis dataKey="date" hide />
-                                        <YAxis hide />
+                                        <XAxis
+                                            dataKey="date"
+                                            stroke="var(--text-dim)"
+                                            fontSize={10}
+                                            tickLine={false}
+                                            axisLine={false}
+                                            tickFormatter={(str) => {
+                                                const d = new Date(str);
+                                                return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                                            }}
+                                        />
+                                        <YAxis
+                                            stroke="var(--text-dim)"
+                                            fontSize={10}
+                                            tickLine={false}
+                                            axisLine={false}
+                                            allowDecimals={false}
+                                        />
                                         <Tooltip content={<CustomTooltip />} />
                                         <Area type="monotone" dataKey="active" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorActive)" />
                                         <Area type="monotone" dataKey="total" stroke="#22c55e" strokeWidth={3} fillOpacity={1} fill="url(#colorTotal)" />
@@ -585,7 +601,7 @@ const SharePointDashboard = () => {
                     <div className="chart-body" style={{ height: '200px' }}>
                         {dashboardData.activity.files?.length > 0 ? (
                             chartsVisible ? (
-                                <ResponsiveContainer width="100%" height={200} minWidth={0} minHeight={0} debounce={50}>
+                                <ResponsiveContainer width="100%" height={200} minWidth={1} minHeight={1} debounce={50}>
                                     <AreaChart data={dashboardData.activity.files}>
                                         <defs>
                                             <linearGradient id="colorViewed" x1="0" y1="0" x2="0" y2="1">
@@ -594,8 +610,24 @@ const SharePointDashboard = () => {
                                             </linearGradient>
                                         </defs>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--glass-border)" />
-                                        <XAxis dataKey="date" hide />
-                                        <YAxis hide />
+                                        <XAxis
+                                            dataKey="date"
+                                            stroke="var(--text-dim)"
+                                            fontSize={10}
+                                            tickLine={false}
+                                            axisLine={false}
+                                            tickFormatter={(str) => {
+                                                const d = new Date(str);
+                                                return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                                            }}
+                                        />
+                                        <YAxis
+                                            stroke="var(--text-dim)"
+                                            fontSize={10}
+                                            tickLine={false}
+                                            axisLine={false}
+                                            allowDecimals={false}
+                                        />
                                         <Tooltip content={<CustomTooltip />} />
                                         <Area type="monotone" dataKey="viewed" stroke="#0dbcd4" strokeWidth={3} fillOpacity={1} fill="url(#colorViewed)" />
                                         <Area type="monotone" dataKey="synced" stroke="#8b1157" strokeWidth={2} fillOpacity={0.1} fill="#8b1157" />

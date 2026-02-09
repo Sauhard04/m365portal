@@ -284,7 +284,7 @@ const GovernanceDashboard = () => {
                     <div className="chart-body" style={{ height: '220px', width: '100%' }}>
                         {caPolicyData.length > 0 ? (
                             chartsVisible ? (
-                                <ResponsiveContainer width="100%" height={220} minWidth={0} minHeight={0} debounce={50}>
+                                <ResponsiveContainer width="100%" height={220} minWidth={1} minHeight={1}>
                                     <PieChart>
                                         <Pie
                                             data={caPolicyData}
@@ -338,7 +338,7 @@ const GovernanceDashboard = () => {
                     </div>
                     <div className="chart-body" style={{ height: '220px', width: '100%' }}>
                         {chartsVisible ? (
-                            <ResponsiveContainer width="100%" height={220} minWidth={0} minHeight={0} debounce={50}>
+                            <ResponsiveContainer width="100%" height={220} minWidth={1} minHeight={1}>
                                 <BarChart data={roleData} layout="vertical">
                                     <XAxis type="number" hide />
                                     <YAxis type="category" dataKey="name" width={110} tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} />

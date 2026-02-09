@@ -397,7 +397,7 @@ const OverviewDashboard = () => {
                     </div>
 
                     <div style={{ width: '120px', height: '120px', position: 'relative', flexShrink: 0 }}>
-                        <ResponsiveContainer width="100%" height={120}>
+                        <ResponsiveContainer width="100%" height={120} minWidth={1} minHeight={1} debounce={50}>
                             <PieChart>
                                 <Pie
                                     data={[
@@ -563,7 +563,7 @@ const OverviewDashboard = () => {
                                     </div>
                                     <div style={{ height: '240px', width: '100%', minWidth: '200px', overflow: 'hidden', position: 'relative' }}>
                                         {chartsVisible ? (
-                                            <ResponsiveContainer width="100%" height={260} minWidth={1} minHeight={1} debounce={200}>
+                                            <ResponsiveContainer width="100%" height={260} minWidth={1} minHeight={1} debounce={50}>
                                                 <PieChart>
                                                     <Pie data={data.charts.userDistribution} cx="50%" cy="50%" outerRadius={80} innerRadius={60} paddingAngle={5} dataKey="value" stroke="var(--glass-bg)" strokeWidth={2}>
                                                         {data.charts.userDistribution.map((entry, index) => (
@@ -597,9 +597,9 @@ const OverviewDashboard = () => {
                                             <p style={{ fontSize: '9px', color: 'var(--text-dim)' }}>Security Posture</p>
                                         </div>
                                     </div>
-                                    <div style={{ height: '240px', minWidth: '0', overflow: 'hidden' }}>
+                                    <div style={{ height: '240px', minWidth: '0', overflow: 'hidden', position: 'relative' }}>
                                         {chartsVisible && (
-                                            <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1} debounce={200}>
+                                            <ResponsiveContainer width="100%" height={240} minWidth={1} minHeight={1} debounce={50}>
                                                 <BarChart data={data.charts.deviceCompliance} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
                                                     <defs>
                                                         <linearGradient id="compGrad" x1="0" y1="0" x2="0" y2="1">
@@ -673,7 +673,7 @@ const OverviewDashboard = () => {
                                     </div>
                                     <div style={{ height: '240px', width: '100%', minWidth: '200px', overflow: 'hidden', position: 'relative' }}>
                                         {chartsVisible ? (
-                                            <ResponsiveContainer width="100%" height={260} minWidth={1} minHeight={1} debounce={200}>
+                                            <ResponsiveContainer width="100%" height={260} minWidth={1} minHeight={1} debounce={50}>
                                                 <AreaChart data={data.charts.emailTrend}>
                                                     <defs>
                                                         <linearGradient id="emailGrad" x1="0" y1="0" x2="0" y2="1">
@@ -681,7 +681,20 @@ const OverviewDashboard = () => {
                                                             <stop offset="95%" stopColor="var(--accent-indigo)" stopOpacity={0} />
                                                         </linearGradient>
                                                     </defs>
-                                                    <XAxis dataKey="name" hide />
+                                                    <XAxis
+                                                        dataKey="name"
+                                                        stroke="var(--text-dim)"
+                                                        fontSize={10}
+                                                        tickLine={false}
+                                                        axisLine={false}
+                                                    />
+                                                    <YAxis
+                                                        stroke="var(--text-dim)"
+                                                        fontSize={10}
+                                                        tickLine={false}
+                                                        axisLine={false}
+                                                        allowDecimals={false}
+                                                    />
                                                     <Tooltip content={<CustomTooltip />} />
                                                     <Area type="monotone" dataKey="sent" name="Sent" stroke="var(--accent-indigo)" fillOpacity={1} fill="url(#emailGrad)" strokeWidth={2} />
                                                     <Area type="monotone" dataKey="received" name="Received" stroke="var(--accent-cyan)" fillOpacity={0} strokeWidth={2} />
@@ -714,7 +727,7 @@ const OverviewDashboard = () => {
                                         </div>
                                         <div style={{ height: '260px', width: '100%', minWidth: '200px', overflow: 'hidden', position: 'relative' }}>
                                             {chartsVisible ? (
-                                                <ResponsiveContainer width="100%" height={260} minWidth={1} minHeight={1} debounce={200}>
+                                                <ResponsiveContainer width="100%" height={260} minWidth={1} minHeight={1} debounce={50}>
                                                     <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data.charts.securityRadar}>
                                                         <PolarGrid stroke="var(--glass-border)" />
                                                         <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-dim)', fontSize: 10 }} />
@@ -739,9 +752,9 @@ const OverviewDashboard = () => {
                                             </div>
                                             <h3 style={{ fontSize: '12px', fontWeight: 700 }}>License Distribution (By SKU Size)</h3>
                                         </div>
-                                        <div style={{ height: '300px', width: '100%', marginTop: '16px' }}>
+                                        <div style={{ height: '300px', width: '100%', marginTop: '16px', position: 'relative' }}>
                                             {chartsVisible ? (
-                                                <ResponsiveContainer width="100%" height={300}>
+                                                <ResponsiveContainer width="100%" height={300} minWidth={1} minHeight={1} debounce={50}>
                                                     <Treemap
                                                         data={data.charts.licenseTreemap}
                                                         dataKey="size"
