@@ -198,6 +198,17 @@ const SecurityDashboard = () => {
                             {safeData.riskyUsers.high} high risk
                         </div>
                     </motion.div>
+
+                    <motion.div whileHover={{ y: -5, scale: 1.02 }} className={styles.statCard} onClick={() => navigate('/service/security/defender-portal')} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1))', border: '1px solid rgba(99, 102, 241, 0.3)' }}>
+                        <div className={styles.statLabel}>
+                            <Shield size={16} style={{ color: '#6366f1' }} />
+                            Defender Portal
+                        </div>
+                        <div className={styles.statValue} style={{ color: '#6366f1', fontSize: '1.1rem' }}>Unified View</div>
+                        <div className={styles.statSubtext} style={{ color: 'var(--text-dim)', fontSize: '0.8125rem' }}>
+                            Complete security analytics →
+                        </div>
+                    </motion.div>
                 </div>
 
                 <div className={styles.grid}>

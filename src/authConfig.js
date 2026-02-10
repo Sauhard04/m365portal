@@ -3,6 +3,7 @@ export const msalConfig = {
         clientId: import.meta.env.VITE_CLIENT_ID,
         authority: `https://login.microsoftonline.com/${import.meta.env.VITE_TENANT_ID}`,
         redirectUri: window.location.origin,
+        navigateToLoginRequestUrl: false, // Prevents popup from navigating to the app
     },
     cache: {
         cacheLocation: "localStorage",

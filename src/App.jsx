@@ -53,6 +53,7 @@ import SecurityAlertsPage from './components/SecurityAlertsPage';
 import SecurityIncidentsPage from './components/SecurityIncidentsPage';
 import RiskyUsersPage from './components/RiskyUsersPage';
 import SecurityExplorer from './components/SecurityExplorer';
+import DefenderSecurityPortal from './components/DefenderSecurityPortal';
 
 // Governance Module
 import GovernanceDashboard from './components/GovernanceDashboard';
@@ -158,6 +159,7 @@ function App() {
                     <Route path="security/incidents" element={<SecurityIncidentsPage />} />
                     <Route path="security/risky-users" element={<RiskyUsersPage />} />
                     <Route path="security/explorer" element={<SecurityExplorer />} />
+                    <Route path="security/defender-portal" element={<DefenderSecurityPortal />} />
 
                     {/* Governance Routes */}
                     <Route path="governance" element={<GovernanceDashboard />} />

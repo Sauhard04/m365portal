@@ -5,6 +5,7 @@ import { Client } from '@microsoft/microsoft-graph-client';
 import { loginRequest } from '../authConfig';
 import { SecurityService } from '../services/security/security.service';
 import { AlertOctagon, ArrowLeft, RefreshCw, Filter, Search, Clock, Users } from 'lucide-react';
+import Loader3D from './Loader3D';
 
 import styles from './DetailPage.module.css';
 
