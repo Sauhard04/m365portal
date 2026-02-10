@@ -29,7 +29,7 @@ import IntuneSecurityBaselines from './components/IntuneSecurityBaselines';
 import IntuneUserDevices from './components/IntuneUserDevices';
 import IntuneRBAC from './components/IntuneRBAC';
 import IntuneAuditLogs from './components/IntuneAuditLogs';
-import IntuneReports from './components/IntuneReports';
+
 import EmailActivityPage from './components/EmailActivityPage';
 import UsageReports from './components/UsageReports';
 import OverviewDashboard from './components/OverviewDashboard';
@@ -142,7 +142,7 @@ function App() {
                     <Route path="intune/user-devices" element={<IntuneUserDevices />} />
                     <Route path="intune/rbac" element={<IntuneRBAC />} />
                     <Route path="intune/audit-logs" element={<IntuneAuditLogs />} />
-                    <Route path="intune/reports" element={<IntuneReports />} />
+
 
                     {/* Purview Routes */}
                     <Route path="purview" element={<PurviewDashboard />} />

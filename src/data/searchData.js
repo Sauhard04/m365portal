@@ -279,14 +279,6 @@ export const searchableItems = [
         icon: FileText,
         tags: ['audit', 'logs', 'activity', 'history', 'changes', 'events']
     },
-    {
-        id: 'intune-reports',
-        title: 'Reports & Insights',
-        description: 'Intune reports and analytics',
-        path: '/service/intune/reports',
-        category: 'Intune',
-        icon: TrendingUp,
-        tags: ['reports', 'analytics', 'insights', 'trends', 'statistics']
     }
 ];
 

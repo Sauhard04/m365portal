@@ -171,14 +171,6 @@ const IntuneMonitoring = () => {
             path: '/service/intune/audit-logs',
             icon: FileText
         },
-        {
-            label: 'Reports & Insights',
-            value: 'Exports',
-            trend: 'Trends',
-            color: 'var(--accent-success)',
-            path: '/service/intune/reports',
-            icon: TrendingUp
-        }
     ];
 
     return (

@@ -8961,7 +8961,7 @@
           "storage": 57612224558
         }
       },
-      "timestamp": 1770703623521,
+      "timestamp": 1770708175759,
       "source": "BirdsEyeView"
     },
     "alerts": {
@@ -8977,7 +8977,7 @@
           "message": "Device \"Admin’s MacBook Air\" is not compliant with policy requirements"
         }
       ],
-      "timestamp": 1770705703734
+      "timestamp": 1770707217085
     },
     "overview": {
       "data": {
@@ -9035,11 +9035,11 @@
           ],
           "deviceByPlatform": [
             {
-              "name": "Windows",
+              "name": "macOS",
               "value": 1
             },
             {
-              "name": "macOS",
+              "name": "Windows",
               "value": 1
             }
           ],
@@ -9073,8 +9073,8 @@
           "signIns": [
             {
               "name": "2026-02-03",
-              "failed": 43,
-              "successful": 45
+              "failed": 23,
+              "successful": 32
             },
             {
               "name": "2026-02-04",
@@ -9108,8 +9108,8 @@
             },
             {
               "name": "2026-02-10",
-              "failed": 1,
-              "successful": 4
+              "failed": 2,
+              "successful": 22
             }
           ],
           "emailTrend": [
@@ -9172,7 +9172,7 @@
             },
             {
               "subject": "Sign-in Success",
-              "value": 88,
+              "value": 95,
               "fullMark": 100
             }
           ],
@@ -9232,7 +9232,7 @@
           "licenseTrendComposed": []
         }
       },
-      "timestamp": 1770703617008,
+      "timestamp": 1770708167900,
       "source": "OverviewDashboard"
     },
     "usageReports": {
@@ -15773,8 +15773,8 @@
       "data": {
         "totalDevices": 2,
         "osDistribution": {
-          "Windows": 1,
-          "macOS": 1
+          "macOS": 1,
+          "Windows": 1
         },
         "nonCompliantDevices": 1,
         "inactiveDevices": 1,
@@ -15787,7 +15787,7 @@
         "securityBaselines": 4,
         "adminRoles": 9
       },
-      "timestamp": 1770705752338,
+      "timestamp": 1770707959091,
       "source": "IntuneMonitoring"
     },
     "intuneDevices": {
@@ -15902,7 +15902,7 @@
           "coverage": 54
         }
       },
-      "timestamp": 1770705666017,
+      "timestamp": 1770708203924,
       "source": "SecurityDashboard"
     },
     "governance": {
@@ -16254,7 +16254,7 @@
           ]
         },
         "roles": {
-          "definitions": 135,
+          "definitions": 134,
           "assignments": 18,
           "eligibleAssignments": 0,
           "privilegedAssignments": 6
@@ -16463,7 +16463,7 @@
           }
         ]
       },
-      "timestamp": 1770626904773,
+      "timestamp": 1770708207692,
       "source": "GovernanceDashboard"
     },
     "sharepoint": {
@@ -16566,12 +16566,12 @@
           "policies": 0,
           "assetsWithLineage": 0,
           "sensitiveAssets": 0,
-          "lastUpdated": "2026-02-09T05:21:00.023Z",
+          "lastUpdated": "2026-02-10T07:19:04.686Z",
           "isConfigured": false
         },
         "assetDistribution": []
       },
-      "timestamp": 1770614460173,
+      "timestamp": 1770707944719,
       "source": "PurviewDashboard"
     },
     "teams": {
@@ -23160,5 +23160,5 @@
       "timestamp": 1770637688061
     }
   },
-  "lastUpdated": 1770706107104
+  "lastUpdated": 1770708207743
 }
