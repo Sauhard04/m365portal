@@ -265,5 +265,20 @@ function generateAISummary(store: any): string {
     return summary.join('\n');
 }
 
+// Production mode: Serve static files from Vite build
+if (process.env.NODE_ENV === 'production') {
+    console.log('[Production] Serving static files from dist/');
+    app.use(express.static(path.join(__dirname, '..', 'dist')));
+
+    // Catch-all route for client-side routing (must be last)
+    app.get('*', (req, res) => {
+        // Skip API routes
+        if (req.path.startsWith('/api')) {
+            return res.status(404).json({ error: 'API endpoint not found' });
+        }
+        res.sendFile(path.join(__dirname, '..', 'dist', 'index.html'));
+    });
+}
+
 const port = process.env.PORT || 4000;
 app.listen(port, () => console.log(`Exchange admin server listening on http://localhost:${port}`));
