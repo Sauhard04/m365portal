@@ -17,11 +17,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-<<<<<<< HEAD
-          node-version: '20.19.0'   # change if you use a different version
-=======
-          node-version: '18'
->>>>>>> 63e036d93fece261a85b36c228185ebc4ad5ede6
+          node-version: '20.19.0'   # Match package.json engines
  
       - name: Install dependencies
         run: npm ci

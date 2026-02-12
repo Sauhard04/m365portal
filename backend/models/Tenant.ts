@@ -29,9 +29,8 @@ const TenantSchema = new mongoose.Schema({
 });
 
 // Update the lastUpdate field on save
-TenantSchema.pre('save', function (next) {
-    this.lastUpdate = new Date();
-    next();
+TenantSchema.pre('save', function () {
+    (this as any).lastUpdate = new Date();
 });
 
 const Tenant = mongoose.model('Tenant', TenantSchema);

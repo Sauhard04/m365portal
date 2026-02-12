@@ -3,11 +3,11 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
-import { executeExchangeJobSync } from '../jobs/exchange.sync.ts';
-import { listAudits } from '../shared/logging/exchangeAudit.ts';
-import connectDB from './config/db.ts';
-import { PowerShellService } from '../services/powerShell.service.ts';
-import { subscriptionGuard } from './middleware/subscriptionGuard.ts';
+import { executeExchangeJobSync } from '../jobs/exchange.sync.js';
+import { listAudits } from '../shared/logging/exchangeAudit.js';
+import connectDB from './config/db.js';
+import { PowerShellService } from '../services/powerShell.service.js';
+import { subscriptionGuard } from './middleware/subscriptionGuard.js';
 
 import { fileURLToPath } from 'url';
 
@@ -267,8 +267,13 @@ function generateAISummary(store: any): string {
 
 // Production mode: Serve static files from Vite build
 if (process.env.NODE_ENV === 'production') {
-    console.log('[Production] Serving static files from dist/');
-    app.use(express.static(path.join(__dirname, '..', 'dist')));
+    const staticPath = path.join(__dirname, '..'); // If running from dist/backend, dist is one level up
+    const clientPath = fs.existsSync(path.join(staticPath, 'index.html'))
+        ? staticPath
+        : path.join(staticPath, 'dist'); // Fallback for dev/other structures
+
+    console.log(`[Production] Serving static files from: ${clientPath}`);
+    app.use(express.static(clientPath));
 
     // Catch-all route for client-side routing (must be last)
     app.get('*', (req, res) => {
@@ -276,7 +281,7 @@ if (process.env.NODE_ENV === 'production') {
         if (req.path.startsWith('/api')) {
             return res.status(404).json({ error: 'API endpoint not found' });
         }
-        res.sendFile(path.join(__dirname, '..', 'dist', 'index.html'));
+        res.sendFile(path.join(clientPath, 'index.html'));
     });
 }
 

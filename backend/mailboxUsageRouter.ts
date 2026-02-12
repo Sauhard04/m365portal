@@ -7,9 +7,9 @@ import { ConfidentialClientApplication } from '@azure/msal-node';
 const router = express.Router();
 
 // Load config from environment variables
-const clientId = process.env.AZURE_CLIENT_ID || process.env.VITE_CLIENT_ID;
-const clientSecret = process.env.AZURE_CLIENT_SECRET;
-const tenantId = process.env.AZURE_TENANT_ID || process.env.VITE_TENANT_ID;
+const clientId = process.env.AZURE_CLIENT_ID || process.env.VITE_CLIENT_ID || "";
+const clientSecret = process.env.AZURE_CLIENT_SECRET || "";
+const tenantId = process.env.AZURE_TENANT_ID || process.env.VITE_TENANT_ID || "";
 
 const msalConfig = {
     auth: {
@@ -26,6 +26,7 @@ async function getAppToken() {
     const result = await cca.acquireTokenByClientCredential({
         scopes: ["https://graph.microsoft.com/.default"],
     });
+    if (!result) throw new Error("Failed to acquire token");
     return result.accessToken;
 }
 

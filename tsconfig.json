@@ -12,10 +12,14 @@
         "resolveJsonModule": true
     },
     "include": [
-        "backend/**/*.ts"
+        "backend/**/*.ts",
+        "jobs/**/*.ts",
+        "services/**/*.ts",
+        "shared/**/*.ts"
     ],
     "exclude": [
         "node_modules",
-        "dist"
+        "dist",
+        "src"
     ]
 }
