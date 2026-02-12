@@ -272,12 +272,23 @@
 }
 
 .highlight {
+    display: inline;
     background: rgba(6, 182, 212, 0.35);
     color: rgb(103, 232, 249);
-    padding: 2px 6px;
-    border-radius: 5px;
+    padding: 0px 2px;
+    margin: 0;
+    border-radius: 3px;
     font-weight: 700;
     box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
+    line-height: inherit;
+    vertical-align: baseline;
+}
+
+/* Light mode: Black text on light blue background */
+:global([data-theme="light"]) .highlight {
+    background: rgba(6, 182, 212, 0.25);
+    color: #000000;
+    box-shadow: 0 0 8px rgba(6, 182, 212, 0.2);
 }
 
 .description {
