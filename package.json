@@ -5,12 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "server": "tsx server/index.ts",
+    "server": "tsx backend/index.ts",
     "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
     "build": "vite build",
     "build:server": "tsc -p tsconfig.json",
     "postbuild": "npm run build:server",
-    "start": "node dist/server/index.js",
+    "start": "node dist/backend/index.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
