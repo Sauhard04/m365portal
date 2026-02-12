@@ -3942,11 +3942,11 @@
             "accountEnabled": "Yes",
             "createdDateTime": "2026-01-28T05:33:06Z",
             "lastActivityDate": "N/A",
-            "itemCount": 231,
+            "itemCount": 254,
             "archivePolicy": false,
-            "mailboxSize": "0.00 GB",
+            "mailboxSize": "0.01 GB",
             "migrationStatus": "Cloud Native",
-            "dataMigrated": "0.00 GB"
+            "dataMigrated": "0.01 GB"
           },
           {
             "displayName": "Demo User",
@@ -3960,7 +3960,7 @@
             "accountEnabled": "Yes",
             "createdDateTime": "2025-10-28T05:18:28Z",
             "lastActivityDate": "2026-02-06",
-            "itemCount": 3087,
+            "itemCount": 3090,
             "archivePolicy": true,
             "mailboxSize": "0.01 GB",
             "migrationStatus": "Cloud Native",
@@ -4032,7 +4032,7 @@
             "accountEnabled": "Yes",
             "createdDateTime": "2025-12-03T05:52:13Z",
             "lastActivityDate": "N/A",
-            "itemCount": 267,
+            "itemCount": 271,
             "archivePolicy": true,
             "mailboxSize": "0.00 GB",
             "migrationStatus": "Cloud Native",
@@ -4050,7 +4050,7 @@
             "accountEnabled": "Yes",
             "createdDateTime": "2025-09-16T05:08:37Z",
             "lastActivityDate": "2026-01-23",
-            "itemCount": 12102,
+            "itemCount": 12096,
             "archivePolicy": true,
             "mailboxSize": "3.48 GB",
             "migrationStatus": "Cloud Native",
@@ -4068,7 +4068,7 @@
             "accountEnabled": "Yes",
             "createdDateTime": "2025-11-20T09:40:42Z",
             "lastActivityDate": "N/A",
-            "itemCount": 2423,
+            "itemCount": 2452,
             "archivePolicy": false,
             "mailboxSize": "0.01 GB",
             "migrationStatus": "Cloud Native",
@@ -4086,7 +4086,7 @@
             "accountEnabled": "Yes",
             "createdDateTime": "2024-04-24T06:33:25Z",
             "lastActivityDate": "2025-11-25",
-            "itemCount": 3282,
+            "itemCount": 3279,
             "archivePolicy": true,
             "mailboxSize": "0.01 GB",
             "migrationStatus": "Cloud Native",
@@ -4122,7 +4122,7 @@
             "accountEnabled": "Yes",
             "createdDateTime": "2025-09-08T10:33:29Z",
             "lastActivityDate": "2025-12-13",
-            "itemCount": 5254,
+            "itemCount": 5271,
             "archivePolicy": false,
             "mailboxSize": "0.00 GB",
             "migrationStatus": "Cloud Native",
@@ -4140,7 +4140,7 @@
             "accountEnabled": "Yes",
             "createdDateTime": "2026-01-09T12:05:35Z",
             "lastActivityDate": "N/A",
-            "itemCount": 1801,
+            "itemCount": 1816,
             "archivePolicy": false,
             "mailboxSize": "0.01 GB",
             "migrationStatus": "Cloud Native",
@@ -4158,7 +4158,7 @@
             "accountEnabled": "Yes",
             "createdDateTime": "2023-10-02T14:54:35Z",
             "lastActivityDate": "2026-01-28",
-            "itemCount": 19538,
+            "itemCount": 19523,
             "archivePolicy": true,
             "mailboxSize": "0.52 GB",
             "migrationStatus": "Cloud Native",
@@ -5386,8 +5386,8 @@
               "averageScore": 46.61,
               "SeatSizeRangeLowerValue": "1",
               "SeatSizeRangeUpperValue": "100",
-              "appsScore": 46.94,
-              "appsScoreMax": 128.73,
+              "appsScore": 46.93,
+              "appsScoreMax": 128.72,
               "dataScore": 0.71,
               "dataScoreMax": 5.44,
               "deviceScore": 9.06,
@@ -6281,6 +6281,2094 @@
           }
         ],
         "signIns": [
+          {
+            "id": "3c4712ea-2675-457d-bfe1-c70073660e00",
+            "createdDateTime": "2026-02-10T11:01:44Z",
+            "userDisplayName": "Vivek Kumar",
+            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+            "appId": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
+            "appDisplayName": "Office365 Shell WCSS-Client",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "a98db3f7-d535-46bb-83aa-6fc297f16079",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "Office365 Shell WCSS-Server",
+            "resourceId": "5f09333a-842c-47da-a157-57da27fcbca5",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyNotApplied"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlyNotApplied"
+              }
+            ]
+          },
+          {
+            "id": "4099cec1-1005-40c7-8722-29fb38ac7000",
+            "createdDateTime": "2026-02-10T11:01:38Z",
+            "userDisplayName": "Vivek Kumar",
+            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+            "appId": "96ff4394-9197-43aa-b393-6a41652e21f8",
+            "appDisplayName": "Power Virtual Agents ",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "84414422-db25-484c-b5e5-78baabe2bfd6",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "PowerApps Service",
+            "resourceId": "475226c6-020e-4fb2-8a90-7a972cbfc1d4",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyNotApplied"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlyNotApplied"
+              }
+            ]
+          },
+          {
+            "id": "79561679-9e9d-439a-aed5-c25bd04f6c00",
+            "createdDateTime": "2026-02-10T11:01:13Z",
+            "userDisplayName": "Vivek Kumar",
+            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+            "appId": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
+            "appDisplayName": "Office365 Shell WCSS-Client",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "e9a4ebc1-68ef-4159-aa45-f54d35b6cf9f",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "Microsoft Graph",
+            "resourceId": "00000003-0000-0000-c000-000000000000",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyNotApplied"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlyNotApplied"
+              }
+            ]
+          },
+          {
+            "id": "f62ca87a-9909-48ce-ae84-9dc24b806800",
+            "createdDateTime": "2026-02-10T11:01:13Z",
+            "userDisplayName": "Vivek Kumar",
+            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+            "appId": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
+            "appDisplayName": "Office365 Shell WCSS-Client",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "11e8d23a-fadf-468e-bf7e-938c97d00232",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "Microsoft Graph",
+            "resourceId": "00000003-0000-0000-c000-000000000000",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyNotApplied"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlyNotApplied"
+              }
+            ]
+          },
+          {
+            "id": "f0c7c365-95be-4683-aae5-313e2ac71000",
+            "createdDateTime": "2026-02-10T11:01:13Z",
+            "userDisplayName": "Vivek Kumar",
+            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+            "appId": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
+            "appDisplayName": "Office365 Shell WCSS-Client",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "c32d15da-735a-4b42-a7e2-3ce9fc07f920",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "IrisSelectionFrontDoor",
+            "resourceId": "16aeb910-ce68-41d1-9ac3-9e1673ac9575",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyNotApplied"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlyNotApplied"
+              }
+            ]
+          },
+          {
+            "id": "f24714c6-53c5-4929-96c9-4605bff65700",
+            "createdDateTime": "2026-02-10T11:01:13Z",
+            "userDisplayName": "Vivek Kumar",
+            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+            "appId": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
+            "appDisplayName": "Office365 Shell WCSS-Client",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "0ceeb1ad-d10b-4f29-9f69-ff677b1940cc",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "Office365 Shell WCSS-Server",
+            "resourceId": "5f09333a-842c-47da-a157-57da27fcbca5",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyNotApplied"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlyNotApplied"
+              }
+            ]
+          },
+          {
+            "id": "96f6c3a8-616f-41d5-827d-e721d5a60c00",
+            "createdDateTime": "2026-02-10T11:00:48Z",
+            "userDisplayName": "Vivek Kumar",
+            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+            "appId": "80ccca67-54bd-44ab-8625-4b79c4dc7775",
+            "appDisplayName": "Microsoft 365 Security and Compliance Center",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "be8063ae-64d6-448a-b2f2-aa240f9c223e",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "Windows Azure Active Directory",
+            "resourceId": "00000002-0000-0000-c000-000000000000",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyNotApplied"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlyNotApplied"
+              }
+            ]
+          },
+          {
+            "id": "b0075ee8-06cf-4bcd-8f32-f214394aba00",
+            "createdDateTime": "2026-02-10T10:41:29Z",
+            "userDisplayName": "Demo User",
+            "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+            "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+            "appId": "0fb1ce07-0af3-4192-a8bf-d8b3cce097fc",
+            "appDisplayName": "M365Portal-Purview-Service",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "019c4724-0eff-78ff-9b42-78241499a8b8",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "Microsoft Graph",
+            "resourceId": "00000003-0000-0000-c000-000000000000",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Edge 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyInterrupted"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlySuccess"
+              }
+            ]
+          },
+          {
+            "id": "44a5eac1-42b9-4588-899f-d158d13d1800",
+            "createdDateTime": "2026-02-10T10:41:24Z",
+            "userDisplayName": "Demo User",
+            "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+            "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+            "appId": "0fb1ce07-0af3-4192-a8bf-d8b3cce097fc",
+            "appDisplayName": "M365Portal-Purview-Service",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "019c4724-0eff-78ff-9b42-78241499a8b8",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "Microsoft Graph",
+            "resourceId": "00000003-0000-0000-c000-000000000000",
+            "status": {
+              "errorCode": 50140,
+              "failureReason": "This occurred due to 'Keep me signed in' interrupt when the user was signing in.",
+              "additionalDetails": "This is an expected part of the login flow, where a user is asked if they want to remain signed into this browser to make further logins easier. For more details, see https://techcommunity.microsoft.com/t5/microsoft-entra/the-new-azure-ad-sign-in-and-keep-me-signed-in-experiences/td-p/128267"
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Edge 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyInterrupted"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlySuccess"
+              }
+            ]
+          },
+          {
+            "id": "6ead8276-2234-4ceb-9b11-07c5e2c60e00",
+            "createdDateTime": "2026-02-10T10:37:03Z",
+            "userDisplayName": "Vivek Kumar",
+            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+            "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
+            "appDisplayName": "Azure Portal",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "019c4720-45e8-75a9-8768-39345c70b75d",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "Azure Resource Manager",
+            "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyNotApplied"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlyNotApplied"
+              }
+            ]
+          },
+          {
+            "id": "b6b1bcf6-70a3-4865-a7f5-acb54f1b4c00",
+            "createdDateTime": "2026-02-10T10:31:58Z",
+            "userDisplayName": "Vivek Kumar",
+            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+            "appId": "4765445b-32c6-49b0-83e6-1d93765276ca",
+            "appDisplayName": "OfficeHome",
+            "ipAddress": "103.178.77.114",
+            "clientAppUsed": "Browser",
+            "correlationId": "7a683b45-188e-4675-8f55-4e78c41e7d3e",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "OfficeHome",
+            "resourceId": "4765445b-32c6-49b0-83e6-1d93765276ca",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Gurgaon",
+              "state": "Haryana",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 28.4595,
+                "longitude": 77.0266
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyNotApplied"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlyNotApplied"
+              }
+            ]
+          },
+          {
+            "id": "a186aa9e-0886-4e92-a27b-c5b4996f1000",
+            "createdDateTime": "2026-02-10T10:31:56Z",
+            "userDisplayName": "Vivek Kumar",
+            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+            "appId": "4765445b-32c6-49b0-83e6-1d93765276ca",
+            "appDisplayName": "OfficeHome",
+            "ipAddress": "103.178.77.114",
+            "clientAppUsed": "Browser",
+            "correlationId": "5c486b48-4035-485b-abdb-d1d56a5f75c5",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "OfficeHome",
+            "resourceId": "4765445b-32c6-49b0-83e6-1d93765276ca",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Gurgaon",
+              "state": "Haryana",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 28.4595,
+                "longitude": 77.0266
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyNotApplied"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlyNotApplied"
+              }
+            ]
+          },
+          {
+            "id": "22b26484-311f-4048-bd5f-a8645d1a7a00",
+            "createdDateTime": "2026-02-10T10:31:45Z",
+            "userDisplayName": "Vivek Kumar",
+            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
+            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
+            "appId": "14638111-3389-403d-b206-a6a71d9f8f16",
+            "appDisplayName": "Copilot App",
+            "ipAddress": "103.178.77.114",
+            "clientAppUsed": "Browser",
+            "correlationId": "019c471b-69e7-77c0-a130-0cd2e3659e75",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "Picasso Prod First Party App",
+            "resourceId": "140e65af-45d1-4427-bf08-3e7295db6836",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Gurgaon",
+              "state": "Haryana",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 28.4595,
+                "longitude": 77.0266
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyNotApplied"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlyNotApplied"
+              }
+            ]
+          },
+          {
+            "id": "646070c6-e79f-4620-9e17-fa10dffc4300",
+            "createdDateTime": "2026-02-10T09:12:31Z",
+            "userDisplayName": "Pilot User",
+            "userPrincipalName": "pilotuser@intunetraininglabs.onmicrosoft.com",
+            "userId": "6c7f3243-9f68-4037-80b7-dce9c510c098",
+            "appId": "0fb1ce07-0af3-4192-a8bf-d8b3cce097fc",
+            "appDisplayName": "M365Portal-Purview-Service",
+            "ipAddress": "103.178.77.114",
+            "clientAppUsed": "Browser",
+            "correlationId": "019c46d1-747f-76c9-b8b4-f6e8065fd595",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "Microsoft Graph",
+            "resourceId": "00000003-0000-0000-c000-000000000000",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Edge 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Gurgaon",
+              "state": "Haryana",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 28.4595,
+                "longitude": 77.0266
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyInterrupted"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlySuccess"
+              }
+            ]
+          },
+          {
+            "id": "aa677814-c4a3-4a21-aca2-f39bb47d4a00",
+            "createdDateTime": "2026-02-10T08:51:21Z",
+            "userDisplayName": "Demo User",
+            "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+            "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+            "appId": "0fb1ce07-0af3-4192-a8bf-d8b3cce097fc",
+            "appDisplayName": "M365Portal-Purview-Service",
+            "ipAddress": "103.178.77.114",
+            "clientAppUsed": "Browser",
+            "correlationId": "019c46be-cbe7-77d0-a050-5bdf5243f898",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "Microsoft Graph",
+            "resourceId": "00000003-0000-0000-c000-000000000000",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Edge 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Gurgaon",
+              "state": "Haryana",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 28.4595,
+                "longitude": 77.0266
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyInterrupted"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlySuccess"
+              }
+            ]
+          },
+          {
+            "id": "3c37b33b-fffc-4dbb-bc17-b3d2f8de7000",
+            "createdDateTime": "2026-02-10T06:51:13Z",
+            "userDisplayName": "Demo User",
+            "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+            "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+            "appId": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
+            "appDisplayName": "Office365 Shell WCSS-Client",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "b66adcb8-9198-4ad6-ba2a-174885ccb7f2",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "Microsoft Graph",
+            "resourceId": "00000003-0000-0000-c000-000000000000",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyInterrupted"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlySuccess"
+              }
+            ]
+          },
+          {
+            "id": "34b62170-6276-4e3a-b27d-8310a2196b00",
+            "createdDateTime": "2026-02-10T06:51:13Z",
+            "userDisplayName": "Demo User",
+            "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+            "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+            "appId": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
+            "appDisplayName": "Office365 Shell WCSS-Client",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "7df2d536-41cf-4b0d-8e4a-6d2b3308d09e",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "Microsoft Graph",
+            "resourceId": "00000003-0000-0000-c000-000000000000",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyInterrupted"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlySuccess"
+              }
+            ]
+          },
+          {
+            "id": "6f657ca3-b493-4336-88a7-9a3af4120800",
+            "createdDateTime": "2026-02-10T06:51:13Z",
+            "userDisplayName": "Demo User",
+            "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+            "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+            "appId": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
+            "appDisplayName": "Office365 Shell WCSS-Client",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "acc77f9b-b597-43d7-8066-a696fe52b134",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "IrisSelectionFrontDoor",
+            "resourceId": "16aeb910-ce68-41d1-9ac3-9e1673ac9575",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyInterrupted"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlySuccess"
+              }
+            ]
+          },
+          {
+            "id": "fe918e2f-2eeb-424c-bfe7-4f93516c6600",
+            "createdDateTime": "2026-02-10T06:51:13Z",
+            "userDisplayName": "Demo User",
+            "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+            "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+            "appId": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
+            "appDisplayName": "Office365 Shell WCSS-Client",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "f280e41e-57ec-4d2f-9a2d-ad0504b7982b",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "Office365 Shell WCSS-Server",
+            "resourceId": "5f09333a-842c-47da-a157-57da27fcbca5",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyInterrupted"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlySuccess"
+              }
+            ]
+          },
+          {
+            "id": "b8e0e3fd-8b93-48a1-8af3-45d948225700",
+            "createdDateTime": "2026-02-10T06:51:08Z",
+            "userDisplayName": "Demo User",
+            "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+            "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+            "appId": "618dd325-23f6-4b6f-8380-4df78026e39b",
+            "appDisplayName": "Microsoft 365 Admin portal",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "6edad7c6-1a63-4772-8b5d-8323f5268e11",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "Microsoft Graph",
+            "resourceId": "00000003-0000-0000-c000-000000000000",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyInterrupted"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlySuccess"
+              }
+            ]
+          },
+          {
+            "id": "7c7e4263-595d-45cc-b164-41c9907d6100",
+            "createdDateTime": "2026-02-10T06:50:59Z",
+            "userDisplayName": "Demo User",
+            "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+            "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+            "appId": "00000006-0000-0ff1-ce00-000000000000",
+            "appDisplayName": "Microsoft Office 365 Portal",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "ebc98ef8-aa6b-4387-835e-585ec6c8a90f",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "Windows Azure Active Directory",
+            "resourceId": "00000002-0000-0000-c000-000000000000",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyInterrupted"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlySuccess"
+              }
+            ]
+          },
+          {
+            "id": "4b1ec3ea-aadf-4a41-abc0-a2adbe616800",
+            "createdDateTime": "2026-02-10T06:50:57Z",
+            "userDisplayName": "Demo User",
+            "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+            "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+            "appId": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
+            "appDisplayName": "Office365 Shell WCSS-Client",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "25fb9b42-4abd-468d-8fc1-423018b24946",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "IrisSelectionFrontDoor",
+            "resourceId": "16aeb910-ce68-41d1-9ac3-9e1673ac9575",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyInterrupted"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlySuccess"
+              }
+            ]
+          },
+          {
+            "id": "c819fb17-9138-41ff-9489-0f7162550700",
+            "createdDateTime": "2026-02-10T06:50:43Z",
+            "userDisplayName": "Demo User",
+            "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+            "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+            "appId": "4765445b-32c6-49b0-83e6-1d93765276ca",
+            "appDisplayName": "OfficeHome",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "d6268d97-9b28-4983-963c-f94694f99c62",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "OfficeHome",
+            "resourceId": "4765445b-32c6-49b0-83e6-1d93765276ca",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyInterrupted"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlySuccess"
+              }
+            ]
+          },
+          {
+            "id": "3ca250eb-5e6e-4f73-abe6-3407b8d56600",
+            "createdDateTime": "2026-02-10T06:50:39Z",
+            "userDisplayName": "Demo User",
+            "userPrincipalName": "demouser@intunetraininglabs.onmicrosoft.com",
+            "userId": "5f0c094d-b3cb-45e3-b010-e654ecd3f7e0",
+            "appId": "4765445b-32c6-49b0-83e6-1d93765276ca",
+            "appDisplayName": "OfficeHome",
+            "ipAddress": "122.184.91.214",
+            "clientAppUsed": "Browser",
+            "correlationId": "d6268d97-9b28-4983-963c-f94694f99c62",
+            "conditionalAccessStatus": "notApplied",
+            "isInteractive": true,
+            "riskDetail": "none",
+            "riskLevelAggregated": "none",
+            "riskLevelDuringSignIn": "none",
+            "riskState": "none",
+            "riskEventTypes": [],
+            "riskEventTypes_v2": [],
+            "resourceDisplayName": "OfficeHome",
+            "resourceId": "4765445b-32c6-49b0-83e6-1d93765276ca",
+            "status": {
+              "errorCode": 0,
+              "failureReason": "Other.",
+              "additionalDetails": null
+            },
+            "deviceDetail": {
+              "deviceId": "",
+              "displayName": "",
+              "operatingSystem": "Windows10",
+              "browser": "Chrome 144.0.0",
+              "isCompliant": false,
+              "isManaged": false,
+              "trustType": null
+            },
+            "location": {
+              "city": "Kanpur",
+              "state": "Uttar Pradesh",
+              "countryOrRegion": "IN",
+              "geoCoordinates": {
+                "altitude": null,
+                "latitude": 26.4642,
+                "longitude": 80.313
+              }
+            },
+            "appliedConditionalAccessPolicies": [
+              {
+                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
+                "displayName": "Mac Require",
+                "enforcedGrantControls": [
+                  "RequireCompliantDevice"
+                ],
+                "enforcedSessionControls": [],
+                "result": "notApplied"
+              },
+              {
+                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
+                "displayName": "Microsoft-managed: Block legacy authentication",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
+                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "notEnabled"
+              },
+              {
+                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
+                "displayName": "Require phishing-resistant multifactor authentication for admins",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [],
+                "result": "reportOnlyInterrupted"
+              },
+              {
+                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
+                "displayName": "Use application enforced restrictions for O365 apps",
+                "enforcedGrantControls": [],
+                "enforcedSessionControls": [
+                  "AppEnforcedRestrictions"
+                ],
+                "result": "reportOnlySuccess"
+              }
+            ]
+          },
           {
             "id": "3163b18e-5e85-4880-9dfe-a99ddabd6b00",
             "createdDateTime": "2026-02-10T06:19:45Z",
@@ -7806,1054 +9894,10 @@
                 "result": "reportOnlySuccess"
               }
             ]
-          },
-          {
-            "id": "7f5a76c8-38e8-4e92-bdb3-2c4689645300",
-            "createdDateTime": "2026-02-09T11:42:41Z",
-            "userDisplayName": "Vivek Kumar",
-            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
-            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
-            "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
-            "appDisplayName": "Azure Portal",
-            "ipAddress": "103.178.77.114",
-            "clientAppUsed": "Browser",
-            "correlationId": "019c4236-0031-7f70-b88a-56afbe2e078d",
-            "conditionalAccessStatus": "notApplied",
-            "isInteractive": true,
-            "riskDetail": "none",
-            "riskLevelAggregated": "none",
-            "riskLevelDuringSignIn": "none",
-            "riskState": "none",
-            "riskEventTypes": [],
-            "riskEventTypes_v2": [],
-            "resourceDisplayName": "Azure Resource Manager",
-            "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
-            "status": {
-              "errorCode": 0,
-              "failureReason": "Other.",
-              "additionalDetails": null
-            },
-            "deviceDetail": {
-              "deviceId": "",
-              "displayName": "",
-              "operatingSystem": "Windows10",
-              "browser": "Chrome 144.0.0",
-              "isCompliant": false,
-              "isManaged": false,
-              "trustType": null
-            },
-            "location": {
-              "city": "Gurgaon",
-              "state": "Haryana",
-              "countryOrRegion": "IN",
-              "geoCoordinates": {
-                "altitude": null,
-                "latitude": 28.4595,
-                "longitude": 77.0266
-              }
-            },
-            "appliedConditionalAccessPolicies": [
-              {
-                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-                "displayName": "Mac Require",
-                "enforcedGrantControls": [
-                  "RequireCompliantDevice"
-                ],
-                "enforcedSessionControls": [],
-                "result": "notApplied"
-              },
-              {
-                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
-                "displayName": "Microsoft-managed: Block legacy authentication",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
-                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-                "displayName": "Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "reportOnlyNotApplied"
-              },
-              {
-                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-                "displayName": "Use application enforced restrictions for O365 apps",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [
-                  "AppEnforcedRestrictions"
-                ],
-                "result": "reportOnlyNotApplied"
-              }
-            ]
-          },
-          {
-            "id": "f2145a6a-3292-4854-b8b0-826a30b24b00",
-            "createdDateTime": "2026-02-09T10:54:32Z",
-            "userDisplayName": "Vivek Kumar",
-            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
-            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
-            "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
-            "appDisplayName": "Microsoft Teams Web Client",
-            "ipAddress": "103.178.77.114",
-            "clientAppUsed": "Browser",
-            "correlationId": "47ba5e16-4d60-4c93-b396-04bac21f25dd",
-            "conditionalAccessStatus": "notApplied",
-            "isInteractive": true,
-            "riskDetail": "none",
-            "riskLevelAggregated": "none",
-            "riskLevelDuringSignIn": "none",
-            "riskState": "none",
-            "riskEventTypes": [],
-            "riskEventTypes_v2": [],
-            "resourceDisplayName": "Microsoft Teams Services",
-            "resourceId": "cc15fd57-2c6c-4117-a88c-83b1d56b4bbe",
-            "status": {
-              "errorCode": 0,
-              "failureReason": "Other.",
-              "additionalDetails": null
-            },
-            "deviceDetail": {
-              "deviceId": "",
-              "displayName": "",
-              "operatingSystem": "Windows10",
-              "browser": "Chrome 144.0.0",
-              "isCompliant": false,
-              "isManaged": false,
-              "trustType": null
-            },
-            "location": {
-              "city": "Gurgaon",
-              "state": "Haryana",
-              "countryOrRegion": "IN",
-              "geoCoordinates": {
-                "altitude": null,
-                "latitude": 28.4595,
-                "longitude": 77.0266
-              }
-            },
-            "appliedConditionalAccessPolicies": [
-              {
-                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-                "displayName": "Mac Require",
-                "enforcedGrantControls": [
-                  "RequireCompliantDevice"
-                ],
-                "enforcedSessionControls": [],
-                "result": "notApplied"
-              },
-              {
-                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
-                "displayName": "Microsoft-managed: Block legacy authentication",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
-                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-                "displayName": "Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "reportOnlyNotApplied"
-              },
-              {
-                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-                "displayName": "Use application enforced restrictions for O365 apps",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [
-                  "AppEnforcedRestrictions"
-                ],
-                "result": "reportOnlyNotApplied"
-              }
-            ]
-          },
-          {
-            "id": "d68ef27b-c9b9-4360-be20-13d609944200",
-            "createdDateTime": "2026-02-09T10:36:54Z",
-            "userDisplayName": "Vivek Kumar",
-            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
-            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
-            "appId": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
-            "appDisplayName": "Office365 Shell WCSS-Client",
-            "ipAddress": "103.178.77.114",
-            "clientAppUsed": "Browser",
-            "correlationId": "5063c280-5763-4061-a8bf-cfbb84037b77",
-            "conditionalAccessStatus": "notApplied",
-            "isInteractive": true,
-            "riskDetail": "none",
-            "riskLevelAggregated": "none",
-            "riskLevelDuringSignIn": "none",
-            "riskState": "none",
-            "riskEventTypes": [],
-            "riskEventTypes_v2": [],
-            "resourceDisplayName": "Office365 Shell WCSS-Server",
-            "resourceId": "5f09333a-842c-47da-a157-57da27fcbca5",
-            "status": {
-              "errorCode": 0,
-              "failureReason": "Other.",
-              "additionalDetails": null
-            },
-            "deviceDetail": {
-              "deviceId": "",
-              "displayName": "",
-              "operatingSystem": "Windows10",
-              "browser": "Chrome 144.0.0",
-              "isCompliant": false,
-              "isManaged": false,
-              "trustType": null
-            },
-            "location": {
-              "city": "Gurgaon",
-              "state": "Haryana",
-              "countryOrRegion": "IN",
-              "geoCoordinates": {
-                "altitude": null,
-                "latitude": 28.4595,
-                "longitude": 77.0266
-              }
-            },
-            "appliedConditionalAccessPolicies": [
-              {
-                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-                "displayName": "Mac Require",
-                "enforcedGrantControls": [
-                  "RequireCompliantDevice"
-                ],
-                "enforcedSessionControls": [],
-                "result": "notApplied"
-              },
-              {
-                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
-                "displayName": "Microsoft-managed: Block legacy authentication",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
-                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-                "displayName": "Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "reportOnlyNotApplied"
-              },
-              {
-                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-                "displayName": "Use application enforced restrictions for O365 apps",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [
-                  "AppEnforcedRestrictions"
-                ],
-                "result": "reportOnlyNotApplied"
-              }
-            ]
-          },
-          {
-            "id": "f86f492d-d60e-402c-bcac-a38a54ff0b00",
-            "createdDateTime": "2026-02-09T10:36:54Z",
-            "userDisplayName": "Vivek Kumar",
-            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
-            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
-            "appId": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
-            "appDisplayName": "Office365 Shell WCSS-Client",
-            "ipAddress": "103.178.77.114",
-            "clientAppUsed": "Browser",
-            "correlationId": "882bb503-e9ea-45c3-963e-ae7661229f9f",
-            "conditionalAccessStatus": "notApplied",
-            "isInteractive": true,
-            "riskDetail": "none",
-            "riskLevelAggregated": "none",
-            "riskLevelDuringSignIn": "none",
-            "riskState": "none",
-            "riskEventTypes": [],
-            "riskEventTypes_v2": [],
-            "resourceDisplayName": "Microsoft Graph",
-            "resourceId": "00000003-0000-0000-c000-000000000000",
-            "status": {
-              "errorCode": 0,
-              "failureReason": "Other.",
-              "additionalDetails": null
-            },
-            "deviceDetail": {
-              "deviceId": "",
-              "displayName": "",
-              "operatingSystem": "Windows10",
-              "browser": "Chrome 144.0.0",
-              "isCompliant": false,
-              "isManaged": false,
-              "trustType": null
-            },
-            "location": {
-              "city": "Gurgaon",
-              "state": "Haryana",
-              "countryOrRegion": "IN",
-              "geoCoordinates": {
-                "altitude": null,
-                "latitude": 28.4595,
-                "longitude": 77.0266
-              }
-            },
-            "appliedConditionalAccessPolicies": [
-              {
-                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-                "displayName": "Mac Require",
-                "enforcedGrantControls": [
-                  "RequireCompliantDevice"
-                ],
-                "enforcedSessionControls": [],
-                "result": "notApplied"
-              },
-              {
-                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
-                "displayName": "Microsoft-managed: Block legacy authentication",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
-                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-                "displayName": "Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "reportOnlyNotApplied"
-              },
-              {
-                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-                "displayName": "Use application enforced restrictions for O365 apps",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [
-                  "AppEnforcedRestrictions"
-                ],
-                "result": "reportOnlyNotApplied"
-              }
-            ]
-          },
-          {
-            "id": "23bf293f-8a3e-4f43-b3f3-bb98cd594c00",
-            "createdDateTime": "2026-02-09T10:36:54Z",
-            "userDisplayName": "Vivek Kumar",
-            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
-            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
-            "appId": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
-            "appDisplayName": "Office365 Shell WCSS-Client",
-            "ipAddress": "103.178.77.114",
-            "clientAppUsed": "Browser",
-            "correlationId": "52cc2ee3-df83-42df-b78c-c958e76af954",
-            "conditionalAccessStatus": "notApplied",
-            "isInteractive": true,
-            "riskDetail": "none",
-            "riskLevelAggregated": "none",
-            "riskLevelDuringSignIn": "none",
-            "riskState": "none",
-            "riskEventTypes": [],
-            "riskEventTypes_v2": [],
-            "resourceDisplayName": "Microsoft Graph",
-            "resourceId": "00000003-0000-0000-c000-000000000000",
-            "status": {
-              "errorCode": 0,
-              "failureReason": "Other.",
-              "additionalDetails": null
-            },
-            "deviceDetail": {
-              "deviceId": "",
-              "displayName": "",
-              "operatingSystem": "Windows10",
-              "browser": "Chrome 144.0.0",
-              "isCompliant": false,
-              "isManaged": false,
-              "trustType": null
-            },
-            "location": {
-              "city": "Gurgaon",
-              "state": "Haryana",
-              "countryOrRegion": "IN",
-              "geoCoordinates": {
-                "altitude": null,
-                "latitude": 28.4595,
-                "longitude": 77.0266
-              }
-            },
-            "appliedConditionalAccessPolicies": [
-              {
-                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-                "displayName": "Mac Require",
-                "enforcedGrantControls": [
-                  "RequireCompliantDevice"
-                ],
-                "enforcedSessionControls": [],
-                "result": "notApplied"
-              },
-              {
-                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
-                "displayName": "Microsoft-managed: Block legacy authentication",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
-                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-                "displayName": "Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "reportOnlyNotApplied"
-              },
-              {
-                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-                "displayName": "Use application enforced restrictions for O365 apps",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [
-                  "AppEnforcedRestrictions"
-                ],
-                "result": "reportOnlyNotApplied"
-              }
-            ]
-          },
-          {
-            "id": "f27d4d89-0635-4aaa-94e3-6143860c0d00",
-            "createdDateTime": "2026-02-09T10:36:54Z",
-            "userDisplayName": "Vivek Kumar",
-            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
-            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
-            "appId": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
-            "appDisplayName": "Office365 Shell WCSS-Client",
-            "ipAddress": "103.178.77.114",
-            "clientAppUsed": "Browser",
-            "correlationId": "8bb17026-1d54-4a84-abfe-4fdeb30eb5bb",
-            "conditionalAccessStatus": "notApplied",
-            "isInteractive": true,
-            "riskDetail": "none",
-            "riskLevelAggregated": "none",
-            "riskLevelDuringSignIn": "none",
-            "riskState": "none",
-            "riskEventTypes": [],
-            "riskEventTypes_v2": [],
-            "resourceDisplayName": "IrisSelectionFrontDoor",
-            "resourceId": "16aeb910-ce68-41d1-9ac3-9e1673ac9575",
-            "status": {
-              "errorCode": 0,
-              "failureReason": "Other.",
-              "additionalDetails": null
-            },
-            "deviceDetail": {
-              "deviceId": "",
-              "displayName": "",
-              "operatingSystem": "Windows10",
-              "browser": "Chrome 144.0.0",
-              "isCompliant": false,
-              "isManaged": false,
-              "trustType": null
-            },
-            "location": {
-              "city": "Gurgaon",
-              "state": "Haryana",
-              "countryOrRegion": "IN",
-              "geoCoordinates": {
-                "altitude": null,
-                "latitude": 28.4595,
-                "longitude": 77.0266
-              }
-            },
-            "appliedConditionalAccessPolicies": [
-              {
-                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-                "displayName": "Mac Require",
-                "enforcedGrantControls": [
-                  "RequireCompliantDevice"
-                ],
-                "enforcedSessionControls": [],
-                "result": "notApplied"
-              },
-              {
-                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
-                "displayName": "Microsoft-managed: Block legacy authentication",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
-                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-                "displayName": "Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "reportOnlyNotApplied"
-              },
-              {
-                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-                "displayName": "Use application enforced restrictions for O365 apps",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [
-                  "AppEnforcedRestrictions"
-                ],
-                "result": "reportOnlyNotApplied"
-              }
-            ]
-          },
-          {
-            "id": "2ee32555-c333-469d-a067-06ab86070a00",
-            "createdDateTime": "2026-02-09T10:36:41Z",
-            "userDisplayName": "Vivek Kumar",
-            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
-            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
-            "appId": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
-            "appDisplayName": "Office365 Shell WCSS-Client",
-            "ipAddress": "103.178.77.114",
-            "clientAppUsed": "Browser",
-            "correlationId": "c1fb17f8-1caa-4f01-b372-62abadca8c63",
-            "conditionalAccessStatus": "notApplied",
-            "isInteractive": true,
-            "riskDetail": "none",
-            "riskLevelAggregated": "none",
-            "riskLevelDuringSignIn": "none",
-            "riskState": "none",
-            "riskEventTypes": [],
-            "riskEventTypes_v2": [],
-            "resourceDisplayName": "Microsoft Graph",
-            "resourceId": "00000003-0000-0000-c000-000000000000",
-            "status": {
-              "errorCode": 0,
-              "failureReason": "Other.",
-              "additionalDetails": null
-            },
-            "deviceDetail": {
-              "deviceId": "",
-              "displayName": "",
-              "operatingSystem": "Windows10",
-              "browser": "Chrome 144.0.0",
-              "isCompliant": false,
-              "isManaged": false,
-              "trustType": null
-            },
-            "location": {
-              "city": "Gurgaon",
-              "state": "Haryana",
-              "countryOrRegion": "IN",
-              "geoCoordinates": {
-                "altitude": null,
-                "latitude": 28.4595,
-                "longitude": 77.0266
-              }
-            },
-            "appliedConditionalAccessPolicies": [
-              {
-                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-                "displayName": "Mac Require",
-                "enforcedGrantControls": [
-                  "RequireCompliantDevice"
-                ],
-                "enforcedSessionControls": [],
-                "result": "notApplied"
-              },
-              {
-                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
-                "displayName": "Microsoft-managed: Block legacy authentication",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
-                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-                "displayName": "Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "reportOnlyNotApplied"
-              },
-              {
-                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-                "displayName": "Use application enforced restrictions for O365 apps",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [
-                  "AppEnforcedRestrictions"
-                ],
-                "result": "reportOnlyNotApplied"
-              }
-            ]
-          },
-          {
-            "id": "ac5d6380-9a33-4b0d-be48-2e5555b85100",
-            "createdDateTime": "2026-02-09T10:36:41Z",
-            "userDisplayName": "Vivek Kumar",
-            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
-            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
-            "appId": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
-            "appDisplayName": "Office365 Shell WCSS-Client",
-            "ipAddress": "103.178.77.114",
-            "clientAppUsed": "Browser",
-            "correlationId": "9673ff51-fc6e-4165-9c63-d0d181472310",
-            "conditionalAccessStatus": "notApplied",
-            "isInteractive": true,
-            "riskDetail": "none",
-            "riskLevelAggregated": "none",
-            "riskLevelDuringSignIn": "none",
-            "riskState": "none",
-            "riskEventTypes": [],
-            "riskEventTypes_v2": [],
-            "resourceDisplayName": "Microsoft Graph",
-            "resourceId": "00000003-0000-0000-c000-000000000000",
-            "status": {
-              "errorCode": 0,
-              "failureReason": "Other.",
-              "additionalDetails": null
-            },
-            "deviceDetail": {
-              "deviceId": "",
-              "displayName": "",
-              "operatingSystem": "Windows10",
-              "browser": "Chrome 144.0.0",
-              "isCompliant": false,
-              "isManaged": false,
-              "trustType": null
-            },
-            "location": {
-              "city": "Gurgaon",
-              "state": "Haryana",
-              "countryOrRegion": "IN",
-              "geoCoordinates": {
-                "altitude": null,
-                "latitude": 28.4595,
-                "longitude": 77.0266
-              }
-            },
-            "appliedConditionalAccessPolicies": [
-              {
-                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-                "displayName": "Mac Require",
-                "enforcedGrantControls": [
-                  "RequireCompliantDevice"
-                ],
-                "enforcedSessionControls": [],
-                "result": "notApplied"
-              },
-              {
-                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
-                "displayName": "Microsoft-managed: Block legacy authentication",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
-                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-                "displayName": "Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "reportOnlyNotApplied"
-              },
-              {
-                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-                "displayName": "Use application enforced restrictions for O365 apps",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [
-                  "AppEnforcedRestrictions"
-                ],
-                "result": "reportOnlyNotApplied"
-              }
-            ]
-          },
-          {
-            "id": "153dbbdb-4bf7-4e36-b6b0-3f5372385800",
-            "createdDateTime": "2026-02-09T10:36:41Z",
-            "userDisplayName": "Vivek Kumar",
-            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
-            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
-            "appId": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
-            "appDisplayName": "Office365 Shell WCSS-Client",
-            "ipAddress": "103.178.77.114",
-            "clientAppUsed": "Browser",
-            "correlationId": "a634e20a-d9ea-4969-9f6a-f170bc804b3d",
-            "conditionalAccessStatus": "notApplied",
-            "isInteractive": true,
-            "riskDetail": "none",
-            "riskLevelAggregated": "none",
-            "riskLevelDuringSignIn": "none",
-            "riskState": "none",
-            "riskEventTypes": [],
-            "riskEventTypes_v2": [],
-            "resourceDisplayName": "IrisSelectionFrontDoor",
-            "resourceId": "16aeb910-ce68-41d1-9ac3-9e1673ac9575",
-            "status": {
-              "errorCode": 0,
-              "failureReason": "Other.",
-              "additionalDetails": null
-            },
-            "deviceDetail": {
-              "deviceId": "",
-              "displayName": "",
-              "operatingSystem": "Windows10",
-              "browser": "Chrome 144.0.0",
-              "isCompliant": false,
-              "isManaged": false,
-              "trustType": null
-            },
-            "location": {
-              "city": "Gurgaon",
-              "state": "Haryana",
-              "countryOrRegion": "IN",
-              "geoCoordinates": {
-                "altitude": null,
-                "latitude": 28.4595,
-                "longitude": 77.0266
-              }
-            },
-            "appliedConditionalAccessPolicies": [
-              {
-                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-                "displayName": "Mac Require",
-                "enforcedGrantControls": [
-                  "RequireCompliantDevice"
-                ],
-                "enforcedSessionControls": [],
-                "result": "notApplied"
-              },
-              {
-                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
-                "displayName": "Microsoft-managed: Block legacy authentication",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
-                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-                "displayName": "Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "reportOnlyNotApplied"
-              },
-              {
-                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-                "displayName": "Use application enforced restrictions for O365 apps",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [
-                  "AppEnforcedRestrictions"
-                ],
-                "result": "reportOnlyNotApplied"
-              }
-            ]
-          },
-          {
-            "id": "f5935c96-b5de-4185-9fdc-9935c2410b00",
-            "createdDateTime": "2026-02-09T10:36:41Z",
-            "userDisplayName": "Vivek Kumar",
-            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
-            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
-            "appId": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
-            "appDisplayName": "Office365 Shell WCSS-Client",
-            "ipAddress": "103.178.77.114",
-            "clientAppUsed": "Browser",
-            "correlationId": "75418e5b-2e3a-4be4-a531-00b17296845f",
-            "conditionalAccessStatus": "notApplied",
-            "isInteractive": true,
-            "riskDetail": "none",
-            "riskLevelAggregated": "none",
-            "riskLevelDuringSignIn": "none",
-            "riskState": "none",
-            "riskEventTypes": [],
-            "riskEventTypes_v2": [],
-            "resourceDisplayName": "Office365 Shell WCSS-Server",
-            "resourceId": "5f09333a-842c-47da-a157-57da27fcbca5",
-            "status": {
-              "errorCode": 0,
-              "failureReason": "Other.",
-              "additionalDetails": null
-            },
-            "deviceDetail": {
-              "deviceId": "",
-              "displayName": "",
-              "operatingSystem": "Windows10",
-              "browser": "Chrome 144.0.0",
-              "isCompliant": false,
-              "isManaged": false,
-              "trustType": null
-            },
-            "location": {
-              "city": "Gurgaon",
-              "state": "Haryana",
-              "countryOrRegion": "IN",
-              "geoCoordinates": {
-                "altitude": null,
-                "latitude": 28.4595,
-                "longitude": 77.0266
-              }
-            },
-            "appliedConditionalAccessPolicies": [
-              {
-                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-                "displayName": "Mac Require",
-                "enforcedGrantControls": [
-                  "RequireCompliantDevice"
-                ],
-                "enforcedSessionControls": [],
-                "result": "notApplied"
-              },
-              {
-                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
-                "displayName": "Microsoft-managed: Block legacy authentication",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
-                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-                "displayName": "Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "reportOnlyNotApplied"
-              },
-              {
-                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-                "displayName": "Use application enforced restrictions for O365 apps",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [
-                  "AppEnforcedRestrictions"
-                ],
-                "result": "reportOnlyNotApplied"
-              }
-            ]
-          },
-          {
-            "id": "66799fbe-6abb-46ed-8a6e-6f669f901000",
-            "createdDateTime": "2026-02-09T10:33:39Z",
-            "userDisplayName": "Vivek Kumar",
-            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
-            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
-            "appId": "5e3ce6c0-2b1f-4285-8d4b-75ee78787346",
-            "appDisplayName": "Microsoft Teams Web Client",
-            "ipAddress": "103.178.77.114",
-            "clientAppUsed": "Browser",
-            "correlationId": "cbc2b15d-c976-4bb6-9f4e-5c7c93f1ea42",
-            "conditionalAccessStatus": "notApplied",
-            "isInteractive": true,
-            "riskDetail": "none",
-            "riskLevelAggregated": "none",
-            "riskLevelDuringSignIn": "none",
-            "riskState": "none",
-            "riskEventTypes": [],
-            "riskEventTypes_v2": [],
-            "resourceDisplayName": "Microsoft Teams Services",
-            "resourceId": "cc15fd57-2c6c-4117-a88c-83b1d56b4bbe",
-            "status": {
-              "errorCode": 0,
-              "failureReason": "Other.",
-              "additionalDetails": null
-            },
-            "deviceDetail": {
-              "deviceId": "",
-              "displayName": "",
-              "operatingSystem": "Windows10",
-              "browser": "Chrome 144.0.0",
-              "isCompliant": false,
-              "isManaged": false,
-              "trustType": null
-            },
-            "location": {
-              "city": "Gurgaon",
-              "state": "Haryana",
-              "countryOrRegion": "IN",
-              "geoCoordinates": {
-                "altitude": null,
-                "latitude": 28.4595,
-                "longitude": 77.0266
-              }
-            },
-            "appliedConditionalAccessPolicies": [
-              {
-                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-                "displayName": "Mac Require",
-                "enforcedGrantControls": [
-                  "RequireCompliantDevice"
-                ],
-                "enforcedSessionControls": [],
-                "result": "notApplied"
-              },
-              {
-                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
-                "displayName": "Microsoft-managed: Block legacy authentication",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
-                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-                "displayName": "Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "reportOnlyNotApplied"
-              },
-              {
-                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-                "displayName": "Use application enforced restrictions for O365 apps",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [
-                  "AppEnforcedRestrictions"
-                ],
-                "result": "reportOnlyNotApplied"
-              }
-            ]
-          },
-          {
-            "id": "0b186fd4-e012-4c18-b9bb-5331059e4400",
-            "createdDateTime": "2026-02-09T06:58:14Z",
-            "userDisplayName": "Vivek Kumar",
-            "userPrincipalName": "vivek@intunetraininglabs.onmicrosoft.com",
-            "userId": "19e93c31-96aa-4f2b-a7da-7569a4491f68",
-            "appId": "c44b4083-3bb0-49c1-b47d-974e53cbdf3c",
-            "appDisplayName": "Azure Portal",
-            "ipAddress": "103.178.77.114",
-            "clientAppUsed": "Browser",
-            "correlationId": "019c4131-93d0-7616-b741-63824ad83924",
-            "conditionalAccessStatus": "notApplied",
-            "isInteractive": true,
-            "riskDetail": "none",
-            "riskLevelAggregated": "none",
-            "riskLevelDuringSignIn": "none",
-            "riskState": "none",
-            "riskEventTypes": [],
-            "riskEventTypes_v2": [],
-            "resourceDisplayName": "Azure Resource Manager",
-            "resourceId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
-            "status": {
-              "errorCode": 0,
-              "failureReason": "Other.",
-              "additionalDetails": null
-            },
-            "deviceDetail": {
-              "deviceId": "",
-              "displayName": "",
-              "operatingSystem": "Windows10",
-              "browser": "Chrome 144.0.0",
-              "isCompliant": false,
-              "isManaged": false,
-              "trustType": null
-            },
-            "location": {
-              "city": "Gurgaon",
-              "state": "Haryana",
-              "countryOrRegion": "IN",
-              "geoCoordinates": {
-                "altitude": null,
-                "latitude": 28.4595,
-                "longitude": 77.0266
-              }
-            },
-            "appliedConditionalAccessPolicies": [
-              {
-                "id": "827cca3b-73e6-4765-ab4d-cae7c857a64f",
-                "displayName": "Mac Require",
-                "enforcedGrantControls": [
-                  "RequireCompliantDevice"
-                ],
-                "enforcedSessionControls": [],
-                "result": "notApplied"
-              },
-              {
-                "id": "53dfba16-5026-4d3a-9ba3-6b1e6b286a49",
-                "displayName": "Microsoft-managed: Block legacy authentication",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "26f1e407-f330-4498-a6ac-c4584994ebf1",
-                "displayName": "Microsoft-managed: Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "notEnabled"
-              },
-              {
-                "id": "3a08ae40-d799-40a0-b54f-7e18e6250cbc",
-                "displayName": "Require phishing-resistant multifactor authentication for admins",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [],
-                "result": "reportOnlyNotApplied"
-              },
-              {
-                "id": "714f3fc0-db61-472f-a833-f29d45ef6c28",
-                "displayName": "Use application enforced restrictions for O365 apps",
-                "enforcedGrantControls": [],
-                "enforcedSessionControls": [
-                  "AppEnforcedRestrictions"
-                ],
-                "result": "reportOnlyNotApplied"
-              }
-            ]
           }
         ]
       },
-      "timestamp": 1770705689694,
+      "timestamp": 1770725112518,
       "source": "ServicePage"
     },
     "birdsEye": {
@@ -8862,7 +9906,7 @@
           "mailboxes": 12,
           "activeMail": 10,
           "domains": 5,
-          "healthIssues": 12
+          "healthIssues": 11
         },
         "entra": {
           "users": 13,
@@ -8931,7 +9975,7 @@
           },
           "entraTotal": "18",
           "configProfiles": 8,
-          "applications": 7
+          "applications": 8
         },
         "security": {
           "score": 183.82,
@@ -8958,10 +10002,10 @@
         "usage": {
           "activeUsers7d": 12,
           "activeUsers30d": 0,
-          "storage": 57612224558
+          "storage": 57612224977
         }
       },
-      "timestamp": 1770708175759,
+      "timestamp": 1770886422339,
       "source": "BirdsEyeView"
     },
     "alerts": {
@@ -9072,19 +10116,9 @@
           ],
           "signIns": [
             {
-              "name": "2026-02-03",
-              "failed": 23,
-              "successful": 32
-            },
-            {
-              "name": "2026-02-04",
-              "failed": 12,
-              "successful": 27
-            },
-            {
               "name": "2026-02-05",
-              "failed": 2,
-              "successful": 51
+              "failed": 0,
+              "successful": 14
             },
             {
               "name": "2026-02-06",
@@ -9108,30 +10142,35 @@
             },
             {
               "name": "2026-02-10",
-              "failed": 2,
-              "successful": 22
+              "failed": 3,
+              "successful": 42
+            },
+            {
+              "name": "2026-02-11",
+              "failed": 0,
+              "successful": 39
+            },
+            {
+              "name": "2026-02-12",
+              "failed": 0,
+              "successful": 6
             }
           ],
           "emailTrend": [
             {
-              "name": "2026-02-02",
-              "sent": 0,
-              "received": 6
-            },
-            {
               "name": "2026-02-03",
               "sent": 0,
-              "received": 12
+              "received": 1
             },
             {
               "name": "2026-02-04",
               "sent": 0,
-              "received": 7
+              "received": 6
             },
             {
               "name": "2026-02-05",
               "sent": 0,
-              "received": 0
+              "received": 12
             },
             {
               "name": "2026-02-06",
@@ -9141,12 +10180,17 @@
             {
               "name": "2026-02-07",
               "sent": 0,
-              "received": 7
+              "received": 0
             },
             {
               "name": "2026-02-08",
               "sent": 0,
-              "received": 2
+              "received": 7
+            },
+            {
+              "name": "2026-02-09",
+              "sent": 0,
+              "received": 7
             }
           ],
           "securityRadar": [
@@ -9172,7 +10216,7 @@
             },
             {
               "subject": "Sign-in Success",
-              "value": 95,
+              "value": 100,
               "fullMark": 100
             }
           ],
@@ -9200,31 +10244,31 @@
           ],
           "userGrowthTrend": [
             {
-              "week": "2026-02-08",
+              "week": "2026-02-10",
               "active": 0
             },
             {
-              "week": "2026-02-08",
+              "week": "2026-02-10",
               "active": 0
             },
             {
-              "week": "2026-02-08",
+              "week": "2026-02-10",
               "active": 0
             },
             {
-              "week": "2026-02-08",
+              "week": "2026-02-10",
               "active": 0
             },
             {
-              "week": "2026-02-08",
+              "week": "2026-02-10",
               "active": 0
             },
             {
-              "week": "2026-02-08",
+              "week": "2026-02-10",
               "active": 0
             },
             {
-              "week": "2026-02-08",
+              "week": "2026-02-10",
               "active": 0
             }
           ],
@@ -9232,7 +10276,7 @@
           "licenseTrendComposed": []
         }
       },
-      "timestamp": 1770708167900,
+      "timestamp": 1770886412418,
       "source": "OverviewDashboard"
     },
     "usageReports": {
@@ -23157,8 +24201,8 @@
           ]
         }
       ],
-      "timestamp": 1770637688061
+      "timestamp": 1770713215683
     }
   },
-  "lastUpdated": 1770712863654
+  "lastUpdated": 1770886422391
 }
