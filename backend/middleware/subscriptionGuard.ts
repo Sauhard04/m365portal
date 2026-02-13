@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import Tenant from '../models/Tenant';
+import Tenant from '../models/Tenant.js';
 
 /**
  * Middleware to check for trial expiration or active subscription
