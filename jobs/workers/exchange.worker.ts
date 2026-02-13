@@ -1,7 +1,7 @@
 import { Worker, Job } from 'bullmq';
 import IORedis from 'ioredis';
-import { ExchangeConnectionService } from '../../services/exchange/connection.service';
-import { createAudit } from '../../shared/logging/exchangeAudit';
+import { ExchangeConnectionService } from '../../services/exchange/connection.service.js';
+import { createAudit } from '../../shared/logging/exchangeAudit.js';
 
 const connection = new IORedis();
 
