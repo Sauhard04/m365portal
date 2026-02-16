@@ -11,6 +11,9 @@ import { PowerShellService } from '../services/powerShell.service';
 import { subscriptionGuard } from './middleware/subscriptionGuard';
 import mongoose from 'mongoose';
 
+const VERSION = '1.2.0-azure-stable';
+console.log(`\n🚀 M365 Portal Backend v${VERSION} starting...`);
+
 // Load environment variables
 dotenv.config();
 
@@ -21,7 +24,7 @@ const SITEDATA_PATH = path.join(process.cwd(), 'data', 'sitedata.json');
 connectDB();
 
 // If Redis is available, ensure worker is started
-const REDIS_HOST = process.env.REDIS_HOST || process.env.REDIS_URL;
+const REDIS_HOST = process.env.REDIS_HOST || process.env.REDIS_URL || process.env.REDIS_CACHE_HOST;
 if (REDIS_HOST) {
     try {
         console.log('[System] Redis configuration found, attempting to start BullMQ worker...');
@@ -32,7 +35,10 @@ if (REDIS_HOST) {
         console.warn('[System] Worker module failed to load:', e.message);
     }
 } else {
-    console.log('[System] No Redis configuration (REDIS_HOST/REDIS_URL) found. Using sync mode for background jobs.');
+    // Silence the BullMQ message entirely in production unless Redis is intended
+    if (process.env.NODE_ENV !== 'production') {
+        console.log('[System] No Redis configuration found. Using sync mode for background jobs.');
+    }
 }
 
 const app = express();
@@ -294,9 +300,12 @@ app.get('/health', async (_req, res) => {
 });
 
 // Production mode: Serve static files from Vite build
-const isProduction = process.env.NODE_ENV === 'production' || __dirname.includes('dist');
+const isProduction = process.env.NODE_ENV === 'production' ||
+    __dirname.includes('dist') ||
+    __dirname.includes('wwwroot') ||
+    __dirname.includes('site');
 
-console.log(`[Server] Initialization: NODE_ENV=${process.env.NODE_ENV}, __dirname=${__dirname}, cwd=${process.cwd()}`);
+console.log(`[Server] Initialization: NODE_ENV=${process.env.NODE_ENV}, __dirname=${__dirname}, cwd=${process.cwd()}, isProduction=${isProduction}`);
 
 if (isProduction) {
     // Try multiple possible locations for the frontend build
@@ -305,24 +314,28 @@ if (isProduction) {
         path.join(__dirname, '../dist'), // Fallback 1
         path.join(process.cwd(), 'dist'), // Fallback 2: dist in CWD
         path.join(process.cwd()), // Fallback 3: CWD itself
+        path.join(process.cwd(), 'client/dist'), // Fallback 4
     ];
 
     let clientPath = '';
+    console.log(`[Production] Searching for frontend (index.html)...`);
     for (const p of possibleStaticPaths) {
-        if (fs.existsSync(path.join(p, 'index.html'))) {
+        const exists = fs.existsSync(path.join(p, 'index.html'));
+        console.log(`  - Checking: ${p} ... [${exists ? '✅ FOUND' : '❌ NOT FOUND'}]`);
+        if (exists) {
             clientPath = p;
-            console.log(`[Production] Found index.html at: ${p}`);
             break;
         }
     }
 
     if (!clientPath) {
-        console.warn(`[Production] WARNING: index.html not found in any expected location!`);
-        // Default to one level up but we'll reflect this in the 404
+        console.warn(`\n[Production] ⚠️ ERROR: index.html not found in any expected location!`);
+        console.warn(`[Production] Serving basic error page instead.`);
         clientPath = path.join(__dirname, '..');
+    } else {
+        console.log(`[Production] ✅ Serving static files from: ${clientPath}`);
     }
 
-    console.log(`[Production] Serving static files from: ${clientPath}`);
     app.use(express.static(clientPath));
 
     // Catch-all route for client-side routing (must be last)
@@ -336,18 +349,30 @@ if (isProduction) {
         if (fs.existsSync(indexPath)) {
             res.sendFile(indexPath);
         } else {
-            console.error(`[Error] 404 Catch-all: index.html not found at ${indexPath}`);
             res.status(404).send(`
-                <h1>Frontend build not found</h1>
-                <p>The server is running but could not locate the frontend files.</p>
-                <p>Target path: <code>${indexPath}</code></p>
-                <p>Please ensure "npm run build" was successful before deployment.</p>
+                <div style="font-family: sans-serif; padding: 2rem; background: #fff5f5; border: 1px solid #feb2b2; border-radius: 0.5rem;">
+                    <h1 style="color: #c53030;">Deployment Configuration Error</h1>
+                    <p>The server is running but could not locate the <b>index.html</b> file.</p>
+                    <p><b>Tried Path:</b> <code>${indexPath}</code></p>
+                    <hr>
+                    <p><b>Troubleshooting:</b></p>
+                    <ol>
+                        <li>Ensure <code>npm run build</code> was successful in your deployment.</li>
+                        <li>Check if the <code>dist</code> folder contains <code>index.html</code>.</li>
+                        <li>Verify that <code>package.json</code> points to the correct build output.</li>
+                    </ol>
+                </div>
             `);
         }
     });
-} else {
+}
+else {
     console.log('[Development] Server running in development mode. Not serving static files.');
 }
 
-const port = process.env.PORT || 4000;
-app.listen(port, () => console.log(`Exchange admin server listening on http://localhost:${port}`));
+const port = Number(process.env.PORT) || 8080;
+app.listen(port, '0.0.0.0', () => {
+    console.log(`\n✅ Server is live and listening on 0.0.0.0:${port}`);
+    console.log(`📊 Health Check: http://localhost:${port}/health`);
+    console.log('--- READY TO HANDLE REQUESTS ---\n');
+});
