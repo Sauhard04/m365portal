@@ -9831,7 +9831,7 @@
           "storage": 57612224444
         }
       },
-      "timestamp": 1771216021713,
+      "timestamp": 1771222410184,
       "source": "BirdsEyeView"
     },
     "alerts": {
@@ -9944,7 +9944,7 @@
             {
               "name": "2026-02-09",
               "failed": 2,
-              "successful": 37
+              "successful": 18
             },
             {
               "name": "2026-02-10",
@@ -9969,7 +9969,7 @@
             {
               "name": "2026-02-16",
               "failed": 0,
-              "successful": 1
+              "successful": 20
             }
           ],
           "emailTrend": [
@@ -10092,7 +10092,7 @@
           "licenseTrendComposed": []
         }
       },
-      "timestamp": 1771216019599,
+      "timestamp": 1771222404094,
       "source": "OverviewDashboard"
     },
     "usageReports": {
@@ -24020,5 +24020,5 @@
       "timestamp": 1770637688061
     }
   },
-  "lastUpdated": 1771216021740
+  "lastUpdated": 1771222410233
 }
