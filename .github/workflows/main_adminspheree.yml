@@ -52,39 +52,15 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_2E93B47AD2E74F5D814D5A8E407173B0 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E7E812CF35F34F3CBA100ADEBED6BC5C }}
 
-      - name: 'Set Azure App Settings'
-        uses: azure/appservice-settings@v1
-        with:
-          app-name: 'adminspheree-eye5apc4dqajcgbh'
-          slot-name: 'Production'
-          app-settings-json: |
-            [
-                {
-                    "name": "WEBSITE_RUN_FROM_PACKAGE",
-                    "value": "1",
-                    "slotSetting": false
-                },
-                {
-                    "name": "WEBSITES_PORT",
-                    "value": "8080",
-                    "slotSetting": false
-                },
-                {
-                    "name": "PORT",
-                    "value": "8080",
-                    "slotSetting": false
-                },
-                {
-                    "name": "NODE_ENV",
-                    "value": "production",
-                    "slotSetting": false
-                }
-            ]
+      - name: 'Configure Azure Web App Settings'
+        run: |
+          az webapp config appsettings set --name 'adminspheree-eye5apc4dqajcgbh' --resource-group 'M365_Operation' --settings \
+            WEBSITE_RUN_FROM_PACKAGE=1 \
+            WEBSITES_PORT=8080 \
+            PORT=8080 \
+            NODE_ENV=production
 
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'adminspheree-eye5apc4dqajcgbh'
-          slot-name: 'Production'
-          package: .
+      - name: 'Deploy to Azure Web App (CLI)'
+        run: |
+          zip -r deployment.zip .
+          az webapp deployment source config-zip --name 'adminspheree-eye5apc4dqajcgbh' --resource-group 'M365_Operation' --src deployment.zip
