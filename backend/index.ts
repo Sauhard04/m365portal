@@ -277,13 +277,20 @@ function generateAISummary(store: any): string {
 }
 
 // Production mode: Serve static files from Vite build
-if (process.env.NODE_ENV === 'production') {
+const isProduction = process.env.NODE_ENV === 'production' || __dirname.includes('dist');
+
+if (isProduction) {
     const staticPath = path.join(__dirname, '..'); // If running from dist/backend, dist is one level up
     const clientPath = fs.existsSync(path.join(staticPath, 'index.html'))
         ? staticPath
         : path.join(staticPath, 'dist'); // Fallback for dev/other structures
 
-    console.log(`[Production] Serving static files from: ${clientPath}`);
+    console.log(`[Production] Detected production environment. Serving static files from: ${clientPath}`);
+
+    if (!fs.existsSync(path.join(clientPath, 'index.html'))) {
+        console.warn(`[Production] WARNING: index.html not found at ${clientPath}. Frontend may not load.`);
+    }
+
     app.use(express.static(clientPath));
 
     // Catch-all route for client-side routing (must be last)
@@ -292,8 +299,16 @@ if (process.env.NODE_ENV === 'production') {
         if (req.path.startsWith('/api')) {
             return res.status(404).json({ error: 'API endpoint not found' });
         }
-        res.sendFile(path.join(clientPath, 'index.html'));
+
+        const indexPath = path.join(clientPath, 'index.html');
+        if (fs.existsSync(indexPath)) {
+            res.sendFile(indexPath);
+        } else {
+            res.status(404).send('Frontend build not found. Please run "npm run build" first.');
+        }
     });
+} else {
+    console.log('[Development] Server running in development mode. Not serving static files.');
 }
 
 const port = process.env.PORT || 4000;

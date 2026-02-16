@@ -12,4 +12,5 @@ fi
 
 # We skip building because we are deploying the built 'dist' folder
 echo "🔌 Starting server..."
+export NODE_ENV=production
 npm run start
