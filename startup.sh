@@ -10,7 +10,15 @@ if [ ! -d "node_modules" ]; then
   npm install --production=false
 fi
 
-# We skip building because we are deploying the built 'dist' folder
-echo "🔌 Starting server..."
+# Ensure we are in the right directory
+cd /home/site/wwwroot
+
+echo "🔍 Checking for build artifacts..."
+if [ ! -f "dist/backend/index.js" ]; then
+  echo "❌ Error: Production build not found at dist/backend/index.js"
+  exit 1
+fi
+
+echo "🔌 Starting server with NODE_ENV=$NODE_ENV and PORT=$PORT"
 export NODE_ENV=production
 npm run start
