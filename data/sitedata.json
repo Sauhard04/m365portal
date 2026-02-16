@@ -9732,7 +9732,7 @@
           "mailboxes": 12,
           "activeMail": 10,
           "domains": 5,
-          "healthIssues": 11
+          "healthIssues": 10
         },
         "entra": {
           "users": 13,
@@ -9814,7 +9814,7 @@
           "teams": 5,
           "privateTeams": 1,
           "publicTeams": 4,
-          "sharepoint": 10,
+          "sharepoint": 11,
           "onedrive": 24,
           "mailboxes": 12,
           "activeEmail": 10
@@ -9823,15 +9823,15 @@
           "labels": 0,
           "retentionPolicies": 0,
           "dlpPolicies": 0,
-          "dlpAlerts": 0
+          "dlpAlerts": 4
         },
         "usage": {
           "activeUsers7d": 12,
           "activeUsers30d": 0,
-          "storage": 57612224977
+          "storage": 57612224444
         }
       },
-      "timestamp": 1770881291187,
+      "timestamp": 1771222410184,
       "source": "BirdsEyeView"
     },
     "alerts": {
@@ -9942,29 +9942,9 @@
           ],
           "signIns": [
             {
-              "name": "2026-02-05",
-              "failed": 0,
-              "successful": 17
-            },
-            {
-              "name": "2026-02-06",
-              "failed": 14,
-              "successful": 48
-            },
-            {
-              "name": "2026-02-07",
-              "failed": 1,
-              "successful": 30
-            },
-            {
-              "name": "2026-02-08",
-              "failed": 0,
-              "successful": 1
-            },
-            {
               "name": "2026-02-09",
               "failed": 2,
-              "successful": 38
+              "successful": 18
             },
             {
               "name": "2026-02-10",
@@ -9979,44 +9959,54 @@
             {
               "name": "2026-02-12",
               "failed": 0,
-              "successful": 3
+              "successful": 21
+            },
+            {
+              "name": "2026-02-13",
+              "failed": 1,
+              "successful": 27
+            },
+            {
+              "name": "2026-02-16",
+              "failed": 0,
+              "successful": 20
             }
           ],
           "emailTrend": [
             {
-              "name": "2026-02-03",
-              "sent": 0,
-              "received": 1
-            },
-            {
-              "name": "2026-02-04",
-              "sent": 0,
-              "received": 6
-            },
-            {
-              "name": "2026-02-05",
-              "sent": 0,
-              "received": 12
-            },
-            {
-              "name": "2026-02-06",
-              "sent": 0,
-              "received": 7
-            },
-            {
-              "name": "2026-02-07",
+              "name": "2026-02-08",
               "sent": 0,
               "received": 0
             },
             {
-              "name": "2026-02-08",
-              "sent": 0,
-              "received": 7
+              "name": "2026-02-09",
+              "sent": 1,
+              "received": 2
             },
             {
-              "name": "2026-02-09",
+              "name": "2026-02-10",
               "sent": 0,
-              "received": 7
+              "received": 0
+            },
+            {
+              "name": "2026-02-11",
+              "sent": 0,
+              "received": 0
+            },
+            {
+              "name": "2026-02-12",
+              "sent": 0,
+              "received": 6
+            },
+            {
+              "name": "2026-02-13",
+              "sent": 0,
+              "received": 1
+            },
+            {
+              "name": "2026-02-14",
+              "sent": 0,
+              "received": 6
             }
           ],
           "securityRadar": [
@@ -10070,31 +10060,31 @@
           ],
           "userGrowthTrend": [
             {
-              "week": "2026-02-10",
+              "week": "2026-02-14",
               "active": 0
             },
             {
-              "week": "2026-02-10",
+              "week": "2026-02-14",
               "active": 0
             },
             {
-              "week": "2026-02-10",
+              "week": "2026-02-14",
               "active": 0
             },
             {
-              "week": "2026-02-10",
+              "week": "2026-02-14",
               "active": 0
             },
             {
-              "week": "2026-02-10",
+              "week": "2026-02-14",
               "active": 0
             },
             {
-              "week": "2026-02-10",
+              "week": "2026-02-14",
               "active": 0
             },
             {
-              "week": "2026-02-10",
+              "week": "2026-02-14",
               "active": 0
             }
           ],
@@ -10102,7 +10092,7 @@
           "licenseTrendComposed": []
         }
       },
-      "timestamp": 1770881290700,
+      "timestamp": 1771222404094,
       "source": "OverviewDashboard"
     },
     "usageReports": {
@@ -24030,5 +24020,5 @@
       "timestamp": 1770637688061
     }
   },
-  "lastUpdated": 1770881291205
+  "lastUpdated": 1771222410233
 }
