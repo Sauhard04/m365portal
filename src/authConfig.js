@@ -1,6 +1,6 @@
 import RuntimeConfig from './config';
 
-export const msalConfig = {
+export const getMsalConfig = () => ({
     auth: {
         clientId: RuntimeConfig.get('VITE_CLIENT_ID'),
         authority: `https://login.microsoftonline.com/${RuntimeConfig.get('VITE_TENANT_ID')}`,
@@ -11,15 +11,16 @@ export const msalConfig = {
         cacheLocation: "localStorage",
         storeAuthStateInCookie: false,
     },
-};
-
-// Scopes for the Graph API calls we need
+});
 
 export const loginRequest = {
     scopes: [
         "User.Read",
         "Directory.Read.All",
         "Reports.Read.All",
+        "AuditLog.Read.All",
+        "DeviceManagementManagedDevices.Read.All",
+        "DeviceManagementServiceConfig.Read.All",
         "ServiceHealth.Read.All"
     ]
 };
