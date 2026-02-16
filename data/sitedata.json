@@ -9735,8 +9735,8 @@
           "healthIssues": 10
         },
         "entra": {
-          "users": 13,
-          "signin": 13,
+          "users": 14,
+          "signin": 14,
           "licensed": 12,
           "guest": 3,
           "groups": 58,
@@ -9831,7 +9831,7 @@
           "storage": 57612224444
         }
       },
-      "timestamp": 1771222410184,
+      "timestamp": 1771231889510,
       "source": "BirdsEyeView"
     },
     "alerts": {
@@ -9852,13 +9852,13 @@
     "overview": {
       "data": {
         "quickStats": {
-          "totalUsers": 13,
+          "totalUsers": 14,
           "totalDevices": 2,
           "totalLicenses": 17,
           "secureScore": 183.82,
           "maxSecureScore": 283,
           "mfaRegistered": 0,
-          "mfaTotal": 26,
+          "mfaTotal": 27,
           "activeRoles": 12
         },
         "charts": {
@@ -9877,7 +9877,7 @@
           "userDistribution": [
             {
               "name": "Active",
-              "value": 13,
+              "value": 14,
               "color": "var(--accent-success)"
             },
             {
@@ -9943,8 +9943,8 @@
           "signIns": [
             {
               "name": "2026-02-09",
-              "failed": 2,
-              "successful": 18
+              "failed": 0,
+              "successful": 14
             },
             {
               "name": "2026-02-10",
@@ -9968,8 +9968,8 @@
             },
             {
               "name": "2026-02-16",
-              "failed": 0,
-              "successful": 20
+              "failed": 1,
+              "successful": 32
             }
           ],
           "emailTrend": [
@@ -10032,7 +10032,7 @@
             },
             {
               "subject": "Sign-in Success",
-              "value": 100,
+              "value": 97,
               "fullMark": 100
             }
           ],
@@ -10092,7 +10092,7 @@
           "licenseTrendComposed": []
         }
       },
-      "timestamp": 1771222404094,
+      "timestamp": 1771231885073,
       "source": "OverviewDashboard"
     },
     "usageReports": {
@@ -24020,5 +24020,5 @@
       "timestamp": 1770637688061
     }
   },
-  "lastUpdated": 1771222410233
+  "lastUpdated": 1771231889536
 }

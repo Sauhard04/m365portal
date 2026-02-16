@@ -55,7 +55,7 @@ jobs:
       - name: 'Set Azure App Settings'
         uses: azure/appservice-settings@v1
         with:
-          app-name: 'adminspheree'
+          app-name: 'adminspheree-eye5apc4dqajcgbh'
           slot-name: 'Production'
           app-settings-json: |
             [
@@ -85,7 +85,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'adminspheree'
+          app-name: 'adminspheree-eye5apc4dqajcgbh'
           slot-name: 'Production'
           package: .
 
