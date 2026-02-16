@@ -68,7 +68,7 @@ jobs:
                 },
                 {
                     "name": "WEBSITES_PORT",
-                    "value": "4000",
+                    "value": "8080",
                     "slotSetting": false
                 },
                 {
@@ -77,9 +77,4 @@ jobs:
                     "slotSetting": false
                 }
             ]
-
-      - name: Start Azure Web App
-        run: |
-          RESOURCE_GROUP=$(az webapp list --query "[?name=='adminspheree-eye5apc4dqajcgbh'].resourceGroup" -o tsv)
-          az webapp start --name 'adminspheree-eye5apc4dqajcgbh' --resource-group $RESOURCE_GROUP
 
