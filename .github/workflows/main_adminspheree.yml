@@ -55,10 +55,6 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_2E93B47AD2E74F5D814D5A8E407173B0 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E7E812CF35F34F3CBA100ADEBED6BC5C }}
 
-      - name: Configure Azure App Service (Set WEBSITE_RUN_FROM_PACKAGE)
-        run: |
-          az webapp config appsettings set --name 'adminspheree' --resource-group $(az webapp list --query "[?name=='adminspheree'].resourceGroup" -o tsv) --settings WEBSITE_RUN_FROM_PACKAGE=1
-
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
@@ -66,4 +62,22 @@ jobs:
           app-name: 'adminspheree'
           slot-name: 'Production'
           package: .
+          app-settings-json: |
+            [
+                {
+                    "name": "WEBSITE_RUN_FROM_PACKAGE",
+                    "value": "1",
+                    "slotSetting": false
+                },
+                {
+                    "name": "WEBSITES_PORT",
+                    "value": "4000",
+                    "slotSetting": false
+                },
+                {
+                    "name": "NODE_ENV",
+                    "value": "production",
+                    "slotSetting": false
+                }
+            ]
           

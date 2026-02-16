@@ -279,32 +279,53 @@ function generateAISummary(store: any): string {
 // Production mode: Serve static files from Vite build
 const isProduction = process.env.NODE_ENV === 'production' || __dirname.includes('dist');
 
+console.log(`[Server] Initialization: NODE_ENV=${process.env.NODE_ENV}, __dirname=${__dirname}, cwd=${process.cwd()}`);
+
 if (isProduction) {
-    const staticPath = path.join(__dirname, '..'); // If running from dist/backend, dist is one level up
-    const clientPath = fs.existsSync(path.join(staticPath, 'index.html'))
-        ? staticPath
-        : path.join(staticPath, 'dist'); // Fallback for dev/other structures
+    // Try multiple possible locations for the frontend build
+    const possibleStaticPaths = [
+        path.join(__dirname, '..'), // Standard: dist/ (one level up from dist/backend)
+        path.join(__dirname, '../dist'), // Fallback 1
+        path.join(process.cwd(), 'dist'), // Fallback 2: dist in CWD
+        path.join(process.cwd()), // Fallback 3: CWD itself
+    ];
 
-    console.log(`[Production] Detected production environment. Serving static files from: ${clientPath}`);
-
-    if (!fs.existsSync(path.join(clientPath, 'index.html'))) {
-        console.warn(`[Production] WARNING: index.html not found at ${clientPath}. Frontend may not load.`);
+    let clientPath = '';
+    for (const p of possibleStaticPaths) {
+        if (fs.existsSync(path.join(p, 'index.html'))) {
+            clientPath = p;
+            console.log(`[Production] Found index.html at: ${p}`);
+            break;
+        }
     }
 
+    if (!clientPath) {
+        console.warn(`[Production] WARNING: index.html not found in any expected location!`);
+        // Default to one level up but we'll reflect this in the 404
+        clientPath = path.join(__dirname, '..');
+    }
+
+    console.log(`[Production] Serving static files from: ${clientPath}`);
     app.use(express.static(clientPath));
 
     // Catch-all route for client-side routing (must be last)
     app.get('*', (req, res) => {
         // Skip API routes
         if (req.path.startsWith('/api')) {
-            return res.status(404).json({ error: 'API endpoint not found' });
+            return res.status(404).json({ error: `API endpoint ${req.path} not found` });
         }
 
         const indexPath = path.join(clientPath, 'index.html');
         if (fs.existsSync(indexPath)) {
             res.sendFile(indexPath);
         } else {
-            res.status(404).send('Frontend build not found. Please run "npm run build" first.');
+            console.error(`[Error] 404 Catch-all: index.html not found at ${indexPath}`);
+            res.status(404).send(`
+                <h1>Frontend build not found</h1>
+                <p>The server is running but could not locate the frontend files.</p>
+                <p>Target path: <code>${indexPath}</code></p>
+                <p>Please ensure "npm run build" was successful before deployment.</p>
+            `);
         }
     });
 } else {
