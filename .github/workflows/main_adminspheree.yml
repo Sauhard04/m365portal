@@ -56,7 +56,6 @@ jobs:
         uses: azure/appservice-settings@v1
         with:
           app-name: 'adminspheree-eye5apc4dqajcgbh'
-          resource-group: 'M365_Operation'
           slot-name: 'Production'
           app-settings-json: |
             [
@@ -87,6 +86,5 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'adminspheree-eye5apc4dqajcgbh'
-          resource-group-name: 'M365_Operation'
           slot-name: 'Production'
           package: .
