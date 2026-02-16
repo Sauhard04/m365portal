@@ -1,15 +1,17 @@
 // Microsoft Purview Service - REST API calls for data governance
 // Base URL: https://{purview-account}.purview.azure.com/
 
+import RuntimeConfig from '../../config';
+
 export const PurviewService = {
     // Configuration
     isConfigured() {
-        return !!(import.meta.env.VITE_PURVIEW_ACCOUNT_NAME || import.meta.env.VITE_PURVIEW_ENDPOINT);
+        return !!(RuntimeConfig.get('VITE_PURVIEW_ACCOUNT_NAME') || RuntimeConfig.get('VITE_PURVIEW_ENDPOINT'));
     },
 
     getPurviewEndpoint() {
-        const accountName = import.meta.env.VITE_PURVIEW_ACCOUNT_NAME;
-        const endpoint = import.meta.env.VITE_PURVIEW_ENDPOINT;
+        const accountName = RuntimeConfig.get('VITE_PURVIEW_ACCOUNT_NAME');
+        const endpoint = RuntimeConfig.get('VITE_PURVIEW_ENDPOINT');
 
         if (endpoint) return endpoint;
         if (accountName && accountName !== 'your-purview-account') return `https://${accountName}.purview.azure.com`;

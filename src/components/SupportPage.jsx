@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, Mail, User, Building, MessageSquare } from 'lucide-react';
 import './SupportPage.css';
+import RuntimeConfig from '../config';
 
 const SupportPage = () => {
     const navigate = useNavigate();
@@ -25,8 +26,8 @@ const SupportPage = () => {
         setStatus('sending');
 
         // Web3Forms API - FREE (250 submissions/month)
-        // Access key is stored in .env file as VITE_WEB3FORMS_ACCESS_KEY
-        const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
+        // Access key is stored in Azure App Settings as VITE_WEB3FORMS_ACCESS_KEY
+        const WEB3FORMS_ACCESS_KEY = RuntimeConfig.get('VITE_WEB3FORMS_ACCESS_KEY');
 
         try {
             const response = await fetch('https://api.web3forms.com/submit', {

@@ -93,6 +93,20 @@ app.get('/api/proxy/download', async (req, res) => {
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
 /**
+ * Runtime configuration for the frontend
+ */
+app.get('/api/config', (_req, res) => {
+    res.json({
+        VITE_CLIENT_ID: process.env.VITE_CLIENT_ID || process.env.CLIENT_ID,
+        VITE_TENANT_ID: process.env.VITE_TENANT_ID || process.env.TENANT_ID,
+        VITE_GROQ_API_KEY: process.env.VITE_GROQ_API_KEY || process.env.GROQ_API_KEY,
+        VITE_PURVIEW_ACCOUNT_NAME: process.env.VITE_PURVIEW_ACCOUNT_NAME || process.env.PURVIEW_ACCOUNT_NAME,
+        VITE_PURVIEW_ENDPOINT: process.env.VITE_PURVIEW_ENDPOINT || process.env.PURVIEW_ENDPOINT,
+        VITE_WEB3FORMS_ACCESS_KEY: process.env.VITE_WEB3FORMS_ACCESS_KEY || process.env.WEB3FORMS_ACCESS_KEY
+    });
+});
+
+/**
  * Enqueue and execute Get-OrganizationConfig synchronously (no BullMQ needed)
  * Returns result immediately
  */

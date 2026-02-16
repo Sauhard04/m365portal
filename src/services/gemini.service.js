@@ -1,6 +1,8 @@
 import SiteDataStore from './siteDataStore';
 
-const API_KEY = import.meta.env.VITE_GROQ_API_KEY;
+import RuntimeConfig from './config';
+
+const API_KEY = RuntimeConfig.get('VITE_GROQ_API_KEY');
 const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 
 const BASE_SYSTEM_PROMPT = `

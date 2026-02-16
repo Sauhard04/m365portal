@@ -13,15 +13,20 @@ window.addEventListener('unhandledrejection', (event) => {
   }
 });
 
-const msalInstance = new PublicClientApplication(msalConfig);
+import RuntimeConfig from './config'
 
-// Initialize MSAL before rendering
-msalInstance.initialize().then(() => {
-  createRoot(document.getElementById('root')).render(
-    <StrictMode>
-      <MsalProvider instance={msalInstance}>
-        <App />
-      </MsalProvider>
-    </StrictMode>,
-  );
+// Initialize runtime configuration, then MSAL, then render
+RuntimeConfig.initialize().then(() => {
+  const msalInstance = new PublicClientApplication(msalConfig);
+
+  // Initialize MSAL before rendering
+  msalInstance.initialize().then(() => {
+    createRoot(document.getElementById('root')).render(
+      <StrictMode>
+        <MsalProvider instance={msalInstance}>
+          <App />
+        </MsalProvider>
+      </StrictMode>,
+    );
+  });
 });

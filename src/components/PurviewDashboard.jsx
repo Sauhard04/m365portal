@@ -275,7 +275,7 @@ const PurviewDashboard = () => {
                                 <div style={{ flex: 1 }}>
                                     <h3 style={{ margin: 0, fontSize: '15px', color: 'var(--text-primary)', fontWeight: 700 }}>Purview Connection Required</h3>
                                     <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--text-dim)', lineHeight: 1.5 }}>
-                                        To view your real asset catalog, configure <code>VITE_PURVIEW_ACCOUNT_NAME</code> and <code>VITE_PURVIEW_ENDPOINT</code> in your <code>.env</code> file.
+                                        To view your real asset catalog, configure <code>PURVIEW_ACCOUNT_NAME</code> and <code>PURVIEW_ENDPOINT</code> in your <b>Azure Portal Settings</b>.
                                     </p>
                                 </div>
                                 <div style={{ display: 'flex', gap: '12px' }}>

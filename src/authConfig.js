@@ -1,9 +1,11 @@
+import RuntimeConfig from './config';
+
 export const msalConfig = {
     auth: {
-        clientId: import.meta.env.VITE_CLIENT_ID,
-        authority: `https://login.microsoftonline.com/${import.meta.env.VITE_TENANT_ID}`,
+        clientId: RuntimeConfig.get('VITE_CLIENT_ID'),
+        authority: `https://login.microsoftonline.com/${RuntimeConfig.get('VITE_TENANT_ID')}`,
         redirectUri: window.location.origin,
-        navigateToLoginRequestUrl: false, // Prevents popup from navigating to the app
+        navigateToLoginRequestUrl: false,
     },
     cache: {
         cacheLocation: "localStorage",
