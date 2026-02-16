@@ -55,6 +55,11 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_2E93B47AD2E74F5D814D5A8E407173B0 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E7E812CF35F34F3CBA100ADEBED6BC5C }}
 
+      - name: Stop Azure Web App
+        run: |
+          az webapp stop --name 'adminspheree' --resource-group $(az webapp list --query "[?name=='adminspheree'].resourceGroup" -o tsv)
+          sleep 10
+
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
@@ -62,4 +67,7 @@ jobs:
           app-name: 'adminspheree'
           slot-name: 'Production'
           package: .
+
+      - name: Start Azure Web App
+        run: az webapp start --name 'adminspheree' --resource-group $(az webapp list --query "[?name=='adminspheree'].resourceGroup" -o tsv)
           
