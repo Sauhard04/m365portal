@@ -1,9 +1,13 @@
 import { Worker, Job } from 'bullmq';
 import IORedis from 'ioredis';
-import { ExchangeConnectionService } from '../../services/exchange/connection.service.js';
-import { createAudit } from '../../shared/logging/exchangeAudit.js';
+import { ExchangeConnectionService } from '../../services/exchange/connection.service';
+import { createAudit } from '../../shared/logging/exchangeAudit';
 
-const connection = new IORedis();
+const redisUrl = process.env.REDIS_URL || (process.env.REDIS_HOST ? `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT || 6379}` : 'redis://localhost:6379');
+const connection = new IORedis(redisUrl, {
+    maxRetriesPerRequest: null,
+    connectTimeout: 10000,
+});
 
 const worker = new Worker('exchange-jobs', async (job: Job) => {
     const payload = job.data as any;

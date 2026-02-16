@@ -1,20 +1,21 @@
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
-import path from 'path';
-
-// Load env vars if not already loaded
-dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 const connectDB = async () => {
     try {
         const uri = process.env.MONGODB_URI || process.env.MONGO_URI;
         if (!uri) {
-            throw new Error('MongoDB connection URI not found in environment variables');
+            console.error('❌ MongoDB connection URI not found in environment variables (MONGODB_URI)');
+            return; // Don't crash immediately, let health check report it
         }
+
+        console.log('[Database] Connecting to MongoDB...');
         const conn = await mongoose.connect(uri);
-        console.log(`MongoDB Connected: ${conn.connection.host}`);
+        console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     } catch (error: any) {
-        console.error(`Error: ${error.message}`);
+        console.error(`❌ MongoDB Connection Error: ${error.message}`);
+        // In production, we might want the process to stay alive so logs can be inspected
+        // or we might want it to crash so Azure restarts it. 
+        // We'll keep the exit to ensure a clean state upon restart.
         process.exit(1);
     }
 };

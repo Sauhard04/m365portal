@@ -1,16 +1,7 @@
 name: Azure App Service CI/CD
- 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    types: [opened, synchronize, reopened]
- 
-jobs:
-  build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
-    runs-on: ubuntu-latest
-    name: Build and Deploy Job
+
+# Disable this workflow - replaced by azure-static-web-apps-brave-grass-07b5ea700.yml
+on: []
  
     steps:
       - name: Checkout repository

@@ -1,10 +1,16 @@
 name: Azure App Service CI/CD (adminspheree)
- 
+
+# Prevent concurrent deployments to the same App Service
+concurrency:
+  group: azure-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [ main ]
   pull_request:
     types: [opened, synchronize, reopened]
+  workflow_dispatch:
  
 jobs:
   build_and_deploy:
@@ -17,7 +23,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20.19.0'   # Match package.json engines
+          node-version: '20'
+          cache: 'npm'
  
       - name: Install dependencies
         run: npm ci
@@ -31,3 +38,6 @@ jobs:
           app-name: "adminspheree"
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: .
+          slot-name: 'production'
+          # This helps avoid file-in-use conflicts during the swap
+          clean: true

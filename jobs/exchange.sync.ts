@@ -1,5 +1,5 @@
-import { ExchangeConnectionService } from '../services/exchange/connection.service.js';
-import { createAudit } from '../shared/logging/exchangeAudit.js';
+import { ExchangeConnectionService } from '../services/exchange/connection.service';
+import { createAudit } from '../shared/logging/exchangeAudit';
 import { v4 as uuidv4 } from 'uuid';
 
 export type ExchangeJobPayload = {

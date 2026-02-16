@@ -3,30 +3,36 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
-import { executeExchangeJobSync } from '../jobs/exchange.sync.js';
-import { listAudits } from '../shared/logging/exchangeAudit.js';
-import connectDB from './config/db.js';
-import { PowerShellService } from '../services/powerShell.service.js';
-import { subscriptionGuard } from './middleware/subscriptionGuard.js';
+import dotenv from 'dotenv';
+import { executeExchangeJobSync } from '../jobs/exchange.sync';
+import { listAudits } from '../shared/logging/exchangeAudit';
+import connectDB from './config/db';
+import { PowerShellService } from '../services/powerShell.service';
+import { subscriptionGuard } from './middleware/subscriptionGuard';
+import mongoose from 'mongoose';
 
-import { fileURLToPath } from 'url';
+// Load environment variables
+dotenv.config();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Path to sitedata.json
-const SITEDATA_PATH = path.join(__dirname, '..', 'data', 'sitedata.json');
+// Use absolute path for data files to be consistent in Azure
+const SITEDATA_PATH = path.join(process.cwd(), 'data', 'sitedata.json');
 
 // Connect to MongoDB
 connectDB();
 
 // If Redis is available, ensure worker is started
-try {
-    import('../jobs/workers/exchange.worker').catch(() => {
-        console.warn('BullMQ worker not started (Redis may not be available). Using sync mode.');
-    });
-} catch (e) {
-    // Worker optional
+const REDIS_HOST = process.env.REDIS_HOST || process.env.REDIS_URL;
+if (REDIS_HOST) {
+    try {
+        console.log('[System] Redis configuration found, attempting to start BullMQ worker...');
+        import('../jobs/workers/exchange.worker').catch((err) => {
+            console.warn('[System] BullMQ worker found but failed to start. Falling back to sync mode.', err.message);
+        });
+    } catch (e: any) {
+        console.warn('[System] Worker module failed to load:', e.message);
+    }
+} else {
+    console.log('[System] No Redis configuration (REDIS_HOST/REDIS_URL) found. Using sync mode for background jobs.');
 }
 
 const app = express();
@@ -265,24 +271,51 @@ function generateAISummary(store: any): string {
     return summary.join('\n');
 }
 
+// Health check endpoint (can be used by Azure for readiness)
+app.get('/health', async (_req, res) => {
+    const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+    res.json({
+        status: dbStatus === 'connected' ? 'ok' : 'error',
+        database: dbStatus,
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString()
+    });
+});
+
 // Production mode: Serve static files from Vite build
 if (process.env.NODE_ENV === 'production') {
-    const staticPath = path.join(__dirname, '..'); // If running from dist/backend, dist is one level up
-    const clientPath = fs.existsSync(path.join(staticPath, 'index.html'))
-        ? staticPath
-        : path.join(staticPath, 'dist'); // Fallback for dev/other structures
+    // In production, the file is usually at dist/backend/index.js
+    // so the root dist folder is one level up.
+    const rootPath = process.cwd();
+    const possiblePaths = [
+        path.join(rootPath),           // Root (if everything is in root)
+        path.join(rootPath, 'dist'),   // dist subfolder
+        path.join(__dirname, '..')     // Up one from current file
+    ];
 
-    console.log(`[Production] Serving static files from: ${clientPath}`);
-    app.use(express.static(clientPath));
-
-    // Catch-all route for client-side routing (must be last)
-    app.get('*', (req, res) => {
-        // Skip API routes
-        if (req.path.startsWith('/api')) {
-            return res.status(404).json({ error: 'API endpoint not found' });
+    let clientPath = '';
+    for (const p of possiblePaths) {
+        if (fs.existsSync(path.join(p, 'index.html'))) {
+            clientPath = p;
+            break;
         }
-        res.sendFile(path.join(clientPath, 'index.html'));
-    });
+    }
+
+    if (clientPath) {
+        console.log(`[Production] Serving static files from: ${clientPath}`);
+        app.use(express.static(clientPath));
+
+        // Catch-all route for client-side routing (must be last)
+        app.get('*', (req, res) => {
+            // Skip API routes
+            if (req.path.startsWith('/api')) {
+                return res.status(404).json({ error: 'API endpoint not found' });
+            }
+            res.sendFile(path.join(clientPath, 'index.html'));
+        });
+    } else {
+        console.warn('[Production] Warning: Could not find static files (index.html) in any expected location.');
+    }
 }
 
 const port = process.env.PORT || 4000;

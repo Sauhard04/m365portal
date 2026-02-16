@@ -13,8 +13,8 @@
  *   3. Print results (success or error details)
  */
 
-import { executeExchangeJobSync } from '../jobs/exchange.sync.js';
-import { listAudits } from '../shared/logging/exchangeAudit.js';
+import { executeExchangeJobSync } from '../jobs/exchange.sync';
+import { listAudits } from '../shared/logging/exchangeAudit';
 
 async function runTest() {
     console.log('=== Phase 1 E2E Test: Get-OrganizationConfig ===\n');
