@@ -52,10 +52,6 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_2E93B47AD2E74F5D814D5A8E407173B0 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E7E812CF35F34F3CBA100ADEBED6BC5C }}
 
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'adminspheree-eye5apc4dqajcgbh'
-          slot-name: 'Production'
-          package: .
+      - name: 'Deploy to Azure Web App (Direct CLI)'
+        run: |
+          az webapp deploy --name 'adminspheree-eye5apc4dqajcgbh' --resource-group 'M365_Operation' --src-path . --type zip
