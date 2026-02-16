@@ -339,7 +339,7 @@ if (isProduction) {
     app.use(express.static(clientPath));
 
     // Catch-all route for client-side routing (must be last)
-    app.get('/:path*', (req, res) => {
+    app.get(/^\/(?!api).*/, (req, res) => {
         // Skip API routes
         if (req.path.startsWith('/api')) {
             return res.status(404).json({ error: `API endpoint ${req.path} not found` });
