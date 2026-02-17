@@ -314,14 +314,18 @@ az cosmosdb mongodb database create `
 ```
 
 **Get connection string:**
-```bash
-az cosmosdb keys list `
+```powershell
+# Get connection string
+$MONGODB_URI = az cosmosdb keys list `
   --name $DB_ACCOUNT_NAME `
   --resource-group $RESOURCE_GROUP `
   --type connection-strings `
   --query "connectionStrings[0].connectionString" `
   --output tsv
 ```
+
+> [!IMPORTANT]
+> **Manual Way**: If the command above fails, go to the **Azure Portal** > **Cosmos DB** > **Connection Strings** and copy the **Primary MongoDB Connection String**.
 
 **Copy this connection string - you'll need it!**
 
@@ -347,6 +351,13 @@ az webapp config appsettings set `
   --name $APP_NAME `
   --resource-group $RESOURCE_GROUP `
   --settings VITE_CLIENT_ID="your_client_id" VITE_TENANT_ID="your_tenant_id"
+
+# Set Support API Key (Web3Forms)
+# Get a free key at: https://web3forms.com
+az webapp config appsettings set `
+  --name $APP_NAME `
+  --resource-group $RESOURCE_GROUP `
+  --settings VITE_WEB3FORMS_ACCESS_KEY="your_web3forms_key"
 
 # Set port
 az webapp config appsettings set `

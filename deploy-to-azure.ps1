@@ -168,6 +168,7 @@ if (Test-Path $envFile) {
         if ($_ -match "^VITE_CLIENT_ID=(.+)$") { $VITE_CLIENT_ID = $matches[1] }
         if ($_ -match "^VITE_TENANT_ID=(.+)$") { $VITE_TENANT_ID = $matches[1] }
         if ($_ -match "^GEMINI_API_KEY=(.+)$") { $GEMINI_API_KEY = $matches[1] }
+        if ($_ -match "^VITE_WEB3FORMS_ACCESS_KEY=(.+)$") { $VITE_WEB3FORMS_ACCESS_KEY = $matches[1] }
     }
 }
 
@@ -177,6 +178,10 @@ if ([string]::IsNullOrWhiteSpace($VITE_CLIENT_ID)) {
 
 if ([string]::IsNullOrWhiteSpace($VITE_TENANT_ID)) {
     $VITE_TENANT_ID = Read-Host "Enter VITE_TENANT_ID (from your .env file)"
+}
+
+if ([string]::IsNullOrWhiteSpace($VITE_WEB3FORMS_ACCESS_KEY)) {
+    $VITE_WEB3FORMS_ACCESS_KEY = Read-Host "Enter VITE_WEB3FORMS_ACCESS_KEY (Get a free key at: https://web3forms.com)"
 }
 
 # Set all environment variables
@@ -189,7 +194,8 @@ az webapp config appsettings set `
         MONGODB_URI="$MONGODB_URI" `
         VITE_CLIENT_ID="$VITE_CLIENT_ID" `
         VITE_TENANT_ID="$VITE_TENANT_ID" `
-        GEMINI_API_KEY="$GEMINI_API_KEY"
+        GEMINI_API_KEY="$GEMINI_API_KEY" `
+        VITE_WEB3FORMS_ACCESS_KEY="$VITE_WEB3FORMS_ACCESS_KEY"
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "✅ Environment variables configured!" -ForegroundColor Green

@@ -67,7 +67,7 @@ Use this checklist to ensure you complete all steps for a successful deployment.
 - [ ] VITE_CLIENT_ID=(your client ID)
 - [ ] VITE_TENANT_ID=(your tenant ID)
 - [ ] GEMINI_API_KEY=(optional)
-- [ ] VITE_WEB3FORMS_KEY=(optional)
+- [ ] VITE_WEB3FORMS_ACCESS_KEY=(required for Support page)
 
 ### Startup Configuration
 - [ ] Startup command set (or using default)
