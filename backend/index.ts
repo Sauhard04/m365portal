@@ -10,7 +10,9 @@ import connectDB from './config/db';
 import { PowerShellService } from '../services/powerShell.service';
 import { subscriptionGuard } from './middleware/subscriptionGuard';
 import mongoose from 'mongoose';
+// @ts-ignore
 import { PDF } from '../src/models/PDF';
+// @ts-ignore
 import { IncomingForm } from 'formidable';
 
 const VERSION = '1.2.0-azure-stable';
@@ -116,8 +118,8 @@ app.get('/api/config', (_req, res) => {
 app.get('/api/pdfs', async (_req, res) => {
     try {
         console.log('[API] Fetching PDF list...');
-        const files = await PDF.find({}, 'fileName displayName size uploadedAt');
-        const formattedFiles = files.map(file => ({
+        const files: any[] = await PDF.find({}, 'fileName displayName size uploadedAt');
+        const formattedFiles = files.map((file: any) => ({
             id: file._id,
             name: file.displayName,
             fileName: file.fileName,
@@ -140,7 +142,7 @@ app.post('/api/pdfs/upload', async (req, res) => {
             maxFileSize: 50 * 1024 * 1024, // 50MB
         });
 
-        form.parse(req, async (err, _fields, files) => {
+        form.parse(req, async (err: any, _fields: any, files: any) => {
             if (err) {
                 console.error('[API] Form parsing error:', err);
                 return res.status(500).json({ success: false, error: String(err) });
