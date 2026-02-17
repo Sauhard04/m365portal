@@ -17,13 +17,13 @@ const TenantSelector = () => {
                 console.log('[TenantSelector] All tenants:', data);
 
                 // Get saved active tenant from localStorage or use first tenant
-                const savedTenantId = localStorage.getItem('activeTenantId');
+                const savedTenantId = localStorage.getItem('m365_active_tenant');
                 if (savedTenantId && data.find(t => t.tenantId === savedTenantId)) {
                     setActiveId(savedTenantId);
                     console.log('[TenantSelector] Using saved tenant:', savedTenantId);
                 } else if (data.length > 0) {
                     setActiveId(data[0].tenantId);
-                    localStorage.setItem('activeTenantId', data[0].tenantId);
+                    localStorage.setItem('m365_active_tenant', data[0].tenantId);
                     console.log('[TenantSelector] Auto-selected first tenant:', data[0].tenantId);
                 }
             })
@@ -40,7 +40,7 @@ const TenantSelector = () => {
     }
 
     const handleSelect = (tenantId) => {
-        localStorage.setItem('activeTenantId', tenantId);
+        localStorage.setItem('m365_active_tenant', tenantId);
         setActiveId(tenantId);
         setIsOpen(false);
 
