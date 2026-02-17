@@ -67,6 +67,8 @@ const TenantManagement = () => {
         e.preventDefault();
         setError(null);
 
+        console.log('[TenantManagement] Saving tenant with data:', formData);
+
         try {
             const response = await fetch('/api/tenants', {
                 method: 'POST',
@@ -74,16 +76,20 @@ const TenantManagement = () => {
                 body: JSON.stringify(formData)
             });
 
+            console.log('[TenantManagement] Response status:', response.status);
+            const responseData = await response.json();
+            console.log('[TenantManagement] Response data:', responseData);
+
             if (response.ok) {
                 setIsModalOpen(false);
                 setFormData({ tenantId: '', clientId: '', displayName: '', isActive: true });
                 setEditingTenant(null);
                 fetchTenants();
             } else {
-                const data = await response.json();
-                setError(data.error || 'Failed to save tenant');
+                setError(responseData.error || 'Failed to save tenant');
             }
         } catch (err) {
+            console.error('[TenantManagement] Save error:', err);
             setError('Network error. Please check your connection.');
         }
     };

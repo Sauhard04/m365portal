@@ -18,6 +18,7 @@ class RuntimeConfig {
     }
 
     async initialize() {
+        console.log('[RuntimeConfig] 🚀 Initialize function called!');
         if (this.initialized) return;
 
         try {
@@ -39,8 +40,13 @@ class RuntimeConfig {
 
                 // Handle dynamic tenant override BEFORE marking as initialized
                 const savedTenantId = localStorage.getItem('m365_active_tenant');
+                console.log('[RuntimeConfig] DEBUG - savedTenantId from localStorage:', savedTenantId);
+                console.log('[RuntimeConfig] DEBUG - data.tenants:', data.tenants);
+                console.log('[RuntimeConfig] DEBUG - data.tenants length:', data.tenants?.length);
+
                 if (savedTenantId && data.tenants) {
                     const active = data.tenants.find(t => t.tenantId === savedTenantId);
+                    console.log('[RuntimeConfig] DEBUG - Found active tenant:', active);
                     if (active) {
                         console.log(`[RuntimeConfig] ✅ Overriding with selected tenant: ${active.displayName}`);
                         console.log(`[RuntimeConfig] Tenant ID: ${active.tenantId}`);
@@ -53,6 +59,8 @@ class RuntimeConfig {
                     }
                 } else {
                     console.log(`[RuntimeConfig] Using default tenant from .env: ${this.config.VITE_TENANT_ID}`);
+                    if (!savedTenantId) console.log('[RuntimeConfig] DEBUG - No saved tenant ID');
+                    if (!data.tenants) console.log('[RuntimeConfig] DEBUG - No tenants in data');
                 }
             } else {
                 console.warn('[RuntimeConfig] Failed to fetch server config, using build-time defaults');
