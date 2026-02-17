@@ -260,59 +260,74 @@ app.post('/api/script/reset', (_req, res) => {
     res.json({ success: true, message: 'Session reset' });
 });
 
+// Map /api/sitedata/save to the generic handler's logic conceptually, 
+// but we'll add a generic one for any file in data/
+
 /**
- * SITEDATA ENDPOINTS - For AI Chatbot Training
- * Persists all API responses to sitedata.json
+ * GENERIC DATA STORAGE ENDPOINTS
+ * Allows saving/loading any JSON file from the data/ folder
  */
 
-// Save site data to sitedata.json (supports full overwrite or partial section update)
-app.post('/api/sitedata/save', subscriptionGuard, async (req, res) => {
+app.get('/api/data/:filename', async (req, res) => {
     try {
+        const { filename } = req.params;
+        const filePath = path.join(process.cwd(), 'data', `${filename}.json`);
+
+        if (!fs.existsSync(filePath)) {
+            // Return empty object for new files
+            return res.json({});
+        }
+
+        const content = fs.readFileSync(filePath, 'utf-8');
+        res.json(JSON.parse(content));
+    } catch (err: any) {
+        res.status(500).json({ error: String(err) });
+    }
+});
+
+app.post('/api/data/:filename', async (req, res) => {
+    try {
+        const { filename } = req.params;
         const body = req.body;
-        if (!body) {
-            return res.status(400).json({ success: false, error: 'No data provided' });
+        const filePath = path.join(process.cwd(), 'data', `${filename}.json`);
+
+        if (!fs.existsSync(path.dirname(filePath))) {
+            fs.mkdirSync(path.dirname(filePath), { recursive: true });
         }
 
-        // Ensure data directory exists
-        const dataDir = path.dirname(SITEDATA_PATH);
-        if (!fs.existsSync(dataDir)) {
-            fs.mkdirSync(dataDir, { recursive: true });
-        }
+        let dataToSave;
 
-        let finalData;
-
-        // Check if this is a partial update (a specific section)
-        if (body.sectionKey && body.sectionData) {
-            console.log(`[SiteData] Partial update received for section: ${body.sectionKey}`);
+        // Custom logic for sitedata.json partial updates
+        if (filename === 'sitedata' && body.sectionKey && body.sectionData) {
             let currentData: any = { lastUpdated: Date.now(), sections: {} };
-
-            if (fs.existsSync(SITEDATA_PATH)) {
+            if (fs.existsSync(filePath)) {
                 try {
-                    currentData = JSON.parse(fs.readFileSync(SITEDATA_PATH, 'utf-8'));
+                    currentData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
                 } catch (e) {
-                    console.warn('[SiteData] Existing file corrupted, starting fresh');
+                    console.warn('[Data] sitedata.json corrupted, starting fresh');
                 }
             }
 
             if (!currentData.sections) currentData.sections = {};
             currentData.sections[body.sectionKey] = body.sectionData;
             currentData.lastUpdated = Date.now();
-            finalData = currentData;
+            dataToSave = currentData;
         } else {
-            // Full overwrite
-            console.log(`[SiteData] Full overwrite received`);
-            finalData = body;
+            dataToSave = body.data || body;
         }
 
-        // Write data to file
-        fs.writeFileSync(SITEDATA_PATH, JSON.stringify(finalData, null, 2), 'utf-8');
-        console.log(`[SiteData] Saved ${Object.keys(finalData.sections || {}).length} sections to sitedata.json`);
-
-        res.json({ success: true, message: 'Site data saved successfully' });
+        fs.writeFileSync(filePath, JSON.stringify(dataToSave, null, 2), 'utf-8');
+        res.json({ success: true, status: 'success' });
     } catch (err: any) {
-        console.error('[SiteData] Save error:', err);
-        res.status(500).json({ success: false, error: String(err) });
+        res.status(500).json({ status: 'error', message: String(err) });
     }
+});
+
+// Alias for existing sitedata save
+app.post('/api/sitedata/save', subscriptionGuard, async (req, res) => {
+    // Redirect to the generic logic
+    req.params.filename = 'sitedata';
+    return (app as any)._router.handle(req, res, () => { });
 });
 
 // Load site data from sitedata.json

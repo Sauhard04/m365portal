@@ -46,8 +46,7 @@ function initStore() {
  */
 async function syncWithServer(tenantId = null) {
     try {
-        // Skip server sync in production as there is no dev server middleware
-        if (!import.meta.env.DEV) return;
+        // Now works in production as well
 
         const headers = {};
         if (tenantId) headers['X-Tenant-Id'] = tenantId;
@@ -92,8 +91,7 @@ function saveLocally() {
 
 const persistToServer = async (sectionKey = null, sectionData = null, tenantId = null) => {
     try {
-        // Skip server persistence in production
-        if (!import.meta.env.DEV) return;
+        // Now works in production as well
 
         let payload;
         if (sectionKey && sectionData) {
