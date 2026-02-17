@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
-    Plus, Building2, Trash2, Edit2, CheckCircle2, XCircle,
-    Search, ExternalLink, Shield, Save, X, AlertCircle
+    Plus, Building2, Trash2, Edit2, Search, Save, X, AlertCircle, ArrowLeft, RefreshCw, CheckCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const TenantManagement = () => {
+    const navigate = useNavigate();
     const [tenants, setTenants] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -93,108 +94,133 @@ const TenantManagement = () => {
     );
 
     return (
-        <div className="p-6 max-w-7xl mx-auto">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div className="animate-in">
+            <button onClick={() => navigate('/service/birdseye')} className="btn-back">
+                <ArrowLeft size={14} style={{ marginRight: '8px' }} />
+                Back to Birds Eye View
+            </button>
+
+            <header className="flex-between spacing-v-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-                        <Shield className="w-6 h-6 text-primary-400" />
-                        Tenant Management
-                    </h1>
-                    <p className="text-slate-400 text-sm mt-1">Configure and manage multiple M365 environments</p>
+                    <h1 className="title-gradient" style={{ fontSize: '32px' }}>Tenant Management</h1>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>Configure and manage multiple M365 environments</p>
                 </div>
-                <button
-                    onClick={() => {
-                        setEditingTenant(null);
-                        setFormData({ tenantId: '', clientId: '', displayName: '', isActive: true });
-                        setIsModalOpen(true);
-                    }}
-                    className="flex items-center justify-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-xl transition-all shadow-lg shadow-primary-600/20 font-medium"
-                >
-                    <Plus className="w-4 h-4" />
-                    Add New Tenant
-                </button>
+                <div className="flex-gap-2">
+                    <button
+                        className="sync-btn"
+                        onClick={() => fetchTenants()}
+                        title="Refresh Tenants"
+                    >
+                        <RefreshCw size={16} />
+                    </button>
+                    <button
+                        onClick={() => {
+                            setEditingTenant(null);
+                            setFormData({ tenantId: '', clientId: '', displayName: '', isActive: true });
+                            setIsModalOpen(true);
+                        }}
+                        className="btn-primary"
+                        style={{ fontSize: '13px', padding: '10px 20px' }}
+                    >
+                        <Plus size={16} />
+                        Add Tenant
+                    </button>
+                </div>
+            </header>
+
+            {/* Search Bar */}
+            <div className="search-wrapper spacing-v-4">
+                <Search className="search-icon" size={18} />
+                <input
+                    type="text"
+                    placeholder="Search by name or tenant ID..."
+                    className="input search-input"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
             </div>
 
-            {/* Stats & Tools */}
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
-                <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                    <input
-                        type="text"
-                        placeholder="Search by name or ID..."
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 focus:border-primary-500/50 outline-none transition-all text-white placeholder:text-slate-600"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
-                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-400">
-                    <span className="font-bold text-white">{filteredTenants.length}</span>
-                    Tenants Configured
-                </div>
+            {/* Stats */}
+            <div className="glass-card" style={{ padding: '12px 20px', marginBottom: '24px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                <Building2 size={16} color="var(--accent-blue)" />
+                <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                    <span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{filteredTenants.length}</span> Tenant{filteredTenants.length !== 1 ? 's' : ''} Configured
+                </span>
             </div>
 
             {/* Content Area */}
             {loading ? (
-                <div className="flex flex-col items-center justify-center py-24 gap-4">
-                    <div className="w-12 h-12 rounded-full border-4 border-primary-500/20 border-t-primary-500 animate-spin" />
-                    <p className="text-slate-500 animate-pulse">Loading configurations...</p>
+                <div className="flex-center" style={{ padding: '80px 0' }}>
+                    <div style={{ width: '48px', height: '48px', borderRadius: '50%', border: '4px solid var(--glass-border)', borderTopColor: 'var(--accent-blue)', animation: 'spin 1s linear infinite' }} />
                 </div>
             ) : filteredTenants.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 bg-white/2 rounded-2xl border border-dashed border-white/10">
-                    <div className="p-4 rounded-full bg-slate-800/50 mb-4">
-                        <Building2 className="w-8 h-8 text-slate-500" />
+                <div className="glass-card" style={{ padding: '80px 40px', textAlign: 'center' }}>
+                    <div style={{ padding: '16px', borderRadius: '50%', background: 'var(--glass-bg)', display: 'inline-flex', marginBottom: '16px' }}>
+                        <Building2 size={32} color="var(--text-dim)" />
                     </div>
-                    <p className="text-slate-400">No tenants found</p>
+                    <p style={{ color: 'var(--text-secondary)', marginBottom: '8px' }}>No tenants found</p>
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="text-primary-400 hover:text-primary-300 text-sm mt-2 font-medium"
+                        style={{ color: 'var(--accent-blue)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}
                     >
                         Click here to add your first tenant
                     </button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 gap-4">
-                    {filteredTenants.map((tenant) => (
+                <div style={{ display: 'grid', gap: '12px' }}>
+                    {filteredTenants.map((tenant, i) => (
                         <motion.div
-                            layout
                             key={tenant.tenantId}
-                            className="bg-enterprise-card rounded-2xl border border-white/5 p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 group transition-all hover:bg-white/[0.04] hover:border-white/10 shadow-lg"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.05 }}
+                            whileHover={{ y: -2 }}
+                            className="glass-card"
+                            style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '16px' }}
                         >
-                            <div className="flex items-center gap-4">
-                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-inner ${tenant.isActive ? 'bg-gradient-to-br from-primary-500 to-primary-600' : 'bg-slate-700'}`}>
-                                    <Building2 className="w-6 h-6" />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-white group-hover:text-primary-400 transition-colors uppercase tracking-tight">{tenant.displayName}</h3>
-                                    <div className="flex items-center gap-3 mt-1">
-                                        <p className="text-[11px] text-slate-500 font-mono bg-black/20 px-2 py-0.5 rounded italic">T: {tenant.tenantId}</p>
-                                        <p className="text-[11px] text-slate-500 font-mono bg-black/20 px-2 py-0.5 rounded italic">C: {tenant.clientId}</p>
-                                    </div>
+                            <div style={{
+                                width: '48px',
+                                height: '48px',
+                                borderRadius: '12px',
+                                background: tenant.isActive ? 'linear-gradient(135deg, var(--accent-blue), var(--accent-indigo))' : 'var(--glass-bg)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0
+                            }}>
+                                <Building2 size={24} color={tenant.isActive ? 'white' : 'var(--text-dim)'} />
+                            </div>
+
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                                <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
+                                    {tenant.displayName}
+                                </h3>
+                                <div style={{ display: 'flex', gap: '12px', fontSize: '11px', color: 'var(--text-dim)', fontFamily: 'monospace' }}>
+                                    <span>Tenant: {tenant.tenantId.substring(0, 8)}...</span>
+                                    <span>Client: {tenant.clientId.substring(0, 8)}...</span>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-2">
-                                <div className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${tenant.isActive ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span className={tenant.isActive ? 'badge-success' : 'badge-error'} style={{ fontSize: '9px', padding: '4px 10px' }}>
                                     {tenant.isActive ? 'Active' : 'Disabled'}
-                                </div>
-                                <div className="h-6 w-px bg-white/5 mx-2" />
+                                </span>
+                                <div style={{ width: '1px', height: '24px', background: 'var(--glass-border)' }} />
                                 <button
                                     onClick={() => handleEdit(tenant)}
-                                    className="p-2 rounded-lg hover:bg-white/5 text-slate-400 hover:text-white transition-all"
-                                    title="Edit Config"
+                                    className="btn-secondary"
+                                    style={{ padding: '8px', borderRadius: '8px' }}
+                                    title="Edit"
                                 >
-                                    <Edit2 className="w-4 h-4" />
+                                    <Edit2 size={16} />
                                 </button>
                                 <button
                                     onClick={() => handleDelete(tenant.tenantId)}
-                                    className="p-2 rounded-lg hover:bg-rose-500/10 text-slate-400 hover:text-rose-500 transition-all"
+                                    className="btn-secondary"
+                                    style={{ padding: '8px', borderRadius: '8px', color: 'var(--accent-error)' }}
                                     title="Delete"
                                 >
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
-                                <button className="p-2 rounded-lg hover:bg-white/5 text-slate-400 hover:text-primary-400 transition-all">
-                                    <ExternalLink className="w-4 h-4" />
+                                    <Trash2 size={16} />
                                 </button>
                             </div>
                         </motion.div>
@@ -205,99 +231,164 @@ const TenantManagement = () => {
             {/* Modal */}
             <AnimatePresence>
                 {isModalOpen && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div style={{
+                        position: 'fixed',
+                        inset: 0,
+                        zIndex: 1000,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '16px'
+                    }}>
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 bg-black/80 backdrop-blur-sm"
+                            style={{
+                                position: 'fixed',
+                                inset: 0,
+                                background: 'rgba(0, 0, 0, 0.8)',
+                                backdropFilter: 'blur(8px)'
+                            }}
                             onClick={() => setIsModalOpen(false)}
                         />
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="relative w-full max-w-lg bg-slate-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+                            style={{
+                                position: 'relative',
+                                width: '100%',
+                                maxWidth: '500px',
+                                background: 'var(--bg-light)',
+                                border: '1px solid var(--glass-border)',
+                                borderRadius: '20px',
+                                overflow: 'hidden',
+                                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)'
+                            }}
                         >
-                            <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
-                                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                                    {editingTenant ? 'Edit Tenant Configuration' : 'Add New M365 Tenant'}
+                            <div style={{
+                                padding: '20px 24px',
+                                borderBottom: '1px solid var(--glass-border)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                background: 'var(--glass-bg)'
+                            }}>
+                                <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
+                                    {editingTenant ? 'Edit Tenant' : 'Add New Tenant'}
                                 </h2>
-                                <button onClick={() => setIsModalOpen(false)} className="p-2 rounded-lg hover:bg-white/5 text-slate-400">
-                                    <X className="w-5 h-5" />
+                                <button
+                                    onClick={() => setIsModalOpen(false)}
+                                    className="btn-secondary"
+                                    style={{ padding: '8px', borderRadius: '8px' }}
+                                >
+                                    <X size={18} />
                                 </button>
                             </div>
 
-                            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+                            <form onSubmit={handleSubmit} style={{ padding: '24px' }}>
                                 {error && (
-                                    <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-500 text-sm flex items-center gap-2">
-                                        <AlertCircle className="w-4 h-4" />
+                                    <div style={{
+                                        padding: '12px 16px',
+                                        marginBottom: '20px',
+                                        borderRadius: '12px',
+                                        background: 'rgba(239, 68, 68, 0.1)',
+                                        border: '1px solid rgba(239, 68, 68, 0.2)',
+                                        color: '#ef4444',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '12px',
+                                        fontSize: '13px'
+                                    }}>
+                                        <AlertCircle size={18} />
                                         {error}
                                     </div>
                                 )}
 
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Display Name</label>
+                                <div style={{ marginBottom: '20px' }}>
+                                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
+                                        Display Name
+                                    </label>
                                     <input
                                         required
                                         type="text"
-                                        placeholder="e.g. My Organization (Production)"
-                                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-primary-500/50 outline-none transition-all text-white"
+                                        placeholder="e.g. Production Environment"
+                                        className="input"
                                         value={formData.displayName}
                                         onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
                                     />
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Tenant ID</label>
+                                <div style={{ marginBottom: '20px' }}>
+                                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
+                                        Tenant ID
+                                    </label>
                                     <input
                                         required
                                         disabled={!!editingTenant}
                                         type="text"
                                         placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-primary-500/50 outline-none transition-all text-white disabled:opacity-50 disabled:bg-slate-800 disabled:cursor-not-allowed font-mono text-sm"
+                                        className="input"
+                                        style={{ fontFamily: 'monospace', fontSize: '13px' }}
                                         value={formData.tenantId}
                                         onChange={(e) => setFormData({ ...formData, tenantId: e.target.value })}
                                     />
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Application (Client) ID</label>
+                                <div style={{ marginBottom: '20px' }}>
+                                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
+                                        Application (Client) ID
+                                    </label>
                                     <input
                                         required
                                         type="text"
                                         placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-primary-500/50 outline-none transition-all text-white font-mono text-sm"
+                                        className="input"
+                                        style={{ fontFamily: 'monospace', fontSize: '13px' }}
                                         value={formData.clientId}
                                         onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
                                     />
                                 </div>
 
-                                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/2 border border-white/5">
+                                <div style={{
+                                    padding: '12px 16px',
+                                    borderRadius: '12px',
+                                    background: 'var(--glass-bg)',
+                                    border: '1px solid var(--glass-border)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px',
+                                    marginBottom: '24px'
+                                }}>
                                     <input
                                         id="is-active"
                                         type="checkbox"
-                                        className="w-4 h-4 rounded border-white/10 bg-white/5 text-primary-500 focus:ring-primary-500/20 ring-offset-slate-900"
+                                        style={{ width: '16px', height: '16px', cursor: 'pointer' }}
                                         checked={formData.isActive}
                                         onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                                     />
-                                    <label htmlFor="is-active" className="text-sm text-slate-300">Tenant is active and available for selection</label>
+                                    <label htmlFor="is-active" style={{ fontSize: '13px', color: 'var(--text-secondary)', cursor: 'pointer', userSelect: 'none' }}>
+                                        Tenant is active and available for selection
+                                    </label>
                                 </div>
 
-                                <div className="pt-4 flex gap-3">
+                                <div style={{ display: 'flex', gap: '12px' }}>
                                     <button
                                         type="button"
                                         onClick={() => setIsModalOpen(false)}
-                                        className="flex-1 px-4 py-3 rounded-xl border border-white/10 text-white font-medium hover:bg-white/5 transition-all text-sm"
+                                        className="btn-secondary"
+                                        style={{ flex: 1, padding: '12px', fontSize: '13px', fontWeight: 600 }}
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
-                                        className="flex-1 px-4 py-3 rounded-xl bg-primary-600 hover:bg-primary-500 text-white font-medium transition-all shadow-lg shadow-primary-600/20 text-sm flex items-center justify-center gap-2"
+                                        className="btn-primary"
+                                        style={{ flex: 1, padding: '12px', fontSize: '13px', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                                     >
-                                        <Save className="w-4 h-4" />
-                                        {editingTenant ? 'Save Changes' : 'Register Tenant'}
+                                        <Save size={16} />
+                                        {editingTenant ? 'Save Changes' : 'Add Tenant'}
                                     </button>
                                 </div>
                             </form>

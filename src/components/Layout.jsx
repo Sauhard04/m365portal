@@ -10,6 +10,8 @@ import SearchModal from './SearchModal';
 import Logo from './Logo';
 import Chatbot from './Chatbot/Chatbot';
 import SiteDataStore from '../services/siteDataStore';
+import TenantSelector from './TenantSelector';
+import { Building2 } from 'lucide-react';
 
 const ServiceLayout = () => {
     const navigate = useNavigate();
@@ -120,7 +122,17 @@ const ServiceLayout = () => {
                     {isSidebarOpen && <span className="font-bold" style={{ fontSize: '14px', marginLeft: '8px' }}>AdminSphere</span>}
                 </div>
 
-                <nav className="sidebar-nav">
+                {/* Tenant Selector */}
+                {isSidebarOpen && (
+                    <div style={{ padding: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div style={{ fontSize: '9px', fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '6px' }}>
+                            Environment
+                        </div>
+                        <TenantSelector />
+                    </div>
+                )}
+
+                <nav className="sidebar-nav" style={{ paddingTop: '12px' }}>
                     <NavItem
                         icon={BarChart3}
                         label="Overview"
@@ -204,6 +216,13 @@ const ServiceLayout = () => {
                         active={isActive('/service/documentation')}
                         isOpen={isSidebarOpen}
                         onClick={() => navigate('/service/documentation')}
+                    />
+                    <NavItem
+                        icon={Building2}
+                        label="Manage Tenants"
+                        active={isActive('/service/tenants')}
+                        isOpen={isSidebarOpen}
+                        onClick={() => navigate('/service/tenants')}
                     />
                 </nav>
 
