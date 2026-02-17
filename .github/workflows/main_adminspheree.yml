@@ -54,4 +54,4 @@ jobs:
 
       - name: 'Deploy to Azure Web App (Direct CLI)'
         run: |
-          az webapp deploy --name 'adminspheree-eye5apc4dqajcgbh' --resource-group 'M365_Operation' --src-path . --type zip
+          az webapp deploy --name 'adminspheree' --resource-group 'M365_Operation' --src-path . --type zip
