@@ -83,7 +83,6 @@ const TenantSelector = () => {
                                 >
                                     <div className="flex flex-col items-start truncate mr-2 min-w-0">
                                         <span className="font-semibold truncate w-full">{tenant.displayName}</span>
-                                        <span className="text-[9px] opacity-40 truncate w-full font-mono">{tenant.tenantId}</span>
                                     </div>
                                     {activeId === tenant.tenantId && <Check className="w-3.5 h-3.5 shrink-0" />}
                                 </button>
