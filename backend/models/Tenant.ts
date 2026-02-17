@@ -7,7 +7,15 @@ const TenantSchema = new mongoose.Schema({
         unique: true,
         index: true
     },
+    clientId: {
+        type: String,
+        required: true
+    },
     displayName: String,
+    isActive: {
+        type: Boolean,
+        default: true
+    },
     trialStartDate: {
         type: Date,
         default: Date.now

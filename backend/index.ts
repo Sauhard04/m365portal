@@ -141,6 +141,9 @@ app.get('/api/tenants', async (_req, res) => {
 app.post('/api/tenants', async (req, res) => {
     try {
         const { tenantId, clientId, displayName, isActive } = req.body;
+        console.log('[API] POST /api/tenants - Request body:', req.body);
+        console.log('[API] Extracted fields:', { tenantId, clientId, displayName, isActive });
+
         if (!tenantId || !clientId || !displayName) {
             return res.status(400).json({ error: 'Missing required tenant fields' });
         }
@@ -152,6 +155,7 @@ app.post('/api/tenants', async (req, res) => {
         );
 
         console.log(`[API] Tenant updated: ${displayName} (${tenantId})`);
+        console.log('[API] Saved tenant document:', JSON.stringify(tenant, null, 2));
         res.json({ success: true, tenant });
     } catch (err: any) {
         console.error('[API] Tenant update error:', err);

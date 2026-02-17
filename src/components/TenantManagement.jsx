@@ -30,6 +30,8 @@ const TenantManagement = () => {
             const response = await fetch('/api/tenants');
             if (response.ok) {
                 const data = await response.json();
+                console.log('[TenantManagement] Fetched tenants from API:', data);
+                console.log('[TenantManagement] First tenant clientId:', data[0]?.clientId);
                 setTenants(data);
             }
         } catch (err) {
