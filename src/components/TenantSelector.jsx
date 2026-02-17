@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, Building2, Check } from 'lucide-react';
-import RuntimeConfig from '../config';
 
 const TenantSelector = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -8,15 +7,34 @@ const TenantSelector = () => {
     const [activeId, setActiveId] = useState(null);
 
     useEffect(() => {
-        setTenants(RuntimeConfig.getTenants());
-        setActiveId(RuntimeConfig.getActiveTenantId());
+        // Fetch tenants from API
+        fetch('/api/tenants')
+            .then(res => res.json())
+            .then(data => {
+                const activeTenants = data.filter(t => t.isActive);
+                setTenants(activeTenants);
+
+                // Get saved active tenant from localStorage or use first tenant
+                const savedTenantId = localStorage.getItem('activeTenantId');
+                if (savedTenantId && activeTenants.find(t => t.tenantId === savedTenantId)) {
+                    setActiveId(savedTenantId);
+                } else if (activeTenants.length > 0) {
+                    setActiveId(activeTenants[0].tenantId);
+                    localStorage.setItem('activeTenantId', activeTenants[0].tenantId);
+                }
+            })
+            .catch(err => console.error('Failed to fetch tenants:', err));
     }, []);
 
     const activeTenant = tenants.find(t => t.tenantId === activeId);
 
     const handleSelect = (tenantId) => {
-        RuntimeConfig.setActiveTenant(tenantId);
+        localStorage.setItem('activeTenantId', tenantId);
+        setActiveId(tenantId);
         setIsOpen(false);
+
+        // Reload the page to apply the new tenant context
+        window.location.reload();
     };
 
     if (tenants.length === 0) return null;
@@ -50,8 +68,8 @@ const TenantSelector = () => {
                                     key={tenant.tenantId}
                                     onClick={() => handleSelect(tenant.tenantId)}
                                     className={`w-full flex items-center justify-between p-2 rounded-md transition-all text-xs ${activeId === tenant.tenantId
-                                            ? 'bg-blue-500/15 text-blue-400 border border-blue-500/20'
-                                            : 'text-slate-300 hover:bg-white/[0.04] hover:text-white border border-transparent'
+                                        ? 'bg-blue-500/15 text-blue-400 border border-blue-500/20'
+                                        : 'text-slate-300 hover:bg-white/[0.04] hover:text-white border border-transparent'
                                         }`}
                                 >
                                     <div className="flex flex-col items-start truncate mr-2 min-w-0">

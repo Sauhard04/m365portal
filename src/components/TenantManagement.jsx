@@ -196,8 +196,8 @@ const TenantManagement = () => {
                                     {tenant.displayName}
                                 </h3>
                                 <div style={{ display: 'flex', gap: '12px', fontSize: '11px', color: 'var(--text-dim)', fontFamily: 'monospace' }}>
-                                    <span>Tenant: {tenant.tenantId.substring(0, 8)}...</span>
-                                    <span>Client: {tenant.clientId.substring(0, 8)}...</span>
+                                    <span>Tenant: {tenant.tenantId?.substring(0, 8) || 'N/A'}...</span>
+                                    <span>Client: {tenant.clientId?.substring(0, 8) || 'N/A'}...</span>
                                 </div>
                             </div>
 
