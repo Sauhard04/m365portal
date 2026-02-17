@@ -103,7 +103,7 @@ app.get('/health', (_req, res) => res.json({ status: 'ok' }));
  */
 app.get('/api/config', async (_req, res) => {
     try {
-        const tenants = await Tenant.find({ isActive: true });
+        const tenants = await Tenant.find({});
         res.json({
             VITE_CLIENT_ID: process.env.VITE_CLIENT_ID || process.env.CLIENT_ID,
             VITE_TENANT_ID: process.env.VITE_TENANT_ID || process.env.TENANT_ID,
