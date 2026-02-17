@@ -13,6 +13,8 @@ import mongoose from 'mongoose';
 // @ts-ignore
 import { PDF } from '../src/models/PDF';
 // @ts-ignore
+import { Tenant } from '../src/models/Tenant';
+// @ts-ignore
 import { IncomingForm } from 'formidable';
 
 const VERSION = '1.2.0-azure-stable';
@@ -99,15 +101,75 @@ app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 /**
  * Runtime configuration for the frontend
  */
-app.get('/api/config', (_req, res) => {
-    res.json({
-        VITE_CLIENT_ID: process.env.VITE_CLIENT_ID || process.env.CLIENT_ID,
-        VITE_TENANT_ID: process.env.VITE_TENANT_ID || process.env.TENANT_ID,
-        VITE_GROQ_API_KEY: process.env.VITE_GROQ_API_KEY || process.env.GROQ_API_KEY,
-        VITE_PURVIEW_ACCOUNT_NAME: process.env.VITE_PURVIEW_ACCOUNT_NAME || process.env.PURVIEW_ACCOUNT_NAME,
-        VITE_PURVIEW_ENDPOINT: process.env.VITE_PURVIEW_ENDPOINT || process.env.PURVIEW_ENDPOINT,
-        VITE_WEB3FORMS_ACCESS_KEY: process.env.VITE_WEB3FORMS_ACCESS_KEY || process.env.WEB3FORMS_ACCESS_KEY
-    });
+app.get('/api/config', async (_req, res) => {
+    try {
+        const tenants = await Tenant.find({ isActive: true });
+        res.json({
+            VITE_CLIENT_ID: process.env.VITE_CLIENT_ID || process.env.CLIENT_ID,
+            VITE_TENANT_ID: process.env.VITE_TENANT_ID || process.env.TENANT_ID,
+            VITE_GROQ_API_KEY: process.env.VITE_GROQ_API_KEY || process.env.GROQ_API_KEY,
+            VITE_PURVIEW_ACCOUNT_NAME: process.env.VITE_PURVIEW_ACCOUNT_NAME || process.env.PURVIEW_ACCOUNT_NAME,
+            VITE_PURVIEW_ENDPOINT: process.env.VITE_PURVIEW_ENDPOINT || process.env.PURVIEW_ENDPOINT,
+            VITE_WEB3FORMS_ACCESS_KEY: process.env.VITE_WEB3FORMS_ACCESS_KEY || process.env.WEB3FORMS_ACCESS_KEY,
+            tenants: tenants.map((t: any) => ({
+                tenantId: t.tenantId,
+                clientId: t.clientId,
+                displayName: t.displayName
+            }))
+        });
+    } catch (err: any) {
+        console.error('[API] Config error:', err);
+        res.status(500).json({ error: 'Failed to load configuration' });
+    }
+});
+
+/**
+ * Multi-Tenant Management Endpoints
+ */
+
+// List all registered tenants
+app.get('/api/tenants', async (_req, res) => {
+    try {
+        const tenants = await Tenant.find({});
+        res.json(tenants);
+    } catch (err: any) {
+        res.status(500).json({ error: String(err) });
+    }
+});
+
+// Add or update a tenant
+app.post('/api/tenants', async (req, res) => {
+    try {
+        const { tenantId, clientId, displayName, isActive } = req.body;
+        if (!tenantId || !clientId || !displayName) {
+            return res.status(400).json({ error: 'Missing required tenant fields' });
+        }
+
+        const tenant = await Tenant.findOneAndUpdate(
+            { tenantId },
+            { clientId, displayName, isActive: isActive !== undefined ? isActive : true },
+            { upsert: true, new: true }
+        );
+
+        console.log(`[API] Tenant updated: ${displayName} (${tenantId})`);
+        res.json({ success: true, tenant });
+    } catch (err: any) {
+        console.error('[API] Tenant update error:', err);
+        res.status(500).json({ error: String(err) });
+    }
+});
+
+// Delete a tenant
+app.delete('/api/tenants/:tenantId', async (req, res) => {
+    try {
+        const { tenantId } = req.params;
+        await Tenant.findOneAndDelete({ tenantId });
+        console.log(`[API] Tenant deleted: ${tenantId}`);
+        res.json({ success: true, message: 'Tenant deleted successfully' });
+    } catch (err: any) {
+        console.error('[API] Tenant deletion error:', err);
+        res.status(500).json({ error: String(err) });
+    }
 });
 
 /**

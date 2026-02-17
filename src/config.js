@@ -10,8 +10,10 @@ class RuntimeConfig {
             VITE_GROQ_API_KEY: import.meta.env.VITE_GROQ_API_KEY,
             VITE_PURVIEW_ACCOUNT_NAME: import.meta.env.VITE_PURVIEW_ACCOUNT_NAME,
             VITE_PURVIEW_ENDPOINT: import.meta.env.VITE_PURVIEW_ENDPOINT,
-            VITE_WEB3FORMS_ACCESS_KEY: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY
+            VITE_WEB3FORMS_ACCESS_KEY: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY,
+            tenants: []
         };
+        this.activeTenantId = localStorage.getItem('m365_active_tenant') || null;
         this.initialized = false;
     }
 
@@ -31,6 +33,17 @@ class RuntimeConfig {
                 if (data.VITE_PURVIEW_ACCOUNT_NAME) this.config.VITE_PURVIEW_ACCOUNT_NAME = data.VITE_PURVIEW_ACCOUNT_NAME;
                 if (data.VITE_PURVIEW_ENDPOINT) this.config.VITE_PURVIEW_ENDPOINT = data.VITE_PURVIEW_ENDPOINT;
                 if (data.VITE_WEB3FORMS_ACCESS_KEY) this.config.VITE_WEB3FORMS_ACCESS_KEY = data.VITE_WEB3FORMS_ACCESS_KEY;
+                if (data.tenants) this.config.tenants = data.tenants;
+
+                // Handle dynamic tenant override
+                if (this.activeTenantId && data.tenants) {
+                    const active = data.tenants.find(t => t.tenantId === this.activeTenantId);
+                    if (active) {
+                        console.log(`[RuntimeConfig] Overriding current config with active tenant: ${active.displayName}`);
+                        this.config.VITE_TENANT_ID = active.tenantId;
+                        this.config.VITE_CLIENT_ID = active.clientId;
+                    }
+                }
 
                 console.log('[RuntimeConfig] Configuration loaded successfully');
             } else {
@@ -45,6 +58,22 @@ class RuntimeConfig {
 
     get(key) {
         return this.config[key];
+    }
+
+    getTenants() {
+        return this.config.tenants || [];
+    }
+
+    getActiveTenantId() {
+        return this.activeTenantId || this.config.VITE_TENANT_ID;
+    }
+
+    setActiveTenant(tenantId) {
+        console.log(`[RuntimeConfig] Switching to tenant: ${tenantId}`);
+        this.activeTenantId = tenantId;
+        localStorage.setItem('m365_active_tenant', tenantId);
+        // Force reload to re-initialize MSAL with new config
+        window.location.reload();
     }
 }
 

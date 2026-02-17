@@ -3,8 +3,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     ShieldCheck, Smartphone, Lock,
-    LayoutDashboard, Radar, Activity, LifeBuoy
+    LayoutDashboard, Radar, Activity, LifeBuoy,
+    Building2
 } from 'lucide-react';
+import TenantSelector from './TenantSelector';
 
 const Sidebar = ({ isSidebarOpen }) => {
     const navigate = useNavigate();
@@ -20,6 +22,15 @@ const Sidebar = ({ isSidebarOpen }) => {
         >
             {/* Navigation Content */}
             <div className="flex-1 py-6 px-4 space-y-8 overflow-y-auto overflow-x-hidden custom-scrollbar">
+                {/* Tenant Selector */}
+                {isSidebarOpen && (
+                    <div className="px-3 mb-2">
+                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.15em] mb-4">
+                            Environment
+                        </p>
+                        <TenantSelector />
+                    </div>
+                )}
 
                 {/* Section: Management */}
                 <div className="space-y-1">
@@ -102,7 +113,14 @@ const Sidebar = ({ isSidebarOpen }) => {
             </div>
 
             {/* Support Section - Separator and Button */}
-            <div className="mt-auto p-4 border-t border-white/10">
+            <div className="mt-auto p-4 border-t border-white/10 space-y-1">
+                <SidebarItem
+                    icon={Building2}
+                    label="Manage Tenants"
+                    active={isActive('/service/tenants')}
+                    isOpen={isSidebarOpen}
+                    onClick={() => navigate('/service/tenants')}
+                />
                 <SidebarItem
                     icon={LifeBuoy}
                     label="Get Support"
