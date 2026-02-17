@@ -35,17 +35,25 @@ class RuntimeConfig {
                 if (data.VITE_WEB3FORMS_ACCESS_KEY) this.config.VITE_WEB3FORMS_ACCESS_KEY = data.VITE_WEB3FORMS_ACCESS_KEY;
                 if (data.tenants) this.config.tenants = data.tenants;
 
-                // Handle dynamic tenant override
-                if (this.activeTenantId && data.tenants) {
-                    const active = data.tenants.find(t => t.tenantId === this.activeTenantId);
+                console.log('[RuntimeConfig] Configuration loaded successfully');
+
+                // Handle dynamic tenant override BEFORE marking as initialized
+                const savedTenantId = localStorage.getItem('m365_active_tenant');
+                if (savedTenantId && data.tenants) {
+                    const active = data.tenants.find(t => t.tenantId === savedTenantId);
                     if (active) {
-                        console.log(`[RuntimeConfig] Overriding current config with active tenant: ${active.displayName}`);
+                        console.log(`[RuntimeConfig] ✅ Overriding with selected tenant: ${active.displayName}`);
+                        console.log(`[RuntimeConfig] Tenant ID: ${active.tenantId}`);
+                        console.log(`[RuntimeConfig] Client ID: ${active.clientId}`);
                         this.config.VITE_TENANT_ID = active.tenantId;
                         this.config.VITE_CLIENT_ID = active.clientId;
+                        this.activeTenantId = savedTenantId;
+                    } else {
+                        console.warn(`[RuntimeConfig] ⚠️ Saved tenant ${savedTenantId} not found in available tenants`);
                     }
+                } else {
+                    console.log(`[RuntimeConfig] Using default tenant from .env: ${this.config.VITE_TENANT_ID}`);
                 }
-
-                console.log('[RuntimeConfig] Configuration loaded successfully');
             } else {
                 console.warn('[RuntimeConfig] Failed to fetch server config, using build-time defaults');
             }
