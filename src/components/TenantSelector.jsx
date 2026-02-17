@@ -12,19 +12,19 @@ const TenantSelector = () => {
             .then(res => res.json())
             .then(data => {
                 console.log('[TenantSelector] Fetched tenants:', data);
-                const activeTenants = data.filter(t => t.isActive);
-                console.log('[TenantSelector] Active tenants:', activeTenants);
-                setTenants(activeTenants);
+                // Show all tenants, not just active ones
+                setTenants(data);
+                console.log('[TenantSelector] All tenants:', data);
 
                 // Get saved active tenant from localStorage or use first tenant
                 const savedTenantId = localStorage.getItem('activeTenantId');
-                if (savedTenantId && activeTenants.find(t => t.tenantId === savedTenantId)) {
+                if (savedTenantId && data.find(t => t.tenantId === savedTenantId)) {
                     setActiveId(savedTenantId);
                     console.log('[TenantSelector] Using saved tenant:', savedTenantId);
-                } else if (activeTenants.length > 0) {
-                    setActiveId(activeTenants[0].tenantId);
-                    localStorage.setItem('activeTenantId', activeTenants[0].tenantId);
-                    console.log('[TenantSelector] Auto-selected first tenant:', activeTenants[0].tenantId);
+                } else if (data.length > 0) {
+                    setActiveId(data[0].tenantId);
+                    localStorage.setItem('activeTenantId', data[0].tenantId);
+                    console.log('[TenantSelector] Auto-selected first tenant:', data[0].tenantId);
                 }
             })
             .catch(err => console.error('[TenantSelector] Failed to fetch tenants:', err));
