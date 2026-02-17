@@ -10,6 +10,8 @@ import connectDB from './config/db';
 import { PowerShellService } from '../services/powerShell.service';
 import { subscriptionGuard } from './middleware/subscriptionGuard';
 import mongoose from 'mongoose';
+import { PDF } from '../src/models/PDF';
+import { IncomingForm } from 'formidable';
 
 const VERSION = '1.2.0-azure-stable';
 console.log(`\n🚀 M365 Portal Backend v${VERSION} starting...`);
@@ -104,6 +106,95 @@ app.get('/api/config', (_req, res) => {
         VITE_PURVIEW_ENDPOINT: process.env.VITE_PURVIEW_ENDPOINT || process.env.PURVIEW_ENDPOINT,
         VITE_WEB3FORMS_ACCESS_KEY: process.env.VITE_WEB3FORMS_ACCESS_KEY || process.env.WEB3FORMS_ACCESS_KEY
     });
+});
+
+/**
+ * PDF / Documentation Endpoints
+ */
+
+// List all PDFs (metadata only)
+app.get('/api/pdfs', async (_req, res) => {
+    try {
+        console.log('[API] Fetching PDF list...');
+        const files = await PDF.find({}, 'fileName displayName size uploadedAt');
+        const formattedFiles = files.map(file => ({
+            id: file._id,
+            name: file.displayName,
+            fileName: file.fileName,
+            path: `/api/pdfs/view/${file._id}`,
+            uploadedAt: file.uploadedAt
+        }));
+        res.json(formattedFiles);
+    } catch (err: any) {
+        console.error('[API] Error listing PDFs:', err);
+        res.status(500).json({ error: String(err) });
+    }
+});
+
+// Upload a new PDF
+app.post('/api/pdfs/upload', async (req, res) => {
+    try {
+        console.log('[API] Handling PDF upload...');
+        const form = new IncomingForm({
+            keepExtensions: true,
+            maxFileSize: 50 * 1024 * 1024, // 50MB
+        });
+
+        form.parse(req, async (err, _fields, files) => {
+            if (err) {
+                console.error('[API] Form parsing error:', err);
+                return res.status(500).json({ success: false, error: String(err) });
+            }
+
+            const uploadedFile = Array.isArray(files.file) ? files.file[0] : files.file;
+            if (!uploadedFile) {
+                return res.status(400).json({ success: false, error: 'No file uploaded' });
+            }
+
+            const fileBuffer = fs.readFileSync(uploadedFile.filepath);
+            const originalName = uploadedFile.originalFilename || `document-${Date.now()}.pdf`;
+            const displayName = originalName.replace('.pdf', '').replace(/-|_/g, ' ');
+
+            const newPDF = new PDF({
+                fileName: originalName,
+                displayName: displayName,
+                fileData: fileBuffer,
+                contentType: uploadedFile.mimetype || 'application/pdf',
+                size: uploadedFile.size
+            });
+
+            await newPDF.save();
+            fs.unlinkSync(uploadedFile.filepath); // Clean up temp file
+
+            console.log(`[API] ✅ PDF Uploaded: ${originalName}`);
+            res.json({ success: true, fileName: originalName });
+        });
+    } catch (err: any) {
+        console.error('[API] Upload error:', err);
+        res.status(500).json({ success: false, error: String(err) });
+    }
+});
+
+// View/Download PDF content
+app.get('/api/pdfs/view/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const pdf = await PDF.findById(id);
+
+        if (!pdf) {
+            return res.status(404).send('PDF not found');
+        }
+
+        res.setHeader('Content-Type', pdf.contentType || 'application/pdf');
+        res.setHeader('Content-Disposition', `inline; filename="${pdf.fileName}"`);
+        res.setHeader('Content-Length', pdf.fileData.length);
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+
+        res.send(pdf.fileData);
+    } catch (err: any) {
+        console.error('[API] Error serving PDF:', err);
+        res.status(500).send('Error retrieving PDF');
+    }
 });
 
 /**
