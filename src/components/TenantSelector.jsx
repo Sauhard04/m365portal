@@ -11,22 +11,33 @@ const TenantSelector = () => {
         fetch('/api/tenants')
             .then(res => res.json())
             .then(data => {
+                console.log('[TenantSelector] Fetched tenants:', data);
                 const activeTenants = data.filter(t => t.isActive);
+                console.log('[TenantSelector] Active tenants:', activeTenants);
                 setTenants(activeTenants);
 
                 // Get saved active tenant from localStorage or use first tenant
                 const savedTenantId = localStorage.getItem('activeTenantId');
                 if (savedTenantId && activeTenants.find(t => t.tenantId === savedTenantId)) {
                     setActiveId(savedTenantId);
+                    console.log('[TenantSelector] Using saved tenant:', savedTenantId);
                 } else if (activeTenants.length > 0) {
                     setActiveId(activeTenants[0].tenantId);
                     localStorage.setItem('activeTenantId', activeTenants[0].tenantId);
+                    console.log('[TenantSelector] Auto-selected first tenant:', activeTenants[0].tenantId);
                 }
             })
-            .catch(err => console.error('Failed to fetch tenants:', err));
+            .catch(err => console.error('[TenantSelector] Failed to fetch tenants:', err));
     }, []);
 
     const activeTenant = tenants.find(t => t.tenantId === activeId);
+    console.log('[TenantSelector] Rendering with tenants:', tenants.length, 'active:', activeTenant?.displayName);
+
+    // Show selector even with one tenant so users can see which tenant is active
+    if (tenants.length === 0) {
+        console.log('[TenantSelector] No tenants, returning null');
+        return null;
+    }
 
     const handleSelect = (tenantId) => {
         localStorage.setItem('activeTenantId', tenantId);
@@ -36,8 +47,6 @@ const TenantSelector = () => {
         // Reload the page to apply the new tenant context
         window.location.reload();
     };
-
-    if (tenants.length === 0) return null;
 
     return (
         <div className="relative">
