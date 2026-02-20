@@ -5,10 +5,14 @@ import { Client } from '@microsoft/microsoft-graph-client';
 import { loginRequest } from '../authConfig';
 import { GovernanceService } from '../services/governance/governance.service';
 import { Lock, ArrowLeft, RefreshCw, Filter, Search, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const ConditionalAccessPage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [policies, setPolicies] = useState([]);
@@ -21,16 +25,12 @@ const ConditionalAccessPage = () => {
         else setLoading(true);
 
         try {
-            const account = accounts[0];
-            if (!account) throw new Error('No account found');
-
-            const tokenResponse = await instance.acquireTokenSilent({
-                ...loginRequest,
-                account
+            const accessToken = await acquireToken({
+                ...loginRequest
             });
 
             const client = Client.init({
-                authProvider: (done) => done(null, tokenResponse.accessToken)
+                authProvider: (done) => done(null, accessToken)
             });
 
             const data = await GovernanceService.getConditionalAccessPolicies(client);
@@ -50,7 +50,7 @@ const ConditionalAccessPage = () => {
 
     useEffect(() => {
         fetchPolicies();
-    }, [instance, accounts]);
+    }, [activeTenantId]);
 
     useEffect(() => {
         let filtered = policies;

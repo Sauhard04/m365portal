@@ -5,6 +5,8 @@ import { Client } from '@microsoft/microsoft-graph-client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { teamsScopes } from '../authConfig';
 import { TeamsService } from '../services/teams/teams.service';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import Loader3D from './Loader3D';
 import {
     Users, Hash, Globe, Lock, Info, ExternalLink, ArrowLeft, RefreshCw
@@ -14,6 +16,8 @@ const TeamDetailsPage = () => {
     const { teamId } = useParams();
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [team, setTeam] = useState(null);
@@ -30,14 +34,12 @@ const TeamDetailsPage = () => {
         setError(null);
 
         try {
-            const account = accounts[0];
-            const tokenResponse = await instance.acquireTokenSilent({
-                ...teamsScopes,
-                account
+            const accessToken = await acquireToken({
+                ...teamsScopes
             });
 
             const client = Client.init({
-                authProvider: (done) => done(null, tokenResponse.accessToken)
+                authProvider: (done) => done(null, accessToken)
             });
 
             const [teamData, channelsData, membersData] = await Promise.all([
@@ -60,7 +62,7 @@ const TeamDetailsPage = () => {
 
     useEffect(() => {
         fetchData();
-    }, [teamId, instance, accounts]);
+    }, [teamId, activeTenantId]);
 
     const formatVisibility = (vis) => {
         if (!vis || vis === 'UnknownFutureValue') return 'Private';

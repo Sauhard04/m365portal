@@ -11,17 +11,21 @@ import { UsageService } from '../../services/usage.service';
 import { useMsal } from '@azure/msal-react';
 import { useNavigate } from 'react-router-dom';
 import SiteDataStore from '../../services/siteDataStore';
+import { useToken } from '../../hooks/useToken';
+import { useActiveTenant } from '../../hooks/useActiveTenant';
 import './Chatbot.css';
 
 const Chatbot = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [isMinimized, setIsMinimized] = useState(false);
-    const [message, setMessage] = useState('');
     const [chatHistory, setChatHistory] = useState([
-        { role: 'assistant', content: 'How can I assist you with the portal today?' }
+        { role: 'assistant', content: 'Hello! I am your M365 Intelligence Assistant. How can I help you today?' }
     ]);
+    const [message, setMessage] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+    const [isMinimized, setIsMinimized] = useState(false);
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const navigate = useNavigate();
     const messagesEndRef = useRef(null);
 
@@ -33,13 +37,20 @@ const Chatbot = () => {
         scrollToBottom();
     }, [chatHistory, isTyping]);
 
+    useEffect(() => {
+        setChatHistory([
+            { role: 'assistant', content: 'Hello! I am your M365 Intelligence Assistant. How can I help you today?' }
+        ]);
+    }, [activeTenantId]);
+
     const getAccessToken = async () => {
-        if (!accounts || accounts.length === 0) throw new Error("Please sign in to access reports.");
-        const response = await instance.acquireTokenSilent({
-            scopes: ['https://graph.microsoft.com/.default'],
-            account: accounts[0]
-        });
-        return response.accessToken;
+        try {
+            return await acquireToken({
+                scopes: ['https://graph.microsoft.com/.default']
+            });
+        } catch (error) {
+            throw new Error(`Auth Error: ${error.message}`);
+        }
     };
 
     const handleMailboxStats = async (userQuery) => {

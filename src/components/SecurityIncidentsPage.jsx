@@ -5,6 +5,8 @@ import { Client } from '@microsoft/microsoft-graph-client';
 import { loginRequest } from '../authConfig';
 import { SecurityService } from '../services/security/security.service';
 import { AlertOctagon, ArrowLeft, RefreshCw, Filter, Search, Clock, Users } from 'lucide-react';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import Loader3D from './Loader3D';
 
 import styles from './DetailPage.module.css';
@@ -12,6 +14,8 @@ import styles from './DetailPage.module.css';
 const SecurityIncidentsPage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [incidents, setIncidents] = useState([]);
@@ -24,16 +28,12 @@ const SecurityIncidentsPage = () => {
         else setLoading(true);
 
         try {
-            const account = accounts[0];
-            if (!account) throw new Error('No account found');
-
-            const tokenResponse = await instance.acquireTokenSilent({
-                ...loginRequest,
-                account
+            const accessToken = await acquireToken({
+                ...loginRequest
             });
 
             const client = Client.init({
-                authProvider: (done) => done(null, tokenResponse.accessToken)
+                authProvider: (done) => done(null, accessToken)
             });
 
             const data = await SecurityService.getSecurityIncidents(client, 100);
@@ -49,7 +49,7 @@ const SecurityIncidentsPage = () => {
 
     useEffect(() => {
         fetchIncidents();
-    }, [instance, accounts]);
+    }, [activeTenantId]);
 
     useEffect(() => {
         let filtered = incidents;

@@ -5,10 +5,14 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { Shield, ArrowLeft, TrendingUp, Target, CheckCircle2, AlertCircle, RefreshCw, ExternalLink } from 'lucide-react';
 import Loader3D from './Loader3D';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const SecureScorePage = () => {
     const { instance, accounts } = useMsal();
     const navigate = useNavigate();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [score, setScore] = useState(null);
     const [controlProfiles, setControlProfiles] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -21,24 +25,8 @@ const SecureScorePage = () => {
             else setLoading(true);
             setError(null);
             try {
-                let response;
-                try {
-                    response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                } catch (authErr) {
-                    if (authErr.name === "InteractionRequiredAuthError") {
-                        if (isManual) {
-                            response = await instance.acquireTokenPopup(loginRequest);
-                        } else {
-                            setError("InteractionRequired");
-                            setLoading(false);
-                            return;
-                        }
-                    } else {
-                        throw authErr;
-                    }
-                }
-
-                const graphService = new GraphService(response.accessToken);
+                const accessToken = await acquireToken({ ...loginRequest });
+                const graphService = new GraphService(accessToken);
                 // ... existing data fetching logic ...
                 const [scoreData, profiles] = await Promise.all([
                     graphService.getSecureScore(),
@@ -102,7 +90,7 @@ const SecureScorePage = () => {
 
     useEffect(() => {
         fetchData();
-    }, [instance, accounts]);
+    }, [activeTenantId]);
 
 
 

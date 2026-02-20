@@ -5,10 +5,14 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { ArrowLeft, Search, Download, Box, RefreshCw, Shield, Globe, Calendar } from 'lucide-react';
 import Loader3D from './Loader3D';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const EntraEnterpriseApps = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [apps, setApps] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -16,15 +20,15 @@ const EntraEnterpriseApps = () => {
 
     useEffect(() => {
         fetchApps();
-    }, [accounts, instance]);
+    }, [activeTenantId]);
 
     const fetchApps = async (isManual = false) => {
         if (accounts.length > 0) {
             if (isManual) setRefreshing(true);
             else setLoading(true);
             try {
-                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                const graphService = new GraphService(response.accessToken);
+                const accessToken = await acquireToken({ ...loginRequest });
+                const graphService = new GraphService(accessToken);
                 const data = await graphService.getServicePrincipals();
                 // Filter out noise to match "Enterprise Applications" view in portal
                 // Logic: "Enterprise Apps" (Service Principals) typically have the 'WindowsAzureActiveDirectoryIntegratedApp' tag.

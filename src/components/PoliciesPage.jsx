@@ -3,29 +3,32 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { PurviewService } from '../services/purview';
 import { ArrowLeft, FileKey, CheckCircle } from 'lucide-react';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import Loader3D from './Loader3D';
 
 const PoliciesPage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [policies, setPolicies] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchPolicies();
-    }, [accounts]);
+    }, [activeTenantId]);
 
     const fetchPolicies = async () => {
         if (accounts.length === 0) return;
         setLoading(true);
 
         try {
-            const response = await instance.acquireTokenSilent({
-                scopes: ['https://purview.azure.net/.default'],
-                account: accounts[0]
+            const accessToken = await acquireToken({
+                scopes: ['https://purview.azure.net/.default']
             });
 
-            const policiesData = await PurviewService.getPolicies(response.accessToken);
+            const policiesData = await PurviewService.getPolicies(accessToken);
             setPolicies(policiesData);
         } catch (error) {
             console.error('Error fetching policies:', error);

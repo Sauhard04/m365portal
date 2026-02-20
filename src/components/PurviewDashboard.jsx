@@ -15,21 +15,23 @@ import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis
 import { MiniSegmentedBar, MiniSeverityStrip, MiniSparkline, MiniProgressBar } from './charts/MicroCharts';
 import SiteDataStore from '../services/siteDataStore';
 import { useDataCaching } from '../hooks/useDataCaching';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const PurviewDashboard = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
 
     const fetchFn = async () => {
         let accessToken = null;
 
         // Only attempt token acquisition if Purview is configured
         if (PurviewService.isConfigured()) {
-            const response = await instance.acquireTokenSilent({
-                scopes: ['https://purview.azure.com/.default'],
-                account: accounts[0]
+            accessToken = await acquireToken({
+                scopes: ['https://purview.azure.com/.default']
             });
-            accessToken = response.accessToken;
         }
 
         const dashboardData = await PurviewService.getDashboardData(accessToken);
@@ -55,7 +57,8 @@ const PurviewDashboard = () => {
         maxAge: 30,
         storeSection: 'purview',
         storeMetadata: { source: 'PurviewDashboard' },
-        enabled: accounts.length > 0
+        enabled: accounts.length > 0,
+        dependencies: [activeTenantId]
     });
 
     const [interactionError, setInteractionError] = useState(false);

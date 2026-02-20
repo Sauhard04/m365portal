@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useMsal } from '@azure/msal-react';
 import LandingPage from './components/LandingPage';
 import ServicePage from './components/ServicePage';
 import ExchangeReport from './components/ExchangeReport';
@@ -84,7 +85,6 @@ import SupportPage from './components/SupportPage';
 import TenantManagement from './components/TenantManagement';
 
 function App() {
-  console.log('[App] Rendering Root Component');
   return (
     <ThemeProvider>
       <SubscriptionProvider>

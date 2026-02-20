@@ -1,29 +1,51 @@
+import RuntimeConfig from '../config';
+
 // In-memory cache for quick access
 let memoryCache = null;
 let initPromise = null;
+let currentTenantId = null;
 
 /**
  * Initialize or load the data store
  */
 export async function ensureInitialized(tenantId = null) {
+    const activeId = tenantId || RuntimeConfig.getActiveTenantId();
+
+    // If tenant changed, force re-initialization
+    if (activeId !== currentTenantId) {
+        console.log(`[SiteDataStore] 🔄 Tenant context changed: ${currentTenantId || 'INIT'} -> ${activeId}`);
+        memoryCache = null;
+        initPromise = null;
+        currentTenantId = activeId;
+    }
+
     if (initPromise) return initPromise;
 
     initPromise = (async () => {
         if (!memoryCache) {
             initStore();
         }
-        await syncWithServer(tenantId);
+        await syncWithServer(activeId);
         return memoryCache;
     })();
 
     return initPromise;
 }
 
+function getStoreKey() {
+    const tenantId = RuntimeConfig.getActiveTenantId() || 'global';
+    return `${tenantId}_m365_sitedata`;
+}
+
 function initStore() {
-    if (memoryCache) return memoryCache;
+    const activeId = RuntimeConfig.getActiveTenantId() || 'global';
+    if (memoryCache && activeId === currentTenantId) return memoryCache;
+
+    currentTenantId = activeId;
 
     try {
-        const stored = localStorage.getItem('m365_sitedata');
+        const key = getStoreKey();
+        const stored = localStorage.getItem(key);
         if (stored) {
             memoryCache = JSON.parse(stored);
         }
@@ -45,9 +67,10 @@ function initStore() {
  * Sync with server-side sitedata.json
  */
 async function syncWithServer(tenantId = null) {
-    try {
-        // Now works in production as well
+    if (!tenantId) tenantId = RuntimeConfig.getActiveTenantId();
+    console.log(`[SiteDataStore] 🛰️ Syncing with server for tenant: ${tenantId}`);
 
+    try {
         const headers = {};
         if (tenantId) headers['X-Tenant-Id'] = tenantId;
 
@@ -69,46 +92,47 @@ async function syncWithServer(tenantId = null) {
 
                 local.lastUpdated = Math.max(local.lastUpdated || 0, serverData.lastUpdated || 0);
                 saveLocally();
-                console.log('[SiteDataStore] Synced with server successfully');
+                console.log(`[SiteDataStore] ✅ Synced with server for: ${tenantId}`);
+            } else {
+                console.log(`[SiteDataStore] ℹ️ Server returned empty data for tenant: ${tenantId}`);
             }
+        } else {
+            console.warn(`[SiteDataStore] ⚠️ Server sync failed (Status: ${response.status}) for: ${tenantId}`);
         }
     } catch (error) {
-        // Only log if it's not a 404, which is expected if the file doesn't exist yet
-        if (error.status !== 404) {
-            console.debug('[SiteDataStore] Background server sync skipped or failed');
-        }
+        console.error(`[SiteDataStore] ❌ Server sync error for ${tenantId}:`, error.message);
     }
 }
 
 function saveLocally() {
     if (!memoryCache) return;
     try {
-        localStorage.setItem('m365_sitedata', JSON.stringify(memoryCache));
+        const key = getStoreKey();
+        localStorage.setItem(key, JSON.stringify(memoryCache));
     } catch (e) {
         console.warn('Failed to save SiteDataStore to localStorage', e);
     }
 }
 
 const persistToServer = async (sectionKey = null, sectionData = null, tenantId = null) => {
-    try {
-        // Now works in production as well
+    const activeId = tenantId || RuntimeConfig.getActiveTenantId();
+    console.log(`[SiteDataStore] 📂 Persisting to server. ${sectionKey ? `Section: ${sectionKey}` : 'FULL'}. Tenant: ${activeId}`);
 
+    try {
         let payload;
         if (sectionKey && sectionData) {
-            // Partial update: only send the changed section
             payload = {
                 sectionKey,
                 sectionData,
-                tenantId // Also send in body as fallback
+                tenantId: activeId
             };
         } else {
-            // Fallback: send everything if no specific section is provided
             if (!memoryCache) return;
-            payload = { ...memoryCache, tenantId };
+            payload = { ...memoryCache, tenantId: activeId };
         }
 
         const headers = { 'Content-Type': 'application/json' };
-        if (tenantId) headers['X-Tenant-Id'] = tenantId;
+        if (activeId) headers['X-Tenant-Id'] = activeId;
 
         const response = await fetch('/api/data/sitedata', {
             method: 'POST',
@@ -117,17 +141,16 @@ const persistToServer = async (sectionKey = null, sectionData = null, tenantId =
         });
 
         if (!response.ok) {
-            // Don't throw for 404 in case the dev server middleware is missing/disabled
             if (response.status === 404) {
-                console.debug('[SiteDataStore] Persistence endpoint not found (Expected in production)');
+                console.debug('[SiteDataStore] Persistence endpoint not found');
                 return;
             }
             const errorText = await response.text();
             throw new Error(`Server rejected storage: ${errorText}`);
         }
-        console.log(`[SiteDataStore] Successfully persisted${sectionKey ? ` section '${sectionKey}'` : ''} to server`);
+        console.log(`[SiteDataStore] ✅ Persisted ${sectionKey || 'Full Store'} for tenant: ${activeId}`);
     } catch (error) {
-        console.error('[SiteDataStore] Failed to persist to server:', error.message);
+        console.error(`[SiteDataStore] ❌ Persistence failed for ${activeId}:`, error.message);
     }
 };
 
@@ -138,6 +161,7 @@ const persistToServer = async (sectionKey = null, sectionData = null, tenantId =
  * @param {object} metadata - Optional metadata (source, period, etc.)
  */
 export function store(sectionKey, data, metadata = {}, tenantId = null) {
+    if (!tenantId) tenantId = RuntimeConfig.getActiveTenantId();
     const store = initStore();
 
     const section = {

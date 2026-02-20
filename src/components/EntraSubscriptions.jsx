@@ -6,10 +6,14 @@ import { GraphService } from '../services/graphService';
 import { SubscriptionsService } from '../services/entra';
 import { ArrowLeft, CreditCard, CheckCircle, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
 import Loader3D from './Loader3D';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const EntraSubscriptions = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [subs, setSubs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -21,8 +25,8 @@ const EntraSubscriptions = () => {
 
             const startTime = Date.now();
             try {
-                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                const client = new GraphService(response.accessToken).client;
+                const accessToken = await acquireToken({ ...loginRequest });
+                const client = new GraphService(accessToken).client;
                 const data = await SubscriptionsService.getSubscriptions(client);
                 setSubs(data || []);
 
@@ -46,7 +50,7 @@ const EntraSubscriptions = () => {
 
     useEffect(() => {
         fetchSubs();
-    }, [accounts, instance]);
+    }, [activeTenantId]);
 
     if (loading) {
         return (

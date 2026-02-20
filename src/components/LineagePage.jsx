@@ -5,11 +5,15 @@ import { loginRequest } from '../authConfig';
 import { PurviewService } from '../services/purview';
 import { motion } from 'framer-motion';
 import { GitBranch, Database, ArrowLeft, ArrowRight, Filter, FileText } from 'lucide-react';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import Loader3D from './Loader3D';
 
 const LineagePage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
 
     const [lineageData, setLineageData] = useState(null);
     const [selectedAsset, setSelectedAsset] = useState(null);
@@ -18,16 +22,15 @@ const LineagePage = () => {
 
     useEffect(() => {
         fetchLineage();
-    }, [accounts]);
+    }, [activeTenantId]);
 
     const fetchLineage = async () => {
         if (accounts.length === 0) return;
         setLoading(true);
 
         try {
-            const response = await instance.acquireTokenSilent({
-                scopes: ['https://purview.azure.net/.default'],
-                account: accounts[0]
+            const accessToken = await acquireToken({
+                scopes: ['https://purview.azure.net/.default']
             });
 
             // Production: Lineage requires a specific asset GUID
@@ -41,7 +44,7 @@ const LineagePage = () => {
                 return;
             }
 
-            const lineage = await PurviewService.getLineage(response.accessToken, assetGuid, direction);
+            const lineage = await PurviewService.getLineage(accessToken, assetGuid, direction);
             setLineageData(lineage);
         } catch (error) {
             console.error('Error fetching lineage:', error);

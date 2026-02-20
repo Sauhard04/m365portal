@@ -16,9 +16,13 @@ import {
 } from 'lucide-react';
 import Loader3D from './Loader3D';
 import SiteDataStore from '../services/siteDataStore';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const UsageReports = () => {
-    const { instance, accounts } = useMsal();
+    const { accounts } = useMsal();
+    const { getAccessToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [searchParams] = useSearchParams();
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -38,39 +42,11 @@ const UsageReports = () => {
 
         const startTime = Date.now();
         try {
-            let tokenResponse;
-            try {
-                // Try to get token silently with required permissions
-                tokenResponse = await instance.acquireTokenSilent({
-                    scopes: [
-                        "User.Read.All",
-                        "Sites.Read.All",
-                        "Reports.Read.All"
-                    ],
-                    account: accounts[0]
-                });
-            } catch (silentError) {
-                // If consent is required, use redirect (more reliable than popup)
-                if (silentError.name === "InteractionRequiredAuthError") {
+            const accessToken = await getAccessToken({
+                scopes: ["User.Read.All", "Sites.Read.All", "Reports.Read.All"]
+            });
 
-                    // Store current location to return after auth
-                    sessionStorage.setItem('preAuthPath', window.location.pathname);
-                    await instance.acquireTokenRedirect({
-                        scopes: [
-                            "User.Read.All",
-                            "Sites.Read.All",
-                            "Reports.Read.All"
-                        ],
-                        account: accounts[0]
-                    });
-                    // This will redirect, so code below won't execute
-                    return;
-                } else {
-                    throw silentError;
-                }
-            }
-
-            const usageService = new UsageService(tokenResponse.accessToken);
+            const usageService = new UsageService(accessToken);
 
             const [teams, exchange, sharepoint, onedrive] = await Promise.all([
                 usageService.getTeamsUsage(period),
@@ -130,7 +106,7 @@ const UsageReports = () => {
         if (accounts.length > 0) {
             fetchData();
         }
-    }, [instance, accounts, period]);
+    }, [accounts, period, activeTenantId]);
 
     useEffect(() => {
         const tab = searchParams.get('tab');

@@ -11,15 +11,19 @@ import Loader3D from './Loader3D';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
 import SiteDataStore from '../services/siteDataStore';
 import { useDataCaching } from '../hooks/useDataCaching';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import { MiniSegmentedBar, MiniSeverityStrip, MiniProgressBar, MiniSparkline } from './charts/MicroCharts';
 
 const EntraDashboard = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
 
     const fetchFn = async () => {
-        const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-        const graphService = new GraphService(response.accessToken);
+        const accessToken = await acquireToken({ ...loginRequest });
+        const graphService = new GraphService(accessToken);
         const client = graphService.client;
 
         const [userCounts, groupCounts, deviceCounts, subCounts, adminCounts, appsResponse, spResponse, scoreResponse, mfaData, signInsData] = await Promise.all([
@@ -93,7 +97,8 @@ const EntraDashboard = () => {
         refetch
     } = useDataCaching('EntraID_v5', fetchFn, {
         maxAge: 30,
-        enabled: accounts.length > 0
+        enabled: accounts.length > 0,
+        dependencies: [activeTenantId]
     });
 
     // Extract values from data with fallbacks

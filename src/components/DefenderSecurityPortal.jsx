@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { motion } from 'framer-motion';
 import { Client } from '@microsoft/microsoft-graph-client';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import {
     Shield, AlertTriangle, Activity, Users, Mail, Cloud, Lock,
     TrendingUp, TrendingDown, Minus, ChevronRight, RefreshCw, Zap,
@@ -70,6 +72,8 @@ const generateTrendData = (baseValue, variance = 0.1, points = 10) => {
 
 const DefenderSecurityPortal = () => {
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -118,10 +122,8 @@ const DefenderSecurityPortal = () => {
     };
 
     useEffect(() => {
-        if (accounts.length > 0) {
-            fetchData();
-        }
-    }, [accounts]);
+        fetchData();
+    }, [activeTenantId]);
 
     const getGraphClient = async () => {
         const request = {
@@ -131,29 +133,14 @@ const DefenderSecurityPortal = () => {
                 'IdentityRiskyUser.Read.All', 'IdentityRiskEvent.Read.All',
                 'AuditLog.Read.All', 'Application.Read.All', 'Reports.Read.All',
                 'Policy.Read.All', 'UserAuthenticationMethod.Read.All'
-            ],
-            account: accounts[0]
+            ]
         };
 
-        let response;
-        try {
-            response = await instance.acquireTokenSilent(request);
-        } catch (error) {
-            // Handle consent/interaction required errors
-            if (error.errorCode === 'consent_required' ||
-                error.errorCode === 'interaction_required' ||
-                error.errorMessage?.includes('AADSTS65001') ||
-                error.name === 'InteractionRequiredAuthError') {
-                console.log('Consent required, triggering interactive authentication...');
-                response = await instance.acquireTokenPopup(request);
-            } else {
-                throw error;
-            }
-        }
+        const accessToken = await acquireToken(request);
 
         return Client.init({
             authProvider: (done) => {
-                done(null, response.accessToken);
+                done(null, accessToken);
             }
         });
     };

@@ -4,11 +4,15 @@ import { useMsal } from '@azure/msal-react';
 import { PurviewService } from '../services/purview';
 import { motion } from 'framer-motion';
 import { BookOpen, ArrowLeft, Folder, FileText, Link as LinkIcon } from 'lucide-react';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import Loader3D from './Loader3D';
 
 const GlossaryPage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
 
     const [terms, setTerms] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -17,21 +21,20 @@ const GlossaryPage = () => {
 
     useEffect(() => {
         fetchGlossary();
-    }, [accounts]);
+    }, [activeTenantId]);
 
     const fetchGlossary = async () => {
         if (accounts.length === 0) return;
         setLoading(true);
 
         try {
-            const response = await instance.acquireTokenSilent({
-                scopes: ['https://purview.azure.net/.default'],
-                account: accounts[0]
+            const accessToken = await acquireToken({
+                scopes: ['https://purview.azure.net/.default']
             });
 
             const [termsData, categoriesData] = await Promise.all([
-                PurviewService.getGlossaryTerms(response.accessToken),
-                PurviewService.getGlossaryCategories(response.accessToken)
+                PurviewService.getGlossaryTerms(accessToken),
+                PurviewService.getGlossaryCategories(accessToken)
             ]);
 
             setTerms(termsData);

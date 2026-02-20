@@ -5,11 +5,15 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { ArrowLeft, Lock, Shield, CheckCircle, XCircle, AlertCircle, Calendar, Users, Info } from 'lucide-react';
 import { IntuneService } from '../services/intune';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import styles from './DetailPage.module.css';
 
 const IntuneSecurityBaselines = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [baselines, setBaselines] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -18,17 +22,14 @@ const IntuneSecurityBaselines = () => {
 
     useEffect(() => {
         fetchBaselines();
-    }, []);
+    }, [activeTenantId]);
 
     const fetchBaselines = async () => {
         if (accounts.length > 0) {
             try {
                 setLoading(true);
-                const response = await instance.acquireTokenSilent({
-                    ...loginRequest,
-                    account: accounts[0]
-                });
-                const client = new GraphService(response.accessToken).client;
+                const accessToken = await acquireToken({ ...loginRequest });
+                const client = new GraphService(accessToken).client;
                 const data = await IntuneService.getSecurityBaselines(client);
                 setBaselines(data);
                 setError(null);
@@ -49,11 +50,8 @@ const IntuneSecurityBaselines = () => {
             // If there are deployed instances, fetch stats for the first one
             if (baseline.deployedInstances && baseline.deployedInstances.length > 0 && !baselineStats[baseline.id]) {
                 try {
-                    const response = await instance.acquireTokenSilent({
-                        ...loginRequest,
-                        account: accounts[0]
-                    });
-                    const client = new GraphService(response.accessToken).client;
+                    const accessToken = await acquireToken({ ...loginRequest });
+                    const client = new GraphService(accessToken).client;
                     const intentId = baseline.deployedInstances[0].id;
                     const stats = await IntuneService.getSecurityBaselineStats(client, intentId);
                     setBaselineStats(prev => ({

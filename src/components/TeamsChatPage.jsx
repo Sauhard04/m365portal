@@ -5,6 +5,8 @@ import { Client } from '@microsoft/microsoft-graph-client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { teamsScopes } from '../authConfig';
 import { TeamsService } from '../services/teams/teams.service';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import Loader3D from './Loader3D';
 import {
     MessageSquare, ArrowLeft, RefreshCw, ExternalLink, Users, Clock, Hash
@@ -13,6 +15,8 @@ import {
 const TeamsChatPage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [chats, setChats] = useState([]);
@@ -26,14 +30,12 @@ const TeamsChatPage = () => {
         setError(null);
 
         try {
-            const account = accounts[0];
-            const tokenResponse = await instance.acquireTokenSilent({
-                ...teamsScopes,
-                account
+            const accessToken = await acquireToken({
+                ...teamsScopes
             });
 
             const client = Client.init({
-                authProvider: (done) => done(null, tokenResponse.accessToken)
+                authProvider: (done) => done(null, accessToken)
             });
 
             const data = await TeamsService.getMyChats(client);
@@ -49,7 +51,7 @@ const TeamsChatPage = () => {
 
     useEffect(() => {
         fetchChats();
-    }, [instance, accounts]);
+    }, [activeTenantId]);
 
     const getChatTitle = (chat) => {
         if (chat.topic) return chat.topic;

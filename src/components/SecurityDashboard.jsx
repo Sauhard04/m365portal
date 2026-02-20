@@ -9,6 +9,8 @@ import { DataPersistenceService } from '../services/dataPersistence';
 import AnimatedTile from './AnimatedTile';
 import Loader3D from './Loader3D';
 import { useDataCaching } from '../hooks/useDataCaching';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import {
     Shield, AlertTriangle, AlertOctagon, UserX, Activity, Lock,
     TrendingUp, RefreshCw, ChevronRight, Eye, FileWarning, Target
@@ -22,18 +24,16 @@ import styles from './DetailPage.module.css';
 const SecurityDashboard = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
 
     const fetchFn = async () => {
-        const account = accounts[0];
-        if (!account) throw new Error('No account found');
-
-        const tokenResponse = await instance.acquireTokenSilent({
-            ...securityScopes,
-            account
+        const accessToken = await acquireToken({
+            ...securityScopes
         });
 
         const client = Client.init({
-            authProvider: (done) => done(null, tokenResponse.accessToken)
+            authProvider: (done) => done(null, accessToken)
         });
 
         return await SecurityService.getDashboardSummary(client);
@@ -49,7 +49,8 @@ const SecurityDashboard = () => {
         maxAge: 30,
         storeSection: 'security',
         storeMetadata: { source: 'SecurityDashboard' },
-        enabled: accounts.length > 0
+        enabled: accounts.length > 0,
+        dependencies: [activeTenantId]
     });
 
     const [interactionError, setInteractionError] = useState(false);

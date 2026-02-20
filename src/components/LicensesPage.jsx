@@ -6,10 +6,14 @@ import { GraphService } from '../services/graphService';
 import { ArrowLeft, Download, AlertCircle, CreditCard, TrendingUp, Search, RefreshCw } from 'lucide-react';
 import Loader3D from './Loader3D';
 import SiteDataStore from '../services/siteDataStore';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const LicensesPage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [licensingSummary, setLicensingSummary] = useState([]);
     const [reportData, setReportData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -22,8 +26,8 @@ const LicensesPage = () => {
         if (isManual) setRefreshing(true);
         else setLoading(true);
         try {
-            const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-            const graphService = new GraphService(response.accessToken);
+            const accessToken = await acquireToken({ ...loginRequest });
+            const graphService = new GraphService(accessToken);
             const { skus, users } = await graphService.getLicensingData();
             setLicensingSummary(skus || []);
 
@@ -57,7 +61,7 @@ const LicensesPage = () => {
 
     useEffect(() => {
         fetchData();
-    }, [instance, accounts]);
+    }, [activeTenantId]);
 
     const filteredData = reportData.filter(item => {
         if (!filterText) return true;

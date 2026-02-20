@@ -9831,7 +9831,7 @@
           "storage": 57612224444
         }
       },
-      "timestamp": 1771320681785,
+      "timestamp": 1771323493727,
       "source": "BirdsEyeView"
     },
     "alerts": {
@@ -9905,11 +9905,11 @@
           ],
           "deviceByPlatform": [
             {
-              "name": "macOS",
+              "name": "Windows",
               "value": 1
             },
             {
-              "name": "Windows",
+              "name": "macOS",
               "value": 1
             }
           ],
@@ -9942,14 +9942,9 @@
           ],
           "signIns": [
             {
-              "name": "2026-02-09",
-              "failed": 0,
-              "successful": 3
-            },
-            {
               "name": "2026-02-10",
-              "failed": 3,
-              "successful": 42
+              "failed": 1,
+              "successful": 18
             },
             {
               "name": "2026-02-11",
@@ -9968,20 +9963,20 @@
             },
             {
               "name": "2026-02-16",
-              "failed": 1,
+              "failed": 2,
+              "successful": 39
+            },
+            {
+              "name": "2026-02-17",
+              "failed": 14,
               "successful": 34
             }
           ],
           "emailTrend": [
             {
-              "name": "2026-02-08",
-              "sent": 0,
-              "received": 0
-            },
-            {
               "name": "2026-02-09",
-              "sent": 1,
-              "received": 2
+              "sent": 0,
+              "received": 6
             },
             {
               "name": "2026-02-10",
@@ -9990,23 +9985,28 @@
             },
             {
               "name": "2026-02-11",
-              "sent": 0,
-              "received": 0
+              "sent": 1,
+              "received": 2
             },
             {
               "name": "2026-02-12",
               "sent": 0,
-              "received": 6
+              "received": 0
             },
             {
               "name": "2026-02-13",
               "sent": 0,
-              "received": 1
+              "received": 0
             },
             {
               "name": "2026-02-14",
               "sent": 0,
               "received": 6
+            },
+            {
+              "name": "2026-02-15",
+              "sent": 0,
+              "received": 1
             }
           ],
           "securityRadar": [
@@ -10032,7 +10032,7 @@
             },
             {
               "subject": "Sign-in Success",
-              "value": 97,
+              "value": 73,
               "fullMark": 100
             }
           ],
@@ -10092,7 +10092,7 @@
           "licenseTrendComposed": []
         }
       },
-      "timestamp": 1771242402733,
+      "timestamp": 1771323484021,
       "source": "OverviewDashboard"
     },
     "usageReports": {
@@ -15053,7 +15053,7 @@
     "entra_id": {
       "data": {
         "identities": {
-          "total": 13,
+          "total": 14,
           "trend": "Directory"
         },
         "groups": {
@@ -15061,11 +15061,11 @@
           "trend": "Teams"
         },
         "apps": {
-          "registered": 31,
+          "registered": 32,
           "trend": "Registrations"
         },
         "enterpriseApps": {
-          "count": 42,
+          "count": 43,
           "trend": "Principals"
         },
         "admins": {
@@ -15087,7 +15087,7 @@
           "status": "Identity Guard"
         }
       },
-      "timestamp": 1770705736787,
+      "timestamp": 1771323351501,
       "source": "EntraDashboard"
     },
     "entraUsers": {
@@ -24020,5 +24020,5 @@
       "timestamp": 1770637688061
     }
   },
-  "lastUpdated": 1771320681825
+  "lastUpdated": 1771323493772
 }

@@ -4,6 +4,8 @@ import { useMsal } from '@azure/msal-react';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { loginRequest } from '../authConfig';
 import { SecurityService } from '../services/security/security.service';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import Loader3D from './Loader3D';
 import { AlertTriangle, ArrowLeft, RefreshCw, Filter, Search, ExternalLink } from 'lucide-react';
 
@@ -12,6 +14,8 @@ import styles from './DetailPage.module.css';
 const SecurityAlertsPage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [refreshing, setRefreshing] = useState(false);
@@ -26,16 +30,12 @@ const SecurityAlertsPage = () => {
         setError(null);
 
         try {
-            const account = accounts[0];
-            if (!account) throw new Error('No account found');
-
-            let tokenResponse = await instance.acquireTokenSilent({
-                ...loginRequest,
-                account
+            let accessToken = await acquireToken({
+                ...loginRequest
             });
 
             const client = Client.init({
-                authProvider: (done) => done(null, tokenResponse.accessToken)
+                authProvider: (done) => done(null, accessToken)
             });
 
             const data = await SecurityService.getSecurityAlerts(client, 200);
@@ -52,7 +52,7 @@ const SecurityAlertsPage = () => {
 
     useEffect(() => {
         fetchAlerts();
-    }, [instance, accounts]);
+    }, [activeTenantId]);
 
     useEffect(() => {
         let filtered = alerts;

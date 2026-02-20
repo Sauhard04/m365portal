@@ -9,6 +9,13 @@ export class GraphService {
                 done(null, accessToken);
             },
         });
+        // Instance-level flags to suppress forbidden optional APIs per tenant session
+        this.suppressed = {
+            labels: false,
+            retention: false,
+            ediscovery: false,
+            ediscoverySearches: false
+        };
     }
 
     async getUserDetails() {
@@ -429,13 +436,15 @@ export class GraphService {
         try {
             // Sensitivity labels might fail with 403 on organization-wide endpoint for some users
             // These are optional telemetry points, so we suppress errors to keep console clean
+            // Sensitivity labels might fail with 403 on organization-wide endpoint for some users
+            // These are optional telemetry points, so we suppress errors to keep console clean
             const fetchLabels = async () => {
-                if (window._graphBetaLabelsForbidden) return { value: [] };
+                if (this.suppressed.labels) return { value: [] };
                 try {
                     return await this.client.api("/security/informationProtection/sensitivityLabels").version("beta").get();
                 } catch (err) {
                     if (err.statusCode === 403 || err.code === 'Forbidden' || err.statusCode === 401) {
-                        window._graphBetaLabelsForbidden = true;
+                        this.suppressed.labels = true;
                     }
                     console.debug("Optional sensitivity labels fetch skipped or forbidden");
                     return { value: [] };
@@ -444,19 +453,19 @@ export class GraphService {
 
             const [labels, retention, cases] = await Promise.all([
                 fetchLabels(),
-                window._graphBetaRetentionForbidden ? Promise.resolve({ value: [] }) : this.client.api("/security/labels/retentionLabels").version("beta").get().catch(err => {
-                    if (err.statusCode === 403 || err.statusCode === 401) window._graphBetaRetentionForbidden = true;
+                this.suppressed.retention ? Promise.resolve({ value: [] }) : this.client.api("/security/labels/retentionLabels").version("beta").get().catch(err => {
+                    if (err.statusCode === 403 || err.statusCode === 401) this.suppressed.retention = true;
                     return { value: [] };
                 }),
-                window._graphBetaEDiscoveryForbidden ? Promise.resolve({ value: [] }) : this.client.api("/compliance/ediscovery/cases").version("beta").get().catch((err) => {
-                    if (err.statusCode === 403 || err.statusCode === 401) window._graphBetaEDiscoveryForbidden = true;
+                this.suppressed.ediscovery ? Promise.resolve({ value: [] }) : this.client.api("/compliance/ediscovery/cases").version("beta").get().catch((err) => {
+                    if (err.statusCode === 403 || err.statusCode === 401) this.suppressed.ediscovery = true;
                     return { value: [] };
                 })
             ]);
 
             // Attempt to fetch searches for the first case if any exist
             let searchCount = 0;
-            if (cases?.value?.length > 0 && !window._graphBetaEDiscoverySearchesForbidden) {
+            if (cases?.value?.length > 0 && !this.suppressed.ediscoverySearches) {
                 try {
                     const caseId = cases.value[0].id;
                     if (caseId) {
@@ -466,7 +475,7 @@ export class GraphService {
                 } catch (e) {
                     // Suppress 400/403 errors for eDiscovery searches as they are optional telemetry
                     if (e.statusCode === 400 || e.statusCode === 403 || e.statusCode === 401) {
-                        window._graphBetaEDiscoverySearchesForbidden = true;
+                        this.suppressed.ediscoverySearches = true;
                     }
                     console.debug("Could not fetch eDiscovery searches (optional):", e.message);
                 }

@@ -5,10 +5,14 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { Loader2, CheckCircle2, Globe, ShieldAlert, ArrowLeft, ShieldCheck, AlertCircle, RefreshCw } from 'lucide-react';
 import Loader3D from './Loader3D';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const DomainsPage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [domains, setDomains] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -19,8 +23,8 @@ const DomainsPage = () => {
         if (isManual) setRefreshing(true);
         else setLoading(true);
         try {
-            const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-            const graphService = new GraphService(response.accessToken);
+            const accessToken = await acquireToken({ ...loginRequest });
+            const graphService = new GraphService(accessToken);
             const data = await graphService.getDomains();
             setDomains(data);
 
@@ -41,7 +45,7 @@ const DomainsPage = () => {
 
     useEffect(() => {
         fetchDomains();
-    }, [instance, accounts]);
+    }, [activeTenantId]);
 
     if (loading && domains.length === 0) {
         return (

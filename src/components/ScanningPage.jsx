@@ -3,29 +3,32 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { PurviewService } from '../services/purview';
 import { ArrowLeft, Scan, Database, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import Loader3D from './Loader3D';
 
 const ScanningPage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [dataSources, setDataSources] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchDataSources();
-    }, [accounts]);
+    }, [activeTenantId]);
 
     const fetchDataSources = async () => {
         if (accounts.length === 0) return;
         setLoading(true);
 
         try {
-            const response = await instance.acquireTokenSilent({
-                scopes: ['https://purview.azure.net/.default'],
-                account: accounts[0]
+            const accessToken = await acquireToken({
+                scopes: ['https://purview.azure.net/.default']
             });
 
-            const sources = await PurviewService.getDataSources(response.accessToken);
+            const sources = await PurviewService.getDataSources(accessToken);
             setDataSources(sources);
         } catch (error) {
             console.error('Error fetching data sources:', error);

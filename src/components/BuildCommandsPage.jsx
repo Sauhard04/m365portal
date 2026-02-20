@@ -29,10 +29,14 @@ import {
     Fingerprint
 } from 'lucide-react';
 import Loader3D from './Loader3D';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const BuildCommandsPage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const { theme } = useTheme();
     const isDark = theme === 'dark';
 
@@ -447,8 +451,8 @@ Disconnect-ExchangeOnline -Confirm:$false
         setError(null);
         try {
             if (accounts.length === 0) return;
-            const res = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-            const graph = new GraphService(res.accessToken);
+            const accessToken = await acquireToken({ ...loginRequest });
+            const graph = new GraphService(accessToken);
             const usersData = await graph.getAllUsers();
             setUsers(usersData || []);
         } catch (err) {
@@ -459,7 +463,7 @@ Disconnect-ExchangeOnline -Confirm:$false
         }
     };
 
-    useEffect(() => { fetchUsers(); }, []);
+    useEffect(() => { fetchUsers(); }, [activeTenantId]);
 
     if (loading && users.length === 0) {
         return <Loader3D showOverlay={true} />;

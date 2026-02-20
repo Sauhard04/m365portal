@@ -22,6 +22,9 @@ import { DataPersistenceService } from '../services/dataPersistence';
 import SiteDataStore from '../services/siteDataStore';
 import { MiniSparkline, MiniProgressBar, MiniSegmentedBar } from './charts/MicroCharts';
 import { useDataCaching } from '../hooks/useDataCaching';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
+import RuntimeConfig from '../config';
 // Recharts components are standard for visualizations
 
 const CustomTreemapContent = (props) => {
@@ -121,11 +124,14 @@ const DashboardGlobalDefs = () => (
 
 const OverviewDashboard = () => {
     const navigate = useNavigate();
-    const { instance, accounts } = useMsal();
+    const { accounts } = useMsal();
+    const { getAccessToken } = useToken();
+    const activeTenantId = useActiveTenant();
+
     const fetchFn = async () => {
-        const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-        const graphService = new GraphService(response.accessToken);
-        const overviewData = await AggregationService.getOverviewData(graphService, response.accessToken);
+        const accessToken = await getAccessToken(loginRequest);
+        const graphService = new GraphService(accessToken);
+        const overviewData = await AggregationService.getOverviewData(graphService, accessToken);
 
         // Map to our persistence schema (Legacy support)
         const persistenceData = {
@@ -157,8 +163,11 @@ const OverviewDashboard = () => {
         maxAge: 30, // 30 minutes
         storeSection: 'overview',
         storeMetadata: { source: 'OverviewDashboard' },
-        enabled: accounts.length > 0
+        enabled: accounts.length > 0 && !!activeTenantId,
+        dependencies: [activeTenantId]
     });
+
+    // Data loading is handled by the useDataCaching hook which is tenant-aware
 
     const [overviewOpen, setOverviewOpen] = useState(true);
     const [birdsEyeOpen, setBirdsEyeOpen] = useState(true);

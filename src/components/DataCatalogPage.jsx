@@ -6,10 +6,14 @@ import { PurviewService } from '../services/purview';
 import { motion } from 'framer-motion';
 import { Search, Filter, Database, FileText, Tag, User, Calendar, ArrowLeft } from 'lucide-react';
 import Loader3D from './Loader3D';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const DataCatalogPage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
 
     const [assets, setAssets] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -18,19 +22,18 @@ const DataCatalogPage = () => {
 
     useEffect(() => {
         fetchAssets();
-    }, [accounts]);
+    }, [activeTenantId]);
 
     const fetchAssets = async () => {
         if (accounts.length === 0) return;
         setLoading(true);
 
         try {
-            const response = await instance.acquireTokenSilent({
-                scopes: ['https://purview.azure.net/.default'],
-                account: accounts[0]
+            const accessToken = await acquireToken({
+                scopes: ['https://purview.azure.net/.default']
             });
 
-            const results = await PurviewService.searchCatalog(response.accessToken, {
+            const results = await PurviewService.searchCatalog(accessToken, {
                 keywords: '*',
                 limit: 100
             });

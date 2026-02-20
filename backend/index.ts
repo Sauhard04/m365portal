@@ -334,10 +334,26 @@ app.post('/api/script/reset', (_req, res) => {
  * Allows saving/loading any JSON file from the data/ folder
  */
 
+// Helper to get tenant-specific file path
+const getDataFilePath = (filename: string, req: express.Request) => {
+    const tenantId = req.headers['x-tenant-id'] || req.body.tenantId;
+    console.log(`[Data] Resolving path for ${filename}. Tenant Context: ${tenantId || 'GLOBAL/NULL'}`);
+
+    if (tenantId && (filename === 'sitedata')) {
+        const tenantPath = path.join(process.cwd(), 'data', `${filename}-${tenantId}.json`);
+        console.log(`[Data] Using tenant-specific file: ${path.basename(tenantPath)}`);
+        return tenantPath;
+    }
+
+    const defaultPath = path.join(process.cwd(), 'data', `${filename}.json`);
+    console.log(`[Data] Falling back to global file: ${path.basename(defaultPath)}`);
+    return defaultPath;
+};
+
 app.get('/api/data/:filename', async (req, res) => {
     try {
         const { filename } = req.params;
-        const filePath = path.join(process.cwd(), 'data', `${filename}.json`);
+        const filePath = getDataFilePath(filename, req);
 
         if (!fs.existsSync(filePath)) {
             // Return empty object for new files
@@ -355,7 +371,7 @@ app.post('/api/data/:filename', async (req, res) => {
     try {
         const { filename } = req.params;
         const body = req.body;
-        const filePath = path.join(process.cwd(), 'data', `${filename}.json`);
+        const filePath = getDataFilePath(filename, req);
 
         if (!fs.existsSync(path.dirname(filePath))) {
             fs.mkdirSync(path.dirname(filePath), { recursive: true });
@@ -370,7 +386,7 @@ app.post('/api/data/:filename', async (req, res) => {
                 try {
                     currentData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
                 } catch (e) {
-                    console.warn('[Data] sitedata.json corrupted, starting fresh');
+                    console.warn(`[Data] ${path.basename(filePath)} corrupted, starting fresh`);
                 }
             }
 
@@ -383,6 +399,7 @@ app.post('/api/data/:filename', async (req, res) => {
         }
 
         fs.writeFileSync(filePath, JSON.stringify(dataToSave, null, 2), 'utf-8');
+        console.log(`[Data] Saved ${path.basename(filePath)}`);
         res.json({ success: true, status: 'success' });
     } catch (err: any) {
         res.status(500).json({ status: 'error', message: String(err) });
@@ -397,13 +414,14 @@ app.post('/api/sitedata/save', subscriptionGuard, async (req, res) => {
 });
 
 // Load site data from sitedata.json
-app.get('/api/sitedata/load', async (_req, res) => {
+app.get('/api/sitedata/load', async (req, res) => {
     try {
-        if (!fs.existsSync(SITEDATA_PATH)) {
+        const filePath = getDataFilePath('sitedata', req);
+        if (!fs.existsSync(filePath)) {
             return res.json({ success: true, data: { lastUpdated: null, sections: {} } });
         }
 
-        const fileContent = fs.readFileSync(SITEDATA_PATH, 'utf-8');
+        const fileContent = fs.readFileSync(filePath, 'utf-8');
         const data = JSON.parse(fileContent);
 
         res.json({ success: true, data });
@@ -414,13 +432,14 @@ app.get('/api/sitedata/load', async (_req, res) => {
 });
 
 // Get AI-friendly summary of site data
-app.get('/api/sitedata/summary', async (_req, res) => {
+app.get('/api/sitedata/summary', async (req, res) => {
     try {
-        if (!fs.existsSync(SITEDATA_PATH)) {
+        const filePath = getDataFilePath('sitedata', req);
+        if (!fs.existsSync(filePath)) {
             return res.json({ success: true, summary: 'No site data available.' });
         }
 
-        const fileContent = fs.readFileSync(SITEDATA_PATH, 'utf-8');
+        const fileContent = fs.readFileSync(filePath, 'utf-8');
         const data = JSON.parse(fileContent);
 
         // Generate summary from stored data

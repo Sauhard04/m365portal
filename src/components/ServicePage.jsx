@@ -10,21 +10,24 @@ import Loader3D from './Loader3D';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, ResponsiveContainer } from 'recharts';
 import { MiniSparkline, MiniProgressBar, MiniSegmentedBar, MiniStatusGeneric } from './charts/MicroCharts';
 import { useDataCaching } from '../hooks/useDataCaching';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const ServicePage = ({ serviceId: propServiceId }) => {
     const params = useParams();
     const serviceId = propServiceId || params.serviceId;
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const isAdmin = serviceId === 'admin';
 
     const fetchFn = async () => {
         if (!isAdmin) return null;
-        const response = await instance.acquireTokenSilent({
-            ...loginRequest,
-            account: accounts[0]
+        const accessToken = await getAccessToken({
+            ...loginRequest
         });
-        const graphService = new GraphService(response.accessToken);
+        const graphService = new GraphService(accessToken);
 
         const [exchangeResult, licensingResult, domainsCount, groups, deletedUsersCount, score, health, signIns] = await Promise.all([
             graphService.getExchangeMailboxReport().catch(() => ({ reports: [] })),
@@ -84,7 +87,8 @@ const ServicePage = ({ serviceId: propServiceId }) => {
         maxAge: 30,
         enabled: accounts.length > 0 && isAdmin,
         storeSection: 'admincenter',
-        storeMetadata: { source: 'ServicePage' }
+        storeMetadata: { source: 'ServicePage' },
+        dependencies: [activeTenantId]
     });
 
     const exchangeData = dashboardData?.exchangeData || [];

@@ -5,10 +5,14 @@ import { loginRequest } from '../authConfig';
 import { Trash2, RefreshCw, AlertCircle, Search, ArrowLeft, UserX } from 'lucide-react';
 import Loader3D from './Loader3D';
 import { useNavigate } from 'react-router-dom';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const DeletedUsersPage = () => {
     const { instance, accounts } = useMsal();
     const navigate = useNavigate();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -21,8 +25,8 @@ const DeletedUsersPage = () => {
         setError(null);
         try {
             if (accounts.length > 0) {
-                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                const graphService = new GraphService(response.accessToken);
+                const accessToken = await acquireToken({ ...loginRequest });
+                const graphService = new GraphService(accessToken);
                 const data = await graphService.getDeletedUsers();
                 setUsers(data || []);
             }
@@ -40,7 +44,7 @@ const DeletedUsersPage = () => {
 
     useEffect(() => {
         fetchData();
-    }, [accounts]);
+    }, [activeTenantId]);
 
     const filteredUsers = users.filter(user => {
         const searchStr = filterText.toLowerCase();

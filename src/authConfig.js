@@ -1,27 +1,76 @@
 import RuntimeConfig from './config';
 
-export const getMsalConfig = () => ({
-    auth: {
-        clientId: RuntimeConfig.get('VITE_CLIENT_ID'),
-        authority: `https://login.microsoftonline.com/${RuntimeConfig.get('VITE_TENANT_ID')}`,
-        redirectUri: window.location.origin,
-        navigateToLoginRequestUrl: false,
-    },
-    cache: {
-        cacheLocation: "localStorage",
-        storeAuthStateInCookie: false,
-    },
-});
+export const getMsalConfig = () => {
+    // Use the ACTIVE tenant's clientId and authority.
+    // RuntimeConfig.initialize() runs before this and applies the pending tenant
+    // (set by TenantSelector before logoutRedirect) — so MSAL is initialized
+    // with the correct credentials for the tenant being switched to.
+    const clientId = RuntimeConfig.get('VITE_CLIENT_ID');
+    const tenantId = RuntimeConfig.getActiveTenantId();
+    const authority = tenantId
+        ? `https://login.microsoftonline.com/${tenantId}`
+        : 'https://login.microsoftonline.com/organizations';
+
+    console.log(`[AuthConfig] MSAL clientId: ${clientId}, authority: ${authority}`);
+
+    return {
+        auth: {
+            clientId,
+            authority,
+            redirectUri: window.location.origin,
+            navigateToLoginRequestUrl: false,
+        },
+        cache: {
+            cacheLocation: 'localStorage',
+            storeAuthStateInCookie: false,
+        },
+    };
+};
 
 export const loginRequest = {
     scopes: [
+        // Core identity
         "User.Read",
         "Directory.Read.All",
-        "Reports.Read.All",
         "AuditLog.Read.All",
+        "Reports.Read.All",
+
+        // Service health
+        "ServiceHealth.Read.All",
+
+        // Security & Compliance (admin consent required)
+        "SecurityEvents.Read.All",
+        "SecurityAlert.Read.All",
+        "SecurityIncident.Read.All",
+        "IdentityRiskyUser.Read.All",
+        "IdentityRiskEvent.Read.All",
+
+        // Purview / Information Protection (admin consent required)
+        "InformationProtectionPolicy.Read",
+
+        // Intune / Device Management (admin consent required)
         "DeviceManagementManagedDevices.Read.All",
         "DeviceManagementServiceConfig.Read.All",
-        "ServiceHealth.Read.All"
+        "DeviceManagementConfiguration.Read.All",
+        "DeviceManagementApps.Read.All",
+
+        // Policy & Governance
+        "Policy.Read.All",
+        "Agreement.Read.All",
+        "UserAuthenticationMethod.Read.All",
+        "AppRoleAssignment.ReadWrite.All",
+
+        // SharePoint & Files
+        "Sites.Read.All",
+        "Files.Read.All",
+
+        // Teams
+        "Team.ReadBasic.All",
+        "TeamSettings.Read.All",
+        "Group.Read.All",
+
+        // Threat Intelligence
+        "ThreatHunting.Read.All",
     ]
 };
 

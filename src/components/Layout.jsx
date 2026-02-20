@@ -12,11 +12,16 @@ import Chatbot from './Chatbot/Chatbot';
 import SiteDataStore from '../services/siteDataStore';
 import TenantSelector from './TenantSelector';
 import { Building2 } from 'lucide-react';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
+import RuntimeConfig from '../config';
 
 const ServiceLayout = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { instance, accounts } = useMsal();
+    const { getAccessToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const { theme, toggleTheme } = useTheme();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -24,15 +29,42 @@ const ServiceLayout = () => {
     const [unresolvedAlertsCount, setUnresolvedAlertsCount] = useState(0);
     const username = localStorage.getItem('m365_user') || 'Admin';
 
-    // Initialize SiteDataStore from server/localStorage
+    // Initialize user context and guard against tenant mismatch.
+    // This is the critical safety check: if MSAL has a cached account from a
+    // DIFFERENT tenant than what's currently active (e.g., Pilot account is cached
+    // but Akarsh tenant is selected), force a logout + re-login with the correct tenant.
     useEffect(() => {
         if (accounts && accounts.length > 0) {
-            const tenantId = accounts[0].tenantId || accounts[0].homeAccountId?.split('.')[1];
+            const account = accounts[0];
+            RuntimeConfig.setCurrentUser(account.homeAccountId);
+
+            const activeTenantId = RuntimeConfig.getActiveTenantId();
+            const accountTenantId = account.tenantId; // The tenant this account's token is from
+
+            // If the logged-in account's tenant doesn't match the intended active tenant,
+            // start a forced re-login for the correct tenant.
+            if (activeTenantId && accountTenantId && activeTenantId !== accountTenantId) {
+                console.warn(`[Layout] ⚠️ TENANT MISMATCH DETECTED!`);
+                console.warn(`[Layout]   Active tenant: ${activeTenantId}`);
+                console.warn(`[Layout]   Account tenant: ${accountTenantId}`);
+                console.warn(`[Layout]   Forcing re-login with correct tenant credentials...`);
+
+                RuntimeConfig.setPendingTenant(activeTenantId);
+                instance.logoutRedirect({
+                    postLogoutRedirectUri: window.location.origin,
+                }).catch(err => {
+                    console.error('[Layout] Forced logout failed:', err);
+                });
+                return; // Don't initialize anything with the wrong account
+            }
+
+            const tenantId = RuntimeConfig.getActiveTenantId();
             SiteDataStore.ensureInitialized(tenantId).then(() => {
                 console.log('SiteDataStore initialized in Layout for tenant:', tenantId);
             });
         }
-    }, [accounts]);
+    }, [accounts, instance]);
+
 
     // Log route changes for AI context
     useEffect(() => {
@@ -66,14 +98,13 @@ const ServiceLayout = () => {
                 const AlertsService = (await import('../services/alerts/alerts.service')).default;
                 const { Client } = await import('@microsoft/microsoft-graph-client');
 
-                const accessToken = await instance.acquireTokenSilent({
-                    scopes: ['https://graph.microsoft.com/.default'],
-                    account: accounts[0]
+                const accessToken = await getAccessToken({
+                    scopes: ['https://graph.microsoft.com/.default']
                 });
 
                 const client = Client.init({
                     authProvider: (done) => {
-                        done(null, accessToken.accessToken);
+                        done(null, accessToken);
                     }
                 });
 
@@ -86,10 +117,8 @@ const ServiceLayout = () => {
         };
 
         fetchAlertCount();
-        // Refresh every 5 minutes
-        const interval = setInterval(fetchAlertCount, 5 * 60 * 1000);
-        return () => clearInterval(interval);
-    }, [instance, accounts]);
+
+    }, [instance, accounts, getAccessToken, activeTenantId]);
 
     const handleLogout = async () => {
         try {

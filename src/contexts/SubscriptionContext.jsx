@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useMsal } from '@azure/msal-react';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const SubscriptionContext = createContext();
 
@@ -14,8 +15,13 @@ export const useSubscription = () => {
 export const SubscriptionProvider = ({ children }) => {
     const { accounts = [] } = useMsal() || {};
     const [isExpired, setIsExpired] = useState(false);
-    const [tenantId, setTenantId] = useState(null);
+    const activeTenantId = useActiveTenant();
     const [isLoading, setIsLoading] = useState(true);
+
+    // Reset expired state when tenant changes to allow re-evaluation
+    useEffect(() => {
+        setIsExpired(false);
+    }, [activeTenantId]);
 
     useEffect(() => {
         // Safety timeout to prevent permanent blank screen if MSAL is slow or fails to return accounts
@@ -26,11 +32,9 @@ export const SubscriptionProvider = ({ children }) => {
             }
         }, 3000);
 
-        if (accounts && accounts.length > 0) {
-            setTenantId(accounts[0].tenantId || accounts[0].homeAccountId?.split('.')[1]);
+        if (isLoading && accounts && accounts.length > 0) {
             setIsLoading(false);
-        } else if (accounts) {
-            // Even if no accounts, we're not "loading" anymore
+        } else if (isLoading && accounts) {
             setIsLoading(false);
         }
 
@@ -43,7 +47,7 @@ export const SubscriptionProvider = ({ children }) => {
     const secureFetch = useCallback(async (url, options = {}) => {
         const headers = {
             ...options.headers,
-            'X-Tenant-Id': tenantId
+            'X-Tenant-Id': activeTenantId
         };
 
         try {
@@ -59,10 +63,10 @@ export const SubscriptionProvider = ({ children }) => {
             console.error('[Subscription] Fetch error:', error);
             throw error;
         }
-    }, [tenantId]);
+    }, [activeTenantId]);
 
     const value = {
-        tenantId,
+        tenantId: activeTenantId,
         isExpired,
         setIsExpired,
         isLoading,

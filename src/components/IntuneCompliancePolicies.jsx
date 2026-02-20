@@ -5,12 +5,16 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { IntuneService } from '../services/intune';
 import { ArrowLeft, Search, Shield, Loader2 } from 'lucide-react';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import Loader3D from './Loader3D';
 import styles from './DetailPage.module.css';
 
 const IntuneCompliancePolicies = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [policies, setPolicies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filterText, setFilterText] = useState('');
@@ -19,11 +23,10 @@ const IntuneCompliancePolicies = () => {
         const fetchPolicies = async () => {
             if (accounts.length > 0) {
                 try {
-                    const response = await instance.acquireTokenSilent({
-                        ...loginRequest,
-                        account: accounts[0]
+                    const accessToken = await acquireToken({
+                        ...loginRequest
                     });
-                    const client = new GraphService(response.accessToken).client;
+                    const client = new GraphService(accessToken).client;
                     const data = await IntuneService.getCompliancePolicies(client);
                     setPolicies(data);
                 } catch (error) {
@@ -34,7 +37,7 @@ const IntuneCompliancePolicies = () => {
             }
         };
         fetchPolicies();
-    }, [accounts, instance]);
+    }, [activeTenantId]);
 
     const filteredPolicies = policies.filter(policy =>
         (policy.displayName || '').toLowerCase().includes(filterText.toLowerCase())

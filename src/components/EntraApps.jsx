@@ -5,10 +5,14 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { ArrowLeft, Search, Download, Box, Loader2, RefreshCw } from 'lucide-react';
 import Loader3D from './Loader3D';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const EntraApps = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [apps, setApps] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -21,8 +25,8 @@ const EntraApps = () => {
 
             const startTime = Date.now();
             try {
-                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                const graphService = new GraphService(response.accessToken);
+                const accessToken = await acquireToken({ ...loginRequest });
+                const graphService = new GraphService(accessToken);
                 const data = await graphService.getApplications();
                 setApps(data || []);
 
@@ -46,7 +50,7 @@ const EntraApps = () => {
 
     useEffect(() => {
         fetchApps();
-    }, [accounts, instance]);
+    }, [activeTenantId]);
 
     const filteredApps = apps.filter(app =>
         app.displayName?.toLowerCase().includes(filterText.toLowerCase()) ||

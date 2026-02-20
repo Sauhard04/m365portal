@@ -4,6 +4,8 @@ import { useMsal } from '@azure/msal-react';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { motion } from 'framer-motion';
 import { loginRequest } from '../authConfig';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import { SecurityService } from '../services/security/security.service';
 import AnimatedTile from './AnimatedTile';
 import Loader3D from './Loader3D';
@@ -19,6 +21,8 @@ import {
 const RiskyUsersPage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [users, setUsers] = useState([]);
@@ -32,16 +36,12 @@ const RiskyUsersPage = () => {
         else setLoading(true);
 
         try {
-            const account = accounts[0];
-            if (!account) throw new Error('No account found');
-
-            const tokenResponse = await instance.acquireTokenSilent({
-                ...loginRequest,
-                account
+            const accessToken = await acquireToken({
+                ...loginRequest
             });
 
             const client = Client.init({
-                authProvider: (done) => done(null, tokenResponse.accessToken)
+                authProvider: (done) => done(null, accessToken)
             });
 
             const [riskyUsersData, detectionsData] = await Promise.all([
@@ -65,10 +65,8 @@ const RiskyUsersPage = () => {
     };
 
     useEffect(() => {
-        if (accounts.length > 0) {
-            fetchData();
-        }
-    }, [instance, accounts]);
+        fetchData();
+    }, [activeTenantId]);
 
     useEffect(() => {
         let filtered = users;

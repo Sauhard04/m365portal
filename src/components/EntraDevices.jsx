@@ -6,10 +6,14 @@ import { GraphService } from '../services/graphService';
 import { DevicesService } from '../services/entra';
 import { ArrowLeft, Search, Laptop, Monitor, Smartphone, RefreshCw, Download } from 'lucide-react';
 import Loader3D from './Loader3D';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const EntraDevices = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [devices, setDevices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -20,15 +24,15 @@ const EntraDevices = () => {
 
     useEffect(() => {
         fetchDevices();
-    }, [accounts, instance]);
+    }, [activeTenantId]);
 
     const fetchDevices = async (isManual = false) => {
         if (accounts.length > 0) {
             if (isManual) setRefreshing(true);
             else setLoading(true);
             try {
-                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                const client = new GraphService(response.accessToken).client;
+                const accessToken = await acquireToken({ ...loginRequest });
+                const client = new GraphService(accessToken).client;
                 const data = await DevicesService.getAllDevices(client, 100);
                 setDevices(data || []);
             } catch (error) {

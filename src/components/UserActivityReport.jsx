@@ -13,10 +13,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const UserActivityReport = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [users, setUsers] = useState([]);
@@ -36,12 +40,8 @@ const UserActivityReport = () => {
         else setLoading(true);
 
         try {
-            const account = accounts[0];
-            if (!account) return;
-
-            const tokenResponse = await instance.acquireTokenSilent({
-                scopes: ["Reports.Read.All", "User.Read.All"],
-                account
+            const tokenResponse = await acquireToken({
+                scopes: ["Reports.Read.All", "User.Read.All"]
             });
 
             const usageService = new UsageService(tokenResponse.accessToken);
@@ -121,7 +121,7 @@ const UserActivityReport = () => {
 
     useEffect(() => {
         fetchActivityData();
-    }, [instance, accounts]);
+    }, [activeTenantId]);
 
     useEffect(() => {
         let filtered = [...users];
@@ -180,12 +180,8 @@ const UserActivityReport = () => {
         setUserSignIns([]);
 
         try {
-            const account = accounts[0];
-            if (!account) return;
-
-            const tokenResponse = await instance.acquireTokenSilent({
-                scopes: ["AuditLog.Read.All"],
-                account
+            const tokenResponse = await acquireToken({
+                scopes: ["AuditLog.Read.All"]
             });
 
             const usageService = new UsageService(tokenResponse.accessToken);

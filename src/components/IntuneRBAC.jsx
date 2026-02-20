@@ -5,12 +5,16 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { IntuneService } from '../services/intune';
 import { ArrowLeft, UserCog, Shield, ChevronDown, ChevronRight, Users } from 'lucide-react';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import styles from './DetailPage.module.css';
 import Loader3D from './Loader3D';
 
 const IntuneRBAC = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
 
     const [roles, setRoles] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -19,7 +23,7 @@ const IntuneRBAC = () => {
 
     useEffect(() => {
         fetchRoles();
-    }, [accounts, instance]);
+    }, [activeTenantId]);
 
     const fetchRoles = async () => {
         if (accounts.length === 0) return;
@@ -28,11 +32,8 @@ const IntuneRBAC = () => {
         setError(null);
 
         try {
-            const response = await instance.acquireTokenSilent({
-                ...loginRequest,
-                account: accounts[0]
-            });
-            const client = new GraphService(response.accessToken).client;
+            const accessToken = await acquireToken({ ...loginRequest });
+            const client = new GraphService(accessToken).client;
             const rbacData = await IntuneService.getRBACData(client);
             setRoles(rbacData);
         } catch (err) {

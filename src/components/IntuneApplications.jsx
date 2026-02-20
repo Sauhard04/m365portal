@@ -5,12 +5,16 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { IntuneService } from '../services/intune';
 import { ArrowLeft, Search, Package, Loader2 } from 'lucide-react';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import Loader3D from './Loader3D';
 import styles from './DetailPage.module.css';
 
 const IntuneApplications = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [apps, setApps] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filterText, setFilterText] = useState('');
@@ -19,11 +23,8 @@ const IntuneApplications = () => {
         const fetchApps = async () => {
             if (accounts.length > 0) {
                 try {
-                    const response = await instance.acquireTokenSilent({
-                        ...loginRequest,
-                        account: accounts[0]
-                    });
-                    const client = new GraphService(response.accessToken).client;
+                    const accessToken = await acquireToken({ ...loginRequest });
+                    const client = new GraphService(accessToken).client;
                     const data = await IntuneService.getMobileApps(client, 100);
                     setApps(data);
                 } catch (error) {
@@ -34,7 +35,7 @@ const IntuneApplications = () => {
             }
         };
         fetchApps();
-    }, [accounts, instance]);
+    }, [activeTenantId]);
 
     const filteredApps = apps.filter(app =>
         (app.displayName || '').toLowerCase().includes(filterText.toLowerCase()) ||

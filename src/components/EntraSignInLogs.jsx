@@ -5,10 +5,14 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { ArrowLeft, Search, Download, CheckCircle2, XCircle, LogIn, MapPin, Globe, Monitor, Calendar, AlertTriangle, Shield } from 'lucide-react';
 import Loader3D from './Loader3D';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const EntraSignInLogs = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [signIns, setSignIns] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -19,7 +23,7 @@ const EntraSignInLogs = () => {
 
     useEffect(() => {
         fetchSignInLogs();
-    }, [accounts, instance]);
+    }, [activeTenantId]);
 
     const fetchSignInLogs = async () => {
         if (accounts.length === 0) return;
@@ -28,11 +32,10 @@ const EntraSignInLogs = () => {
         setError(null);
 
         try {
-            const response = await instance.acquireTokenSilent({
-                ...loginRequest,
-                account: accounts[0]
+            const accessToken = await acquireToken({
+                ...loginRequest
             });
-            const client = new GraphService(response.accessToken).client;
+            const client = new GraphService(accessToken).client;
 
             // Fetch sign-in logs
             const signInsResponse = await client.api('/auditLogs/signIns')

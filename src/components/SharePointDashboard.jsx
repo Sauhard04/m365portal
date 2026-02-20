@@ -16,10 +16,14 @@ import {
     ResponsiveContainer, PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis, LineChart, Line, AreaChart, Area, CartesianGrid
 } from 'recharts';
 import { useDataCaching } from '../hooks/useDataCaching';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const SharePointDashboard = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [chartsVisible, setChartsVisible] = useState(false);
 
     useEffect(() => {
@@ -28,16 +32,12 @@ const SharePointDashboard = () => {
     }, []);
 
     const fetchFn = async () => {
-        const account = accounts[0];
-        if (!account) throw new Error('No account found');
-
-        const tokenResponse = await instance.acquireTokenSilent({
-            ...sharepointScopes,
-            account
+        const accessToken = await acquireToken({
+            ...sharepointScopes
         });
 
         const client = Client.init({
-            authProvider: (done) => done(null, tokenResponse.accessToken)
+            authProvider: (done) => done(null, accessToken)
         });
 
         const [
@@ -120,7 +120,8 @@ const SharePointDashboard = () => {
         maxAge: 30,
         storeSection: 'sharepoint',
         storeMetadata: { source: 'SharePointDashboard' },
-        enabled: accounts.length > 0
+        enabled: accounts.length > 0,
+        dependencies: [activeTenantId]
     });
 
     const [interactionError, setInteractionError] = useState(false);

@@ -5,12 +5,16 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { IntuneService } from '../services/intune';
 import { ArrowLeft, Search, Download, CheckCircle2, XCircle, Loader2, Smartphone, Monitor } from 'lucide-react';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import Loader3D from './Loader3D';
 import styles from './DetailPage.module.css';
 
 const IntuneManagedDevices = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [devices, setDevices] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filterText, setFilterText] = useState('');
@@ -22,11 +26,8 @@ const IntuneManagedDevices = () => {
         const fetchDevices = async () => {
             if (accounts.length > 0) {
                 try {
-                    const response = await instance.acquireTokenSilent({
-                        ...loginRequest,
-                        account: accounts[0]
-                    });
-                    const client = new GraphService(response.accessToken).client;
+                    const accessToken = await acquireToken({ ...loginRequest });
+                    const client = new GraphService(accessToken).client;
                     const data = await IntuneService.getManagedDevices(client, 100);
                     setDevices(data);
 
@@ -41,7 +42,7 @@ const IntuneManagedDevices = () => {
             }
         };
         fetchDevices();
-    }, [accounts, instance]);
+    }, [activeTenantId]);
 
     const filteredDevices = devices.filter(device => {
         const matchesText = (device.deviceName || '').toLowerCase().includes(filterText.toLowerCase()) ||

@@ -5,12 +5,16 @@ import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
 import { IntuneService } from '../services/intune';
 import { ArrowLeft, Search, Users, Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import Loader3D from './Loader3D';
 import styles from './DetailPage.module.css';
 
 const IntuneUserDevices = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [searchText, setSearchText] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -23,11 +27,8 @@ const IntuneUserDevices = () => {
         const fetchUsers = async () => {
             setLoading(true);
             try {
-                const response = await instance.acquireTokenSilent({
-                    ...loginRequest,
-                    account: accounts[0]
-                });
-                const client = new GraphService(response.accessToken).client;
+                const accessToken = await acquireToken({ ...loginRequest });
+                const client = new GraphService(accessToken).client;
                 const fetchedUsers = await IntuneService.getUsers(client);
                 setUsers(fetchedUsers);
                 setSearchResults(fetchedUsers);
@@ -41,7 +42,7 @@ const IntuneUserDevices = () => {
         if (accounts.length > 0) {
             fetchUsers();
         }
-    }, [accounts, instance]);
+    }, [activeTenantId]);
 
     const handleSearch = async () => {
         if (!searchText) {
@@ -51,11 +52,8 @@ const IntuneUserDevices = () => {
 
         setLoading(true);
         try {
-            const response = await instance.acquireTokenSilent({
-                ...loginRequest,
-                account: accounts[0]
-            });
-            const client = new GraphService(response.accessToken).client;
+            const accessToken = await acquireToken({ ...loginRequest });
+            const client = new GraphService(accessToken).client;
             const results = await IntuneService.searchUsers(client, searchText);
             setSearchResults(results);
         } catch (error) {
@@ -69,11 +67,8 @@ const IntuneUserDevices = () => {
         setSelectedUser(user);
         setLoadingDevices(true);
         try {
-            const response = await instance.acquireTokenSilent({
-                ...loginRequest,
-                account: accounts[0]
-            });
-            const client = new GraphService(response.accessToken).client;
+            const accessToken = await acquireToken({ ...loginRequest });
+            const client = new GraphService(accessToken).client;
             const devices = await IntuneService.getUserDevices(client, user.userPrincipalName);
             setUserDevices(devices);
         } catch (error) {

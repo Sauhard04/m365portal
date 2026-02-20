@@ -15,21 +15,21 @@ import {
     ResponsiveContainer, PieChart, Pie, Cell, Tooltip
 } from 'recharts';
 import { useDataCaching } from '../hooks/useDataCaching';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const TeamsDashboard = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const fetchFn = async () => {
-        const account = accounts[0];
-        if (!account) throw new Error('No account found');
-
-        const tokenResponse = await instance.acquireTokenSilent({
-            ...teamsScopes,
-            account
+        const accessToken = await acquireToken({
+            ...teamsScopes
         });
 
         const client = Client.init({
-            authProvider: (done) => done(null, tokenResponse.accessToken)
+            authProvider: (done) => done(null, accessToken)
         });
 
         const [dashboardSummary, recentActivity] = await Promise.all([
@@ -53,7 +53,8 @@ const TeamsDashboard = () => {
         maxAge: 30,
         storeSection: 'teams',
         storeMetadata: { source: 'TeamsDashboard' },
-        enabled: accounts.length > 0
+        enabled: accounts.length > 0,
+        dependencies: [activeTenantId]
     });
 
     const [interactionError, setInteractionError] = useState(false);

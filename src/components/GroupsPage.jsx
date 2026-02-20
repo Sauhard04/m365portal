@@ -3,12 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import { Loader2, ArrowLeft, Users, Shield, Globe, Mail, Search, RefreshCw } from 'lucide-react';
 import Loader3D from './Loader3D';
 
 const GroupsPage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [groups, setGroups] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -21,8 +25,8 @@ const GroupsPage = () => {
         if (isManual) setRefreshing(true);
         else setLoading(true);
         try {
-            const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-            const graphService = new GraphService(response.accessToken);
+            const accessToken = await acquireToken({ ...loginRequest });
+            const graphService = new GraphService(accessToken);
             const data = await graphService.getGroups();
             setGroups(data);
         } catch (err) {
@@ -39,7 +43,7 @@ const GroupsPage = () => {
 
     useEffect(() => {
         fetchGroups();
-    }, [instance, accounts]);
+    }, [activeTenantId]);
 
     const m365Count = groups.filter(g => g.groupTypes?.includes('Unified')).length;
     const securityCount = groups.filter(g => g.securityEnabled && !g.groupTypes?.includes('Unified')).length;

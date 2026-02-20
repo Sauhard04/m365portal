@@ -9,10 +9,14 @@ import { useMsal } from '@azure/msal-react';
 import { Client } from '@microsoft/microsoft-graph-client';
 import AlertsService from '../services/alerts/alerts.service';
 import Loader3D from './Loader3D';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const AlertsPage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [filter, setFilter] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [alerts, setAlerts] = useState([]);
@@ -28,7 +32,7 @@ const AlertsPage = () => {
 
     useEffect(() => {
         fetchAlerts();
-    }, []);
+    }, [activeTenantId]);
 
     const fetchAlerts = async (isManual = false) => {
         if (isManual) setRefreshing(true);
@@ -36,14 +40,13 @@ const AlertsPage = () => {
 
         const startTime = Date.now();
         try {
-            const accessToken = await instance.acquireTokenSilent({
-                scopes: ['https://graph.microsoft.com/.default'],
-                account: accounts[0]
+            const accessToken = await acquireToken({
+                scopes: ['https://graph.microsoft.com/.default']
             });
 
             const client = Client.init({
                 authProvider: (done) => {
-                    done(null, accessToken.accessToken);
+                    done(null, accessToken);
                 }
             });
 

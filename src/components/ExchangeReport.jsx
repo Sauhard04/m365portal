@@ -7,10 +7,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, Download, AlertCircle, Shield, ArrowLeft, Mail, Search, Terminal } from 'lucide-react';
 import Loader3D from './Loader3D';
 import SiteDataStore from '../services/siteDataStore';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const ExchangeReport = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
 
     const [reportData, setReportData] = useState([]);
     const [filterText, setFilterText] = useState('');
@@ -98,9 +102,8 @@ const ExchangeReport = () => {
         setError(null);
         const startTime = Date.now();
         try {
-            if (accounts.length === 0) return;
-            const res = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-            const graph = new GraphService(res.accessToken);
+            const accessToken = await acquireToken({ ...loginRequest });
+            const graph = new GraphService(accessToken);
             const data = await graph.getExchangeMailboxReport();
             setReportData(data.reports || []);
             setIsConcealed(data.isConcealed);
@@ -123,7 +126,7 @@ const ExchangeReport = () => {
         }
     };
 
-    useEffect(() => { fetchData(); }, []);
+    useEffect(() => { fetchData(); }, [activeTenantId]);
 
     if (loading && reportData.length === 0) {
         return <Loader3D showOverlay={true} />;

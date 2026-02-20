@@ -5,10 +5,14 @@ import { UsageService } from '../services/usage.service';
 import { ArrowLeft, Mail, Activity, Send, Inbox, TrendingUp, AlertCircle, Download } from 'lucide-react';
 import Loader3D from './Loader3D';
 import SiteDataStore from '../services/siteDataStore';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const EmailActivityPage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [activity, setActivity] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -19,11 +23,10 @@ const EmailActivityPage = () => {
             setLoading(true);
             setError(null);
             try {
-                const tokenResponse = await instance.acquireTokenSilent({
-                    scopes: ["Reports.Read.All"],
-                    account: accounts[0]
+                const accessToken = await acquireToken({
+                    scopes: ["Reports.Read.All"]
                 });
-                const service = new UsageService(tokenResponse.accessToken);
+                const service = new UsageService(accessToken);
                 const result = await service.getExchangeUsage('D7');
 
                 if (result && result.detail && result.detail.length > 0) {
@@ -47,7 +50,7 @@ const EmailActivityPage = () => {
             }
         };
         fetchActivityData();
-    }, [instance, accounts]);
+    }, [activeTenantId]);
 
     const stats = {
         sent: activity.reduce((acc, curr) => acc + (Number(curr.sendCount) || 0), 0),

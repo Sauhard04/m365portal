@@ -1,3 +1,5 @@
+import RuntimeConfig from '../config';
+
 const MEMORY_CACHE = new Map();
 
 /**
@@ -8,17 +10,27 @@ const MEMORY_CACHE = new Map();
  */
 export const DataPersistenceService = {
     /**
+     * Helper to get tenant-aware cache key
+     */
+    getCacheKey(filename) {
+        const tenantId = RuntimeConfig.getActiveTenantId() || 'global';
+        return `${tenantId}_cache_${filename}`;
+    },
+
+    /**
      * Save data across all layers (synchronous version - only L1 and L2)
      */
     save(filename, data) {
-        const cacheKey = `cache_${filename}`;
+        const cacheKey = this.getCacheKey(filename);
+        const memKey = `${RuntimeConfig.getActiveTenantId() || 'global'}_${filename}`;
+
         const payload = {
             timestamp: Date.now(),
             data: data
         };
 
         // L1: Memory update
-        MEMORY_CACHE.set(filename, payload);
+        MEMORY_CACHE.set(memKey, payload);
 
         // L2: LocalStorage update
         try {
@@ -36,11 +48,12 @@ export const DataPersistenceService = {
      * @param {number} maxAgeMs - Optional max age in milliseconds
      */
     load(filename, maxAgeMs = null) {
-        const cacheKey = `cache_${filename}`;
+        const cacheKey = this.getCacheKey(filename);
+        const memKey = `${RuntimeConfig.getActiveTenantId() || 'global'}_${filename}`;
 
         // Try L1: Memory
-        if (MEMORY_CACHE.has(filename)) {
-            const payload = MEMORY_CACHE.get(filename);
+        if (MEMORY_CACHE.has(memKey)) {
+            const payload = MEMORY_CACHE.get(memKey);
             if (maxAgeMs && payload.timestamp) {
                 if (Date.now() - payload.timestamp > maxAgeMs) {
                     return null; // Expired
@@ -59,7 +72,7 @@ export const DataPersistenceService = {
                         return null; // Expired
                     }
                 }
-                MEMORY_CACHE.set(filename, parsed); // Hydrate L1
+                MEMORY_CACHE.set(memKey, parsed); // Hydrate L1
                 return parsed.data;
             }
         } catch (e) {
@@ -73,7 +86,8 @@ export const DataPersistenceService = {
      * Check if the cache is older than specified minutes
      */
     isExpired(filename, minutes = 30) {
-        const payload = MEMORY_CACHE.get(filename);
+        const memKey = `${RuntimeConfig.getActiveTenantId() || 'global'}_${filename}`;
+        const payload = MEMORY_CACHE.get(memKey);
         if (!payload || !payload.timestamp) return true;
 
         const ageInMs = Date.now() - payload.timestamp;
@@ -85,8 +99,9 @@ export const DataPersistenceService = {
      * Clear specific cache entry
      */
     clear(filename) {
-        const cacheKey = `cache_${filename}`;
-        MEMORY_CACHE.delete(filename);
+        const cacheKey = this.getCacheKey(filename);
+        const memKey = `${RuntimeConfig.getActiveTenantId() || 'global'}_${filename}`;
+        MEMORY_CACHE.delete(memKey);
         try {
             localStorage.removeItem(cacheKey);
         } catch (e) {

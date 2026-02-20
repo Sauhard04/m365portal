@@ -4,6 +4,7 @@ import { GraphService } from "../services/graphService";
 import { useNavigate } from 'react-router-dom';
 import { DataPersistenceService } from '../services/dataPersistence';
 import SiteDataStore from '../services/siteDataStore';
+import RuntimeConfig from '../config';
 import {
     Users, ShieldCheck, Mail, Globe,
     LayoutGrid, KeyRound, UserCog, Shield,
@@ -14,11 +15,15 @@ import {
 } from 'lucide-react';
 import Loader3D from './Loader3D';
 import { generateSections } from './BirdsEyeView_sections';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 import styles from './BirdsEyeView.module.css';
 
 const BirdsEyeView = ({ embedded = false }) => {
     const { instance, accounts } = useMsal();
+    const { getAccessToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const navigate = useNavigate();
     const fetchRef = React.useRef(0);
     const [loading, setLoading] = useState(true);
@@ -45,9 +50,11 @@ const BirdsEyeView = ({ embedded = false }) => {
         const requestId = ++fetchRef.current;
         setError(null);
 
+        const cacheKey = `${activeTenantId}_BirdsEyeView`;
+
         if (!isManual) {
-            const cached = await DataPersistenceService.load('BirdsEyeView');
-            if (cached && !DataPersistenceService.isExpired('BirdsEyeView', 15)) {
+            const cached = await DataPersistenceService.load(cacheKey);
+            if (cached && !DataPersistenceService.isExpired(cacheKey, 15)) {
                 if (requestId !== fetchRef.current) return;
                 setStats(cached);
                 setLoading(false);
@@ -57,7 +64,7 @@ const BirdsEyeView = ({ embedded = false }) => {
 
         if (isManual) {
             setRefreshing(true);
-            await DataPersistenceService.clear('BirdsEyeView');
+            await DataPersistenceService.clear(cacheKey);
         } else {
             setLoading(true);
         }
@@ -72,28 +79,41 @@ const BirdsEyeView = ({ embedded = false }) => {
                     "Sites.Read.All", "InformationProtectionPolicy.Read", "SensitivityLabel.Read",
                     "RecordsManagement.Read.All", "eDiscovery.Read.All", "SecurityAlert.Read.All",
                     "SecurityIncident.Read.All", "IdentityRiskyUser.Read.All", "IdentityRiskEvent.Read.All"
-                ],
-                account: accounts[0],
+                ]
             };
 
-            let response;
+            let accessToken;
             try {
-                response = await instance.acquireTokenSilent(request);
+                accessToken = await getAccessToken(request);
             } catch (error) {
-                if (error.name === "InteractionRequiredAuthError" || error.errorCode === "invalid_grant") {
+                console.error('[BirdsEyeView] Token Acquisition Error:', error);
+                if (error.name === "InteractionRequiredAuthError" || error.errorCode === "invalid_grant" || error.errorCode === "user_login_error") {
                     if (isManual) {
-                        response = await instance.acquireTokenPopup({ ...request, prompt: 'select_account' });
+                        try {
+                            const response = await instance.acquireTokenPopup({
+                                ...request,
+                                authority: `https://login.microsoftonline.com/${activeTenantId}`,
+                                prompt: 'select_account'
+                            });
+                            accessToken = response.accessToken;
+                        } catch (popupError) {
+                            setError("Access Denied: You might not have access to this tenant.");
+                            setLoading(false);
+                            return;
+                        }
                     } else {
                         setError("InteractionRequired");
                         setLoading(false);
                         return;
                     }
                 } else {
-                    throw error;
+                    setError(`Connection Error: ${error.message}`);
+                    setLoading(false);
+                    return;
                 }
             }
 
-            const graphService = new GraphService(response.accessToken);
+            const graphService = new GraphService(accessToken);
 
             const [
                 users, groups, devices, secureScore, skus,
@@ -218,8 +238,8 @@ const BirdsEyeView = ({ embedded = false }) => {
             };
 
             setStats(newStats);
-            await DataPersistenceService.save('BirdsEyeView', newStats);
-            SiteDataStore.store('birdsEye', newStats, { source: 'BirdsEyeView' });
+            await DataPersistenceService.save(cacheKey, newStats);
+            SiteDataStore.store('birdsEye', newStats, { source: 'BirdsEyeView' }, activeTenantId);
 
             console.log(`BirdsEyeView: Fetch finished in ${Date.now() - startTime}ms. SharePoint Sites: ${newStats.collaboration.sharepoint}`);
 
@@ -237,8 +257,8 @@ const BirdsEyeView = ({ embedded = false }) => {
     };
 
     useEffect(() => {
-        if (accounts.length > 0) fetchData();
-    }, [accounts]);
+        if (accounts.length > 0) fetchData(true); // Force clear cache on tenant change
+    }, [accounts, activeTenantId]);
 
     const sections = generateSections(stats, styles);
 

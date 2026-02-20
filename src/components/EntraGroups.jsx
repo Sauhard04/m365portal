@@ -6,10 +6,14 @@ import { GraphService } from '../services/graphService';
 import { GroupsService } from '../services/entra';
 import { ArrowLeft, Search, Download, UsersRound, Loader2, Users, RefreshCw } from 'lucide-react';
 import Loader3D from './Loader3D';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const EntraGroups = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [groups, setGroups] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -23,8 +27,8 @@ const EntraGroups = () => {
 
             const startTime = Date.now();
             try {
-                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                const client = new GraphService(response.accessToken).client;
+                const accessToken = await acquireToken({ ...loginRequest });
+                const client = new GraphService(accessToken).client;
                 const data = await GroupsService.getAllGroups(client, 100);
                 setGroups(data);
 
@@ -48,7 +52,7 @@ const EntraGroups = () => {
 
     useEffect(() => {
         fetchGroups();
-    }, [accounts, instance]);
+    }, [accounts, activeTenantId]);
 
     const filteredGroups = groups.filter(group => {
         const matchesText = (group.displayName || '').toLowerCase().includes(filterText.toLowerCase());

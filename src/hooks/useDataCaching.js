@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { DataPersistenceService } from '../services/dataPersistence';
 import SiteDataStore from '../services/siteDataStore';
+import RuntimeConfig from '../config';
+import { useActiveTenant } from './useActiveTenant';
 
 /**
  * Standardized hook for data caching and background revalidation.
  * 
- * @param {string} cacheKey - Unique key for the cache (e.g. 'overview_data')
+ * @param {string} baseCacheKey - Unique key for the cache (e.g. 'overview_data')
  * @param {Function} fetchFn - Async function to fetch fresh data
  * @param {Object} options - Configuration options
  * @param {number} options.maxAge - Max age in minutes before data is considered stale (default 30)
@@ -14,7 +16,7 @@ import SiteDataStore from '../services/siteDataStore';
  * @param {Array} options.dependencies - Dependency array for the effect (default [])
  * @param {boolean} options.enabled - Whether to enable fetching (default true)
  */
-export const useDataCaching = (cacheKey, fetchFn, options = {}) => {
+export const useDataCaching = (baseCacheKey, fetchFn, options = {}) => {
     const {
         maxAge = 30,
         storeSection = null,
@@ -24,12 +26,14 @@ export const useDataCaching = (cacheKey, fetchFn, options = {}) => {
     } = options;
 
     const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(enabled);
     const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState(null);
     const [lastUpdated, setLastUpdated] = useState(null);
 
     const fetchRequestRef = useRef(0);
+    const activeTenantId = useActiveTenant();
+    const cacheKey = `${activeTenantId}_${baseCacheKey}`;
 
     const performFetch = useCallback(async (isManual = false) => {
         const requestId = ++fetchRequestRef.current;
@@ -92,7 +96,7 @@ export const useDataCaching = (cacheKey, fetchFn, options = {}) => {
         if (enabled) {
             loadFromCache();
         }
-    }, [enabled, ...dependencies]);
+    }, [enabled, ...dependencies, activeTenantId]);
 
     return {
         data,

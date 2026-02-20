@@ -17,10 +17,14 @@ import {
     ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip
 } from 'recharts';
 import { useDataCaching } from '../hooks/useDataCaching';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const GovernanceDashboard = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [chartsVisible, setChartsVisible] = useState(false);
 
     useEffect(() => {
@@ -29,16 +33,12 @@ const GovernanceDashboard = () => {
     }, []);
 
     const fetchFn = async () => {
-        const account = accounts[0];
-        if (!account) throw new Error('No account found');
-
-        const tokenResponse = await instance.acquireTokenSilent({
-            ...governanceScopes,
-            account
+        const accessToken = await acquireToken({
+            ...governanceScopes
         });
 
         const client = Client.init({
-            authProvider: (done) => done(null, tokenResponse.accessToken)
+            authProvider: (done) => done(null, accessToken)
         });
 
         return await GovernanceService.getDashboardSummary(client);
@@ -54,7 +54,8 @@ const GovernanceDashboard = () => {
         maxAge: 30,
         storeSection: 'governance',
         storeMetadata: { source: 'GovernanceDashboard' },
-        enabled: accounts.length > 0
+        enabled: accounts.length > 0,
+        dependencies: [activeTenantId]
     });
 
     const [interactionError, setInteractionError] = useState(false);

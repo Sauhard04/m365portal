@@ -15,18 +15,21 @@ import { DataPersistenceService } from '../services/dataPersistence';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, ResponsiveContainer } from 'recharts';
 import { MiniSegmentedBar, MiniSeverityStrip, MiniStatusGeneric, MiniSparkline, MiniProgressBar } from './charts/MicroCharts';
 import { useDataCaching } from '../hooks/useDataCaching';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const IntuneMonitoring = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
 
     const fetchFn = async () => {
-        const response = await instance.acquireTokenSilent({
-            ...intuneScopes,
-            account: accounts[0]
+        const accessToken = await acquireToken({
+            ...intuneScopes
         });
 
-        const client = new GraphService(response.accessToken).client;
+        const client = new GraphService(accessToken).client;
         const dashboardStats = await IntuneService.getDashboardStats(client);
 
         // Map to our persistence schema for legacy support if needed
@@ -66,7 +69,8 @@ const IntuneMonitoring = () => {
         maxAge: 30,
         storeSection: 'intune',
         storeMetadata: { source: 'IntuneMonitoring' },
-        enabled: accounts.length > 0
+        enabled: accounts.length > 0,
+        dependencies: [activeTenantId]
     });
 
     const [interactionError, setInteractionError] = useState(false);

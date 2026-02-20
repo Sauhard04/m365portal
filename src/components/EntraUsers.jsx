@@ -7,10 +7,14 @@ import { UsersService } from '../services/entra';
 import { ArrowLeft, Search, Download, CheckCircle2, XCircle, Loader2, Users, RefreshCw } from 'lucide-react';
 import SiteDataStore from '../services/siteDataStore';
 import Loader3D from './Loader3D';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const EntraUsers = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -26,8 +30,8 @@ const EntraUsers = () => {
 
             const startTime = Date.now();
             try {
-                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                const client = new GraphService(response.accessToken).client;
+                const accessToken = await acquireToken({ ...loginRequest });
+                const client = new GraphService(accessToken).client;
                 const data = await UsersService.getAllUsers(client, 100);
                 setUsers(data);
                 SiteDataStore.store('entraUsers', {
@@ -53,7 +57,7 @@ const EntraUsers = () => {
 
     useEffect(() => {
         fetchUsers();
-    }, [accounts, instance]);
+    }, [accounts, activeTenantId]);
 
     const filteredUsers = users.filter(user => {
         const matchesText = (user.displayName || '').toLowerCase().includes(filterText.toLowerCase()) ||

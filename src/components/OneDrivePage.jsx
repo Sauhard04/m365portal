@@ -4,12 +4,16 @@ import { useMsal } from '@azure/msal-react';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { sharepointScopes } from '../authConfig';
 import { SharePointService } from '../services/sharepoint/sharepoint.service';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import Loader3D from './Loader3D';
 import { Cloud, ArrowLeft, RefreshCw, Search, ExternalLink, User, Database } from 'lucide-react';
 
 const OneDrivePage = () => {
     const navigate = useNavigate();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [oneDriveAccounts, setOneDriveAccounts] = useState([]);
@@ -21,16 +25,12 @@ const OneDrivePage = () => {
         else setLoading(true);
 
         try {
-            const account = accounts[0];
-            if (!account) throw new Error('No account found');
-
-            const tokenResponse = await instance.acquireTokenSilent({
-                ...sharepointScopes,
-                account
+            const accessToken = await acquireToken({
+                ...sharepointScopes
             });
 
             const client = Client.init({
-                authProvider: (done) => done(null, tokenResponse.accessToken)
+                authProvider: (done) => done(null, accessToken)
             });
 
             const data = await SharePointService.getOneDriveAccounts(client);
@@ -46,7 +46,7 @@ const OneDrivePage = () => {
 
     useEffect(() => {
         fetchOneDriveAccounts();
-    }, [instance, accounts]);
+    }, [activeTenantId]);
 
     useEffect(() => {
         if (!searchTerm) {

@@ -5,6 +5,8 @@ import { Client } from '@microsoft/microsoft-graph-client';
 import { motion } from 'framer-motion';
 import { sharepointScopes } from '../authConfig';
 import { SharePointService } from '../services/sharepoint/sharepoint.service';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 import Loader3D from './Loader3D';
 import {
     ArrowLeft, Globe, HardDrive, List, Database, ExternalLink, Calendar, RefreshCw
@@ -15,6 +17,8 @@ const SiteDetailsPage = () => {
     const navigate = useNavigate();
     const { siteId } = useParams();
     const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [siteData, setSiteData] = useState({
@@ -31,16 +35,12 @@ const SiteDetailsPage = () => {
         setError(null);
 
         try {
-            const account = accounts[0];
-            if (!account) throw new Error('No account found');
-
-            const tokenResponse = await instance.acquireTokenSilent({
-                ...sharepointScopes,
-                account
+            const accessToken = await acquireToken({
+                ...sharepointScopes
             });
 
             const client = Client.init({
-                authProvider: (done) => done(null, tokenResponse.accessToken)
+                authProvider: (done) => done(null, accessToken)
             });
 
             const data = await SharePointService.getSiteDetails(client, siteId);
@@ -56,7 +56,7 @@ const SiteDetailsPage = () => {
 
     useEffect(() => {
         fetchSiteDetails();
-    }, [siteId, instance, accounts]);
+    }, [siteId, activeTenantId]);
 
     const CustomTooltip = ({ active, payload }) => {
         if (active && payload && payload.length) {

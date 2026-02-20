@@ -10,10 +10,14 @@ import {
 import { useMsal } from '@azure/msal-react';
 import { GraphService } from '../services/graphService';
 import { loginRequest } from '../authConfig';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
 
 const UserDetailsPage = () => {
     const navigate = useNavigate();
     const { accounts, instance } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
     const [userProfile, setUserProfile] = useState(accounts[0] || { name: 'Admin User', username: 'admin@company.onmicrosoft.com' });
     const [securityInfo, setSecurityInfo] = useState({ passwordChanged: null, mfaStatus: null, mfaMethods: [] });
     const [hasSecurityData, setHasSecurityData] = useState(false);
@@ -43,8 +47,8 @@ const UserDetailsPage = () => {
             if (!accounts[0]) return;
             setLoading(true);
             try {
-                const response = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] });
-                const client = new GraphService(response.accessToken).client;
+                const accessToken = await acquireToken({ ...loginRequest });
+                const client = new GraphService(accessToken).client;
 
                 // Fetch User Details including password change
                 const userDetails = await client.api('/me')
@@ -84,7 +88,7 @@ const UserDetailsPage = () => {
         };
 
         fetchData();
-    }, [accounts, instance]);
+    }, [activeTenantId]);
 
     const formatTimeAgo = (dateString) => {
         if (!dateString) return 'Unknown';
