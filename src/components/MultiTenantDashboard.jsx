@@ -574,7 +574,6 @@ const MultiTenantDashboard = () => {
                                             <td style={{ color: t.highAlerts > 0 ? '#ef4444' : 'var(--text-dim)', fontWeight: t.highAlerts > 0 ? 700 : 400 }}>{t.highAlerts}</td>
                                             <td>{t.activeAlerts}</td>
                                             <td>{t.totalReports}</td>
-                                            <td><button className="btn btn-secondary" style={{ padding: '4px 10px', fontSize: '10px' }} onClick={e => { e.stopPropagation(); handleNavigateTenant(t.tenantId); }}><ExternalLink size={10} /> View</button></td>
                                         </tr>
                                     ))}
                                 </tbody>
