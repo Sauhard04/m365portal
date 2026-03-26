@@ -1,0 +1,5 @@
+/* App level overrides if needed. Core styles are in index.css */
+body {
+  margin: 0;
+  padding: 0;
+}

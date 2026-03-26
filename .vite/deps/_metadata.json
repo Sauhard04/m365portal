@@ -1,0 +1,103 @@
+{
+  "hash": "19592b9e",
+  "configHash": "518c8615",
+  "lockfileHash": "261ac2e2",
+  "browserHash": "36cfee93",
+  "optimized": {
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "0e6c8207",
+      "needsInterop": true
+    },
+    "react-dom": {
+      "src": "../../node_modules/react-dom/index.js",
+      "file": "react-dom.js",
+      "fileHash": "2f601631",
+      "needsInterop": true
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "1724df38",
+      "needsInterop": true
+    },
+    "react/jsx-runtime": {
+      "src": "../../node_modules/react/jsx-runtime.js",
+      "file": "react_jsx-runtime.js",
+      "fileHash": "b0e63a5b",
+      "needsInterop": true
+    },
+    "@azure/msal-browser": {
+      "src": "../../node_modules/@azure/msal-browser/dist/index.mjs",
+      "file": "@azure_msal-browser.js",
+      "fileHash": "956b4de5",
+      "needsInterop": false
+    },
+    "@azure/msal-react": {
+      "src": "../../node_modules/@azure/msal-react/dist/index.js",
+      "file": "@azure_msal-react.js",
+      "fileHash": "07c130fd",
+      "needsInterop": false
+    },
+    "@microsoft/microsoft-graph-client": {
+      "src": "../../node_modules/@microsoft/microsoft-graph-client/lib/es/src/browser/index.js",
+      "file": "@microsoft_microsoft-graph-client.js",
+      "fileHash": "fabb22d0",
+      "needsInterop": false
+    },
+    "framer-motion": {
+      "src": "../../node_modules/framer-motion/dist/es/index.mjs",
+      "file": "framer-motion.js",
+      "fileHash": "84adbbad",
+      "needsInterop": false
+    },
+    "lucide-react": {
+      "src": "../../node_modules/lucide-react/dist/esm/lucide-react.js",
+      "file": "lucide-react.js",
+      "fileHash": "dcb5b4b7",
+      "needsInterop": false
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "4eec4b73",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.mjs",
+      "file": "react-router-dom.js",
+      "fileHash": "1fa415fd",
+      "needsInterop": false
+    },
+    "recharts": {
+      "src": "../../node_modules/recharts/es6/index.js",
+      "file": "recharts.js",
+      "fileHash": "5ec98021",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "BrowserPerformanceMeasurement-NJ3JX4L5": {
+      "file": "BrowserPerformanceMeasurement-NJ3JX4L5.js"
+    },
+    "chunk-TDZEZOEN": {
+      "file": "chunk-TDZEZOEN.js"
+    },
+    "chunk-KV36G3YU": {
+      "file": "chunk-KV36G3YU.js"
+    },
+    "chunk-TII35OMW": {
+      "file": "chunk-TII35OMW.js"
+    },
+    "chunk-U4Z6SGAT": {
+      "file": "chunk-U4Z6SGAT.js"
+    },
+    "chunk-GDINV6T2": {
+      "file": "chunk-GDINV6T2.js"
+    },
+    "chunk-PR4QN5HX": {
+      "file": "chunk-PR4QN5HX.js"
+    }
+  }
+}

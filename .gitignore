@@ -1,0 +1,40 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.env
+
+
+node_modules
+dist 
+dist-ssr
+*.local
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+implementations.txt
+
+# Backend Debug & Temp Files
+backend/xml_debug.txt
+backend/full_text.txt
+backend/phrases.txt
+backend/base_text.txt
+backend/template_text_verify.txt
+backend/fix_output.txt
+backend/table_list.txt
+backend/db_dump.txt
+backend/*.log
+backend/node_modules
+backend/dist

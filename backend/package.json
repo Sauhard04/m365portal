@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "docxtemplater": "^3.68.3",
+    "pdfkit": "^0.18.0",
+    "pizzip": "^3.2.0"
+  },
+  "devDependencies": {
+    "@types/pdfkit": "^0.17.5"
+  }
+}

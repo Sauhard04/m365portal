@@ -1,0 +1,32 @@
+name: Azure App Service CI/CD
+
+# Disable this workflow - replaced by azure-static-web-apps-brave-grass-07b5ea700.yml
+on: []
+ 
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+          lfs: false
+ 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'  # Match App Service runtime and package.json "engines"
+ 
+      - name: Install dependencies
+        run: npm ci
+ 
+      # This builds the Vite frontend and compiles the backend TypeScript to dist/backend
+      - name: Build (frontend + backend)
+        run: npm run build
+ 
+      # Deploy to Azure App Service using Publish Profile secret
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: "adminspheree"
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          package: .
+ 

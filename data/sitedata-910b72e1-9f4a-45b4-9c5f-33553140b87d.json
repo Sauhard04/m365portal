@@ -1,0 +1,296 @@
+{
+  "lastUpdated": 1774268414394,
+  "sections": {
+    "overview": {
+      "data": {
+        "quickStats": {
+          "totalUsers": 34,
+          "totalDevices": 0,
+          "totalLicenses": 40,
+          "secureScore": 39.24,
+          "maxSecureScore": 137,
+          "mfaRegistered": 0,
+          "mfaTotal": 68,
+          "activeRoles": 3
+        },
+        "charts": {
+          "serviceHealth": [
+            {
+              "name": "Operational",
+              "value": 21,
+              "color": "var(--accent-success)"
+            },
+            {
+              "name": "Issues",
+              "value": 8,
+              "color": "var(--accent-error)"
+            }
+          ],
+          "userDistribution": [
+            {
+              "name": "Active",
+              "value": 34,
+              "color": "var(--accent-success)"
+            },
+            {
+              "name": "Inactive",
+              "value": 0,
+              "color": "var(--accent-warning)"
+            }
+          ],
+          "deviceCompliance": [
+            {
+              "name": "Compliant",
+              "value": 0,
+              "color": "var(--accent-success)"
+            },
+            {
+              "name": "Non-Compliant",
+              "value": 0,
+              "color": "var(--accent-error)"
+            },
+            {
+              "name": "Not Evaluated",
+              "value": 0,
+              "color": "var(--accent-warning)"
+            }
+          ],
+          "deviceByPlatform": [],
+          "licenseUsage": [
+            {
+              "name": "Microsoft 365 E5 (no",
+              "assigned": 20,
+              "available": 0
+            },
+            {
+              "name": "Microsoft Teams Ente",
+              "assigned": 20,
+              "available": 0
+            }
+          ],
+          "signIns": [
+            {
+              "name": "2026-03-23",
+              "failed": 8,
+              "successful": 10
+            }
+          ],
+          "emailTrend": [
+            {
+              "name": "2026-03-15",
+              "sent": 1,
+              "received": 1
+            },
+            {
+              "name": "2026-03-16",
+              "sent": 1,
+              "received": 3
+            },
+            {
+              "name": "2026-03-17",
+              "sent": 1,
+              "received": 3
+            },
+            {
+              "name": "2026-03-18",
+              "sent": 1,
+              "received": 3
+            },
+            {
+              "name": "2026-03-19",
+              "sent": 1,
+              "received": 8
+            },
+            {
+              "name": "2026-03-20",
+              "sent": 1,
+              "received": 8
+            },
+            {
+              "name": "2026-03-21",
+              "sent": 1,
+              "received": 20
+            }
+          ],
+          "securityRadar": [
+            {
+              "subject": "Secure Score",
+              "value": 29,
+              "fullMark": 100
+            },
+            {
+              "subject": "Compliance",
+              "value": 100,
+              "fullMark": 100
+            },
+            {
+              "subject": "Active Users",
+              "value": 100,
+              "fullMark": 100
+            },
+            {
+              "subject": "License Usage",
+              "value": 100,
+              "fullMark": 100
+            },
+            {
+              "subject": "Sign-in Success",
+              "value": 56,
+              "fullMark": 100
+            }
+          ],
+          "licenseTreemap": [
+            {
+              "name": "Microsoft 365 E5 (no Team",
+              "size": 20,
+              "fill": "#3b82f6"
+            },
+            {
+              "name": "Microsoft Teams Enterpris",
+              "size": 20,
+              "fill": "#8b5cf6"
+            }
+          ],
+          "userGrowthTrend": [
+            {
+              "week": "2026-03-22",
+              "active": 0
+            },
+            {
+              "week": "2026-03-22",
+              "active": 0
+            },
+            {
+              "week": "2026-03-22",
+              "active": 0
+            },
+            {
+              "week": "2026-03-22",
+              "active": 0
+            },
+            {
+              "week": "2026-03-22",
+              "active": 0
+            },
+            {
+              "week": "2026-03-22",
+              "active": 0
+            },
+            {
+              "week": "2026-03-22",
+              "active": 0
+            }
+          ],
+          "enrollmentFunnel": [],
+          "licenseTrendComposed": []
+        }
+      },
+      "timestamp": 1774267821466,
+      "source": "OverviewDashboard"
+    },
+    "birdsEye": {
+      "data": {
+        "admin": {
+          "mailboxes": 20,
+          "activeMail": 20,
+          "domains": 1,
+          "healthIssues": 13
+        },
+        "entra": {
+          "users": 34,
+          "signin": 34,
+          "licensed": 20,
+          "guest": 0,
+          "groups": 35,
+          "securityGroups": 12,
+          "distGroups": 9,
+          "unifiedGroups": 14,
+          "admins": [
+            {
+              "name": "Global",
+              "count": 8
+            },
+            {
+              "name": "Exchange",
+              "count": 1
+            }
+          ],
+          "apps": 6,
+          "domains": 1,
+          "deletedUsers": 1,
+          "caPolicies": 1,
+          "riskyUsers": 0
+        },
+        "licenses": {
+          "purchased": 40,
+          "assigned": 40,
+          "total": 2,
+          "topSkus": [
+            {
+              "name": "Microsoft_365_E5_(no_Teams)",
+              "count": 20
+            },
+            {
+              "name": "Microsoft_Teams_Enterprise_New",
+              "count": 20
+            }
+          ]
+        },
+        "intune": {
+          "total": 0,
+          "compliant": 0,
+          "osSummary": {
+            "androidCount": 0,
+            "iosCount": 0,
+            "macOSCount": 0,
+            "windowsMobileCount": 0,
+            "windowsCount": 0,
+            "unknownCount": 0,
+            "androidDedicatedCount": 0,
+            "androidDeviceAdminCount": 0,
+            "androidFullyManagedCount": 0,
+            "androidWorkProfileCount": 0,
+            "androidCorporateWorkProfileCount": 0,
+            "configMgrDeviceCount": 0,
+            "aospUserlessCount": 0,
+            "aospUserAssociatedCount": 0,
+            "linuxCount": 0,
+            "chromeOSCount": 0
+          },
+          "entraTotal": "0",
+          "configProfiles": 2,
+          "applications": 8
+        },
+        "security": {
+          "score": 39.24,
+          "max": 137,
+          "alerts": 0,
+          "incidents": 0,
+          "failedSignins": 0
+        },
+        "collaboration": {
+          "teams": 13,
+          "privateTeams": 8,
+          "publicTeams": 5,
+          "sharepoint": 27,
+          "onedrive": 20,
+          "mailboxes": 20,
+          "activeEmail": 20
+        },
+        "purview": {
+          "labels": 0,
+          "retentionPolicies": 6,
+          "dlpPolicies": 0,
+          "dlpAlerts": 0
+        },
+        "usage": {
+          "activeUsers7d": 20,
+          "activeUsers30d": 0,
+          "storage": 292958551
+        }
+      },
+      "timestamp": 1774268414358,
+      "source": "BirdsEyeView"
+    }
+  }
+}

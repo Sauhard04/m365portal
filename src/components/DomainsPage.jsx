@@ -1,0 +1,155 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useMsal } from '@azure/msal-react';
+import { loginRequest } from '../authConfig';
+import { GraphService } from '../services/graphService';
+import { Loader2, CheckCircle2, Globe, ShieldAlert, ArrowLeft, ShieldCheck, AlertCircle, RefreshCw } from 'lucide-react';
+import Loader3D from './Loader3D';
+import { useToken } from '../hooks/useToken';
+import { useActiveTenant } from '../hooks/useActiveTenant';
+
+const DomainsPage = () => {
+    const navigate = useNavigate();
+    const { instance, accounts } = useMsal();
+    const { getAccessToken: acquireToken } = useToken();
+    const activeTenantId = useActiveTenant();
+    const [domains, setDomains] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    const [error, setError] = useState(null);
+
+    const fetchDomains = async (isManual = false) => {
+        if (accounts.length === 0) return;
+        if (isManual) setRefreshing(true);
+        else setLoading(true);
+        try {
+            const accessToken = await acquireToken({ ...loginRequest });
+            const graphService = new GraphService(accessToken);
+            const data = await graphService.getDomains();
+            setDomains(data);
+
+            // Background store for AI context
+            const SiteDataStore = (await import('../services/siteDataStore')).default;
+            SiteDataStore.store('domains', data);
+        } catch (err) {
+            setError("Organization domains could not be retrieved.");
+        } finally {
+            if (isManual) {
+                setTimeout(() => setRefreshing(false), 1000);
+            } else {
+                setLoading(false);
+                setRefreshing(false);
+            }
+        }
+    };
+
+    useEffect(() => {
+        fetchDomains();
+    }, [activeTenantId]);
+
+    if (loading && domains.length === 0) {
+        return (
+            <Loader3D showOverlay={true} />
+        );
+    }
+
+    const verifiedCount = domains.filter(d => d.state === 'Verified').length;
+
+    return (
+        <div className="animate-in">
+            <button onClick={() => navigate('/service/admin')} className="btn-back">
+                <ArrowLeft size={14} style={{ marginRight: '8px' }} />
+                Back to Dashboard
+            </button>
+
+            <header className="flex-between spacing-v-8">
+                <div>
+                    <h1 className="title-gradient" style={{ fontSize: '32px' }}>Organization Domains</h1>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>DNS configuration and identity verification status</p>
+                </div>
+                <div className="flex-gap-2">
+                    <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchDomains(true)} title="Sync & Refresh">
+                        <RefreshCw size={16} />
+                    </button>
+                </div>
+            </header>
+
+            {error && (
+                <div className="glass-card" style={{ background: 'hsla(0, 84%, 60%, 0.05)', borderColor: 'hsla(0, 84%, 60%, 0.2)', marginBottom: '32px' }}>
+                    <div className="flex-center justify-start flex-gap-4" style={{ color: 'var(--accent-error)' }}>
+                        <AlertCircle size={20} />
+                        <span>{error}</span>
+                    </div>
+                </div>
+            )}
+
+            <div className="stat-grid">
+                <div className="glass-card stat-card">
+                    <span className="stat-label">Total Registered</span>
+                    <div className="stat-value">{domains.length}</div>
+                    <div className="mt-4"><span className="badge badge-info">Tenant Level</span></div>
+                </div>
+                <div className="glass-card stat-card">
+                    <span className="stat-label">Verified & Secure</span>
+                    <div className="stat-value" style={{ color: 'var(--accent-success)' }}>{verifiedCount}</div>
+                    <div className="mt-4"><span className="badge badge-success">Active</span></div>
+                </div>
+            </div>
+
+            <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
+                <div className="table-container">
+                    <table className="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Domain Identifier</th>
+                                <th>State</th>
+                                <th>Authentication Type</th>
+                                <th style={{ textAlign: 'center' }}>Identity Default</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {domains.length > 0 ? domains.map((domain) => (
+                                <tr key={domain.id}>
+                                    <td>
+                                        <div className="flex-center justify-start flex-gap-4">
+                                            <div style={{ padding: '8px', background: 'hsla(var(--hue), 90%, 60%, 0.1)', color: 'var(--accent-blue)', borderRadius: '8px' }}>
+                                                <Globe size={16} />
+                                            </div>
+                                            <span style={{ fontWeight: 600 }}>{domain.id}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {domain.state === 'Verified' ? (
+                                            <span className="badge badge-success">Verified</span>
+                                        ) : (
+                                            <span className="badge badge-error">{domain.state}</span>
+                                        )}
+                                    </td>
+                                    <td>
+                                        <span className="badge badge-info">{domain.authenticationType}</span>
+                                    </td>
+                                    <td style={{ textAlign: 'center' }}>
+                                        {domain.isDefault && (
+                                            <div className="flex-center">
+                                                <ShieldCheck size={20} color="var(--accent-success)" />
+                                            </div>
+                                        )}
+                                    </td>
+                                </tr>
+                            )) : (
+                                <tr>
+                                    <td colSpan="4" style={{ textAlign: 'center', padding: '100px', color: 'var(--text-dim)' }}>
+                                        <Globe size={48} style={{ opacity: 0.2, marginBottom: '16px' }} />
+                                        <p>No organization domains found.</p>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default DomainsPage;

@@ -1,0 +1,220 @@
+.doc-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.doc-header {
+    margin-bottom: 48px;
+    position: relative;
+}
+
+.doc-header::after {
+    content: '';
+    position: absolute;
+    bottom: -16px;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+    border-radius: 2px;
+}
+
+.doc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+    margin-bottom: 48px;
+}
+
+.doc-card {
+    transition: all 0.4s var(--transition-smooth);
+    border-left: 4px solid transparent;
+    cursor: pointer;
+}
+
+.doc-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    background: var(--glass-bg-hover);
+    border-left-color: var(--accent-blue);
+}
+
+.doc-icon-box {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.doc-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.doc-content {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+.faq-section {
+    padding: 40px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, hsla(0, 0%, 100%, 0.02) 0%, hsla(0, 0%, 100%, 0.05) 100%);
+}
+
+.faq-item {
+    padding: 24px;
+    border-radius: 16px;
+    background: hsla(0, 0%, 100%, 0.02);
+    border: 1px solid var(--glass-border);
+    transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+    background: hsla(0, 0%, 100%, 0.04);
+    border-color: var(--glass-border-hover);
+}
+
+.faq-question {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.faq-icon {
+    margin-top: 4px;
+    color: var(--accent-blue);
+    flex-shrink: 0;
+}
+
+.faq-text-q {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.faq-answer {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-left: 36px;
+}
+
+.doc-footer {
+    margin-top: 60px;
+    padding: 32px;
+    text-align: center;
+    border-top: 1px solid var(--glass-border);
+}
+
+.tag-label {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 8px;
+    background: hsla(217, 91%, 60%, 0.1);
+    color: var(--accent-blue);
+}
+
+.upload-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 12px;
+}
+
+.upload-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(56, 189, 248, 0.3);
+}
+
+.upload-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.upload-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.glass-btn {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.glass-btn:hover {
+    background: var(--glass-bg-hover);
+    color: var(--text-primary);
+    border-color: var(--glass-border-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.glass-btn:active {
+    transform: translateY(0);
+}
+
+.flex-center-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.spinner-sm {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
