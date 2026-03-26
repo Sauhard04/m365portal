@@ -361,31 +361,35 @@ const MultiTenantDashboard = () => {
     // Insights
     const insights = useMemo(() => {
         const result = [];
-        tenantHealthData.forEach(t => {
+        const activeTenants = selectedTenant ? tenantHealthData.filter(t => t.tenantId === selectedTenant) : tenantHealthData;
+        
+        activeTenants.forEach(t => {
             if (t.highAlerts >= 3) result.push({ type: 'critical', icon: AlertTriangle, color: '#ef4444', message: `${t.displayName} has ${t.highAlerts} critical alerts requiring immediate attention`, tenant: t });
             if (t.healthScore < 40) result.push({ type: 'warning', icon: Heart, color: '#f59e0b', message: `${t.displayName} health score is critically low (${t.healthScore}/100)`, tenant: t });
             if (t.totalReports === 0) result.push({ type: 'info', icon: Activity, color: '#3b82f6', message: `${t.displayName} has no recent activity or reports`, tenant: t });
         });
 
-        // Global MFA Insight
+        const scopeLabel = selectedTenant ? 'Tenant' : 'Global';
+
+        // Global/Tenant MFA Insight
         if (stats?.mfaTotal > 0) {
             const mfaPct = Math.round((stats.mfaRegistered / stats.mfaTotal) * 100);
             if (mfaPct < 80) {
-                result.unshift({ type: 'security', icon: Shield, color: '#ef4444', message: `Global MFA coverage is low (${mfaPct}%). Total ${stats.mfaTotal - stats.mfaRegistered} users are not secured.` });
+                result.unshift({ type: 'security', icon: Shield, color: '#ef4444', message: `${scopeLabel} MFA coverage is low (${mfaPct}%). Total ${stats.mfaTotal - stats.mfaRegistered} users are not secured.` });
             }
         }
 
-        // Global Licensing Insight
+        // Global/Tenant Licensing Insight
         if (stats?.totalLicenses > 0) {
             const usagePct = Math.round((stats.assignedLicenses / stats.totalLicenses) * 100);
             if (usagePct > 90) {
-                result.push({ type: 'usage', icon: FileText, color: '#f59e0b', message: `License utilization is high (${usagePct}%). Consider purchasing more seats.` });
+                result.push({ type: 'usage', icon: FileText, color: '#f59e0b', message: `${scopeLabel} license utilization is high (${usagePct}%). Consider purchasing more seats.` });
             }
         }
 
-        if (criticalAlerts.length > 5) result.unshift({ type: 'critical', icon: Zap, color: '#ef4444', message: `${criticalAlerts.length} critical alerts across all tenants need resolution` });
+        if (criticalAlerts.length > 5) result.unshift({ type: 'critical', icon: Zap, color: '#ef4444', message: `${criticalAlerts.length} critical alerts across ${scopeLabel.toLowerCase()} view need resolution` });
         return result.slice(0, 10);
-    }, [tenantHealthData, criticalAlerts, stats]);
+    }, [tenantHealthData, criticalAlerts, stats, selectedTenant]);
 
     // Chart data
     const reportsByTypeData = stats?.reportsByType ? Object.entries(stats.reportsByType).map(([type, count]) => ({ name: type.charAt(0).toUpperCase() + type.slice(1), count, fill: TYPE_COLORS[type] || '#64748b' })) : [];

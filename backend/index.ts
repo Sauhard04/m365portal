@@ -911,7 +911,7 @@ app.get('/api/admin/dashboard-stats', async (req, res) => {
             const birdsEye = sections.birdsEye?.data || {};
 
             totalUsers += overview.totalUsers || birdsEye.entra?.users || 0;
-            const tLic = (overview.totalLicenses || birdsEye.licenses?.purchased || 0);
+            const tLic = (birdsEye.licenses?.purchased || overview.totalLicenses || 0);
             console.log(`[Stats] Tenant ${tid} - Users: ${overview.totalUsers}/${birdsEye.entra?.users}, Licenses: ${overview.totalLicenses}/${birdsEye.licenses?.purchased} (Using: ${tLic})`);
             totalLicenses += tLic;
             assignedLicenses += birdsEye.licenses?.assigned || overview.assignedLicenses || 0;
@@ -919,7 +919,7 @@ app.get('/api/admin/dashboard-stats', async (req, res) => {
             mfaTotal += overview.mfaTotal || birdsEye.entra?.users || overview.totalUsers || 0;
 
             licenseStatsByTenant[tid] = {
-                total: overview.totalLicenses || birdsEye.licenses?.purchased || 0,
+                total: birdsEye.licenses?.purchased || overview.totalLicenses || 0,
                 assigned: birdsEye.licenses?.assigned || overview.assignedLicenses || 0,
                 topSkus: birdsEye.licenses?.topSkus || []
             };
