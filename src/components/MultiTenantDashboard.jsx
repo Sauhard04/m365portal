@@ -7,7 +7,7 @@ import {
     TrendingUp, Users, BarChart3, ExternalLink, X,
     ChevronDown, ChevronUp, Eye, MapPin, Info,
     Download, Activity, Shield, Zap, Target,
-    Layers, Heart, AlertCircle, Search, Save, Bookmark, Trash2, Package
+    Layers, Heart, AlertCircle, Search, Save, Bookmark, Trash2, Package, ShieldCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, CartesianGrid } from 'recharts';
@@ -318,11 +318,17 @@ const MultiTenantDashboard = () => {
             const medAlerts = tAlerts.filter(a => a.severity === 'medium' && a.isActive).length;
             const activeAlerts = tAlerts.filter(a => a.isActive).length;
             const totalReports = stats?.reportsByTenant?.[t.tenantId] || 0;
+            
+            // Health Score: Base 100
+            // Deduct 20 for each high alert (max 60)
+            // Deduct 5 for each active alert (max 20)
             const healthScore = Math.max(0, Math.min(100, 100 - (highAlerts * 20) - (activeAlerts * 5)));
+            
             // Risk score: 0-100, higher = more risk
             const riskScore = Math.min(100, (highAlerts * 25) + (medAlerts * 10) + (activeAlerts * 3));
             const riskColor = riskScore >= 60 ? '#ef4444' : riskScore >= 30 ? '#f59e0b' : '#10b981';
             const riskLabel = riskScore >= 60 ? 'High Risk' : riskScore >= 30 ? 'Medium' : 'Low Risk';
+            
             return {
                 ...t, highAlerts, medAlerts, activeAlerts, totalAlerts: tAlerts.length,
                 totalReports, healthScore, riskScore, riskColor, riskLabel,
@@ -360,9 +366,26 @@ const MultiTenantDashboard = () => {
             if (t.healthScore < 40) result.push({ type: 'warning', icon: Heart, color: '#f59e0b', message: `${t.displayName} health score is critically low (${t.healthScore}/100)`, tenant: t });
             if (t.totalReports === 0) result.push({ type: 'info', icon: Activity, color: '#3b82f6', message: `${t.displayName} has no recent activity or reports`, tenant: t });
         });
+
+        // Global MFA Insight
+        if (stats?.mfaTotal > 0) {
+            const mfaPct = Math.round((stats.mfaRegistered / stats.mfaTotal) * 100);
+            if (mfaPct < 80) {
+                result.unshift({ type: 'security', icon: Shield, color: '#ef4444', message: `Global MFA coverage is low (${mfaPct}%). Total ${stats.mfaTotal - stats.mfaRegistered} users are not secured.` });
+            }
+        }
+
+        // Global Licensing Insight
+        if (stats?.totalLicenses > 0) {
+            const usagePct = Math.round((stats.assignedLicenses / stats.totalLicenses) * 100);
+            if (usagePct > 90) {
+                result.push({ type: 'usage', icon: FileText, color: '#f59e0b', message: `License utilization is high (${usagePct}%). Consider purchasing more seats.` });
+            }
+        }
+
         if (criticalAlerts.length > 5) result.unshift({ type: 'critical', icon: Zap, color: '#ef4444', message: `${criticalAlerts.length} critical alerts across all tenants need resolution` });
-        return result.slice(0, 8);
-    }, [tenantHealthData, criticalAlerts]);
+        return result.slice(0, 10);
+    }, [tenantHealthData, criticalAlerts, stats]);
 
     // Chart data
     const reportsByTypeData = stats?.reportsByType ? Object.entries(stats.reportsByType).map(([type, count]) => ({ name: type.charAt(0).toUpperCase() + type.slice(1), count, fill: TYPE_COLORS[type] || '#64748b' })) : [];
@@ -478,11 +501,11 @@ const MultiTenantDashboard = () => {
                         <div key={i} className="glass-card" style={{ flex: '1 1 140px', height: '80px', opacity: 0.4, minWidth: '140px' }} />
                     )) : (<>
                         <KpiCard icon={Building2} label="Total Tenants" value={tenants.length} color="#3b82f6" sub="registered" />
-                        <KpiCard icon={Bell} label="Total Alerts" value={stats?.totalAlerts || 0} color="#8b5cf6" sub="from all sources" />
+                        <KpiCard icon={Users} label="Total Users" value={stats?.totalUsers || 0} color="#06b6d4" sub="across nodes" />
+                        <KpiCard icon={ShieldCheck} label="MFA Coverage" value={stats?.mfaTotal ? `${Math.round((stats.mfaRegistered / stats.mfaTotal) * 100)}%` : '0%'} color="#10b981" sub={stats?.mfaRegistered > 0 ? `${stats.mfaRegistered}/${stats.mfaTotal} registered` : `Audit Pending (${stats?.mfaTotal || 0} total)`} />
+                        <KpiCard icon={FileText} label="Licenses" value={`${Math.round(((stats?.assignedLicenses || 0) / (stats?.totalLicenses || 1)) * 100)}%`} color="#f59e0b" sub={`${stats?.assignedLicenses || 0}/${stats?.totalLicenses || 0} used`} />
                         <KpiCard icon={ShieldAlert} label="High Severity" value={stats?.highAlerts || 0} color="#ef4444" sub="needs attention" pulse={stats?.highAlerts > 0} />
                         <KpiCard icon={AlertTriangle} label="Tenants at Risk" value={tenantsAtRisk} color="#f59e0b" sub="health < 40%" pulse={tenantsAtRisk > 0} />
-                        <KpiCard icon={FileText} label="Total Reports" value={stats?.totalReports || 0} color="#10b981" sub="across tenants" />
-                        <KpiCard icon={Activity} label="Active Alerts" value={stats?.activeAlerts || 0} color="#06b6d4" sub="unresolved" />
                     </>)}
                 </div>
             </section>
@@ -528,7 +551,7 @@ const MultiTenantDashboard = () => {
                         </div>
                         <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
                             <table className="modern-table" style={{ margin: 0 }}>
-                                <thead><tr><th>Tenant</th><th>Health</th><th>Risk Score</th><th>Status</th><th>High Alerts</th><th>Active</th><th>Reports</th><th>Action</th></tr></thead>
+                                <thead><tr><th>Tenant</th><th>Health</th><th>Risk Score</th><th>Status</th><th>High Alerts</th><th>Active</th><th>Reports</th></tr></thead>
                                 <tbody>
                                     {tenantHealthData.map(t => (
                                         <tr key={t.tenantId} style={{ cursor: 'pointer' }} onClick={() => handleNavigateTenant(t.tenantId)}>
@@ -637,6 +660,28 @@ const MultiTenantDashboard = () => {
                                     ))}
                                 </div>
                             </div>
+                        </div>
+                    )}
+                    {/* License Utilization Cross-Tenant Widget */}
+                    {stats?.licenseStatsByTenant && (
+                        <div className="glass-card" style={{ padding: '20px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                                <ShieldCheck size={14} color="#10b981" /><h3 style={{ fontSize: '13px', fontWeight: 700 }}>License Utilization %</h3>
+                            </div>
+                            <ResponsiveContainer width="100%" height={180}>
+                                <BarChart data={Object.entries(stats.licenseStatsByTenant).map(([tid, data]) => ({
+                                    name: tenants.find(t => t.tenantId === tid)?.displayName || shortTenant(tid),
+                                    utilization: data.total > 0 ? Math.round((data.assigned / data.total) * 100) : 0,
+                                    fill: '#10b981'
+                                }))} barSize={24} layout="vertical">
+                                    <XAxis type="number" domain={[0, 100]} hide />
+                                    <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: 'var(--text-dim)' }} width={80} axisLine={false} tickLine={false} />
+                                    <Tooltip content={<ChartTooltip />} />
+                                    <Bar dataKey="utilization" radius={[0, 4, 4, 0]}>
+                                        {Object.entries(stats.licenseStatsByTenant).map((_, i) => <Cell key={i} fill={PIE_PALETTE[i % PIE_PALETTE.length]} />)}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
                         </div>
                     )}
                 </section>

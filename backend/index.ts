@@ -420,7 +420,7 @@ app.post('/api/data/:filename', async (req, res) => {
                 currentData.sections = body.sections || body.data?.sections || {};
                 currentData.markModified('sections');
             }
-            
+
             currentData.lastUpdated = Date.now();
             await currentData.save();
             console.log(`[SiteData] Saved to MongoDB for tenant: ${tenantId}`);
@@ -544,12 +544,24 @@ function generateAISummary(store: any): string {
  * Returns the list of tenantIds that have a sitedata entry in MongoDB.
  */
 async function getSitedataTenantIds(): Promise<string[]> {
+    const ids = new Set<string>();
     try {
-        const tenants = await SiteData.find().select('tenantId').lean() as any[];
-        return tenants.map((t: any) => t.tenantId);
-    } catch {
-        return [];
-    }
+        if (mongoose.connection.readyState !== 0) {
+            const tenants = await SiteData.find().select('tenantId').lean() as any[];
+            tenants.forEach(t => ids.add(t.tenantId));
+        }
+    } catch {}
+    
+    // Fallback/Supplement from filesystem
+    try {
+        const files = fs.readdirSync(path.join(__dirname, '../data'));
+        files.forEach(f => {
+            const match = f.match(/^sitedata-(.+)\.json$/);
+            if (match) ids.add(match[1]);
+        });
+    } catch {}
+    
+    return Array.from(ids);
 }
 
 /**
@@ -557,11 +569,29 @@ async function getSitedataTenantIds(): Promise<string[]> {
  */
 async function readSitedata(tenantId: string): Promise<any | null> {
     try {
-        const data = await SiteData.findOne({ tenantId }).lean();
-        return data || null;
-    } catch {
-        return null;
-    }
+        // Try DB first
+        if (mongoose.connection.readyState !== 0) {
+            const data = await SiteData.findOne({ tenantId }).lean();
+            if (data) return data;
+        }
+    } catch {}
+
+    // Fallback to Filesystem
+    try {
+        const filePath = path.join(__dirname, `../data/sitedata-${tenantId}.json`);
+        if (fs.existsSync(filePath)) {
+            const content = fs.readFileSync(filePath, 'utf-8');
+            return { tenantId, sections: JSON.parse(content).sections || {} };
+        }
+        // Generic fallback
+        const genericPath = path.join(__dirname, '../data/sitedata.json');
+        if (fs.existsSync(genericPath)) {
+            const content = fs.readFileSync(genericPath, 'utf-8');
+            return { tenantId, sections: JSON.parse(content).sections || {} };
+        }
+    } catch {}
+    
+    return null;
 }
 
 // Human-readable label map for sitedata section keys
@@ -821,21 +851,34 @@ app.get('/api/admin/dashboard-stats', async (req, res) => {
         let allTenantIds: string[] = [];
         try {
             if (mongoose.connection.readyState !== 0) {
-                allTenantIds = await getSitedataTenantIds();
+                const registeredTenants = await Tenant.find({}).select('tenantId').lean() as any[];
+                allTenantIds = registeredTenants.map(t => t.tenantId);
             }
         } catch (dbErr) {
             console.warn('[API] Database error fetching tenant IDs for dashboard-stats.');
         }
+
+        // If no tenants in DB, fallback to what SiteData find thinks (to keep dashboard alive)
+        if (allTenantIds.length === 0) {
+            allTenantIds = await getSitedataTenantIds();
+        }
+
         const targetTenants = tenantId ? [tenantId as string] : allTenantIds;
 
         let totalReports = 0;
         let totalAlerts = 0;
         let activeAlerts = 0;
         let highAlerts = 0;
+        let totalUsers = 0;
+        let totalLicenses = 0;
+        let assignedLicenses = 0;
+        let mfaRegistered = 0;
+        let mfaTotal = 0;
         const affectedTenantSet = new Set<string>();
         const reportsByType: Record<string, number> = {};
         const reportsByTenant: Record<string, number> = {};
         const alertsBySeverity: Record<string, number> = { high: 0, medium: 0, low: 0 };
+        const licenseStatsByTenant: Record<string, any> = {};
 
         for (const tid of targetTenants) {
             const sitedata = await readSitedata(tid);
@@ -861,6 +904,25 @@ app.get('/api/admin/dashboard-stats', async (req, res) => {
                 alertsBySeverity[sev] = (alertsBySeverity[sev] || 0) + 1;
                 if (sev === 'high') highAlerts++;
             });
+
+            // Aggregate metrics from sections
+            const sections = sitedata.sections || {};
+            const overview = sections.overview?.data?.quickStats || {};
+            const birdsEye = sections.birdsEye?.data || {};
+
+            totalUsers += overview.totalUsers || birdsEye.entra?.users || 0;
+            const tLic = (overview.totalLicenses || birdsEye.licenses?.purchased || 0);
+            console.log(`[Stats] Tenant ${tid} - Users: ${overview.totalUsers}/${birdsEye.entra?.users}, Licenses: ${overview.totalLicenses}/${birdsEye.licenses?.purchased} (Using: ${tLic})`);
+            totalLicenses += tLic;
+            assignedLicenses += birdsEye.licenses?.assigned || overview.assignedLicenses || 0;
+            mfaRegistered += overview.mfaRegistered || 0;
+            mfaTotal += overview.mfaTotal || birdsEye.entra?.users || overview.totalUsers || 0;
+
+            licenseStatsByTenant[tid] = {
+                total: overview.totalLicenses || birdsEye.licenses?.purchased || 0,
+                assigned: birdsEye.licenses?.assigned || overview.assignedLicenses || 0,
+                topSkus: birdsEye.licenses?.topSkus || []
+            };
         }
 
         res.json({
@@ -868,10 +930,16 @@ app.get('/api/admin/dashboard-stats', async (req, res) => {
             totalAlerts,
             activeAlerts,
             highAlerts,
+            totalUsers,
+            totalLicenses,
+            assignedLicenses,
+            mfaRegistered,
+            mfaTotal,
             affectedTenants: affectedTenantSet.size,
             reportsByType,
             reportsByTenant,
-            alertsBySeverity
+            alertsBySeverity,
+            licenseStatsByTenant
         });
     } catch (err: any) {
         console.error('[API] /admin/dashboard-stats error:', err);
