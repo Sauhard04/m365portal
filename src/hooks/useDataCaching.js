@@ -44,7 +44,7 @@ export const useDataCaching = (baseCacheKey, fetchFn, options = {}) => {
         setError(null);
 
         try {
-            const freshData = await fetchFn();
+            const freshData = await fetchFn(isManual);
 
             // Avoid race conditions: only update if this is still the latest request
             if (requestId !== fetchRequestRef.current) return;
@@ -64,7 +64,17 @@ export const useDataCaching = (baseCacheKey, fetchFn, options = {}) => {
 
             return freshData;
         } catch (err) {
-            console.error(`[useDataCaching] Error fetching for ${cacheKey}:`, err);
+            const errCode = err?.statusCode || err?.status;
+            if (errCode === 403) {
+                console.warn(`[Portal] 403 Forbidden: ${cacheKey} — check app permissions or licence`);
+            } else if (errCode === 429) {
+                console.warn(`[Portal] 429 Throttled: ${cacheKey} — retry-after respected`);
+            } else if (errCode === 401) {
+                console.warn(`[Portal] 401 Unauthorized: ${cacheKey} — token may have expired`);
+            } else {
+                console.error(`[Portal] Fetch failed: ${cacheKey}`, err?.message || err);
+            }
+            
             if (requestId === fetchRequestRef.current) {
                 setError(err.message || 'Failed to fetch fresh data');
                 // If we have stale data, we keep it but log the error
@@ -83,8 +93,9 @@ export const useDataCaching = (baseCacheKey, fetchFn, options = {}) => {
             setData(cached);
             setLoading(false);
 
-            // Check if expired
+            // Check if expired — re-fetch in background and show refreshing indicator
             if (DataPersistenceService.isExpired(cacheKey, maxAge)) {
+                setRefreshing(true);
                 performFetch(false);
             }
         } else if (enabled) {

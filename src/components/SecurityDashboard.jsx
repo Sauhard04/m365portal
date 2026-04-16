@@ -5,12 +5,12 @@ import { Client } from '@microsoft/microsoft-graph-client';
 import { motion } from 'framer-motion';
 import { securityScopes } from '../authConfig';
 import { SecurityService } from '../services/security/security.service';
-import { DataPersistenceService } from '../services/dataPersistence';
 import AnimatedTile from './AnimatedTile';
 import Loader3D from './Loader3D';
 import { useDataCaching } from '../hooks/useDataCaching';
 import { useToken } from '../hooks/useToken';
 import { useActiveTenant } from '../hooks/useActiveTenant';
+import { useTenantCapabilities } from '../hooks/useTenantCapabilities';
 import {
     Shield, AlertTriangle, AlertOctagon, UserX, Activity, Lock,
     TrendingUp, RefreshCw, ChevronRight, Eye, FileWarning, Target
@@ -26,11 +26,12 @@ const SecurityDashboard = () => {
     const { instance, accounts } = useMsal();
     const { getAccessToken: acquireToken } = useToken();
     const activeTenantId = useActiveTenant();
+    const { hasP2 } = useTenantCapabilities();
 
-    const fetchFn = async () => {
+    const fetchFn = async (isManual = false) => {
         const accessToken = await acquireToken({
             ...securityScopes
-        });
+        }, isManual);
 
         const client = Client.init({
             authProvider: (done) => done(null, accessToken)
@@ -56,7 +57,11 @@ const SecurityDashboard = () => {
     const [interactionError, setInteractionError] = useState(false);
 
     useEffect(() => {
-        if (fetchError && (fetchError.includes('InteractionRequiredAuthError') || fetchError.includes('interaction_required'))) {
+        if (fetchError && (
+            fetchError.includes('InteractionRequiredAuthError') ||
+            fetchError.includes('interaction_required') ||
+            fetchError === 'SESSION_EXPIRED'
+        )) {
             setInteractionError(true);
         }
     }, [fetchError]);
@@ -64,11 +69,15 @@ const SecurityDashboard = () => {
     const safeData = dashboardData || {
         alerts: { total: 0, highSeverity: 0, mediumSeverity: 0, lowSeverity: 0 },
         incidents: { total: 0, active: 0, resolved: 0 },
-        secureScore: { current: 0, max: 100, percentage: 0 },
+        secureScore: { current: 0, max: 0, percentage: null },
         riskyUsers: { total: 0, high: 0, medium: 0, low: 0 },
         riskDetections: { total: 0, recent: [] },
-        mfa: { registered: 0, total: 0, coverage: 0 }
+        mfa: { registered: 0, total: 0, coverage: 0 },
+        dataAvailability: { alerts: 'empty', incidents: 'empty', riskyUsers: 'empty', riskDetections: 'empty' }
     };
+
+    // Determine if Identity Protection data is inaccessible (no P2 or explicit 403)
+    const ipForbidden = !hasP2 || safeData.dataAvailability?.riskyUsers === 'forbidden';
 
     const CustomTooltip = ({ active, payload }) => {
         if (active && payload && payload.length) {
@@ -161,9 +170,13 @@ const SecurityDashboard = () => {
                             <Target size={16} style={{ color: '#22c55e' }} />
                             Secure Score
                         </div>
-                        <div className={styles.statValue} style={{ color: '#22c55e' }}>{safeData.secureScore.percentage}%</div>
+                        <div className={styles.statValue} style={{ color: '#22c55e' }}>
+                            {safeData.secureScore.percentage !== null ? `${safeData.secureScore.percentage}%` : '—'}
+                        </div>
                         <div className={styles.statSubtext} style={{ color: 'var(--text-dim)', fontSize: '0.8125rem' }}>
-                            {safeData.secureScore.current}/{safeData.secureScore.max} points
+                            {safeData.secureScore.max > 0
+                                ? `${safeData.secureScore.current}/${safeData.secureScore.max} points`
+                                : 'Score unavailable'}
                         </div>
                     </motion.div>
 
@@ -194,10 +207,19 @@ const SecurityDashboard = () => {
                             <UserX size={16} style={{ color: '#a855f7' }} />
                             Risky Users
                         </div>
-                        <div className={styles.statValue} style={{ color: '#a855f7' }}>{safeData.riskyUsers.total}</div>
-                        <div className={styles.statSubtext} style={{ color: 'var(--text-dim)', fontSize: '0.8125rem' }}>
-                            {safeData.riskyUsers.high} high risk
-                        </div>
+                        {ipForbidden ? (
+                            <>
+                                <div className={styles.statValue} style={{ color: 'var(--text-dim)', fontSize: '1.4rem' }} title="Azure AD P2 licence required for Identity Protection data">N/A</div>
+                                <div className={styles.statSubtext} style={{ color: 'var(--text-dim)', fontSize: '0.75rem' }}>⚠ Requires Azure AD P2</div>
+                            </>
+                        ) : (
+                            <>
+                                <div className={styles.statValue} style={{ color: '#a855f7' }}>{safeData.riskyUsers.total}</div>
+                                <div className={styles.statSubtext} style={{ color: 'var(--text-dim)', fontSize: '0.8125rem' }}>
+                                    {safeData.riskyUsers.high} high risk
+                                </div>
+                            </>
+                        )}
                     </motion.div>
 
                     <motion.div whileHover={{ y: -5, scale: 1.02 }} className={styles.statCard} onClick={() => navigate('/service/security/defender-portal')} style={{ cursor: 'pointer', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1))', border: '1px solid rgba(99, 102, 241, 0.3)' }}>
@@ -326,7 +348,7 @@ const SecurityDashboard = () => {
                     </div>
                 </div>
             </div>
-            <style jsx="true">{`
+            <style>{`
                 .spinning {
                     animation: spin 1s linear infinite;
                 }

@@ -15,6 +15,7 @@ import {
 } from 'recharts';
 import { useToken } from '../hooks/useToken';
 import { useActiveTenant } from '../hooks/useActiveTenant';
+import DateRangePicker from './DateRangePicker';
 
 const UserActivityReport = () => {
     const navigate = useNavigate();
@@ -34,6 +35,20 @@ const UserActivityReport = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [userSignIns, setUserSignIns] = useState([]);
     const [loadingSignIns, setLoadingSignIns] = useState(false);
+    const [period, setPeriod] = useState('D7');
+    const [dateRange, setDateRange] = useState({
+        fromDate: (() => { const d = new Date(); d.setDate(d.getDate() - 7); return d.toISOString().split('T')[0]; })(),
+        toDate: new Date().toISOString().split('T')[0],
+    });
+    const [resolvedPeriodLabel, setResolvedPeriodLabel] = useState('Last 7 Days');
+
+    const handleDateChange = ({ fromDate, toDate, period: newPeriod }) => {
+        const resolved = newPeriod || 'D7';
+        setPeriod(resolved);
+        setDateRange({ fromDate, toDate });
+        const labels = { D7: 'Last 7 Days', D30: 'Last 30 Days', D90: 'Last 90 Days', D180: 'Last 180 Days' };
+        setResolvedPeriodLabel(labels[resolved] || resolved);
+    };
 
     const fetchActivityData = async (isManual = false) => {
         if (isManual) setRefreshing(true);
@@ -47,8 +62,8 @@ const UserActivityReport = () => {
             const usageService = new UsageService(tokenResponse.accessToken);
             // Fetch multiple data points in parallel
             const [data, trend] = await Promise.all([
-                usageService.getOffice365ActiveUserDetail('D7'),
-                usageService.getOffice365ActiveUserCounts('D30')
+                usageService.getOffice365ActiveUserDetail(period),
+                usageService.getOffice365ActiveUserCounts(period === 'D7' ? 'D30' : period)
             ]);
 
             if (data) {
@@ -121,7 +136,7 @@ const UserActivityReport = () => {
 
     useEffect(() => {
         fetchActivityData();
-    }, [activeTenantId]);
+    }, [activeTenantId, period]);
 
     useEffect(() => {
         let filtered = [...users];
@@ -310,6 +325,13 @@ const UserActivityReport = () => {
                     </div>
                 </div>
                 <div className="flex-gap-2">
+                    <DateRangePicker
+                        fromDate={dateRange.fromDate}
+                        toDate={dateRange.toDate}
+                        mode="period"
+                        label={resolvedPeriodLabel}
+                        onChange={handleDateChange}
+                    />
                     <button onClick={() => fetchActivityData(true)} disabled={refreshing} className={`sync-btn ${refreshing ? 'spinning' : ''}`} title="Refresh Data">
                         <RefreshCw size={16} />
                     </button>

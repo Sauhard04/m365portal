@@ -11,13 +11,14 @@ import {
 import {
     Users, Mail, Globe, MessageCircle,
     Video, Phone, FileText, Share2,
-    RefreshCw, ChevronDown, ChevronUp, BarChart3,
+    RefreshCw, BarChart3,
     Calendar, Filter, Download, Activity
 } from 'lucide-react';
 import Loader3D from './Loader3D';
 import SiteDataStore from '../services/siteDataStore';
 import { useToken } from '../hooks/useToken';
 import { useActiveTenant } from '../hooks/useActiveTenant';
+import DateRangePicker from './DateRangePicker';
 
 const UsageReports = () => {
     const { accounts } = useMsal();
@@ -27,7 +28,11 @@ const UsageReports = () => {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [period, setPeriod] = useState('D7');
-    const [isPeriodDropdownOpen, setIsPeriodDropdownOpen] = useState(false);
+    const [dateRange, setDateRange] = useState({
+        fromDate: (() => { const d = new Date(); d.setDate(d.getDate() - 7); return d.toISOString().split('T')[0]; })(),
+        toDate: new Date().toISOString().split('T')[0],
+    });
+    const [resolvedPeriodLabel, setResolvedPeriodLabel] = useState('Last 7 Days');
     const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'teams');
     const [data, setData] = useState({
         teams: { detail: [], counts: [] },
@@ -100,6 +105,14 @@ const UsageReports = () => {
                 setRefreshing(false);
             }
         }
+    };
+
+    const handleDateChange = ({ fromDate, toDate, period: newPeriod }) => {
+        const resolvedPeriod = newPeriod || 'D7';
+        setPeriod(resolvedPeriod);
+        setDateRange({ fromDate, toDate });
+        const labels = { D7: 'Last 7 Days', D30: 'Last 30 Days', D90: 'Last 90 Days', D180: 'Last 180 Days' };
+        setResolvedPeriodLabel(labels[resolvedPeriod] || resolvedPeriod);
     };
 
     useEffect(() => {
@@ -507,91 +520,28 @@ const UsageReports = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '13px' }}>Monitor resource consumption across Microsoft 365 services.</p>
                 </div>
                 <div className="flex-gap-3">
-                    <div style={{ position: 'relative' }}>
-                        <button
-                            onClick={() => setIsPeriodDropdownOpen(!isPeriodDropdownOpen)}
-                            className="input flex-center"
-                            style={{
-                                padding: '8px 16px',
-                                fontSize: '12px',
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <DateRangePicker
+                            fromDate={dateRange.fromDate}
+                            toDate={dateRange.toDate}
+                            mode="period"
+                            label={resolvedPeriodLabel}
+                            onChange={handleDateChange}
+                        />
+                        {resolvedPeriodLabel && (
+                            <div style={{
+                                padding: '5px 10px',
+                                background: 'rgba(59,130,246,0.1)',
+                                border: '1px solid rgba(59,130,246,0.2)',
+                                borderRadius: '8px',
+                                fontSize: '11px',
                                 fontWeight: 600,
-                                minWidth: '160px',
-                                cursor: 'pointer',
-                                justifyContent: 'space-between',
-                                display: 'flex',
-                                alignItems: 'center'
-                            }}
-                        >
-                            {period === 'D7'
-                                ? 'Last 7 days'
-                                : period === 'D30'
-                                    ? 'Last 30 days'
-                                    : period === 'D90'
-                                        ? 'Last 90 days'
-                                        : period === 'D180'
-                                            ? 'Last 180 days'
-                                            : 'Last 90 days'}
-
-                            {isPeriodDropdownOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                        </button>
-
-                        <AnimatePresence>
-                            {isPeriodDropdownOpen && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 5 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 5 }}
-                                    className="glass-card"
-                                    style={{
-                                        position: 'absolute',
-                                        top: '100%',
-                                        right: 0,
-                                        marginTop: '4px',
-                                        minWidth: '160px',
-                                        zIndex: 100,
-                                        padding: '4px',
-                                        overflow: 'hidden'
-                                    }}
-                                >
-                                    {[
-                                        { label: 'Last 7 days', value: 'D7' },
-                                        { label: 'Last 30 days', value: 'D30' },
-                                        { label: 'Last 90 days', value: 'D90' },
-                                        { label: 'Last 180 days', value: 'D180' }
-                                    ].map(opt => (
-                                        <div
-                                            key={opt.value}
-                                            onClick={() => { setPeriod(opt.value); setIsPeriodDropdownOpen(false); }}
-                                            style={{
-                                                padding: '8px 12px',
-                                                fontSize: '12px',
-                                                cursor: 'pointer',
-                                                borderRadius: '6px',
-                                                background: period === opt.value ? 'rgba(59, 130, 246, 0.15)' : 'transparent',
-                                                color: period === opt.value ? 'var(--accent-blue)' : 'var(--text-secondary)',
-                                                fontWeight: period === opt.value ? 700 : 500,
-                                                marginBottom: '2px',
-                                                textAlign: 'left'
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                if (period !== opt.value) {
-                                                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                                                    e.currentTarget.style.color = 'var(--text-primary)';
-                                                }
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                if (period !== opt.value) {
-                                                    e.currentTarget.style.background = 'transparent';
-                                                    e.currentTarget.style.color = 'var(--text-secondary)';
-                                                }
-                                            }}
-                                        >
-                                            {opt.label}
-                                        </div>
-                                    ))}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                                color: '#60a5fa',
+                                whiteSpace: 'nowrap',
+                            }}>
+                                {resolvedPeriodLabel}
+                            </div>
+                        )}
                     </div>
                     <button className={`sync-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchData(true)} style={{ marginTop: '2px' }}>
                         <RefreshCw size={14} />

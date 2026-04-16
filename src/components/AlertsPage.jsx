@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    Bell, AlertTriangle, Info, AlertCircle, Filter,
+    AlertTriangle, AlertCircle,
     CheckCircle2, Search, Calendar,
     ShieldAlert, Zap, ArrowLeft, ChevronDown, ChevronRight, RefreshCw
 } from 'lucide-react';

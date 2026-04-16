@@ -27,9 +27,10 @@ export class ISecurityDataSource {
  * Graph Security Data Source
  */
 export class GraphSecurityDataSource extends ISecurityDataSource {
-    constructor() {
+    constructor(graphClient) {
         super('Graph');
-        this.graphService = GraphService;
+        // graphClient: an initialized @microsoft/microsoft-graph-client Client instance
+        this.client = graphClient;
     }
 
     async fetchRawData(tenantId, params) {
@@ -109,9 +110,10 @@ export class GraphSecurityDataSource extends ISecurityDataSource {
  * Defender API Data Source
  */
 export class DefenderAPIDataSource extends ISecurityDataSource {
-    constructor() {
+    constructor(defenderService) {
         super('Defender');
-        this.defenderService = DefenderAPIService;
+        // defenderService: an initialized DefenderAPIService instance
+        this.defenderService = defenderService;
     }
 
     async fetchRawData(tenantId, params) {
@@ -154,9 +156,9 @@ export class DefenderAPIDataSource extends ISecurityDataSource {
  * Advanced Hunting Data Source
  */
 export class AdvancedHuntingDataSource extends ISecurityDataSource {
-    constructor() {
+    constructor(defenderService) {
         super('AdvancedHunting');
-        this.defenderService = DefenderAPIService;
+        this.defenderService = defenderService;
     }
 
     async fetchRawData(tenantId, params) {
@@ -331,7 +333,8 @@ export class SecurityReportAggregator {
     }
 }
 
-// Export singleton instance
-const securityReportAggregator = new SecurityReportAggregator();
-
-export default securityReportAggregator;
+// NOTE: No auto-singleton — instantiate with injected dependencies when needed.
+// Example usage:
+//   import { SecurityReportAggregator } from './securityAggregator.service';
+//   const aggregator = new SecurityReportAggregator();
+//   (Then wire up data sources with proper client instances)

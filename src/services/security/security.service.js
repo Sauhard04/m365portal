@@ -182,13 +182,34 @@ export const SecurityService = {
      */
     async getDashboardSummary(client) {
         try {
+            // Track data availability per endpoint (available / forbidden / empty)
+            const availability = {
+                alerts: 'available',
+                incidents: 'available',
+                riskyUsers: 'available',
+                riskDetections: 'available',
+            };
+
+            const safeGet = async (key, fn) => {
+                try {
+                    const result = await fn();
+                    if (result.length === 0) availability[key] = 'empty';
+                    return result;
+                } catch (err) {
+                    const status = err?.statusCode || err?.status;
+                    availability[key] = status === 403 || status === 401 ? 'forbidden' : 'error';
+                    console.warn(`[SecurityService] ${key} unavailable (${status}):`, err.message);
+                    return [];
+                }
+            };
+
             const [alerts, incidents, secureScores, riskyUsers, riskDetections, authMethods] =
                 await Promise.all([
-                    this.getSecurityAlerts(client, 100),
-                    this.getSecurityIncidents(client, 50),
+                    safeGet('alerts', () => this.getSecurityAlerts(client, 100)),
+                    safeGet('incidents', () => this.getSecurityIncidents(client, 50)),
                     this.getSecureScores(client, 1),
-                    this.getRiskyUsers(client),
-                    this.getRiskDetections(client, 50),
+                    safeGet('riskyUsers', () => this.getRiskyUsers(client)),
+                    safeGet('riskDetections', () => this.getRiskDetections(client, 50)),
                     this.getAuthMethodsRegistration(client)
                 ]);
 
@@ -220,7 +241,7 @@ export const SecurityService = {
                 : 0;
 
             // Get current secure score
-            const currentScore = secureScores[0] || { currentScore: 0, maxScore: 100 };
+            const currentScore = secureScores[0] || { currentScore: 0, maxScore: 0 };
 
             return {
                 alerts: {
@@ -238,10 +259,10 @@ export const SecurityService = {
                 },
                 secureScore: {
                     current: currentScore.currentScore || 0,
-                    max: currentScore.maxScore || 100,
+                    max: currentScore.maxScore || 0,
                     percentage: currentScore.maxScore
                         ? Math.round((currentScore.currentScore / currentScore.maxScore) * 100)
-                        : 0
+                        : null  // null = no data, display as '—' not '0%'
                 },
                 riskyUsers: {
                     total: riskyUsers.length,
@@ -258,17 +279,25 @@ export const SecurityService = {
                     registered: mfaRegistered,
                     total: authMethods.length,
                     coverage: mfaCoverage
-                }
+                },
+                dataAvailability: availability
             };
+
         } catch (error) {
             console.error('Security dashboard summary fetch failed:', error);
             return {
                 alerts: { total: 0, bySeverity: {}, highSeverity: 0, mediumSeverity: 0, lowSeverity: 0 },
                 incidents: { total: 0, byStatus: {}, active: 0, resolved: 0 },
-                secureScore: { current: 0, max: 100, percentage: 0 },
+                secureScore: { current: 0, max: 0, percentage: null },
                 riskyUsers: { total: 0, byLevel: {}, high: 0, medium: 0, low: 0 },
                 riskDetections: { total: 0, recent: [] },
-                mfa: { registered: 0, total: 0, coverage: 0 }
+                mfa: { registered: 0, total: 0, coverage: 0 },
+                dataAvailability: {
+                    alerts: 'error',
+                    incidents: 'error',
+                    riskyUsers: 'error',
+                    riskDetections: 'error'
+                }
             };
         }
     }

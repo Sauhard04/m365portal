@@ -23,11 +23,38 @@ export class GraphService {
     }
 
     /**
+     * Retry wrapper for Graph API calls that may be throttled (HTTP 429).
+     * Reads Retry-After header and waits before retrying, up to maxAttempts times.
+     * @param {Function} fn - Async function to retry
+     * @param {number} maxAttempts - Max number of attempts (default 3)
+     */
+    async withRetry(fn, maxAttempts = 3) {
+        let lastError;
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                return await fn();
+            } catch (err) {
+                lastError = err;
+                const status = err.statusCode || err.status;
+                if (status === 429) {
+                    const retryAfter = parseInt(err.headers?.get?.('Retry-After') || err.responseHeaders?.['retry-after'] || '5', 10);
+                    const waitMs = (retryAfter || attempt * 2) * 1000;
+                    console.warn(`[GraphService] 429 throttled. Waiting ${waitMs / 1000}s before retry ${attempt}/${maxAttempts}...`);
+                    await new Promise(resolve => setTimeout(resolve, waitMs));
+                } else {
+                    throw err; // Non-throttle errors don't retry
+                }
+            }
+        }
+        throw lastError;
+    }
+
+    /**
      * Helper to fetch reports via proxy to avoid CORS
      * @param {string} endpoint - Graph API endpoint (e.g., /reports/...)
      */
     async _fetchReport(endpoint) {
-        try {
+        return this.withRetry(async () => {
             const url = `https://graph.microsoft.com/beta${endpoint}`;
             const resp = await fetch(url, {
                 headers: { "Authorization": `Bearer ${this.accessToken}` },
@@ -35,13 +62,11 @@ export class GraphService {
             });
 
             if (resp.ok) {
-                // If it didn't redirect (unlikely for reports), return json
                 const json = await resp.json();
                 return json.value || [];
             } else if (resp.status === 302 || resp.status === 301) {
                 const location = resp.headers.get("Location");
                 if (location) {
-                    // Use our server proxy to fetch the content
                     const proxyUrl = `/api/proxy/download?url=${encodeURIComponent(location)}`;
                     const dr = await fetch(proxyUrl);
                     if (dr.ok) {
@@ -49,12 +74,19 @@ export class GraphService {
                         return json.value || [];
                     }
                 }
+            } else if (resp.status === 429) {
+                // Synthesize an error with Retry-After for the retry wrapper
+                const retryAfter = resp.headers.get('Retry-After');
+                const err = new Error('Too Many Requests');
+                err.statusCode = 429;
+                err.headers = resp.headers;
+                throw err;
             }
             return [];
-        } catch (e) {
+        }).catch(e => {
             console.warn(`Report fetch failed for ${endpoint}:`, e);
             return [];
-        }
+        });
     }
 
     /**

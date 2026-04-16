@@ -34,12 +34,12 @@ export class AggregationService {
             const totalDevices = devices.value?.length || 0;
             const totalLicenses = licenses.value?.reduce((acc, sku) => acc + (sku.consumedUnits || 0), 0) || 0;
             const currentSecureScore = secureScore.value?.[0]?.currentScore || 0;
-            const maxSecureScore = secureScore.value?.[0]?.maxScore || 100;
+            const maxSecureScore = secureScore.value?.[0]?.maxScore || 0;
 
             // Process MFA & Roles
             const mfaData = mfaStats.value || [];
             const mfaRegistered = mfaData.reduce((acc, curr) => acc + (curr.userRegistrationCount || 0), 0);
-            const mfaTotal = mfaData.reduce((acc, curr) => acc + (curr.totalUserCount || 0), totalUsers); // Fallback to totalUsers
+            const mfaTotal = mfaData.reduce((acc, curr) => acc + (curr.totalUserCount || 0), 0);
 
             const activeRoles = roles.value?.length || 0;
 

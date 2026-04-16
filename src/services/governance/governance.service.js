@@ -5,7 +5,7 @@ export const GovernanceService = {
      * Get Conditional Access policies
      * @param {Client} client - Microsoft Graph client
      */
-    async getConditionalAccessPolicies(client) {
+    async getConditionalAccessPolicies(client, throwOnError = false) {
         try {
             const response = await client.api('/identity/conditionalAccess/policies')
                 .select('id,displayName,state,createdDateTime,modifiedDateTime,conditions,grantControls')
@@ -13,6 +13,7 @@ export const GovernanceService = {
                 .get();
             return response.value || [];
         } catch (error) {
+            if (throwOnError) throw error;
             console.warn('Conditional Access policies fetch failed:', error);
             return [];
         }
@@ -38,7 +39,7 @@ export const GovernanceService = {
      * Get active role assignments
      * @param {Client} client - Microsoft Graph client
      */
-    async getRoleAssignments(client) {
+    async getRoleAssignments(client, throwOnError = false) {
         try {
             const response = await client.api('/roleManagement/directory/roleAssignments')
                 .expand('roleDefinition')
@@ -46,6 +47,7 @@ export const GovernanceService = {
                 .get();
             return response.value || [];
         } catch (error) {
+            if (throwOnError) throw error;
             console.warn('Role assignments fetch failed:', error);
             return [];
         }
@@ -55,7 +57,7 @@ export const GovernanceService = {
      * Get eligible role assignments (PIM)
      * @param {Client} client - Microsoft Graph client
      */
-    async getEligibleRoleAssignments(client) {
+    async getEligibleRoleAssignments(client, throwOnError = false) {
         try {
             const response = await client.api('/roleManagement/directory/roleEligibilitySchedules')
                 .expand('roleDefinition')
@@ -63,6 +65,7 @@ export const GovernanceService = {
                 .get();
             return response.value || [];
         } catch (error) {
+            if (throwOnError) throw error;
             console.warn('Eligible role assignments fetch failed:', error);
             return [];
         }
@@ -89,7 +92,7 @@ export const GovernanceService = {
      * Get access reviews
      * @param {Client} client - Microsoft Graph client
      */
-    async getAccessReviews(client) {
+    async getAccessReviews(client, throwOnError = false) {
         try {
             const response = await client.api('/identityGovernance/accessReviews/definitions')
                 .select('id,displayName,status,createdDateTime,scope')
@@ -97,6 +100,7 @@ export const GovernanceService = {
                 .get();
             return response.value || [];
         } catch (error) {
+            if (throwOnError) throw error;
             console.warn('Access reviews fetch failed:', error);
             return [];
         }
@@ -106,13 +110,14 @@ export const GovernanceService = {
      * Get entitlement management catalogs
      * @param {Client} client - Microsoft Graph client
      */
-    async getEntitlementCatalogs(client) {
+    async getEntitlementCatalogs(client, throwOnError = false) {
         try {
             const response = await client.api('/identityGovernance/entitlementManagement/catalogs')
                 .select('id,displayName,description,createdDateTime,state')
                 .get();
             return response.value || [];
         } catch (error) {
+            if (throwOnError) throw error;
             console.warn('Entitlement catalogs fetch failed:', error);
             return [];
         }
@@ -142,6 +147,8 @@ export const GovernanceService = {
     async getMfaRegistrationStatus(client) {
         try {
             const response = await client.api('/reports/authenticationMethods/userRegistrationDetails')
+                .version('beta')
+                .top(999)
                 .get();
             return response.value || [];
         } catch (error) {
@@ -189,6 +196,27 @@ export const GovernanceService = {
      */
     async getDashboardSummary(client) {
         try {
+            const availability = {
+                conditionalAccess: 'available',
+                roles: 'available',
+                pim: 'available',
+                accessReviews: 'available',
+                entitlementManagement: 'available'
+            };
+
+            const safeGet = async (key, fn) => {
+                try {
+                    const result = await fn();
+                    if (result.length === 0) availability[key] = 'empty';
+                    return result;
+                } catch (err) {
+                    const status = err?.statusCode || err?.status;
+                    availability[key] = status === 403 || status === 401 ? 'forbidden' : 'error';
+                    console.warn(`[GovernanceService] ${key} unavailable (${status}):`, err.message);
+                    return [];
+                }
+            };
+
             const [
                 caPolicies,
                 roleDefinitions,
@@ -200,12 +228,12 @@ export const GovernanceService = {
                 agreements,
                 auditLogs
             ] = await Promise.all([
-                this.getConditionalAccessPolicies(client),
+                safeGet('conditionalAccess', () => this.getConditionalAccessPolicies(client, true)),
                 this.getRoleDefinitions(client),
-                this.getRoleAssignments(client),
-                this.getEligibleRoleAssignments(client),
-                this.getAccessReviews(client),
-                this.getEntitlementCatalogs(client),
+                safeGet('roles', () => this.getRoleAssignments(client, true)),
+                safeGet('pim', () => this.getEligibleRoleAssignments(client, true)),
+                safeGet('accessReviews', () => this.getAccessReviews(client, true)),
+                safeGet('entitlementManagement', () => this.getEntitlementCatalogs(client, true)),
                 this.getMfaRegistrationStatus(client),
                 this.getAgreements(client),
                 this.getGovernanceAuditLogs(client)
@@ -277,15 +305,25 @@ export const GovernanceService = {
                     actor: log.initiatedBy?.user?.userPrincipalName || log.initiatedBy?.app?.displayName || 'System',
                     timestamp: log.activityDateTime,
                     result: log.result
-                }))
+                })),
+                dataAvailability: availability
             };
         } catch (error) {
             console.error('Governance dashboard summary fetch failed:', error);
             return {
-                conditionalAccess: { total: 0, byState: {}, enabled: 0, disabled: 0, policies: [] },
+                conditionalAccess: { total: 0, byState: {}, enabled: 0, enabledForReportingButNotEnforced: 0, disabled: 0, policies: [] },
                 roles: { definitions: 0, assignments: 0, eligibleAssignments: 0, privilegedAssignments: 0 },
                 accessReviews: { total: 0, active: 0, reviews: [] },
-                entitlementManagement: { catalogs: 0, catalogs: [] }
+                entitlementManagement: { catalogs: 0, catalogsList: [] },
+                mfa: { totalUsers: 0, capable: 0, mfaRegistered: 0, ssprRegistered: 0 },
+                compliance: { agreements: 0, agreementsList: [] },
+                audit: [],
+                dataAvailability: {
+                    conditionalAccess: 'error',
+                    roles: 'error',
+                    accessReviews: 'error',
+                    entitlementManagement: 'error'
+                }
             };
         }
     }

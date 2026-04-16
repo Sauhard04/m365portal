@@ -86,6 +86,20 @@ import TenantManagement from './components/TenantManagement';
 import MultiTenantDashboard from './components/MultiTenantDashboard';
 
 function App() {
+  // If this window was opened by MSAL as a popup, render a lightweight blank screen
+  // to prevent loading the heavy portal UI inside the authentication popup.
+  if (window.opener && window.name && window.name.includes('msal.')) {
+      return (
+          <div style={{ background: '#0f172a', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontFamily: 'sans-serif' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+                  <div className="spinner" style={{ width: '32px', height: '32px', border: '3px solid rgba(255,255,255,0.1)', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                  <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                  <span>Authenticating...</span>
+              </div>
+          </div>
+      );
+  }
+
   return (
     <ThemeProvider>
       <SubscriptionProvider>

@@ -5,7 +5,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useMsal } from '@azure/msal-react';
 import { InteractionStatus } from '@azure/msal-browser';
 import {
-    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Bell, Settings as SettingsIcon, BarChart3, Activity, Command, BookOpen, Sun, Moon, User, Shield, Key, FolderOpen, MessageCircle, LifeBuoy, Layers
+    ShieldCheck, Smartphone, Lock, LogOut, LayoutDashboard, Menu, Search, Settings as SettingsIcon, BarChart3, Activity, Command, BookOpen, Sun, Moon, User, Shield, Key, FolderOpen, MessageCircle, LifeBuoy, Layers
 } from 'lucide-react';
 import SearchModal from './SearchModal';
 import Logo from './Logo';
@@ -28,7 +28,6 @@ const ServiceLayout = () => {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
     const [sessionMismatch, setSessionMismatch] = useState(false);
-    const [unresolvedAlertsCount, setUnresolvedAlertsCount] = useState(0);
     const username = localStorage.getItem('m365_user') || 'Admin';
 
     // Initialize user context and guard against tenant mismatch.
@@ -93,36 +92,6 @@ const ServiceLayout = () => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
-    // Fetch unresolved alerts count
-    useEffect(() => {
-        const fetchAlertCount = async () => {
-            try {
-                if (!accounts || accounts.length === 0) return;
-
-                const AlertsService = (await import('../services/alerts/alerts.service')).default;
-                const { Client } = await import('@microsoft/microsoft-graph-client');
-
-                const accessToken = await getAccessToken({
-                    scopes: ['https://graph.microsoft.com/.default']
-                });
-
-                const client = Client.init({
-                    authProvider: (done) => {
-                        done(null, accessToken);
-                    }
-                });
-
-                const alerts = await AlertsService.getAllAlerts(client);
-                const unresolved = alerts.filter(a => a.status === 'unresolved').length;
-                setUnresolvedAlertsCount(unresolved);
-            } catch (error) {
-                console.debug('Could not fetch alert count:', error);
-            }
-        };
-
-        fetchAlertCount();
-
-    }, [instance, accounts, getAccessToken, activeTenantId]);
 
     const handleLogout = async () => {
         try {
@@ -404,30 +373,6 @@ const ServiceLayout = () => {
                             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                         </button>
 
-                        <button
-                            onClick={() => navigate('/service/admin/alerts')}
-                            style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', position: 'relative' }}
-                        >
-                            <Bell size={18} />
-                            {unresolvedAlertsCount > 0 && (
-                                <span style={{
-                                    position: 'absolute',
-                                    top: '-4px',
-                                    right: '-6px',
-                                    background: 'var(--accent-error)',
-                                    color: 'white',
-                                    borderRadius: '10px',
-                                    padding: '2px 5px',
-                                    fontSize: '9px',
-                                    fontWeight: 700,
-                                    minWidth: '16px',
-                                    textAlign: 'center',
-                                    border: '1.5px solid var(--bg-primary)'
-                                }}>
-                                    {unresolvedAlertsCount > 99 ? '99+' : unresolvedAlertsCount}
-                                </span>
-                            )}
-                        </button>
                         <div style={{ width: '1px', height: '16px', background: 'var(--glass-border)' }}></div>
                         <div style={{ position: 'relative' }}>
                             <button

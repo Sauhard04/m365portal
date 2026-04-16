@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../authConfig';
 import { GraphService } from '../services/graphService';
-import { ArrowLeft, Search, Download, CheckCircle2, XCircle, LogIn, MapPin, Globe, Monitor, Calendar, AlertTriangle, Shield } from 'lucide-react';
+import { ArrowLeft, Search, Download, CheckCircle2, XCircle, LogIn, MapPin, Globe, Monitor, Calendar } from 'lucide-react';
 import Loader3D from './Loader3D';
 import { useToken } from '../hooks/useToken';
 import { useActiveTenant } from '../hooks/useActiveTenant';
+import DateRangePicker from './DateRangePicker';
 
 const EntraSignInLogs = () => {
     const navigate = useNavigate();
@@ -20,27 +21,43 @@ const EntraSignInLogs = () => {
     const [filterStatus, setFilterStatus] = useState('all');
     const [filterApp, setFilterApp] = useState('all');
     const [apps, setApps] = useState([]);
+    // Date range state — defaults to last 7 days
+    const [dateRange, setDateRange] = useState({
+        fromDate: (() => { const d = new Date(); d.setDate(d.getDate() - 7); return d.toISOString().split('T')[0]; })(),
+        toDate: new Date().toISOString().split('T')[0],
+    });
+
+    const handleDateChange = ({ fromDate, toDate }) => {
+        setDateRange({ fromDate, toDate });
+    };
 
     useEffect(() => {
         fetchSignInLogs();
-    }, [activeTenantId]);
+    }, [activeTenantId, dateRange]);
 
-    const fetchSignInLogs = async () => {
+    const fetchSignInLogs = async (isManual = false) => {
         if (accounts.length === 0) return;
 
         setLoading(true);
         setError(null);
+        setSignIns([]);
+        setApps([]);
 
         try {
             const accessToken = await acquireToken({
                 ...loginRequest
-            });
+            }, isManual);
             const client = new GraphService(accessToken).client;
+
+            // Build the date-range filter for the API
+            const fromISO = `${dateRange.fromDate}T00:00:00Z`;
+            const toISO = `${dateRange.toDate}T23:59:59Z`;
 
             // Fetch sign-in logs
             const signInsResponse = await client.api('/auditLogs/signIns')
                 .select('id,userDisplayName,userPrincipalName,createdDateTime,status,ipAddress,location,clientAppUsed,appDisplayName,deviceDetail,riskState,conditionalAccessStatus')
-                .top(200)
+                .filter(`createdDateTime ge ${fromISO} and createdDateTime le ${toISO}`)
+                .top(500)
                 .orderby('createdDateTime desc')
                 .get();
 
@@ -70,19 +87,6 @@ const EntraSignInLogs = () => {
         return { text: 'Failed', class: 'badge badge-error' };
     };
 
-    const getRiskBadge = (riskState) => {
-        switch (riskState?.toLowerCase()) {
-            case 'atrisk':
-                return { text: 'At Risk', class: 'badge badge-error' };
-            case 'confirmedcompromised':
-                return { text: 'Compromised', class: 'badge badge-error' };
-            case 'dismissedsafe':
-            case 'none':
-                return { text: 'None', class: 'badge' };
-            default:
-                return { text: riskState || 'None', class: 'badge' };
-        }
-    };
 
     const formatDateTime = (dateStr) => {
         if (!dateStr) return 'N/A';
@@ -200,15 +204,17 @@ const EntraSignInLogs = () => {
                 Back to Dashboard
             </button>
 
-            <header className="flex-between spacing-v-8">
-                <div>
-                    <h1 className="title-gradient" style={{ fontSize: '32px' }}>Sign-In Logs</h1>
-                    <p style={{ color: 'var(--text-dim)', fontSize: '14px' }}>User authentication activity and security events</p>
+            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', flexWrap: 'wrap', marginBottom: 'var(--spacing-v-8, 24px)' }}>
+                <div style={{ minWidth: 0, flex: '1 1 auto' }}>
+                    <h1 className="title-gradient" style={{ fontSize: '32px', margin: 0 }}>Sign-In Logs</h1>
+                    <p style={{ color: 'var(--text-dim)', fontSize: '14px', margin: '4px 0 0 0' }}>User authentication activity and security events</p>
                 </div>
-                <button className="btn btn-primary" onClick={handleDownloadCSV} disabled={filteredSignIns.length === 0}>
-                    <Download size={16} />
-                    Export Logs
-                </button>
+                <div style={{ flex: '0 0 auto' }}>
+                    <button className="btn btn-primary" onClick={handleDownloadCSV} disabled={filteredSignIns.length === 0}>
+                        <Download size={16} />
+                        Export Logs
+                    </button>
+                </div>
             </header>
 
             {/* Stats Cards */}
@@ -232,9 +238,10 @@ const EntraSignInLogs = () => {
             </div>
 
             {/* Filters */}
-            <div className="glass-card" style={{ marginBottom: '24px', padding: '20px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                    <div className="search-wrapper">
+            <div className="glass-card" style={{ marginBottom: '24px', padding: '16px 20px' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
+                    {/* Search — grows to fill available space */}
+                    <div className="search-wrapper" style={{ flex: '1 1 220px', minWidth: '180px' }}>
                         <input
                             type="text"
                             className="input search-input"
@@ -244,23 +251,37 @@ const EntraSignInLogs = () => {
                         />
                         <Search size={18} className="search-icon" />
                     </div>
-                    <select className="input" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+                    {/* Status dropdown */}
+                    <select className="input" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
+                        style={{ flex: '0 0 140px' }}>
                         <option value="all">All Status</option>
                         <option value="success">Success Only</option>
                         <option value="failed">Failed Only</option>
                     </select>
-                    <select className="input" value={filterApp} onChange={(e) => setFilterApp(e.target.value)}>
+                    {/* App dropdown */}
+                    <select className="input" value={filterApp} onChange={(e) => setFilterApp(e.target.value)}
+                        style={{ flex: '0 0 180px' }}>
                         <option value="all">All Applications</option>
                         {apps.map((app, i) => (
                             <option key={i} value={app}>{app}</option>
                         ))}
                     </select>
+                    {/* Date range picker — always visible at end */}
+                    <div style={{ flex: '0 0 auto' }}>
+                        <DateRangePicker
+                            fromDate={dateRange.fromDate}
+                            toDate={dateRange.toDate}
+                            mode="exact"
+                            label="Date Range"
+                            onChange={handleDateChange}
+                        />
+                    </div>
                 </div>
             </div>
 
             {/* Sign-in logs table */}
             <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
-                <div className="table-container">
+                <div style={{ overflowX: 'auto', width: '100%' }}>
                     <table className="modern-table">
                         <thead>
                             <tr>
@@ -271,13 +292,11 @@ const EntraSignInLogs = () => {
                                 <th>Location</th>
                                 <th>IP Address</th>
                                 <th>Client</th>
-                                <th>Risk</th>
                             </tr>
                         </thead>
                         <tbody>
                             {filteredSignIns.length > 0 ? filteredSignIns.map((signIn, i) => {
                                 const statusBadge = getStatusBadge(signIn.status);
-                                const riskBadge = getRiskBadge(signIn.riskState);
 
                                 return (
                                     <tr key={i}>
@@ -324,17 +343,11 @@ const EntraSignInLogs = () => {
                                                 {signIn.clientAppUsed || 'N/A'}
                                             </div>
                                         </td>
-                                        <td>
-                                            <span className={riskBadge.class} style={{ fontSize: '11px' }}>
-                                                {riskBadge.text !== 'None' && <AlertTriangle size={10} style={{ marginRight: '4px' }} />}
-                                                {riskBadge.text}
-                                            </span>
-                                        </td>
                                     </tr>
                                 );
                             }) : (
                                 <tr>
-                                    <td colSpan="8" style={{ textAlign: 'center', padding: '80px', color: 'var(--text-dim)' }}>
+                                    <td colSpan="7" style={{ textAlign: 'center', padding: '80px', color: 'var(--text-dim)' }}>
                                         <LogIn size={48} style={{ marginBottom: '16px', opacity: 0.2 }} />
                                         <p>No sign-in logs found matching your filters.</p>
                                     </td>

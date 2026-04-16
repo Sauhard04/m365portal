@@ -95,7 +95,6 @@ const PurviewDashboard = () => {
             color: 'var(--accent-blue)',
             path: '/service/purview/catalog',
             icon: Database,
-            sparkline: true
         },
         {
             label: 'Asset Types',
@@ -123,18 +122,17 @@ const PurviewDashboard = () => {
             value: stats.classifications,
             subtitle: 'Sensitivity labels',
             color: 'var(--accent-warning)',
-            path: '/service/purview/classifications',
+            path: '/service/purview/catalog',
             icon: Tags,
-            sparkline: true
         },
         {
             label: 'Business Glossary',
-            value: stats.glossaryTermsCount,
+            value: stats.glossaryTerms,
             subtitle: `${stats.glossaryCategories} categories`,
             color: 'var(--accent-indigo)',
             path: '/service/purview/glossary',
             icon: BookOpen,
-            progress: Math.min(100, (stats.glossaryTermsCount / 500) * 100)
+            progress: Math.min(100, (stats.glossaryTerms / 500) * 100)
         },
         {
             label: 'Data Sources',
@@ -164,14 +162,13 @@ const PurviewDashboard = () => {
             color: 'var(--accent-error)',
             path: '/service/purview/policies',
             icon: FileKey,
-            sparkline: true
         },
         {
             label: 'Data Insights',
             value: stats.sensitiveAssets || 0,
             subtitle: 'Sensitive assets',
             color: 'var(--accent-pink)',
-            path: '/service/purview/insights',
+            path: '/service/purview/catalog',
             icon: BarChart3,
             severity: 'medium'
         }

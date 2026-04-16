@@ -19,7 +19,7 @@ export const getMsalConfig = () => {
             clientId,
             authority,
             redirectUri: window.location.origin,
-            navigateToLoginRequestUrl: false,
+            navigateToLoginRequestUrl: true,
             loggerOptions: {
                 loggerCallback: (level, message, containsPii) => {
                     if (containsPii) return;
@@ -103,7 +103,7 @@ export const governanceScopes = {
         "Policy.Read.All",
         "Agreement.Read.All",
         "Directory.Read.All",
-        "AppRoleAssignment.ReadWrite.All",
+        "AppRoleAssignment.Read.All",
         "AuditLog.Read.All",
         "UserAuthenticationMethod.Read.All"
     ]
@@ -136,7 +136,6 @@ export const teamsScopes = {
         "Team.ReadBasic.All",
         "TeamSettings.Read.All",
         "Group.Read.All",
-        "Chat.Read",
         "Reports.Read.All"
     ]
 };

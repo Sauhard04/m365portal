@@ -7,6 +7,7 @@ import Loader3D from './Loader3D';
 import SiteDataStore from '../services/siteDataStore';
 import { useToken } from '../hooks/useToken';
 import { useActiveTenant } from '../hooks/useActiveTenant';
+import DateRangePicker from './DateRangePicker';
 
 const EmailActivityPage = () => {
     const navigate = useNavigate();
@@ -16,6 +17,20 @@ const EmailActivityPage = () => {
     const [activity, setActivity] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [period, setPeriod] = useState('D7');
+    const [dateRange, setDateRange] = useState({
+        fromDate: (() => { const d = new Date(); d.setDate(d.getDate() - 7); return d.toISOString().split('T')[0]; })(),
+        toDate: new Date().toISOString().split('T')[0],
+    });
+    const [resolvedPeriodLabel, setResolvedPeriodLabel] = useState('Last 7 Days');
+
+    const handleDateChange = ({ fromDate, toDate, period: newPeriod }) => {
+        const resolved = newPeriod || 'D7';
+        setPeriod(resolved);
+        setDateRange({ fromDate, toDate });
+        const labels = { D7: 'Last 7 Days', D30: 'Last 30 Days', D90: 'Last 90 Days', D180: 'Last 180 Days' };
+        setResolvedPeriodLabel(labels[resolved] || resolved);
+    };
 
     useEffect(() => {
         const fetchActivityData = async () => {
@@ -27,7 +42,7 @@ const EmailActivityPage = () => {
                     scopes: ["Reports.Read.All"]
                 });
                 const service = new UsageService(accessToken);
-                const result = await service.getExchangeUsage('D7');
+                const result = await service.getExchangeUsage(period);
 
                 if (result && result.detail && result.detail.length > 0) {
                     setActivity(result.detail);
@@ -36,9 +51,9 @@ const EmailActivityPage = () => {
                         counts: result.counts,
                         lastSent: result.detail.reduce((acc, curr) => acc + (Number(curr.sendCount) || 0), 0),
                         lastReceived: result.detail.reduce((acc, curr) => acc + (Number(curr.receiveCount) || 0), 0)
-                    }, { source: 'EmailActivityPage', period: 'D7' });
+                    }, { source: 'EmailActivityPage', period });
                 } else {
-                    setError("No detailed email activity record found for this period.");
+                    setError(`No detailed email activity record found for this period.`);
                     setActivity([]);
                 }
             } catch (err) {
@@ -50,7 +65,7 @@ const EmailActivityPage = () => {
             }
         };
         fetchActivityData();
-    }, [activeTenantId]);
+    }, [activeTenantId, period]);
 
     const stats = {
         sent: activity.reduce((acc, curr) => acc + (Number(curr.sendCount) || 0), 0),
@@ -95,15 +110,24 @@ const EmailActivityPage = () => {
                     <h1 className="title-gradient" style={{ margin: 0, fontSize: '28px' }}>Email Flow Analytics</h1>
                     <p style={{ color: 'var(--text-dim)', margin: '4px 0 0 0' }}>Live communication telemetry from Microsoft Graph</p>
                 </div>
-                <button
-                    onClick={downloadCsv}
-                    disabled={activity.length === 0}
-                    className="btn btn-primary"
-                    style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-                >
-                    <Download size={16} />
-                    Export Report
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <DateRangePicker
+                        fromDate={dateRange.fromDate}
+                        toDate={dateRange.toDate}
+                        mode="period"
+                        label={resolvedPeriodLabel}
+                        onChange={handleDateChange}
+                    />
+                    <button
+                        onClick={downloadCsv}
+                        disabled={activity.length === 0}
+                        className="btn btn-primary"
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                    >
+                        <Download size={16} />
+                        Export Report
+                    </button>
+                </div>
             </div>
 
             {error && (

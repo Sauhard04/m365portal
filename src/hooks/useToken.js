@@ -12,7 +12,7 @@ export const useToken = () => {
     const { instance, accounts } = useMsal();
     const activeTenantId = useActiveTenant();
 
-    const getAccessToken = useCallback(async (request) => {
+    const getAccessToken = useCallback(async (request, allowPopup = false) => {
         if (accounts.length === 0) {
             throw new Error('No active account found');
         }
@@ -82,21 +82,14 @@ export const useToken = () => {
                     return finalResponse.accessToken;
                 }
 
-                // WARNING: Browser popup blockers often kill this if triggered inside a useEffect.
-                // We only attempt it as a last resort, but we log clearly if it fails.
-                console.warn('[useToken] Interaction required. Attempting popup fallback...');
-                interactionPromise = instance.acquireTokenPopup(tokenRequest);
-                try {
-                    const popupResponse = await interactionPromise;
-                    return popupResponse.accessToken;
-                } catch (popupError) {
-                    if (popupError.errorCode === 'popup_window_error') {
-                        console.error('[useToken] Popup blocked! User must click an interactive element to re-authenticate.');
-                    }
-                    throw popupError;
-                } finally {
-                    interactionPromise = null;
+                if (!allowPopup) {
+                     console.warn('[useToken] Interaction required but popup not allowed in background fetch. Throwing SESSION_EXPIRED.');
+                     throw new Error('SESSION_EXPIRED');
                 }
+
+                // Automatically navigates the parent window to prevent jarring mini popup windows
+                console.warn('[useToken] Interaction required. Using seamless redirect fallback...');
+                return await instance.acquireTokenRedirect(tokenRequest);
             }
 
             throw error;

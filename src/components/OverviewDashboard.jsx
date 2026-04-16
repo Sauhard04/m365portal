@@ -128,28 +128,10 @@ const OverviewDashboard = () => {
     const { getAccessToken } = useToken();
     const activeTenantId = useActiveTenant();
 
-    const fetchFn = async () => {
-        const accessToken = await getAccessToken(loginRequest);
+    const fetchFn = async (isManual = false) => {
+        const accessToken = await getAccessToken(loginRequest, isManual);
         const graphService = new GraphService(accessToken);
         const overviewData = await AggregationService.getOverviewData(graphService, accessToken);
-
-        // Map to our persistence schema (Legacy support)
-        const persistenceData = {
-            overview: {
-                statistics: {
-                    total_users: overviewData.quickStats.totalUsers,
-                    total_devices: overviewData.quickStats.totalDevices,
-                    total_licenses: overviewData.quickStats.totalLicenses,
-                    secure_score: overviewData.quickStats.secureScore
-                },
-                health_and_security: {
-                    failed_signins: overviewData.charts?.signIns?.[0]?.failed || 0,
-                    compliance_rate: overviewData.charts.securityRadar.find(d => d.subject === 'Compliance')?.value || 0
-                }
-            },
-            raw: overviewData
-        };
-        // L2 cache is handled by the hook for fresh data
         return overviewData;
     };
 
@@ -255,7 +237,8 @@ const OverviewDashboard = () => {
         },
         {
             label: 'Managed Devices',
-            value: data?.quickStats?.totalDevices || 0,
+            sublabel: 'Intune-managed only',
+            value: data?.quickStats?.totalDevices ?? null,
             icon: Smartphone,
             color: 'var(--accent-purple)',
             gradient: 'linear-gradient(135deg, #a855f7, #9333ea)',
@@ -263,7 +246,7 @@ const OverviewDashboard = () => {
         },
         {
             label: 'Active Licenses',
-            value: data?.quickStats?.totalLicenses || 0,
+            value: data?.quickStats?.totalLicenses ?? null,
             icon: CreditCard,
             color: 'var(--accent-cyan)',
             gradient: 'linear-gradient(135deg, #06b6d4, #0891b2)',
@@ -271,7 +254,12 @@ const OverviewDashboard = () => {
         },
         {
             label: 'Secure Score',
-            value: data?.quickStats?.secureScore ? `${Math.round((data.quickStats.secureScore / (data.quickStats.maxSecureScore || 100)) * 100)}%` : '0%',
+            value: (() => {
+                const cur = data?.quickStats?.secureScore;
+                const max = data?.quickStats?.maxSecureScore;
+                if (!max || max === 0) return '\u2014';
+                return `${Math.round((cur / max) * 100)}%`;
+            })(),
             icon: Shield,
             color: 'var(--accent-success)',
             gradient: 'linear-gradient(135deg, #10b981, #059669)',
@@ -279,7 +267,12 @@ const OverviewDashboard = () => {
         },
         {
             label: 'MFA Enrollment',
-            value: data?.quickStats?.mfaRegistered && data?.quickStats?.mfaTotal ? `${Math.round((data.quickStats.mfaRegistered / data.quickStats.mfaTotal) * 100)}%` : '0%',
+            value: (() => {
+                const reg = data?.quickStats?.mfaRegistered;
+                const total = data?.quickStats?.mfaTotal;
+                if (!total || total === 0) return '\u2014';
+                return `${Math.round((reg / total) * 100)}%`;
+            })(),
             icon: Lock,
             color: 'var(--accent-success)',
             gradient: 'linear-gradient(135deg, #059669, #047857)',
@@ -587,13 +580,18 @@ const OverviewDashboard = () => {
                                             <span className="stat-label">{stat.label}</span>
                                             <stat.icon size={14} style={{ color: stat.color }} />
                                         </div>
+                                        {stat.sublabel && (
+                                            <div style={{ fontSize: '10px', color: 'var(--text-dim)', marginBottom: '4px' }}>
+                                                {stat.sublabel}
+                                            </div>
+                                        )}
                                         <div className="stat-value" style={{
                                             background: stat.gradient,
                                             WebkitBackgroundClip: 'text',
                                             WebkitTextFillColor: 'transparent',
                                             fontSize: '22px'
                                         }}>
-                                            {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
+                                            {typeof stat.value === 'number' ? stat.value.toLocaleString() : (stat.value ?? '\u2014')}
                                         </div>
                                         {microFigure}
                                     </motion.div>
