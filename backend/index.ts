@@ -555,8 +555,8 @@ async function getSitedataTenantIds(): Promise<string[]> {
             const tenants = await SiteData.find().select('tenantId').lean() as any[];
             tenants.forEach(t => ids.add(t.tenantId));
         }
-    } catch {}
-    
+    } catch { }
+
     // Fallback/Supplement from filesystem
     try {
         const files = fs.readdirSync(path.join(__dirname, '../data'));
@@ -564,8 +564,8 @@ async function getSitedataTenantIds(): Promise<string[]> {
             const match = f.match(/^sitedata-(.+)\.json$/);
             if (match) ids.add(match[1]);
         });
-    } catch {}
-    
+    } catch { }
+
     return Array.from(ids);
 }
 
@@ -579,7 +579,7 @@ async function readSitedata(tenantId: string): Promise<any | null> {
             const data = await SiteData.findOne({ tenantId }).lean();
             if (data) return data;
         }
-    } catch {}
+    } catch { }
 
     // Fallback to Filesystem
     try {
@@ -594,8 +594,8 @@ async function readSitedata(tenantId: string): Promise<any | null> {
             const content = fs.readFileSync(genericPath, 'utf-8');
             return { tenantId, sections: JSON.parse(content).sections || {} };
         }
-    } catch {}
-    
+    } catch { }
+
     return null;
 }
 
