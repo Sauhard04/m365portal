@@ -304,7 +304,13 @@ const Chatbot = () => {
     };
 
     return (
-        <div className={`chatbot-container ${isOpen ? 'active' : ''}`}>
+        <motion.div 
+            className={`chatbot-container ${isOpen ? 'active' : ''}`}
+            drag
+            dragConstraints={{ left: typeof window !== 'undefined' ? -window.innerWidth + 100 : -1000, right: 0, top: typeof window !== 'undefined' ? -window.innerHeight + 100 : -1000, bottom: 0 }}
+            dragElastic={0.1}
+            dragMomentum={false}
+        >
             {/* Floating Action Button */}
             <motion.button
                 className="chatbot-fab"
@@ -455,7 +461,7 @@ const Chatbot = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
-        </div>
+        </motion.div>
     );
 };
 

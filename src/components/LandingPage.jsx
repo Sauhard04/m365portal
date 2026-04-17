@@ -4,7 +4,7 @@ import { useMsal } from '@azure/msal-react';
 import { InteractionStatus } from '@azure/msal-browser';
 import { loginRequest } from '../authConfig';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Zap, ArrowRight, AlertCircle, Check, Building2, ChevronRight } from 'lucide-react';
+import { Shield, Zap, ArrowRight, AlertCircle, Check, Building2, ChevronRight, X } from 'lucide-react';
 import styles from './LandingPage.module.css';
 import Logo from './Logo';
 import Loader3D from './Loader3D';
@@ -220,6 +220,33 @@ const LandingPage = () => {
           <div style={{ color: '#6b7280', fontSize: 13, marginTop: 6 }}>
             Setting up secure session
           </div>
+          
+          <button
+              onClick={() => {
+                  setLoading(false);
+                  setSwitchingTenant(false);
+                  sessionStorage.removeItem('msal_login_attempt');
+                  RuntimeConfig.clearPendingTenant();
+                  // Force a full location reload to reset MSAL state completely
+                  window.location.reload();
+              }}
+              style={{
+                  marginTop: '28px', padding: '8px 20px', background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.1)', color: '#9ca3af', borderRadius: '20px',
+                  fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
+                  transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={e => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
+                  e.currentTarget.style.color = 'white';
+              }}
+              onMouseLeave={e => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                  e.currentTarget.style.color = '#9ca3af';
+              }}
+          >
+              <X size={14} /> Cancel Connection
+          </button>
         </div>
       )}
 

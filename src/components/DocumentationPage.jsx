@@ -125,21 +125,12 @@ const DocumentationPage = () => {
                             </p>
                         </div>
                         <button
-                            onClick={handleUploadClick}
-                            disabled={uploading}
+                            disabled={true}
                             className="upload-button"
+                            title="Upload is currently disabled"
                         >
-                            {uploading ? (
-                                <>
-                                    <div className="spinner-sm" style={{ border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', width: '14px', height: '14px', borderRadius: '50%' }}></div>
-                                    <span>Uploading...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <Upload size={18} />
-                                    <span>Upload PDF</span>
-                                </>
-                            )}
+                            <Upload size={18} />
+                            <span>Upload PDF</span>
                         </button>
                     </div>
                 </div>
@@ -194,7 +185,7 @@ const DocumentationPage = () => {
                         <p className="doc-content" style={{ maxWidth: '400px', margin: '0 auto 24px' }}>
                             Upload PDF manuals, guides, or reports to make them accessible here.
                         </p>
-                        <button onClick={handleUploadClick} className="secondary-button" style={{ fontSize: '14px', padding: '8px 20px' }}>
+                        <button disabled={true} className="secondary-button" style={{ fontSize: '14px', padding: '8px 20px', opacity: 0.5, cursor: 'not-allowed' }} title="Upload is currently disabled">
                             Upload First Document
                         </button>
                     </div>

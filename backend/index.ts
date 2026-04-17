@@ -59,8 +59,13 @@ app.use(bodyParser.urlencoded({ limit: '500mb', extended: true }));
 // Security Headers Middleware
 app.use((_req, res, next) => {
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-    res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:; connect-src 'self' https://login.microsoftonline.com https://graph.microsoft.com https://api.web3forms.com; frame-src 'self' https://login.microsoftonline.com;");
-    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:; connect-src 'self' https://login.microsoftonline.com https://graph.microsoft.com https://api.web3forms.com https://api.groq.com; frame-src 'self' https://login.microsoftonline.com;");
+    // Allow framing for PDF viewer routes (loaded in iframe), deny for everything else
+    if (_req.path.startsWith('/api/pdfs/view/')) {
+        res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    } else {
+        res.setHeader('X-Frame-Options', 'DENY');
+    }
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');

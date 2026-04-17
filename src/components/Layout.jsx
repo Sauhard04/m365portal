@@ -10,6 +10,7 @@ import {
 import SearchModal from './SearchModal';
 import Logo from './Logo';
 import Chatbot from './Chatbot/Chatbot';
+import Footer from './Footer';
 import SiteDataStore from '../services/siteDataStore';
 import TenantSelector from './TenantSelector';
 import { Building2 } from 'lucide-react';
@@ -445,7 +446,7 @@ const ServiceLayout = () => {
                     </div>
                 </header>
 
-                <div className="main-content">
+                <div className="main-content" style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={location.pathname}
@@ -453,10 +454,12 @@ const ServiceLayout = () => {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
                             transition={{ duration: 0.3 }}
+                            style={{ flex: 1 }}
                         >
                             <Outlet />
                         </motion.div>
                     </AnimatePresence>
+                    <Footer />
                 </div>
             </main>
 

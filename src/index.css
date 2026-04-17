@@ -95,12 +95,9 @@
   --accent-cyan: #06b6d4;
   --accent-pink: #db2777;
 
-  /* Force Header to stay Dark (User Preference) */
-  --header-bg: hsla(220, 25%, 2%, 0.8);
-  /* Same as Dark Mode */
-
-  /* Sidebar stays Dark (User Preference) */
-  --sidebar-bg: hsla(220, 25%, 3%, 0.8);
+  /* Force Header & Sidebar to use static blue in Light Mode */
+  --header-bg: #1e3a8a;
+  --sidebar-bg: #1e3a8a;
   color-scheme: light;
 }
 
@@ -117,41 +114,99 @@
   -webkit-text-fill-color: transparent;
 }
 
-/* Force Light Text in Header AND Sidebar for Light Mode */
+/* Force blue background + white text in Header & Sidebar for Light Mode */
+[data-theme="light"] .sidebar {
+  background: #1e3a8a !important;
+  border-right-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="light"] .header-top {
+  background: #1e3a8a !important;
+  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+
 [data-theme="light"] .header-top,
 [data-theme="light"] .header-top button,
 [data-theme="light"] .header-top span,
 [data-theme="light"] .header-top p,
 [data-theme="light"] .header-top svg,
+[data-theme="light"] .header-top div,
 [data-theme="light"] .sidebar,
 [data-theme="light"] .sidebar .nav-item,
+[data-theme="light"] .sidebar .nav-item span,
 [data-theme="light"] .sidebar svg,
-[data-theme="light"] .sidebar-header {
-  color: white !important;
+[data-theme="light"] .sidebar-header,
+[data-theme="light"] .sidebar-header span {
+  color: rgba(255, 255, 255, 0.9) !important;
   border-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Nav Item Hover State in Light Mode (Keep text white/accent) */
-[data-theme="light"] .nav-item:hover,
+/* Sidebar header bottom border */
+[data-theme="light"] .sidebar-header {
+  border-bottom-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Sidebar dividers */
+[data-theme="light"] .sidebar-nav {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Nav Item Hover State in Light Mode */
+[data-theme="light"] .nav-item:hover {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
 [data-theme="light"] .nav-item.active {
   color: white !important;
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.18) !important;
+  border-left-color: #ffffff !important;
+}
+
+[data-theme="light"] .nav-item.active span,
+[data-theme="light"] .nav-item.active svg {
+  color: #ffffff !important;
 }
 
 /* Force buttons in Sidebar to be white in Light Mode */
 [data-theme="light"] .sidebar .btn-secondary {
   color: white !important;
   border-color: rgba(255, 255, 255, 0.2) !important;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 [data-theme="light"] .sidebar .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
 }
 
 /* Exception for search input inside header if any */
 [data-theme="light"] .header-top input {
   color: white !important;
+}
+
+/* Environment label in sidebar */
+[data-theme="light"] .sidebar div[style*="borderBottom"] {
+  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="light"] .sidebar div[style*="color: #6b7280"] {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Support section at sidebar bottom */
+[data-theme="light"] .sidebar div[style*="borderTop"] {
+  border-top-color: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Header profile divider */
+[data-theme="light"] .header-top div[style*="background: var(--glass-border)"] {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Header user role text */
+[data-theme="light"] .header-top div[style*="color: #9ca3af"] {
+  color: rgba(255, 255, 255, 0.7) !important;
 }
 
 /* Recharts Global Overrides */
@@ -1234,3 +1289,43 @@ select option {
     display: none;
   }
 }
+
+/* ========================================
+   FOOTER STYLES
+   ======================================== */
+
+/* Default (dark mode) footer link & powered text */
+.app-footer .footer-link {
+  color: var(--text-secondary);
+}
+
+.app-footer .footer-link:hover {
+  color: var(--text-primary);
+}
+
+.app-footer .footer-powered {
+  color: var(--accent-blue);
+}
+
+/* Light mode: blue background, white text */
+[data-theme="light"] .app-footer {
+  background: #1e3a8a !important;
+  border-top-color: #1e3a8a !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+[data-theme="light"] .app-footer span {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+[data-theme="light"] .app-footer .footer-powered {
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .app-footer .footer-link {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+[data-theme="light"] .app-footer .footer-link:hover {
+  color: #ffffff !important;
+}
